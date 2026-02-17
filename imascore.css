@@ -1567,6 +1567,14 @@ fieldset.plain {
 fieldset.plain legend {
 	font-weight: normal;
 }
+
+details {
+	border: 1px solid #ccc;
+	padding: 1px 5px;
+}
+details[open] summary {
+	border-bottom: 1px solid #ccc;
+}
 /* override MathJax dark mode colors */
 @media (prefers-color-scheme: dark) {
 	:root {

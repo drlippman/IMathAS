@@ -29,6 +29,9 @@ if (isset($_POST['clearall'])) {
 			$n = array();
 			$n[0] = trim(htmlentities($_POST['segtitle'.$i]));
 			$thistime = timetosec($_POST['segend'.$i]);
+			if (isset($_POST['skipsegment'.$i])) {
+				$thistime *= -1;
+			}
 			$n[1] = $thistime;
 			if (isset($_POST['qn'.$i])) {
 				$n[2] = $_POST['qn'.$i];
@@ -43,7 +46,7 @@ if (isset($_POST['clearall'])) {
 				}
 				$n[5] = trim(htmlentities($_POST['followuptitle'.$i]));
 			}
-			$data[$thistime] = $n;
+			$data[abs($thistime)] = $n;
 		}
 	}
 	ksort($data);
@@ -149,6 +152,7 @@ if ($viddata != '') {
 	$aspectRatio = $vidarpts[0]/$vidarpts[1];
 	$n = count($data);
 	$title = array(); $endtime = array();
+	$skipseg = [];
 	$qn = array();
 	$followuptitle = array();
 	$followupenddtime = array();
@@ -161,8 +165,9 @@ if ($viddata != '') {
 			$finalsegtitle = $data[$i][0];
 			$n--;
 		} else {
-			$endtime[$i] = sectotime($data[$i][1]);
+			$endtime[$i] = sectotime(abs($data[$i][1]));
 		}
+		$skipseg[$i] = ($data[$i][1]<0);
 		if (count($data[$i])>2) {  //is a question segment
 			$qn[$i] = $data[$i][2];
 			if (count($data[$i])>3) { //has followup
@@ -361,8 +366,9 @@ function addsegat(n) {
 	var html = '<label><?php echo _('Segment title:'); ?> <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/></label> ';
 	html += '<label><?php echo _('Ends at:'); ?> <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/></label> ';
 	html += '<input type="button" value="<?php echo _('grab'); ?>" onclick="grabcurvidtime('+curnumseg+',0);"/>';
-	html += ' <a href="#" onclick="return deleteseg(this);">[<?php echo _('Delete');?>]</a>';
-
+	html += ' <a href="#" onclick="return deleteseg(this);">[<?php echo _('Delete');?>]</a> ';
+	html += ' <label><input type=checkbox value=1 name="skipsegment'+curnumseg+'">Skip segment</label>';
+	
 	var newseg = document.createElement("div");
 	newseg.className = "vidsegblock";
 	newseg.innerHTML = html;
@@ -458,7 +464,9 @@ for ($i=0;$i<$n;$i++) {
 		echo '<div class="vidsegblock">';
 		echo '<label>'._('Segment title:').' <input type="text" size="20" name="segtitle'.$i.'" value="' . Sanitize::encodeStringForDisplay($title[$i]) . '"/></label> ';
 		echo '<label>'._('Ends at:').' <input type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="' . Sanitize::encodeStringForDisplay($endtime[$i]) . '"/></label> ';
-		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
+		echo '<input type="button" value="'._('grab').'" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a> ';
+		echo '<label><input type=checkbox value=1 name="skipsegment'.$i.'"'.($skipseg[$i]?' checked':'').'> '._('Skip segment').'</label>';
+		echo '</div>';
 	}
 }
 echo '<div class="insblock" id="insat' . $n . '">';

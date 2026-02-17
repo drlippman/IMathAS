@@ -49,13 +49,16 @@ export default {
       */
       for (let i = 0; i < store.assessInfo.videocues.length; i++) {
         const cuedata = store.assessInfo.videocues[i];
-        out.push({
-          // internallink: '/videocued/' + cuen + '/v',
-          onclick: () => this.$emit('jumpto', i, 'v'),
-          type: 'v',
-          title: cuedata.title,
-          cue: i
-        });
+
+        if (!cuedata.skipseg) {
+          out.push({
+            // internallink: '/videocued/' + cuen + '/v',
+            onclick: () => this.$emit('jumpto', i, 'v'),
+            type: 'v',
+            title: cuedata.title,
+            cue: i
+          });
+        }
         if (cuedata.hasOwnProperty('qn')) {
           out.push({
             // internallink: '/videocued/' + cuen + '/q',

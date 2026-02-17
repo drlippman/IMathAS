@@ -71,36 +71,49 @@ export default {
       if (store.assessInfo.videocues[this.cue].hasOwnProperty('followuptitle')) {
         this.$emit('addfollowup', this.cue);
       }
-      return (this.nextVidType === 'followup' ||
-        store.assessInfo.videocues.hasOwnProperty(this.cue + 1)
+      return (this.nextVidType === 'followup' || 
+        this.nextCueToShow !== false
       );
     },
     nextVidTitle () {
       if (this.nextVidType === 'followup') {
         return store.assessInfo.videocues[this.cue].followuptitle;
       } else {
-        return store.assessInfo.videocues[this.cue + 1].title;
+        return store.assessInfo.videocues[this.nextCueToShow].title;
       }
+    },
+    nextCueToShow () {
+      let nextcue = this.cue + 1;
+      if (!store.assessInfo.videocues.hasOwnProperty(nextcue)) {
+        return false;
+      }
+      while (store.assessInfo.videocues[nextcue].skipseg) {
+        nextcue++;
+        if (!store.assessInfo.videocues.hasOwnProperty(nextcue)) {
+          return false;
+        }
+      }
+      return nextcue;
     },
     showSkip () {
       return (this.status === 'correct' &&
         this.nextVidType === 'followup' &&
-        store.assessInfo.videocues.hasOwnProperty(this.cue + 1)
+        this.nextCueToShow !== false
       );
     },
     skipTitle () {
-      return store.assessInfo.videocues[this.cue + 1].title;
+      return store.assessInfo.videocues[this.nextCueToShow].title;
     }
   },
   methods: {
     skipLink () {
-      this.$emit('jumpto', this.cue + 1, 'v');
+      this.$emit('jumpto', this.nextCueToShow, 'v');
     },
     nextVidLink () {
       if (this.nextVidType === 'followup') {
         this.$emit('jumpto', this.cue, 'f');
       } else {
-        this.$emit('jumpto', this.cue + 1, 'v');
+        this.$emit('jumpto', this.nextCueToShow, 'v');
       }
     },
     startVid () {

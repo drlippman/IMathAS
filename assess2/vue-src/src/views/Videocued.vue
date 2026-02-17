@@ -308,6 +308,10 @@ export default {
           store.errorMsg = null;
         }
         const newCue = store.assessInfo.videocues[newCueNum];
+        if (newCue.skipseg && store.assessInfo.videocues.hasOwnProperty(newCueNum+1)) {
+          this.jumpTo(newCueNum + 1, newToshow, 1);
+          return;
+        }
         let seektime = 0;
         if (newToshow === 'v') {
           if (newCueNum > 0) {
@@ -361,6 +365,10 @@ export default {
     if (store.assessInfo.intro !== '') {
       this.cue = -1;
       this.toshow = 'i';
+    } else {
+      while (store.assessInfo.videocues[this.cue].skipseg) {
+        this.cue++;
+      }
     }
   }
 };
