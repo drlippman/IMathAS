@@ -50,11 +50,11 @@ var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && 
 <link rel="stylesheet" href="<?php echo $staticroot . "/assessment/mathtest.css?ver=040520";?>" type="text/css"/>
 <?php
 
-if (!empty($CFG['GEN']['uselocaljs'])) {
-	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
-} else {
+//if (!empty($CFG['GEN']['uselocaljs'])) {
+//	echo '<script src="'.$staticroot.'/javascript/jquery.min.js"></script>';
+//} else {
 	echo '<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>';	echo '<script>window.jQuery || document.write(\'<script src="'.$staticroot.'/javascript/jquery.min.js"><\/script>\')</script>';
-}
+//}
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';staticroot='$staticroot';</script>";
 
 if (isset($CFG['locale'])) {
@@ -137,11 +137,11 @@ if (!isset($_SESSION['mathdisp'])) {
 		MathJax.Ajax.config.path["Local"] = "'.$staticroot.'/javascript/mathjax";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
-	if (!empty($CFG['GEN']['uselocaljs'])) {
-		echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
-	} else {
+	//if (!empty($CFG['GEN']['uselocaljs'])) {
+	//	echo '<script type="text/javascript" async src="'.$staticroot.'/mathjax/MathJax.js?config=AM_CHTML-full"></script>';
+	//} else {
 		echo '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=AM_CHTML-full"></script>';
-	}
+	//}
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; var mathRenderer = "MathJax"; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>';
 	echo '<style type="text/css">span.MathJax { font-size: 105%;}</style>';
 } else if ($_SESSION['mathdisp']==6) {
