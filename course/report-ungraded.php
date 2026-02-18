@@ -16,7 +16,7 @@ if (isset($_POST['cat'])) {
     //mg: need to decode scoreddata, look for questions with raw = -2 with 
     //    no override and no feedback 
     $qarr = [$cid];
-    $query = 'SELECT ia.id,ia.name,istu.userid,iar.score,iar.lastchange,iar.status,iu.FirstName,iu.LastName,ia.submitby';
+    $query = 'SELECT ia.id,ia.name,istu.userid,iar.score,iar.lastchange,iar.status,iar.status2,iu.FirstName,iu.LastName,ia.submitby,ia.scoresingb';
     if ($feature == 'mg' || $feature == 'work' || $feature == 'qwork') {
         $query .= ',iar.scoreddata';
     }
@@ -57,6 +57,10 @@ if (isset($_POST['cat'])) {
         } else if ($feature == 'work' && ($row['status']&8) == 8) {
             // has feedback somewhere, so doesn't meet the "no feedback" condition
             continue;
+        } else if ($feature == 'manual') {
+            if ($row['scoresingb'] == 'manual' && ($row['status2']&1)==0) {
+                addtolist($row);
+            }
         } else {
             if ($row['lastchange'] > 0) {
                 
@@ -178,6 +182,7 @@ echo ' <li><label><input type=radio name=feature value=nofb />' . _('No feedback
 echo ' <li><label><input type=radio name=feature value=mg />' . _('A manual grade question with a score of 0 and no question-level feedback') . '</label>';
 echo ' <li><label><input type=radio name=feature value=work />' . _('Assessment has work added, but no feedback (assessment or question level)') . '</label>';
 echo ' <li><label><input type=radio name=feature value=qwork />' . _('Question has work added, but no question-level feedback') . '</label>';
+echo ' <li><label><input type=radio name=feature value=manual />' . _('Score not released on a manual-release assessment') . '</label>';
 echo '</ul>';
 echo '<p><button type=button onclick="getresults()">'._('Search').'</button>';
 echo '<span id=spinner style="display:none;"><img alt="" src="../img/updating.gif"/></span></p>';
