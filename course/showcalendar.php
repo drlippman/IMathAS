@@ -75,6 +75,32 @@
 	}
 	</style>
   <script type="text/javascript">
+	var dragState = null; // Tracks current drag operation
+	var ghostEl = null;   // Visual drag ghost element
+	function createGhost(sourceEl, x, y) {
+		var ghost = sourceEl.cloneNode(true);
+		var rect = sourceEl.getBoundingClientRect();
+		ghost.style.cssText = 
+			'position:fixed;' +
+			'left:' + rect.left + 'px;' +
+			'top:' + rect.top + 'px;' +
+			'width:' + rect.width + 'px;' +
+			'opacity:0.7;' +
+			'pointer-events:none;' +
+			'z-index:9999;' +
+			'margin:0;';
+		ghost.classList.add('dragging');
+		document.body.appendChild(ghost);
+		return ghost;
+	}
+
+	function getTdUnderPointer(x, y) {
+		// Temporarily hide ghost so elementFromPoint can see through it
+		if (ghostEl) ghostEl.style.display = 'none';
+		var el = document.elementFromPoint(x, y);
+		if (ghostEl) ghostEl.style.display = '';
+		return el ? $(el).closest("table.cal td") : $();
+	}
 	function initcaldragreorder() {
 		// Set titles
 		$("span.calitem[id^=CD]").attr("title", _("Calendar Event Date"));
@@ -94,113 +120,119 @@
 		$("span.calitem[id^=FP]").attr("title", _("Forum Post By"));
 		$("span.calitem[id^=FR]").attr("title", _("Forum Reply By"));
 
-		// Make calitems draggable with HTML5 API
+		// Make calitems draggable with Pointer Events
 		$("span.calitem").each(function() {
-			this.draggable = true;
-			
-			this.addEventListener('dragstart', function(e) {
-				e.dataTransfer.effectAllowed = 'move';
-				e.dataTransfer.setData('text/html', this.id);
-				
-				// Store original parent
-				var originalParent = $(this).closest("td").attr("id");
+			this.style.touchAction = 'none'; // Prevent scroll hijacking
+			this.style.userSelect = 'none';
+			this.style.cursor = 'grab';
+
+			this.addEventListener('pointerdown', function(e) {
+				e.preventDefault();
+				this.setPointerCapture(e.pointerId);
+
+				const originalParent = $(this).closest("td").attr("id");
 				$(this).data("originalParent", originalParent);
-				
-				// Add dragging class for styling
-				$(this).addClass('dragging');
+
+				dragState = {
+					el: this,
+					id: this.id,
+					originalParent: originalParent,
+					currentTd: null,
+					offsetX: e.clientX - this.getBoundingClientRect().left,
+					offsetY: e.clientY - this.getBoundingClientRect().top,
+				};
+
+				ghostEl = createGhost(this, e.clientX, e.clientY);
 			});
-			
-			this.addEventListener('dragend', function(e) {
-				$(this).removeClass('dragging');
-			});
-		});
 
-
-		// Make table cells droppable
-		$("table.cal td").each(function() {
-			let dragCounter = 0;
-
-			this.addEventListener('dragover', function(e) {
+			this.addEventListener('pointermove', function(e) {
+				if (!dragState) return;
 				e.preventDefault();
-				e.stopPropagation();
 
-				e.dataTransfer.dropEffect = 'move';
-				$(this).addClass('drag-over');
-				return false;
-			});
+				// Move the ghost
+				ghostEl.style.left = (e.clientX - dragState.offsetX) + 'px';
+				ghostEl.style.top  = (e.clientY - dragState.offsetY) + 'px';
 
-			this.addEventListener('dragenter', function(e) {
-				e.preventDefault(); 
-        		e.stopPropagation();
-				dragCounter++;
-				$(this).addClass('drag-over');
-			});
-
-			this.addEventListener('dragleave', function(e) {
-				dragCounter--;
-				if (dragCounter <= 0) {
-					$(this).removeClass('drag-over');
-					dragCounter = 0;
+				// Highlight the td under the pointer
+				var $td = getTdUnderPointer(e.clientX, e.clientY);
+				if (dragState.currentTd && (!$td.length || $td[0] !== dragState.currentTd[0])) {
+					dragState.currentTd.removeClass('drag-over');
+				}
+				if ($td.length) {
+					$td.addClass('drag-over');
+					dragState.currentTd = $td;
+				} else {
+					dragState.currentTd = null;
 				}
 			});
 
-			this.addEventListener('drop', function(e) {
-				e.stopPropagation();
-				e.preventDefault();
+			this.addEventListener('pointerup', function(e) {
+				if (!dragState) return;
 
-				$(this).removeClass('drag-over');
-				dragCounter = 0;
+				// Clean up ghost and highlighting
+				if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+				if (dragState.currentTd) dragState.currentTd.removeClass('drag-over');
 
-				var draggedId = e.dataTransfer.getData('text/html');
-				var dropped = $("#" + draggedId);
-				var droppedOn = $(this);
-				var originalParent = dropped.data("originalParent");
+				var $td = getTdUnderPointer(e.clientX, e.clientY);
+				if ($td.length) {
+					handleDrop($td, dragState.el, dragState.id, dragState.originalParent);
+				}
 
-				// Move the element
-				dropped.detach().appendTo(droppedOn.find("div.center"));
+				dragState = null;
+			});
 
-				// Check if actually moved to a different cell
-				if (droppedOn.attr("id") != originalParent) {
-					$(".calupdatenotice").html('<img src="<?php echo $staticroot;?>/img/updating.gif" alt="Saving"/> ' + _("Saving..."));
-					
-					$.ajax({
-						"url": "savecalendardrag.php",
-						data: {
-							cid: <?php echo $cid;?>,
-							item: draggedId,
-							dest: this.id
-						}
-					}).done(function(msg) {
-						if (msg.res == "error") {
-							console.log("ERROR: " + msg.error);
-							$(".calupdatenotice").html(_("Error saving change"));
-							dropped.detach().appendTo($("#" + originalParent).find("div.center"));
-						} else {
-							$(".calupdatenotice").html("");
-							var daycaldata = caleventsarr[originalParent].data;
-							for (var i = 0; i < daycaldata.length; i++) {
-								if (daycaldata[i].type + daycaldata[i].typeref == draggedId) {
-									var thisrec = daycaldata.splice(i, 1);
-									if (caleventsarr[droppedOn.attr("id")].hasOwnProperty("data")) {
-										caleventsarr[droppedOn.attr("id")].data.push(thisrec[0]);
-									} else {
-										caleventsarr[droppedOn.attr("id")].data = thisrec;
-									}
-									if ($("table.cal td.today").length > 0) {
-										showcalcontents($("table.cal td.today")[0]);
-									}
-									break;
-								}
+			this.addEventListener('pointercancel', function(e) {
+				if (!dragState) return;
+				if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+				if (dragState.currentTd) dragState.currentTd.removeClass('drag-over');
+				dragState = null;
+			});
+		});
+	}
+	function handleDrop(droppedOn, droppedEl, draggedId, originalParent) {
+		var dropped = $(droppedEl);
+
+		// Move the element
+		dropped.detach().appendTo(droppedOn.find("div.center"));
+
+		// Check if actually moved to a different cell
+		if (droppedOn.attr("id") != originalParent) {
+			$(".calupdatenotice").html('<img src="<?php echo $staticroot;?>/img/updating.gif" alt="Saving"/> ' + _("Saving..."));
+
+			$.ajax({
+				"url": "savecalendardrag.php",
+				data: {
+					cid: <?php echo $cid;?>,
+					item: draggedId,
+					dest: droppedOn.attr("id")
+				}
+			}).done(function(msg) {
+				if (msg.res == "error") {
+					console.log("ERROR: " + msg.error);
+					$(".calupdatenotice").html(_("Error saving change"));
+					dropped.detach().appendTo($("#" + originalParent).find("div.center"));
+				} else {
+					$(".calupdatenotice").html("");
+					var daycaldata = caleventsarr[originalParent].data;
+					for (var i = 0; i < daycaldata.length; i++) {
+						if (daycaldata[i].type + daycaldata[i].typeref == draggedId) {
+							var thisrec = daycaldata.splice(i, 1);
+							if (caleventsarr[droppedOn.attr("id")].hasOwnProperty("data")) {
+								caleventsarr[droppedOn.attr("id")].data.push(thisrec[0]);
+							} else {
+								caleventsarr[droppedOn.attr("id")].data = thisrec;
 							}
+							if ($("table.cal td.today").length > 0) {
+								showcalcontents($("table.cal td.today")[0]);
+							}
+							break;
 						}
-					}).fail(function() {
-						dropped.detach().appendTo($("#" + originalParent).find("div.center"));
-					});
+					}
 				}
-
-				return false;
+			}).fail(function() {
+				dropped.detach().appendTo($("#" + originalParent).find("div.center"));
 			});
-		});
+		}
 	}
 
 	$(function() {
