@@ -44,19 +44,24 @@ Options -Indexes
  </FilesMatch>
 </IfModule>
 
-# Annoying vulnerability scans
-RewriteEngine On
-# Deny all files and directories starting with a '.'
-RewriteRule "(^|/)\." - [R=404,L]
-
+# Deny all files starting with a '.' and some others
+<FilesMatch "^\.">
+    deny from all
+</FilesMatch>
 # Deny specific files.
-RewriteRule "composer\.(json|lock)" - [R=404,L]
-RewriteRule "\.(dist|md|log)$" - [R=404,L]
-RewriteRule "phpunit\.xml|codeception\.yml|docker-compose\.yml" - [R=404,L]
+<FilesMatch "^(composer\.(json|lock)|phpunit\.xml|codeception\.yml|docker-compose\.yml)$">
+    deny from all
+</FilesMatch>
+<FilesMatch "\.(dist|md|log)$">
+    deny from all
+</FilesMatch>
 
-# Deny specific dirs.
+RewriteEngine On
+# Deny all directories starting with a '.'
+RewriteRule "(^|/)\." - [R=404,L]
 RewriteRule "(^|/)(config|deploy-scripts|docker)" - [R=404,L]
 
+# Annoying vulnerability scans
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule (.*admin.*) - [R=404,L]
 RewriteRule (.*mysql.*) - [R=404,L]
