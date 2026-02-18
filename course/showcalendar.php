@@ -130,7 +130,7 @@
 				e.preventDefault();
 				this.setPointerCapture(e.pointerId);
 
-				const originalParent = $(this).closest("td").attr("id");
+				var originalParent = $(this).closest("td").attr("id");
 				$(this).data("originalParent", originalParent);
 
 				dragState = {
