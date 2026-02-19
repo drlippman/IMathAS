@@ -131,7 +131,7 @@ function sectotime($t) {
 }
 function timetosec($t) {
 	if (strpos($t,':')===false) {
-		$time = $t;
+		$time = intval($t);
 	} else {
 		$x = explode(':',$t);
 		$time = 60*$x[0] + $x[1];
@@ -165,14 +165,14 @@ if ($viddata != '') {
 			$finalsegtitle = $data[$i][0];
 			$n--;
 		} else {
-			$endtime[$i] = sectotime(abs($data[$i][1]));
+			$endtime[$i] = sectotime(abs(intval($data[$i][1])));
 		}
 		$skipseg[$i] = ($data[$i][1]<0);
 		if (count($data[$i])>2) {  //is a question segment
 			$qn[$i] = $data[$i][2];
 			if (count($data[$i])>3) { //has followup
 				$followuptitle[$i] = $data[$i][5];
-				$followupendtime[$i] = sectotime($data[$i][3]);
+				$followupendtime[$i] = sectotime(intval($data[$i][3]));
 				$showlink[$i] = $data[$i][4];
 				$hasfollowup[$i] = true;
 			} else {
