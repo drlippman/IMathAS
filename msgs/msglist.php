@@ -112,7 +112,7 @@ if (isset($_GET['getstulist'])) {
 			$query .= "AND (imas_tutors.section=:section OR imas_tutors.section='') ";
 		}
 		if (!$isteacher) {
-			$query .= "AND (imas_tutors.nomsg & 1)=0";
+			$query .= "AND (imas_tutors.nomsg & 1)=0 ";
 		}
 		$query .= "ORDER BY imas_users.LastName";
 		$stm = $DBH->prepare($query);
