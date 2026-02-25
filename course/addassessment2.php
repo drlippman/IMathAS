@@ -194,7 +194,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		// Core options
 		if (!empty($_POST['copyfrom'])) { // copy options from another assessment
 			$fields = array('displaymethod','submitby','defregens','defregenpenalty',
-									'keepscore','defattempts','defpenalty','showscores','showans',
+									'keepscore','retakewait','defattempts','defpenalty','showscores','showans',
 									'viewingb','scoresingb','ansingb','gbcategory','caltag','shuffle',
 									'istutorial','noprint','showcat','allowlate','LPcutoff',
 									'timelimit','overtime_grace','overtime_penalty','password',
@@ -253,7 +253,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (isset($_POST['keepscore'])) {
 				$toset['keepscore'] = Sanitize::simpleString($_POST['keepscore']);
 			}
-
+			if ($_POST['subtype'] == 'by_assessment') {
+				$toset['retakewait'] = Sanitize::onlyInt($_POST['retakewait'] ?? 0);
+			} else {
+				$toset['retakewait'] = 0;
+			}
 
 			$toset['defattempts'] = Sanitize::onlyInt($_POST['defattempts']);
 			$defattemptpenalty_aftern = Sanitize::onlyInt($_POST['defattemptpenaltyaftern'] ?? 0);
@@ -687,6 +691,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['defregens'] = isset($CFG['AMS2']['defregens'])?$CFG['AMS2']['defregens']:20;
 					$line['defregenpenalty'] = isset($CFG['AMS2']['defregenpenalty'])?$CFG['AMS2']['defregenpenalty']:0;
 					$line['keepscore'] = isset($CFG['AMS2']['keepscore'])?$CFG['AMS2']['keepscore']:'best';
+					$line['retakewait'] = isset($CFG['AMS2']['retakewait'])?$CFG['AMS2']['retakewait']:0;
 					$line['defattempts'] = isset($CFG['AMS2']['defattempts'])?$CFG['AMS2']['defattempts']:3;
 					$line['defpenalty'] = isset($CFG['AMS']['defpenalty'])?$CFG['AMS']['defpenalty']:0;
 					$line['showscores'] = isset($CFG['AMS2']['showscores'])?$CFG['AMS2']['showscores']:'during';

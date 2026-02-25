@@ -34,6 +34,7 @@ $vueData = array(
 	'defregenpenalty' => $defregenpenalty,
 	'defregenpenaltyaftern' => $defregenpenalty_aftern,
 	'keepscore' => $line['keepscore'],
+	'retakewait' => $line['retakewait'],
 	'defattempts' => $line['defattempts'],
 	'defattemptpenalty' => $defattemptpenalty,
 	'defattemptpenaltyaftern' => $defattemptpenalty_aftern,
@@ -296,6 +297,12 @@ $vueData = array(
 							<option value="last"><?php echo _('Last');?></option>
 							<option value="average"><?php echo _('Average');?></option>
 						</select>
+						<br/>
+						<label>
+							<?php echo _('Require wait between retakes');?>: 
+							<input type=text id="retakewait" name="retakewait" v-model="retakewait" size="5" />
+							<?php echo _('hours'); ?>
+						</label>
 					</span>
 				</span>
 			</span><br class=form />

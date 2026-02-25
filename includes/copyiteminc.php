@@ -239,7 +239,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
 			deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,
 			istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,
 			posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,
-			ansingb,defregens,defregenpenalty,ver,keepscore,overtime_grace,overtime_penalty,
+			ansingb,defregens,defregenpenalty,ver,keepscore,retakewait,overtime_grace,overtime_penalty,
 			showwork,autoexcuse,workcutoff
 			FROM imas_assessments WHERE id=:id";
         $stm = $DBH->prepare($query);
