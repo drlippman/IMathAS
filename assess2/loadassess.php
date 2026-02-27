@@ -71,7 +71,8 @@ $include_from_assess_info = array(
   'can_use_latepass', 'allowed_attempts', 'retake_penalty', 'exceptionpenalty', 'earlybonus',
   'timelimit_multiplier', 'latepasses_avail', 'latepass_extendto', 'keepscore',
   'noprint', 'overtime_penalty', 'overtime_grace', 'reqscorename', 'reqscorevalue', 
-  'attemptext', 'showworktype', 'latepass_enddate', 'latepass_after', 'latepass_reason'
+  'attemptext', 'showworktype', 'latepass_enddate', 'latepass_after', 'latepass_reason',
+  'retakewait'
 );
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -173,6 +174,18 @@ if (!$assessInfoOut['has_active_attempt']) {
     $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) == 0);
   } else {
     $assessInfoOut['can_retake'] = (count($assessInfoOut['prev_attempts']) < $assessInfoOut['allowed_attempts']);
+  }
+}
+
+//get retakewait info
+if ($assessInfoOut['retakewait'] > 0 && 
+  !$assessInfoOut['has_active_attempt'] && 
+  count($assessInfoOut['prev_attempts']) > 0
+) {
+  $retaketime = $assess_record->getNextRetaketime();
+  if ($retaketime > 0) {
+    $assessInfoOut['can_retake'] = false;
+    $assessInfoOut['retake_time'] = $retaketime;
   }
 }
 

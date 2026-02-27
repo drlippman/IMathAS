@@ -4333,6 +4333,27 @@ class AssessRecord
     }
     return true;
   }
+
+  /*
+   * Gets time next retake is allowed. 0 if not applicable
+   */
+  public function getNextRetaketime() {
+    $retakewait = $this->assess_info->getSetting('retakewait');
+    if ($retakewait == 0 ||
+      $this->assess_info->getSetting('submitby') == 'by_question' ||
+      $this->hasUnsubmittedAttempt() ||
+      empty($this->data['assess_versions'])
+    ) {
+      return 0;
+    }
+    $cntatt = count($this->data['assess_versions']);
+    if ($cntatt > 0) {
+      return $this->data['assess_versions'][$cntatt-1]['lastchange'] +
+        $retakewait*60*60;
+    }
+    return 0;
+  }
+
   /**
    * Record a try on a question
    * @param  int $qn      Question number
