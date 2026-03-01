@@ -313,10 +313,12 @@ function normalizemathunicode($str) {
 		array("'", "'", '"', '"', '-', '-', '...'),
 		$str);
 	// Next, replace their Windows-1252 equivalents.
+	/*
+	// Removed because it was breaking some unicode
 	$str = str_replace(
 		array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133)),
 		array("'", "'", '"', '"', '-', '-', '...'),
-		$str);
+		$str);*/
 
     $str = preg_replace('/\b(OO|infty)\b/i','oo', $str);
     $str = str_replace('&ZeroWidthSpace;', '', $str);
