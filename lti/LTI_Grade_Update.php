@@ -23,7 +23,7 @@ if (!defined('TOOL_HOST')) {
 class LTI_Grade_Update {
   private $dbh;
   private $access_tokens = [];
-  private $private_key = '';
+  private $private_key = [];
   private $failures = [];
   private $debug = false;
 
@@ -213,9 +213,12 @@ class LTI_Grade_Update {
    * @param  string $client_id    optional if known - the client_id
    * @param  string $token_server optional if known - the token_server_url
    * @param  string $auth_server  optional if known - the aud for token request
+   * @param  string|null $keyseturl  optional if known - the keyset url
    * @return false|string access token, or false on failure
    */
-  public function get_access_token(int $platform_id, string $client_id='', string $token_server='', string $auth_server='') {
+  public function get_access_token(int $platform_id, string $client_id='', string $token_server='', string $auth_server='',
+                                   ?string $keyseturl = null
+  ) {
     // see if we already have the token in our private variable cache
     if (isset($this->access_tokens[$platform_id]) &&
       $this->access_tokens[$platform_id]['expires'] < time()
@@ -251,7 +254,7 @@ class LTI_Grade_Update {
       list($client_id, $token_server, $auth_server) = $stm->fetch(PDO::FETCH_NUM);
     }
     $this->debuglog('requesting a token from '.$platform_id);
-    $request_post = $this->get_token_request_post($platform_id, $client_id, $token_server, $auth_server);
+    $request_post = $this->get_token_request_post($platform_id, $client_id, $token_server, $auth_server, $keyseturl);
     // Make request to get auth token
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $token_server);
@@ -310,11 +313,16 @@ class LTI_Grade_Update {
    * @param  string $client_id
    * @param  string $token_server
    * @param  string $auth_server
+   * @param  string|null $keyseturl
    * @return string output of http_build_query
    */
   public function get_token_request_post(int $platform_id, string $client_id,
-    string $token_server, string $auth_server
+    string $token_server, string $auth_server, ?string $keyseturl = null
   ): string {
+    if (empty($keyseturl)) {
+        $keyseturl = TOOL_HOST . '/lti/jwks.php';
+    }
+
     // Build up JWT to exchange for an auth token
     $jwt_claim = [
       "iss" => $client_id,
@@ -326,10 +334,10 @@ class LTI_Grade_Update {
     ];
 
     // Get tool private key from our JWKS
-    $private_key = $this->get_tool_private_key();
+    $private_key[$keyseturl] = $this->get_tool_private_key($keyseturl);
 
     // Sign the JWT with our private key (given by the platform on registration)
-    $jwt = JWT::encode($jwt_claim, $private_key['privatekey'], 'RS256', $private_key['kid']);
+    $jwt = JWT::encode($jwt_claim, $private_key[$keyseturl]['privatekey'], 'RS256', $private_key[$keyseturl]['kid']);
 
     // Build auth token request headers
     $auth_request = [
@@ -394,14 +402,15 @@ class LTI_Grade_Update {
 
   /**
    * Get tool's private key
+   * @param string $keyseturl
    * @return array
    */
-  private function get_tool_private_key(): array {
-    if (!empty($this->private_key)) {
-      return $this->private_key;
+  private function get_tool_private_key(string $keyseturl): array {
+    if (!empty($this->private_key[$keyseturl])) {
+      return $this->private_key[$keyseturl];
     }
     $stm = $this->dbh->prepare('SELECT * FROM imas_lti_keys WHERE key_set_url=? AND privatekey != "" ORDER BY created_at DESC LIMIT 1');
-    $stm->execute(array(TOOL_HOST.'/lti/jwks.php'));
+    $stm->execute(array($keyseturl));
     $row = $stm->fetch(PDO::FETCH_ASSOC);
     $this->private_key = $row;
     return $row;
