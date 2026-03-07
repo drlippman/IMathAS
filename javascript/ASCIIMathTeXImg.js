@@ -198,6 +198,8 @@ var AMsymbols = [
 
 //miscellaneous symbols
 {input:"int",  tag:"mo", output:"\u222B", tex:null, ttype:CONST},
+{input:"iint",  tag:"mo", output:"\u222C", tex:null, ttype:CONST},
+{input:"iiint",  tag:"mo", output:"\u222D", tex:null, ttype:CONST},
 {input:"dx",   tag:"mi", output:"{:d x:}", tex:null, ttype:DEFINITION},
 {input:"dy",   tag:"mi", output:"{:d y:}", tex:null, ttype:DEFINITION},
 {input:"dz",   tag:"mi", output:"{:d z:}", tex:null, ttype:DEFINITION},

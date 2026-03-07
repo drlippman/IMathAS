@@ -105,7 +105,7 @@ if ((isset($useeditor) && $_SESSION['useed']==1) || // using editor
 		echo 'var mathbg = "dark";';
 	}
 	echo '</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=111923\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=030726\" type=\"text/javascript\"></script>\n";
 }
 if (!isset($_SESSION['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;var mathRenderer="none";</script>';
@@ -120,13 +120,13 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; var mathRenderer=\"Image\";function rendermathnode(el,callback) {AMprocessNode(el);} if(typeof callback=='function'){callback();}</script>";
 } else if ($_SESSION['mathdisp'] == 8) { // mathjax 3
 	echo '<script>var mathjaxdisp = 8;</script>'; 
-    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=021626\" type=\"text/javascript\"></script>\n";
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=030726\" type=\"text/javascript\"></script>\n";
     echo '<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script"></script>';
 	echo '<style type="text/css">span.AM { font-size: 105%;} </style>';
 } else if ($_SESSION['mathdisp'] > 0) { // mathjax
 	echo '<script>var mathjaxdisp = 9;</script>'; // default MJ 4
 	echo '<script nomodule>mathjaxdisp = 8;</script>'; // fallback to MJ 3 for old browsers
-    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=021626\" type=\"text/javascript\"></script>\n";
+    echo "<script src=\"$staticroot/javascript/mathjaxconfig.js?ver=030726\" type=\"text/javascript\"></script>\n";
 	if (!empty($CFG['GEN']['uselocaljs'])) {
     	echo '<script type="module" src="'.$staticroot.'/javascript/mathjax4/startup.js?ver=020426" id="MathJax-script"></script>';
 	} else {

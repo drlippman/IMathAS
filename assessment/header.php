@@ -131,7 +131,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	echo "<script src=\"$staticroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($_SESSION['mathdisp']==1 || $_SESSION['mathdisp']==3 || $_SESSION['mathdisp']==7 || $_SESSION['mathdisp']==8 || $_SESSION['mathdisp']==9) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=030726\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}});
 		MathJax.Ajax.config.path["Local"] = "'.$staticroot.'/javascript/mathjax";
@@ -147,7 +147,7 @@ if (!isset($_SESSION['mathdisp'])) {
 } else if ($_SESSION['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=100418\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?ver=030726\" type=\"text/javascript\"></script>\n";
 	// removed MathJax fallback since Katex covers pretty much everything now, and MathJax load was slowing display.
 	/*echo '<script type="text/x-mathjax-config">
 		MathJax.Hub.Config({"messageStyle": "none", asciimath2jax: {ignoreClass:"skipmathrender"}, skipStartupTypeset: true});
@@ -179,7 +179,7 @@ if (!isset($_SESSION['mathdisp'])) {
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($_SESSION['mathdisp']==2) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?v=042318\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIMathTeXImg_min.js?v=030726\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;var MathJaxCompatible = false;var mathRenderer = \"img\";function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($_SESSION['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';

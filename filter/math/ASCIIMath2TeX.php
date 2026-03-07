@@ -158,6 +158,8 @@ array( 'input'=>'|--', 'tex'=>'vdash'),
 
 // Miscellaneous symbols
 array( 'input'=>'int'),
+array( 'input'=>'iint'),
+array( 'input'=>'iiint'),
 array( 'input'=>'dx', 'output'=>'{:d x:}', 'definition'=>TRUE),
 array( 'input'=>'dy', 'output'=>'{:d y:}', 'definition'=>TRUE), 
 array( 'input'=>'dz', 'output'=>'{:d z:}', 'definition'=>TRUE), 

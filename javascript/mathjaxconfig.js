@@ -26,6 +26,8 @@ window.MathJax = {
         AM.newsymbol({input: "ominus", tag:"mo", output:"\u2296", ttype:AM.TOKEN.CONST});
         AM.newsymbol({input: "rightleftharpoons", tag:"mo", output:"\u21CC", ttype:AM.TOKEN.CONST});
         AM.newsymbol({input: "hbar", tag:"mi", output:"\u210F", ttype:AM.TOKEN.CONST});
+        AM.newsymbol({input: "iint", tag:"mo", output:"\u222C", ttype:AM.TOKEN.CONST});
+        AM.newsymbol({input: "iiint", tag:"mo", output:"\u222D", ttype:AM.TOKEN.CONST});
         ["arcsec","arccsc","arccot"].forEach(function(v) {
             AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
         });
