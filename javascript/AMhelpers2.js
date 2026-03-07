@@ -1255,7 +1255,9 @@ function AMnumfuncPrepVar(qn,str) {
 		  if (greekletters.indexOf(vars[i].toLowerCase())!=-1) {
 			  isgreek = true;
 		  }
-		  if (vars[i].match(/^\w+_\w+$/)) {
+		  if (vars[i].slice(-1)=="'" && greekletters.indexOf(vars[i].toLowerCase().slice(0,-1))!=-1) {
+        // leave alone
+      } else if (vars[i].match(/^\w+_\w+$/)) {
 		  	if (!foundaltcap[i]) {
 		  		regmod = "gi";
 		  	} else {

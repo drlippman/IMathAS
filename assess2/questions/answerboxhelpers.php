@@ -398,7 +398,9 @@ function numfuncPrepShowanswer($string, $variables) {
             $varlower = strtolower($variables[$i]);
             $isgreek = in_array($varlower, $greekletters);
             
-            if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/', $variables[$i], $matches)) {
+			if ($varlower[-1]=="'" && in_array(substr($varlower, 0, -1), $greekletters)) {
+				continue;
+			} else if (!$isgreek && preg_match('/^(\w+)_(\w+|\(.*?\))$/', $variables[$i], $matches)) {
                 $chg = false;
                 if (strlen($matches[1]) > 1 && !in_array(strtolower($matches[1]), $greekletters)) {
                     $matches[1] = '"' . $matches[1] . '"';
