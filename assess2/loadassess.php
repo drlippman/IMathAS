@@ -180,6 +180,7 @@ if (!$assessInfoOut['has_active_attempt']) {
 //get retakewait info
 if ($assessInfoOut['retakewait'] > 0 && 
   !$assessInfoOut['has_active_attempt'] && 
+  $assessInfoOut['can_retake'] && // make sure they'd otherwise be able to retake
   count($assessInfoOut['prev_attempts']) > 0
 ) {
   $retaketime = $assess_record->getNextRetaketime();
