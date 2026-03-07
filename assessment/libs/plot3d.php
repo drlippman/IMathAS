@@ -1,5 +1,6 @@
 <?php
-//Basic 3D display, using HTML5 Canvas or flash fallback.
+//Basic 3D display, using HTML5 Canvas fallback.
+// Version 2.1 Mar 7 2026 removed flash backup
 // Version 2.0 May 3 2018 adding CalcPlot3D functions
 
 global $allowedmacros;
@@ -82,7 +83,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
     $html = '';
 	$r = uniqid();
 	if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
-		$html .= '<script type="text/javascript" src="'.$staticroot.'/javascript/3dviewer.js?v=1"></script>';
+		$html .= '<script type="text/javascript" src="'.$staticroot.'/javascript/3dviewer.js?v=2"></script>';
 	}
 	$GLOBALS['3dplotcnt'] = $r;
 	$html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
@@ -93,8 +94,6 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	} else {
 		$bndtxt='';
 	}
-	$url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
-	$html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Flash Alternate</a></span>";
 	$html .= "</canvas>";
 	$html .= '<span class="sr-only">' . Sanitize::encodeStringForDisplay($alt) . '<wbr/></span>';
 	$init = "var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height', showaxes:$axes}, 'plot3d$r');";
@@ -169,17 +168,14 @@ function spacecurve($func,$tmin,$tmax) {
 
 	$r = uniqid();
 	$html = '';
-		if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
-			$html .= '<script type="text/javascript" src="'.$staticroot.'/javascript/3dviewer.js"></script>';
-		}
-		$GLOBALS['3dplotcnt'] = $r;
-		$html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
-		$html .= 'role="img" tabindex="0" aria-hidden="true" ';
-		$html .= ">";
-		$url = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . (isset($_SERVER['QUERY_STRING'])?'?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'&useflash=true':'?useflash=true');
-
-		$html .= "<span aria-hidden=true>Not seeing the 3D graph?  <a href=\"$url\">Try Alternate</a></span>";
-		$html .= "</canvas>";
+	if (!isset($GLOBALS['3dplotcnt']) || (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1)) {
+		$html .= '<script type="text/javascript" src="'.$staticroot.'/javascript/3dviewer.js?v=2"></script>';
+	}
+	$GLOBALS['3dplotcnt'] = $r;
+	$html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
+	$html .= 'role="img" tabindex="0" aria-hidden="true" ';
+	$html .= ">";
+	$html .= "</canvas>";
 	$html .= '<span class="sr-only">' . Sanitize::encodeStringForDisplay($alt) . '<wbr/></span>';
 
 	if (isset($bounds)) {

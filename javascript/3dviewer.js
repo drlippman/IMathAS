@@ -31,6 +31,13 @@ function Viewer3D(paramObj, targetel) {
 	t._paper = document.getElementById(targetel);
 	t._context = t._paper.getContext("2d");
 
+	t.dpr = window.devicePixelRatio || 1;
+	t._paper.width = t.swidth * t.dpr;
+	t._paper.height = t.sheight * t.dpr;
+	t._paper.style.width = t.swidth + 'px';
+	t._paper.style.height = t.sheight + 'px';
+	t._context.scale(t.dpr, t.dpr);
+
 	t._context.fillStyle = "#FFFFFF";
 	t._context.fillRect(0, 0, t.swidth, t.sheight);
 
