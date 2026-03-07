@@ -37,13 +37,13 @@ class Sanitize
 		'.nb',  '.nbp',  '.mw',   '.mws',  '.m',    '.mat',  '.mlx',   '.omv',
 		'.sas', '.sav',  '.r',    '.rda',  '.rds',  '.dta',  '.rdata', '.rmd',  
 		'.sps', '.qmd',  '.mpx',  '.mpj',  '.mwx',  '.mtw',  '.jmp',   '.jrn', '.jrp', 
-		'.dat',  '.json', 
+		'.dat',  '.json', '.jasp',
 		'.imas', '.imscc', '.ggb',
 		'.ipynb', '.pages', '.numbers'
 	];
 
 	private static $whitelistedNonlocalExtensions = [
-		'.htm', '.html', '.js', '.xml', '.xhtml'
+		'.htm', '.html', '.js', '.xml', '.xhtml', '.py', '.java'
 	];
 
 	/**
