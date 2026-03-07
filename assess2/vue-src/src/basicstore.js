@@ -854,9 +854,9 @@ export const actions = {
         store.inTransit = false;
       });
   },
-  getScores () {
+  getScores (callback) {
     if (store.inTransit) {
-      window.setTimeout(() => this.getScores(), 20);
+      window.setTimeout(() => this.getScores(callback), 20);
       return;
     }
     store.inTransit = true;
@@ -876,6 +876,9 @@ export const actions = {
         }
         response = this.processSettings(response);
         this.copySettings(response);
+        if (typeof callback === 'function') {
+          callback();
+        }
       })
       .fail((xhr, textStatus, errorThrown) => {
         this.handleError(textStatus === 'parsererror' ? 'parseerror' : 'noserver');

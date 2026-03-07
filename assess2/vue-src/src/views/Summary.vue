@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <summary-header class="headerpane" />
-    <div class="flexpanes">
+    <div class="flexpanes" v-show="ready">
       <div style="flex-grow: 1">
         <summary-diag-info />
 
@@ -83,7 +83,8 @@ export default {
   },
   data: function () {
     return {
-      activeTab: 0
+      activeTab: 0,
+      ready: false
     };
   },
   computed: {
@@ -117,12 +118,22 @@ export default {
         }
       }
       return hascat;
+    },
+    hasQInfo () {
+      for (const i in this.ainfo.questions) {
+        if (!this.ainfo.questions[i].hasOwnProperty('parts')) {
+          return false;
+        }
+      }
+      return true;
     }
   },
   methods: {
     loadScoresIfNeeded () {
-      if (!this.hasScore) {
-        actions.getScores();
+      if (!this.hasQInfo) {
+        actions.getScores(() => this.ready = true);
+      } else {
+        this.ready = true;
       }
     }
   },
