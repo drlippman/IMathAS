@@ -386,8 +386,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             } else if ($searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $admingroupid;
-                // don't need, since we'll limit to groupid=? below
-                // need if no libquery
+                // groupid limit for unassigned is handled by separate query; only need here if no libquery
                 if ($libquery == '') {
                     $rightsand2[] = '(imas_users.groupid=? OR iq.userights>0)';
                     $searchvals2[] = $admingroupid;
@@ -398,8 +397,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand2[] = 'iq.userights=0';
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
-                // not needed since libid>0
-                // need if no libquery
+                // no unassigned is handled by libquery; only need here if no libquery
                 if ($libquery == '') {
                     $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
                     $searchvals[] = $admingroupid;
@@ -409,8 +407,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $searchvals2[] = $admingroupid;
                 $searchvals2[] = $search['id'];
             } else if ($searchtype != 'assess') {
-                // not needed since libid>0
-                // need if no libquery
+                // no unassigned is handled by libquery; only need here if no libquery
                 if ($libquery == '') {
                     $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
                     $searchvals[] = $admingroupid;
@@ -433,8 +430,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand2[] = 'iq.userights=0';
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
-                // not needed since libid>0
-                // need if no libquery
+                // no unassigned is handled by libquery; only need here if no libquery
                 if ($libquery == '') {
                     $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
                     $searchvals[] = $userid;
@@ -444,8 +440,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $searchvals2[] = $userid;
                 $searchvals2[] = $search['id'];
             } else if ($searchtype != 'assess') {
-                // not needed since libid>0
-                // need if no libquery
+                // no unassigned is handled by libquery; only need here if no libquery
                 if ($libquery == '') {
                     $rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
                     $searchvals[] = $userid;
