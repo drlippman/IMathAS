@@ -845,7 +845,7 @@ function gbstudisp($stu) {
 				echo '</div>';
 				echo '</form>';
 			} else {
-				echo "<div style=\"clear:both;display:inline-block\" class=\"cpmid\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";
+				echo "<div style=\"clear:both;\" class=\"tabpanel\">" . Sanitize::encodeStringForDisplay($gbcomment) . "</div><br/>";
 			}
 		}
 		$lpmsg = '';

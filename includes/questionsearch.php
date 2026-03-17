@@ -387,8 +387,11 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $admingroupid;
                 // don't need, since we'll limit to groupid=? below
-                //$rightsand2[] = '(imas_users.groupid=? OR iq.userights>0)';
-                //$searchvals2[] = $admingroupid;
+                // need if no libquery
+                if ($libquery == '') {
+                    $rightsand2[] = '(imas_users.groupid=? OR iq.userights>0)';
+                    $searchvals2[] = $admingroupid;
+                }
             }
             if (isset($search['public']) && $search['public'] == 0) {
                 $rightsand[] = 'iq.userights=0';
@@ -396,16 +399,22 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
                 // not needed since libid>0
-                //$rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
-                //$searchvals[] = $admingroupid;
-                //$searchvals[] = $search['id'];
+                // need if no libquery
+                if ($libquery == '') {
+                    $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=? OR iq.id=?)';
+                    $searchvals[] = $admingroupid;
+                    $searchvals[] = $search['id'];
+                }
                 $rightsand2[] = '(imas_users.groupid=? OR iq.id=?)';
                 $searchvals2[] = $admingroupid;
                 $searchvals2[] = $search['id'];
             } else if ($searchtype != 'assess') {
                 // not needed since libid>0
-                //$rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
-                //$searchvals[] = $admingroupid;
+                // need if no libquery
+                if ($libquery == '') {
+                    $rightsand[] = '(ili.libid > 0 OR imas_users.groupid=?)';
+                    $searchvals[] = $admingroupid;
+                }
                 $rightsand2[] = '(imas_users.groupid=?)';
                 $searchvals2[] = $admingroupid;
             }
@@ -425,16 +434,22 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
                 // not needed since libid>0
-                //$rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
-                //$searchvals[] = $userid;
-                //$searchvals[] = $search['id'];
+                // need if no libquery
+                if ($libquery == '') {
+                    $rightsand[] = '(ili.libid > 0 OR iq.ownerid=? OR iq.id=?)';
+                    $searchvals[] = $userid;
+                    $searchvals[] = $search['id'];
+                }
                 $rightsand2[] = '(iq.ownerid=? OR iq.id=?)';
                 $searchvals2[] = $userid;
                 $searchvals2[] = $search['id'];
             } else if ($searchtype != 'assess') {
                 // not needed since libid>0
-                //$rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
-                //$searchvals[] = $userid;
+                // need if no libquery
+                if ($libquery == '') {
+                    $rightsand[] = '(ili.libid > 0 OR iq.ownerid=?)';
+                    $searchvals[] = $userid;
+                }
                 $rightsand2[] = '(iq.ownerid=?)';
                 $searchvals2[] = $userid;
             }
