@@ -1221,8 +1221,9 @@ function parseShortScript(sscript,gw,gh) {
 		   }
 		   inx += 10;
 		}
-
-		picture.setAttribute("alt",eqnlist);
+    if (!picture.getAttribute("alt")) {
+		  picture.setAttribute("alt",eqnlist);
+    }
 
 		try {
 			eval(commands);

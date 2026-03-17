@@ -60,7 +60,7 @@ function myhtmLawed($t, $NC=1, $NS='') {
 		'cdata'=>0,
 		'comment'=>1
 		);
-	$S = "embed=sscr";
+	$S = "embed=sscr,alt";
 	if (is_array($NC)) { //overwrite or append new config
 		foreach ($NC as $k=>$v) {
 			$C[$k] = $v;

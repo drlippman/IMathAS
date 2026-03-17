@@ -8,7 +8,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="../../../javascript/mathparser_min.js?v=031126"></script>
 	<script type="text/javascript" src="../../../javascript/ASCIIsvg_min.js?v=122025"></script>
-	<script type="text/javascript" src="js/asciisvgdlg.js?v=081925"></script>
+	<script type="text/javascript" src="js/asciisvgdlg.js?v=031626"></script>
 
 	<style type="text/css">
 	svg {
@@ -103,6 +103,10 @@ Graphs: <select id="graphs" onchange="AsciisvgDialog.loadeqn()"></select>
 <hr/>
 <div id="preview"><embed id="previewsvg" type="image/svg+xml" style="width: 300px; height: 200px; vertical-align: middle; float: none;" sscr="-7.5,7.5,-5,5,1,1,1,1,1,300,200" /></div>
 <img style="display:none;" id="previewimg" />
+<div style="display:flex; margin-top:5px; gap:5px;">
+	<label for="alt">Custom alt text:</label>
+	<textarea rows=1 id=alt style="flex:1;resize:vertical"></textarea>
+</div>
 
 </form>
 
