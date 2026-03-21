@@ -54,7 +54,7 @@
 		padding: 2px 5px;
 		cursor: move;
 	}
-	span.calitem:hover {
+	span.calitemhighlight {
 		background-color: #6cf;
 	}
 	span.calitem span {
@@ -188,12 +188,24 @@
 				dragState = null;
 			});
 		});
+		// add item highlight of item and bookend pair on hover
+		$("span.calitem").on('pointerenter', function(ev) {
+			var id = this.id.substr(2);
+			$("span.calitem[id$='"+id+"']").addClass("calitemhighlight");
+		}).on('pointerleave', function(ev) {
+			var id = this.id.substr(2);
+			$("span.calitem[id$='"+id+"']").removeClass("calitemhighlight");
+		});
 	}
 	function handleDrop(droppedOn, droppedEl, draggedId, originalParent) {
 		var dropped = $(droppedEl);
 
 		// Move the element
 		dropped.detach().appendTo(droppedOn.find("div.center"));
+
+		// Unhighlight it
+		var id = draggedId.substr(2);
+		$("span.calitem[id$='"+id+"']").removeClass("calitemhighlight");
 
 		// Check if actually moved to a different cell
 		if (droppedOn.attr("id") != originalParent) {
