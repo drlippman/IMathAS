@@ -870,7 +870,7 @@
 	$placeinhead .= 'var canedit = ' . ($canedit ? "true" : "false") . ';';
 
 	$placeinhead .= '</script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=032126"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=032226"></script>';
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
@@ -908,12 +908,13 @@
 		}
 
 	}
-	echo "<div id='errmsgContainer'>$errmsg</div>";
-	echo "<div id='outputmsgContainer'>$outputmsg</div>";
 
 	echo '<div id="headermoddataset" class="pagetitle">';
 	echo "<h1>" . Sanitize::encodeStringForDisplay($addmod) . ": "._("QuestionSet Question"),"</h1>\n";
 	echo '</div>';
+
+	echo "<div id='errmsgContainer'".($errmsg==''?'':' class=cpmid').">$errmsg</div>";
+	echo "<div id='outputmsgContainer'".($outputmsg==''?'':' class=cpmid').">$outputmsg</div>";
 
 	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {
 		echo '<p>'._('This question appears to be a Tutorial Style question.').'  <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">'._('Open in the tutorial question editor').'</a></p>';

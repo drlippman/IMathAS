@@ -264,13 +264,13 @@ if (FormData){ // Only allow quicksave if FormData object exists
 			contentType: false,
 			processData: false,
 			success: function(res){
-				if (exit) {
-					window.location.href = $(".breadcrumb a").last().attr("href");
-					return;
-				}
 				// Parse out response string
 				var res = JSON.parse(res);
 				var formAction = res.formAction;
+				if (exit && formAction.indexOf("frompot=1")===-1) {
+					window.location.href = $(".breadcrumb a").last().attr("href");
+					return;
+				}
 				var images = res.images;
 				// Change form action url and testing address
 				if (formAction.indexOf("moddataset.php") > -1) {
@@ -283,8 +283,13 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				$("form")[0].action = quickSaveQuestion.url;
 				if (window.history.replaceState) window.history.replaceState({}, "qs", quickSaveQuestion.url);
 				// Change outputmsg and errmsg
-				$("#outputmsgContainer").html(res.outputmsg);
-				$("#errmsgContainer").html(res.errmsg);
+				$("#outputmsgContainer").html(res.outputmsg).toggleClass("cpmid", res.outputmsg !== '');
+				$("#errmsgContainer").html(res.errmsg).toggleClass("cpmid", res.errmsg !== '');
+				if (exit) {
+					$("#mainform").hide();
+					$("#outputmsgContainer")[0].scrollIntoView();
+					return;
+				}
 				// HANDLE IMAGES
 				var imgUploaded = $("input[name='imgfile']")[0].files.length > 0 ? true : false; // Image uploaded
 				var imgDeleted = $("input[name^='delimg-']:checked").length > 0 ? true : false; // Image deleted
