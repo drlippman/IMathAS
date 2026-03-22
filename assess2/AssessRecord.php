@@ -3408,7 +3408,8 @@ class AssessRecord
     $qinfo = $this->data['assess_versions'][$aver]['questions'][$qn];
     $out = array(
       'scored_version' => $qinfo['scored_version'],
-      'score' => $qinfo['score']
+      'score' => $qinfo['score'],
+      'time' => $qinfo['time']
     );
     return $out;
   }
