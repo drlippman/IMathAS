@@ -221,6 +221,7 @@ var AMsymbols = [
 {input:"^\\prime",   tag:"mi", output:"'", tex:null, ttype:DEFINITION},
 {input:"prime",   tag:"mi", output:"'", tex:null, ttype:DEFINITION},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST, val:true},
+{input:"thinspace",  tag:"mo", output:"\u202F", tex:null, ttype:CONST},
 {input:"frown",  tag:"mo", output:"\u2322", tex:null, ttype:CONST},
 {input:"%",  tag:"mo", output:"%", tex:"%", ttype:CONST, notexcopy:true},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
