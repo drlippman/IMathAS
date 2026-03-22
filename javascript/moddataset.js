@@ -256,6 +256,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 
 		// Get form data
 		var data = new FormData($("form")[0]);
+		var cleara11yreviews = ($("[name=cleara11yreviews]").prop("checked") === true);
 
 		$.ajax({
 			url: quickSaveQuestion.url + "&quick=1",
@@ -336,7 +337,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 
 				// Empty notices
 				$(".quickSaveNotice").empty();
-				if (data.get('cleara11yreviews') == 1) {
+				if (cleara11yreviews) {
 					$(".a11ynegrev").hide();
 				}
 				// Load preview page
