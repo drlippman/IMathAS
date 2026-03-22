@@ -646,7 +646,7 @@
 					$inlibs[] = $row[0];
 				}*/
 				$locklibs = array();
-				$addmod = _("Add");
+				$addmod = _("Add Question");
 				$stm = $DBH->prepare("SELECT qrightsdef FROM imas_users WHERE id=:id");
                 $stm->execute(array(':id'=>$userid));
                 $qrightsdef = $stm->fetchColumn(0);
@@ -686,7 +686,7 @@
 						$locklibs[] = $row[0];
 					}
 				}
-				$addmod = _("Modify");
+				$addmod = _("Modify Question");
 				//$query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
 				//$query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid=:questionsetid AND imas_courses.ownerid<>:userid";
 				$query = "SELECT imas_questions.id FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
@@ -766,14 +766,14 @@
 				} else {$inlibs = '0';}
 			}
 
-			$addmod = _("Add");
+			$addmod = _("Add Question");
 	}
     $canedit = $myq;
     if ($viewonly) {
         $canedit = false;
     }
 	if (!$canedit) {
-		$addmod = _('View');
+		$addmod = _('View Question Code');
 	}
 
 	$inlibssafe = implode(',', array_map('intval', explode(',',$inlibs)));
@@ -890,30 +890,30 @@
 
 	if (isset($_GET['aid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"$addq.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; "._("Modify Questions")."</div>";
+		echo "&gt; <a href=\"$addq.php?aid=".Sanitize::onlyInt($_GET['aid'])."&cid=$cid\">"._("Add/Remove Questions")."</a> &gt; ".Sanitize::encodeStringForDisplay($addmod)."</div>";
 
 	} else if (isset($_GET['daid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">"._("Add Drill Assessment")."</a> &gt; "._("Modify Questions")."</div>";
+		echo "&gt; <a href=\"adddrillassess.php?daid=".Sanitize::encodeUrlParam($_GET['daid'])."&cid=$cid\">"._("Add Drill Assessment")."</a> &gt; ".Sanitize::encodeStringForDisplay($addmod)."</div>";
 	} else {
 		if ($cid==="admin") {
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../admin/admin2.php\">Admin</a> ";
-			echo "&gt; <a href=\"manageqset.php?cid=admin\">"._("Manage Question Set")."</a> &gt; "._("Modify Question")."</div>\n";
+			echo "&gt; <a href=\"manageqset.php?cid=admin\">"._("Manage Question Set")."</a> &gt; ".Sanitize::encodeStringForDisplay($addmod)."</div>\n";
 		} else {
 			echo "<div class=breadcrumb><a href=\"../index.php\">"._("Home")."</a> ";
 			if ($cid>0) {
 				echo "&gt; <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a>";
 			}
-			echo " &gt; <a href=\"manageqset.php?cid=$cid\">"._("Manage Question Set")."</a> &gt; "._("Modify Question")."</div>\n";
+			echo " &gt; <a href=\"manageqset.php?cid=$cid\">"._("Manage Question Set")."</a> &gt; ".Sanitize::encodeStringForDisplay($addmod)."</div>\n";
 		}
 
 	}
 
 	echo '<div id="headermoddataset" class="pagetitle">';
-	echo "<h1>" . Sanitize::encodeStringForDisplay($addmod) . ": "._("QuestionSet Question"),"</h1>\n";
+	echo "<h1>" , Sanitize::encodeStringForDisplay($addmod) ,"</h1>\n";
 	echo '</div>';
 
-	echo "<div id='errmsgContainer'".($errmsg==''?'':' class=cpmid').">$errmsg</div>";
+	echo "<div id='errmsgContainer' class='noticetext".($errmsg==''?'':' cpmid')."'>$errmsg</div>";
 	echo "<div id='outputmsgContainer'".($outputmsg==''?'':' class=cpmid').">$outputmsg</div>";
 
 	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {
