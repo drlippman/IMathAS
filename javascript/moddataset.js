@@ -239,7 +239,13 @@ function saveEditors() {
 	}
 }
 if (FormData){ // Only allow quicksave if FormData object exists
-	var quickSaveQuestion = function(){
+	$(function () {
+		// use quicksave and exit instead of regular form submission
+		$("button[type=submit]").attr("type","button").on('click', function() {
+			quickSaveQuestion(true);
+		});
+	});
+	var quickSaveQuestion = function(exit){
 		// Add text to notice areas
 		$(".quickSaveNotice").html("Saving...");
 
@@ -258,6 +264,10 @@ if (FormData){ // Only allow quicksave if FormData object exists
 			contentType: false,
 			processData: false,
 			success: function(res){
+				if (exit) {
+					window.location.href = $(".breadcrumb a").last().attr("href");
+					return;
+				}
 				// Parse out response string
 				var res = JSON.parse(res);
 				var formAction = res.formAction;

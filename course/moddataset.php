@@ -870,7 +870,7 @@
 	$placeinhead .= 'var canedit = ' . ($canedit ? "true" : "false") . ';';
 
 	$placeinhead .= '</script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=031726"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=032126"></script>';
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
@@ -956,7 +956,7 @@ if ($viewonly) {
 ?>
 <input type="hidden" name="hasimg" value="<?php echo Sanitize::encodeStringForDisplay($line['hasimg']);?>"/>
 <p>
-<label for=description><?php echo _('Description');?></label>:<br/>
+<label for=description><?php echo _('Description');?></label>:<br>
 <textarea cols=60 rows=4 name=description id=description <?php if (!$canedit) echo "disabled";?>><?php echo Sanitize::encodeStringForDisplay($line['description'], true);?></textarea>
 </p>
 <p>
@@ -981,7 +981,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo "<option value=\"4\" ";
 	if ($line['userights']==4) {echo "SELECTED";}
 	echo ">"._("Allow use by all and modifications by all")."</option>\n";
-	echo '</select><br/>';
+	echo '</select><br>';
 	echo '<label for=license>' . _('License:').'</label> <select name="license" id="license" onchange="checklicense()">';
 	echo '<option value="0" '.($line['license']==0?'selected':'').'>Copyrighted</option>';
 	echo '<option value="1" '.($line['license']==1?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
@@ -990,14 +990,14 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo '<option value="4" '.($line['license']==4?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
 	echo '</select><span id="licensewarn" class=noticetext style="font-size:80%;"></span>';
 	if ($line['otherattribution']=='') {
-		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">'._('Add additional attribution').'</a>';
+		echo '<br><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">'._('Add additional attribution').'</a>';
 		echo '<span id="addattrspan" style="display:none;">';
 	} else {
-		echo '<br/><span id="addattrspan">';
+		echo '<br><span id="addattrspan">';
 	}
 	echo '<label for=addattr>'._('Additional Attribution').'</label>: <input type="text" size="80" name="addattr" id="addattr" value="'.Sanitize::encodeStringForDisplay($line['otherattribution'], true).'"/>';
 	if ($line['otherattribution']!='') {
-		echo '<br/><span class=noticetext style="font-size:80%">'._('You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution').'</span>';
+		echo '<br><span class=noticetext style="font-size:80%">'._('You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution').'</span>';
 	}
 	echo '</span>';
     echo '</p>';
@@ -1008,7 +1008,7 @@ var curlibs = '<?php echo Sanitize::encodeStringForJavascript($inlibs);?>';
 var locklibs = '<?php echo Sanitize::encodeStringForJavascript($locklibs);?>';
 </script>
 <p>
-<?php echo _('My library assignments:'); ?> <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
+<?php echo _('My library assignments:'); ?> <span id="libnames"><?php echo Sanitize::encodeStringForDisplay($lnames);?></span><input type=hidden name="libs" id="libs" value="<?php echo Sanitize::encodeStringForDisplay($inlibs);?>">
 <button type="button" onClick="libselect()"><?php echo _("Select Libraries"); ?></button>
 <?php
 if (isset($_GET['id']) && $canedit) {
@@ -1135,17 +1135,17 @@ if ($line['solution']=='') {
 <button type="submit"><?php echo _("Save"); ?></button>
 <input type=submit name=test value="Save and Test Question" class="saveandtest" />
 <button type="button" class="quickSaveButton" onclick="quickSaveQuestion()"><?php echo _('Quick Save and Preview'); ?></button>
-<br/>
+<br>
 <label><input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
    onclick="$('#userandnote').toggle()">
 <?php echo _('Uses random variables from the question, or question is not randomized.'); ?></label>
  <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
    <i><?php echo _('Be sure to include the question you are solving in the text'); ?></i>
- </span><br/>
+ </span><br>
 <label><input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
-<?php echo _('Use this as a "written example" help button'); ?></label><br/>
+<?php echo _('Use this as a "written example" help button'); ?></label><br>
 <label><input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
-<?php echo _('Display with the "Show Answer"'); ?></label><br/>
+<?php echo _('Display with the "Show Answer"'); ?></label><br>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$canedit) echo "readonly=\"readonly\"";?>><?php echo Sanitize::encodeStringForDisplay($line['solution'], true);?></textarea>
 </div>
 <div id=imgbox>
@@ -1155,7 +1155,7 @@ if ($line['solution']=='') {
   <label for=newimgvar><?php echo _('assign to variable:'); ?></label> 
     <input type="text" name="newimgvar" id="newimgvar" size="6" <?php if (!$canedit) {echo 'disabled';};?>/>
   <label for="newimgalt"><?php echo _('Description:'); ?></label> 
-    <textarea rows=1 cols=30 name="newimgalt" id="newimgalt" <?php if (!$canedit) {echo 'disabled';};?>></textarea><br/>
+    <textarea rows=1 cols=30 name="newimgalt" id="newimgalt" <?php if (!$canedit) {echo 'disabled';};?>></textarea><br>
 <div id="imgListContainer" style="display:<?php echo (isset($images['vars']) && count($images['vars'])>0) ? 'block' : 'none'; ?>">
 	<?php echo _('Images:'); ?>
 	<ul id='imgList'>
@@ -1185,13 +1185,13 @@ if (isset($images['vars']) && count($images['vars'])>0) {
  </select>
  <label for=helpurl><?php echo _('URL')?></label>: <input type="text" name="helpurl" id="helpurl" size="30" <?php if (!$canedit) {echo 'disabled';};?>/>
  <label for=helpdescr><?php echo _('Description')?></label>: <input type="text" name="helpdescr" id="helpdescr" size="30" <?php if (!$canedit) {echo 'disabled';};?>/>
- <br/>
+ <br>
 <?php
 echo '<div id="helpbtnwrap" ';
 if (count($extref)==0) {
 	echo 'class="hidden"';
 }
-echo ">"._("Help buttons:")."<br/>";
+echo ">"._("Help buttons:")."<br>";
 echo '<ul id="helpbtnlist">';
 if (count($extref)>0) {
 	for ($i=0;$i<count($extref);$i++) {
@@ -1221,7 +1221,7 @@ echo '</p>';
 if ($canedit && $bada11yreviews>0) {	
 	echo '<p class="a11ynegrev">'.sprintf(_('This question has received %d "needs work" accessibility reviews.'), $bada11yreviews).' ';
 	echo _('If you have fixed the issues, you can clear the accessibility reviews.');
-	echo '<br/><label><input type=checkbox name=cleara11yreviews value=1 /> '._('Clear all accessiblity reviews').'</label></p>';
+	echo '<br><label><input type=checkbox name=cleara11yreviews value=1 /> '._('Clear all accessiblity reviews').'</label></p>';
 }
 
 if ($myrights==100) {
@@ -1258,14 +1258,14 @@ $placeinfooter='
 	<div id="solverinsides">
 	<div id="operationselect">
 	Select and drag or copy an expression from your question code.
-	<img id="solverinputhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br/>
+	<img id="solverinputhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br>
 	<div id="solverinputhelp" style="display: none;">
 	</div>
 	<input id="imathastosage" type="text" size="30">
 	<select id="solveroperation" name="solveroperation">
 		<option id="solverchoose" value="">Choose</option>
 		<option id="solversolve" value="solve">Solve</option>
-		<option id="solversolve" value="simplify">Simplify</option>
+		<option id="solversimplify" value="simplify">Simplify</option>
 		<option id="solverdiff" value="diff">Differentiate</option>
 		<option id="solverint" value="integral">Integrate</option>
 		<option id="solverplot" value="plot">Plot</option>
@@ -1275,14 +1275,14 @@ $placeinfooter='
 	<div id="sagemathcode" style="display: none;"></div>
 	<div id="sagecellcontainer">
 		<div id="sagecell"></div>
-		<img id="solverhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br/>
+		<img id="solverhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br>
 	</div>
 	<div id="solverhelpbody" style="display: none">
 	</div>
 	<div id="sagecelloutput"></div>
     <div id="sagetocontroldiv" style="display: none;" >
 		Drag this to the Common Control box or use the buttons below.
-	<img id="solveroutputhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br/>
+	<img id="solveroutputhelpicon" src="'.$staticroot.'/img/help.svg" alt="Help"><br>
 	<div id="sagetocontrolresult">
 		<p><span id="sagetocontrol" draggable="true"></span></p>
 	</div>
