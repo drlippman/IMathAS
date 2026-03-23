@@ -115,7 +115,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$rubgrp = -1;
 		}
 		$rubric = array();
-		for ($i=0;$i<15; $i++) {
+		for ($i=0;$i<25; $i++) {
 			if (!empty($_POST['rubitem'.$i])) {
 				$rubric[] = array($_POST['rubitem'.$i], $_POST['rubnote'.$i], floatval($_POST['rubscore'.$i]));
 			}
@@ -268,7 +268,7 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	echo '<th>Rubric Item<span class="hfeedback"><br/>Shows in feedback</span></th><th>Instructor Note<span class="hfeedback"><br/>Not in feedback</span></th>';
 	echo '<th class="rubricpoints"><span id="pointsheader">'. _('Portion of Score');
 	echo '</span></th></tr></thead><tbody>';
-	for ($i=0;$i<15; $i++) {
+	for ($i=0;$i<25; $i++) {
 		echo '<tr><td><span class="sr-only" id="l'.$i.'">Item '.($i+1).'</span>';
 		echo '<input type="text" size="40" name="rubitem'.$i.'" value="';
 		if (isset($rubric[$i]) && isset($rubric[$i][0])) { echo Sanitize::encodeStringForDisplay($rubric[$i][0]);}
