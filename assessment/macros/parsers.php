@@ -77,10 +77,18 @@ function parseNtuple($str, $do_or = false, $do_eval = true, $isComplex = false, 
                             } else {
                                 $thisTuple['vals'][$j] = evalMathParser($thisTuple['vals'][$j]);
                             }
+                        } else {
+                            $thisTuple['cvals'][$j] = $thisTuple['vals'][$j];
                         }
                     }
                 } else if ($isComplex) {
-                    $thisTuple['cvals'] = array_map("parsecomplex", $thisTuple['vals']);
+                    for ($j = 0; $j < count($thisTuple['vals']); $j++) {
+                        if ($thisTuple['vals'][$j] === 'oo' || $thisTuple['vals'][$j] === '-oo') {
+                            $thisTuple['cvals'][$j] = $thisTuple['vals'][$j];
+                        } else {
+                            $thisTuple['cvals'][$j] = parsecomplex($thisTuple['vals'][$j]);
+                        }
+                    }
                 }
                 if ($do_or && $inor) {
                     $ntuples[count($ntuples) - 1][] = $thisTuple;

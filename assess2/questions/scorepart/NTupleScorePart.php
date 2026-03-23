@@ -187,6 +187,7 @@ class NTupleScorePart implements ScorePart
         $answer = makepretty($answer);
         // parse and evaluate the answer, capturing "or"s
         $anarr = parseNtuple($answer, true, true, $isComplex, $ansformats);
+
         if ($checkSameform) {
             $normalizedAnswer = parseNtuple($answer, true, false, $isComplex, $ansformats);
             foreach($normalizedAnswer as $ai=>$chkme) {
@@ -209,14 +210,14 @@ class NTupleScorePart implements ScorePart
         foreach ($gaarr as $k=>$givenans) {
             if ($isComplex) {
                 foreach ($givenans['cvals'] as $v) {
-                    if (!is_array($v) || !is_numeric($v[0]) || !is_numeric($v[1])) {
+                    if ((!is_array($v) || !is_numeric($v[0]) || !is_numeric($v[1])) && $v !== 'oo' && $v !== '-oo') {
                         unset($gaarr[$k]);
                         continue 2;
                     }
                 }
             } else {
                 foreach ($givenans['vals'] as $v) {
-                    if (!is_numeric($v)) {
+                    if (!is_numeric($v) && $v !== 'oo' && $v !== '-oo') {
                         unset($gaarr[$k]);
                         continue 2;
                     }

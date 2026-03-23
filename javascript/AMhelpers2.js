@@ -1643,7 +1643,7 @@ function processCalcNtuple(qn, fullstr, format, qtype) {
     if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
       sub = fullstr.substring(lastcut,i).replace(/^\s+/,'').replace(/\s+$/,'');
       if (sub == '') {notationok = false;}
-      if (qtype.match(/complex/)) {
+      if (qtype.match(/complex/) && !sub.match(/^\s*-?oo\s*$/)) {
         res = evalcheckcomplex(sub, format);
         err += res.err;
         outcalceddisp += res.outstrdisp;
@@ -2356,6 +2356,9 @@ function syntaxcheckexpr(str,format,vl) {
 function singlevaleval(evalstr, format) {
   if (commasep) {
     evalstr = evalstr.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+  }
+  if (evalstr.match(/^\s*-?oo\s*$/)) {
+    return [evalstr, ''];
   }
   if (evalstr.match(/,/)) {
     return [NaN, _("syntax incomplete")+". "];
