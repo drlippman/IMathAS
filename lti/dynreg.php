@@ -91,8 +91,7 @@ $post = [
             [
                 "type" => "LtiDeepLinkingRequest",
                 "target_link_uri" => $basesiteurl.'/lti/launch.php',
-                "label" => sprintf(_("%s Assessment"), $installname),
-                "placements" => ["assignment_selection"]
+                "label" => sprintf(_("%s Assessment"), $installname)
             ],
             [
                 "type" => "LtiResourceLinkRequest",
@@ -101,6 +100,11 @@ $post = [
         ]
     ]
 ];
+
+if (strpos($iss, '.instructure.com')!==false) {
+    $post["https://purl.imsglobal.org/spec/lti-tool-configuration"]["messages"][0]["placements"] = ["assignment_selection"];
+    $post["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/privacy_level"] = "public";
+}
 
 $ch = curl_init($regurl);
 $authorization = "Authorization: Bearer ".$token; // Prepare the authorisation token
