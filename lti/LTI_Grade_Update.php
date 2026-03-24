@@ -92,6 +92,7 @@ class LTI_Grade_Update {
    * @param  string $score_url        the lineitem url
    * @param  float $score             normalized to 0-1
    * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
+   * @param  int    $localuserid      the imathas userid, imas_users.id
    * @param  string $activityProgress default 'Submitted'
    * @param  string $gradingProgress  default 'FullyGraded'
    * @param  int    $isstu            default 1
@@ -99,13 +100,13 @@ class LTI_Grade_Update {
    * @return false|array  false on failure, or array with body and headers
    */
   public function send_update(string $token, string $score_url, float $score,
-    string $ltiuserid, string $activityProgress='Submitted',
+    string $ltiuserid, int $localuserid, string $activityProgress='Submitted',
     string $gradingProgress='FullyGraded', $isstu = 1, string $comment = ''
   ) {
     $pos = strpos($score_url, '?');
     $score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
 
-    $content = $this->get_update_body($token, $score, $ltiuserid, $isstu, null,
+    $content = $this->get_update_body($token, $score, $ltiuserid, $localuserid, $isstu, null,
       $activityProgress, $gradingProgress, $comment);
     $this->debuglog('Sending update: '.$content['body']);
     // try to spawn a curl and don't wait for response
@@ -167,6 +168,7 @@ class LTI_Grade_Update {
    * @param  string $token            the token string
    * @param  float $score             the score, normalized 0-1
    * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
+   * @param  int    $localuserid      the imathas userid, imas_users.id
    * @param  boolean    $isstu            default true
    * @param  int?   $addedon          the time the submission was added (null for default)
    * @param  string $activityProgress default 'Submitted'
@@ -175,12 +177,14 @@ class LTI_Grade_Update {
    * @return array [body=>, header=>]
    */
   public function get_update_body(string $token, float $score, string $ltiuserid, 
-    $isstu = true, $addedon = null,
+    int $localuserid, $isstu = true, $addedon = null,
     string $activityProgress='Submitted', string $gradingProgress='FullyGraded',
     string $comment = ''
   ) {
     $canvasext = [
-        'new_submission' => ($isstu ? true : false)
+        'new_submission' => ($isstu ? true : false),
+        'submission_type' => 'basic_lti_launch',
+        'submission_data' => $GLOBALS['basesiteurl'] . '/lti/launch.php?submissionreview='.$localuserid
     ];
     if ($isstu && !empty($addedon)) {
         $canvasext['submitted_at'] = date('Y-m-d\TH:i:s.uP', $addedon);

@@ -13,7 +13,15 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
   $platform_id = $launch->get_platform_id();
   $resource_link = $launch->get_resource_link();
   //$target = parse_target_link($launch->get_target_link(), $db);
-  $targetltiuserid = $launch->get_submission_review_user_id();
+  if ($launch->is_submission_review_launch()) {
+    $targetltiuserid = $launch->get_submission_review_user_id();
+  } else {
+    $linkquery = parse_url($launch->get_target_link(), PHP_URL_QUERY);
+    if (!empty($linkquery['submissionreview'])) {
+      $targetuserid = $linkquery['submissionreview'];
+      $targetltiuserid = 'nolookupneeded';
+    }
+  }
   if (empty($targetltiuserid)) {
       echo _('No target user id provided');
       exit;
@@ -49,8 +57,10 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
 
-    $targetuserid = $db->get_local_userid($launch, 'Learner', $targetltiuserid);
-    if ($targetuserid == false) {
+    if ($targetltiuserid !== 'nolookupneeded') {
+      $targetuserid = $db->get_local_userid($launch, 'Learner', $targetltiuserid);
+    }
+    if (empty($targetuserid)) {
         echo 'Cannot find target student';
         exit;
     }
