@@ -115,7 +115,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			deleteInvalid($row['hash']);
 			continue; 
 		}
-		list($thisaid, $thisuid) = explode('-', $row['hash']);
 		if ($updater1p3->have_token($platformid)) {
 			if ($updater1p3->token_valid($platformid)) {
 				debuglog('queing request with token for '.$row['hash']);
@@ -128,7 +127,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 						'ver' => 'LTI1.3',
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
-						'userid' => $thisuid,
+						'hash' => $row['hash'],
 						'platformid' => $platformid,
 						'grade' => max(0, $row['grade']),
                         'isstu' => $row['isstu'],
@@ -217,7 +216,6 @@ if (count($round2)>0 &&  $timeused < 40) {
 	// this would only be LTI1.3 updates that didn't have a token the first time
 	foreach ($round2 as $row) {
 		list($ltiver,$ltiuserid,$score_url,$platformid) = explode(':|:', $row['sourcedid']);
-		list($thisaid, $thisuid) = explode('-', $row['hash']);
 		if ($updater1p3->have_token($platformid)) {
 			if ($updater1p3->token_valid($platformid)) {
 				debuglog('queing round2 request for '.$row['hash']);
@@ -230,7 +228,7 @@ if (count($round2)>0 &&  $timeused < 40) {
 						'ver' => 'LTI1.3',
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
-						'userid' => $thisuid,
+						'hash' => $row['hash'],
 						'platformid' => $platformid,
 						'grade' => max(0, $row['grade']),
                         'isstu' => $row['isstu'],
@@ -289,7 +287,7 @@ function LTIqueuePostdataCallback($data) {
                 $updater1p3->token_valid($data['platformid'])
             ) { // double check we have a valid token
 				$token = $updater1p3->get_access_token($data['platformid']);
-				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid'], $data['userid'], $data['isstu'], $data['addedon']);
+				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid'], $data['hash'], $data['isstu'], $data['addedon']);
 			} else {
 				return false;
 			}

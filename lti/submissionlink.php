@@ -20,7 +20,7 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
     if (!empty($linkquery)) {
       parse_str($linkquery, $param);
       if (!empty($param['submissionreview'])) {
-        $targetuserid = $param['submissionreview'];
+        list($targetaid,$targetuserid) = explode('-',$param['submissionreview']);
         $targetltiuserid = 'nolookupneeded';
       }
     }
@@ -41,18 +41,21 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
   }
   */
   
-  // look to see if we already know where this link should point
-  $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
-  if ($link === null) {
-    $lineitemstr = $launch->get_lineitem();
-    if ($lineitemstr !== false) {
-        $link = $db->get_link_assoc_by_lineitem($lineitemstr, $localcourse->get_id());
+  if ($launch->is_submission_review_launch()) {
+    // look to see if we already know where this link should point
+    $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
+    if ($link === null) {
+      $lineitemstr = $launch->get_lineitem();
+      if ($lineitemstr !== false) {
+          $link = $db->get_link_assoc_by_lineitem($lineitemstr, $localcourse->get_id());
+      }
     }
+    if ($link === null) {
+      echo _('Cannot do a submission launch before an initial regular launch');
+      exit;
+    } 
+    $targetaid = $link->get_typeid();
   }
-  if ($link === null) {
-    echo _('Cannot do a submission launch before an initial regular launch');
-    exit;
-  } 
   // OK, we have a link at this point, so now we'll redirect to it
   if ($link->get_placementtype() == 'assess') {
     $_SESSION['ltiitemtype'] = $link->get_typenum();
@@ -79,7 +82,7 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
       header(sprintf('Location: %s/course/gb-viewasid.php?cid=%d&aid=%d&uid=%d&asid=%d',
         $GLOBALS['basesiteurl'],
         $localcourse->get_courseid(),
-        $link->get_typeid(),
+        $targetaid,
         $targetuserid,
         $targetasid
       ));
@@ -87,7 +90,7 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
       header(sprintf('Location: %s/assess2/gbviewassess.php?cid=%d&aid=%d&uid=%d',
         $GLOBALS['basesiteurl'],
         $localcourse->get_courseid(),
-        $link->get_typeid(),
+        $targetaid,
         $targetuserid
       ));
     }

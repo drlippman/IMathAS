@@ -110,7 +110,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$is
       $ltiparts[2], // lineitemurl
       $action == 'delete' ? 0 : $grade, // score
       $ltiparts[1], // ltiuserid
-	  $uid, // local userid
+	  $aid.'-'.$uid, // local aid-userid
       $action == 'delete' ? 'Initialized' : 'Submitted', // activityProgress
       $action == 'delete' ? 'NotReady' : 'FullyGraded', // gradingProgress
       $isstu
