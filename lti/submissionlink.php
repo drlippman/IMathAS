@@ -17,9 +17,12 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
     $targetltiuserid = $launch->get_submission_review_user_id();
   } else {
     $linkquery = parse_url($launch->get_target_link(), PHP_URL_QUERY);
-    if (!empty($linkquery['submissionreview'])) {
-      $targetuserid = $linkquery['submissionreview'];
-      $targetltiuserid = 'nolookupneeded';
+    if (!empty($linkquery)) {
+      parse_str($linkquery, $param);
+      if (!empty($param['submissionreview'])) {
+        $targetuserid = $param['submissionreview'];
+        $targetltiuserid = 'nolookupneeded';
+      }
     }
   }
   if (empty($targetltiuserid)) {
