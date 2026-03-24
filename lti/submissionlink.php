@@ -55,11 +55,18 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
       exit;
     } 
     $targetaid = $link->get_typeid();
+    $placementtype = $link->get_placementtype();
+    $typenum = $link->get_typenum();
+    $typeid = $link->get_typeid();
+  } else {
+    $placementtype = 'assess';
+    $typenum = 0;
+    $typeid = $targetaid;
   }
   // OK, we have a link at this point, so now we'll redirect to it
-  if ($link->get_placementtype() == 'assess') {
-    $_SESSION['ltiitemtype'] = $link->get_typenum();
-    $_SESSION['ltiitemid'] = $link->get_typeid();
+  if ($placementtype == 'assess') {
+    $_SESSION['ltiitemtype'] = $typenum;
+    $_SESSION['ltiitemid'] = $typeid;
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
 
@@ -94,11 +101,11 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
         $targetuserid
       ));
     }
-  } else if ($link->get_placementtype() == 'course') {
+  } else if ($placementtype == 'course') {
    
-  } else if (function_exists('lti_redirect_submissionreview') && lti_is_reviewable($link->get_placementtype())) {
-    $_SESSION['ltiitemtype'] = $link->get_typenum();
-    $_SESSION['ltiitemid'] = $link->get_typeid();
+  } else if (function_exists('lti_redirect_submissionreview') && lti_is_reviewable($placementtype)) {
+    $_SESSION['ltiitemtype'] = $typenum;
+    $_SESSION['ltiitemid'] = $typeid;
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
 
