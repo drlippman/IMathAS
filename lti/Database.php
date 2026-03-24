@@ -319,11 +319,14 @@ class Imathas_LTI_Database implements LTI\Database
      * Get local user id
      * @param  LTI_Message_Launch $launch
      * @param  string $role
+     * @param  string $ltiuserid (optional, only provide if using a different value than primary launch user)
      * @return false|int local userid
      */
-    public function get_local_userid(LTI\LTI_Message_Launch $launch, string $role)
+    public function get_local_userid(LTI\LTI_Message_Launch $launch, string $role, string $ltiuserid = '')
     {
-        $ltiuserid = $launch->get_platform_user_id();
+        if ($ltiuserid === '') {
+            $ltiuserid = $launch->get_platform_user_id();
+        }
         $platform_id = $launch->get_platform_id();
 
         $query = 'SELECT lti.userid,iu.LastName,lti.id FROM imas_ltiusers AS lti 
