@@ -13,7 +13,18 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
   $platform_id = $launch->get_platform_id();
   $resource_link = $launch->get_resource_link();
   //$target = parse_target_link($launch->get_target_link(), $db);
-  $targetltiuserid = $launch->get_submission_review_user_id();
+  if ($launch->is_submission_review_launch()) {
+    $targetltiuserid = $launch->get_submission_review_user_id();
+  } else {
+    $linkquery = parse_url($launch->get_target_link(), PHP_URL_QUERY);
+    if (!empty($linkquery)) {
+      parse_str($linkquery, $param);
+      if (!empty($param['submissionreview'])) {
+        list($targetaid,$targetuserid) = explode('-',$param['submissionreview']);
+        $targetltiuserid = 'nolookupneeded';
+      }
+    }
+  }
   if (empty($targetltiuserid)) {
       echo _('No target user id provided');
       exit;
@@ -30,27 +41,39 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
   }
   */
   
-  // look to see if we already know where this link should point
-  $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
-  if ($link === null) {
-    $lineitemstr = $launch->get_lineitem();
-    if ($lineitemstr !== false) {
-        $link = $db->get_link_assoc_by_lineitem($lineitemstr, $localcourse->get_id());
+  if ($launch->is_submission_review_launch()) {
+    // look to see if we already know where this link should point
+    $link = $db->get_link_assoc($resource_link['id'], $contextid, $platform_id);
+    if ($link === null) {
+      $lineitemstr = $launch->get_lineitem();
+      if ($lineitemstr !== false) {
+          $link = $db->get_link_assoc_by_lineitem($lineitemstr, $localcourse->get_id());
+      }
     }
+    if ($link === null) {
+      echo _('Cannot do a submission launch before an initial regular launch');
+      exit;
+    } 
+    $targetaid = $link->get_typeid();
+    $placementtype = $link->get_placementtype();
+    $typenum = $link->get_typenum();
+    $typeid = $link->get_typeid();
+  } else {
+    $placementtype = 'assess';
+    $typenum = 0;
+    $typeid = $targetaid;
   }
-  if ($link === null) {
-    echo _('Cannot do a submission launch before an initial regular launch');
-    exit;
-  } 
   // OK, we have a link at this point, so now we'll redirect to it
-  if ($link->get_placementtype() == 'assess') {
-    $_SESSION['ltiitemtype'] = $link->get_typenum();
-    $_SESSION['ltiitemid'] = $link->get_typeid();
+  if ($placementtype == 'assess') {
+    $_SESSION['ltiitemtype'] = $typenum;
+    $_SESSION['ltiitemid'] = $typeid;
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
 
-    $targetuserid = $db->get_local_userid($launch, 'Learner', $targetltiuserid);
-    if ($targetuserid == false) {
+    if ($targetltiuserid !== 'nolookupneeded') {
+      $targetuserid = $db->get_local_userid($launch, 'Learner', $targetltiuserid);
+    }
+    if (empty($targetuserid)) {
         echo 'Cannot find target student';
         exit;
     }
@@ -66,23 +89,23 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
       header(sprintf('Location: %s/course/gb-viewasid.php?cid=%d&aid=%d&uid=%d&asid=%d',
         $GLOBALS['basesiteurl'],
         $localcourse->get_courseid(),
-        $link->get_typeid(),
+        $targetaid,
         $targetuserid,
         $targetasid
       ));
     } else {
-      header(sprintf('Location: %s/assess2/gbviewassess.php?cid=%d&aid=%d&uid=%d',
+      header(sprintf('Location: %s/assess2/submissionreview.php?cid=%d&aid=%d&uid=%d',
         $GLOBALS['basesiteurl'],
         $localcourse->get_courseid(),
-        $link->get_typeid(),
+        $targetaid,
         $targetuserid
       ));
     }
-  } else if ($link->get_placementtype() == 'course') {
+  } else if ($placementtype == 'course') {
    
-  } else if (function_exists('lti_redirect_submissionreview') && lti_is_reviewable($link->get_placementtype())) {
-    $_SESSION['ltiitemtype'] = $link->get_typenum();
-    $_SESSION['ltiitemid'] = $link->get_typeid();
+  } else if (function_exists('lti_redirect_submissionreview') && lti_is_reviewable($placementtype)) {
+    $_SESSION['ltiitemtype'] = $typenum;
+    $_SESSION['ltiitemid'] = $typeid;
     $_SESSION['ltiitemver'] = $localcourse->get_UIver();
     $_SESSION['ltirole'] = strtolower($role);
 

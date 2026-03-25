@@ -91,7 +91,8 @@ $post = [
             [
                 "type" => "LtiDeepLinkingRequest",
                 "target_link_uri" => $basesiteurl.'/lti/launch.php',
-                "label" => sprintf(_("%s Assessment"), $installname)
+                "label" => sprintf(_("%s Assessment"), $installname),
+                "placements" => ["assignment_selection"]
             ],
             [
                 "type" => "LtiResourceLinkRequest",

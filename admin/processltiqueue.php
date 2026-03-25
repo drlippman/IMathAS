@@ -127,8 +127,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 						'ver' => 'LTI1.3',
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
+						'hash' => $row['hash'],
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade']),
+						'grade' => $row['grade'],
                         'isstu' => $row['isstu'],
                         'addedon' => $row['addedon']
 					),
@@ -174,7 +175,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             $secret = '';
             if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
                 debuglog('queing 1.1 request for '.$row['hash']);
-                $grade = min(1, max(0, $row['grade']));
                 $RCX->addRequest(
                     $ltiurl,  //url to request
                     array( 		//post data; will get transformed before send
@@ -227,8 +227,9 @@ if (count($round2)>0 &&  $timeused < 40) {
 						'ver' => 'LTI1.3',
 						'action' => 'update',
 						'ltiuserid' => $ltiuserid,
+						'hash' => $row['hash'],
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade']),
+						'grade' => $row['grade'],
                         'isstu' => $row['isstu'],
                         'addedon' => $row['addedon']
 					),
@@ -285,7 +286,7 @@ function LTIqueuePostdataCallback($data) {
                 $updater1p3->token_valid($data['platformid'])
             ) { // double check we have a valid token
 				$token = $updater1p3->get_access_token($data['platformid']);
-				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid'], $data['isstu'], $data['addedon']);
+				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid'], $data['hash'], $data['isstu'], $data['addedon']);
 			} else {
 				return false;
 			}

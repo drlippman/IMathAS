@@ -10,7 +10,7 @@ require_once __DIR__.'/../lti/LTI_Grade_Update.php';
  * @param string  $key       a unique key for the user/item.
  *                        Assessments use "assessmentid-userid", so other
  *                        types should use something different. Max 32 char.
- * @param float  $grade     The grade to send, between 0 and 1
+ * @param float|string  $grade     The grade to send, between 0 and 1, or "pts/poss"
  * @param boolean $sendnow   true to send in the next update, false (default)
  *                          to send after the $CFG-set queuedelay.
  * @param boolean $isstu    whether it was a student initiated grade change
@@ -68,12 +68,11 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
     // new assesses
     $total = $scores;
   }
-    if ($aidposs > 0) {
-	    $grade = max(0,$total/$aidposs);
+    if ($aidposs > 0 && $total >= 0) {
+	    $grade = $total.'/'.$aidposs;
     } else {
         $grade = 0;
     }
-	$grade = number_format($grade,8);
 	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow,$isstu);
 }
 
@@ -110,6 +109,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$is
       $ltiparts[2], // lineitemurl
       $action == 'delete' ? 0 : $grade, // score
       $ltiparts[1], // ltiuserid
+	  $aid.'-'.$uid, // local aid-userid
       $action == 'delete' ? 'Initialized' : 'Submitted', // activityProgress
       $action == 'delete' ? 'NotReady' : 'FullyGraded', // gradingProgress
       $isstu
@@ -177,7 +177,6 @@ function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false)
 		}
 		if ($secret != '') {
 			if ($action=='update') {
-				$grade = min(1, max(0,$grade));
 				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
 			} else if ($action=='delete') {
 				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);
@@ -496,8 +495,22 @@ if (!function_exists("getpts")) {
 	}
 }
 
+function normalizeGrade($grade) {
+	if (is_string($grade) && strpos($grade,'/')!==false) {
+		$gradepts = explode('/', $grade);
+		if ($gradepts[1] > 0) {
+			$grade = $gradepts[0] / $gradepts[1];
+		} else {
+			$grade = 0;
+		}
+	}
+	$grade = min(max(0,$grade), 1);
+	return number_format($grade,8);
+}
 
 function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResponse=false) {
+
+	$grade = normalizeGrade($grade);	
 
 	$method="POST";
 	$content_type = "application/xml";
@@ -574,6 +587,9 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResp
 
 
 function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
+
+	$grade = normalizeGrade($grade);
+
 	$body = '<?xml version = "1.0" encoding = "UTF-8"?>
 	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
 		<imsx_POXHeader>

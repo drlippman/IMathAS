@@ -219,7 +219,7 @@ if ($role == 'Instructor' && $localcourse === null) {
   if ($launch->is_deep_link_launch() && $role == 'Instructor') {
     require_once __DIR__.'/deep_link_form.php';
     deep_link_form($launch, $localuserid, $localcourse, $db);
-  } else if ($launch->is_submission_review_launch()) {
+  } else if ($launch->is_submission_review_launch() || strpos($launch->get_target_link(), 'submissionreview=')!==false) {
     require_once __DIR__.'/submissionlink.php';
     link_to_submission($launch, $localuserid, $localcourse, $db);
   } else if ($launch->is_resource_launch()) {
