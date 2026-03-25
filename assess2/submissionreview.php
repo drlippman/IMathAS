@@ -57,7 +57,7 @@ if (isset($studentid)) {
 
     //fields to extract from assess info for inclusion in output
     $include_from_assess_info = array(
-    'enddate', 'can_use_latepass', 'latepass_enddate', 'viewingb'
+        'enddate', 'can_use_latepass', 'latepass_enddate', 'viewingb', 'submitby', 'ansingb'
     );
     $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 
@@ -70,11 +70,28 @@ if (isset($studentid)) {
         exit;
     }
     if ($assessInfoOut['can_use_latepass'] > 0) {
-        require('../header.php');
-        echo '<p>'._('This assignment can still be reopened. If you review your work in the gradebook now, you will not be able to later use a LatePass.').'</p>';
-        echo '<p><a href="'.Sanitize::encodeStringForDisplay($link).'">'._('Review work anyway').'</a></p>';
-        require('../footer.php');
-        exit;
+        $LPblockingView = true;
+        // non-blocking views are ones where viewing work in GB was already allowed by settings
+        if ($assessInfoOut['viewingb'] === 'immediately' ||
+            ($assessInfoOut['submitby'] === 'by_assessment' && $assessInfoOut['viewingb'] == 'after_take')
+        ) {
+            // non-blocking views are ones where answers aren't showing
+            $ansingb = $assessInfoOut['ansingb'];
+            if ($ansingb === 'never' || $ansingb === 'after_take') {
+                $LPblockingView = false;
+            } else if ($ansingb === 'after_due' && $now < $assessInfoOut['enddate']) {
+                $LPblockingView = false;
+            } else if ($ansingb === 'after_lp' && $now < $assessInfoOut['latepass_enddate']) {
+                $LPblockingView = false;
+            }
+        }
+        if ($LPblockingView) {
+            require('../header.php');
+            echo '<p>'._('This assignment can still be reopened. If you review your work in the gradebook now, you will not be able to later use a LatePass.').'</p>';
+            echo '<p><a href="'.Sanitize::encodeStringForDisplay($link).'">'._('Review work anyway').'</a></p>';
+            require('../footer.php');
+            exit;
+        }
     }
 }
 header('Location:'.$link);
