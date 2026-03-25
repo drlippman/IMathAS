@@ -129,7 +129,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 						'ltiuserid' => $ltiuserid,
 						'hash' => $row['hash'],
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade']),
+						'grade' => $row['grade'],
                         'isstu' => $row['isstu'],
                         'addedon' => $row['addedon']
 					),
@@ -175,7 +175,6 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             $secret = '';
             if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
                 debuglog('queing 1.1 request for '.$row['hash']);
-                $grade = min(1, max(0, $row['grade']));
                 $RCX->addRequest(
                     $ltiurl,  //url to request
                     array( 		//post data; will get transformed before send
@@ -230,7 +229,7 @@ if (count($round2)>0 &&  $timeused < 40) {
 						'ltiuserid' => $ltiuserid,
 						'hash' => $row['hash'],
 						'platformid' => $platformid,
-						'grade' => max(0, $row['grade']),
+						'grade' => $row['grade'],
                         'isstu' => $row['isstu'],
                         'addedon' => $row['addedon']
 					),
