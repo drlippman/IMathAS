@@ -94,7 +94,7 @@ function link_to_submission($launch, $localuserid, $localcourse, $db) {
         $targetasid
       ));
     } else {
-      header(sprintf('Location: %s/assess2/gbviewassess.php?cid=%d&aid=%d&uid=%d',
+      header(sprintf('Location: %s/assess2/submissionreview.php?cid=%d&aid=%d&uid=%d',
         $GLOBALS['basesiteurl'],
         $localcourse->get_courseid(),
         $targetaid,
