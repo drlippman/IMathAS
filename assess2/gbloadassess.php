@@ -189,9 +189,11 @@ if ($isstudent) {
   if ($assessInfoOut['viewingb'] === 'immediately' ||
     ($assessInfoOut['submitby'] === 'by_assessment' && $assessInfoOut['viewingb'] == 'after_take')
   ) {
-    // non-blocking views are ones where answers aren't showing
+    // non-blocking views are ones where answers aren't showing or can't resume
+    // after_take and manual don't block, since presumably instructor chose to let them
+    // view answers before retaking
     $ansingb = $assess_info->getSetting('ansingb');
-    if ($ansingb === 'never' || $ansingb === 'after_take') {
+    if ($ansingb === 'never' || $ansingb === 'after_take' || $ansingb === 'manual') {
       $LPblockingView = false;
     } else if ($ansingb === 'after_due' && $now < $assessInfoOut['enddate']) {
       $LPblockingView = false;

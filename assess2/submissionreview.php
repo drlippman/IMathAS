@@ -77,7 +77,7 @@ if (isset($studentid)) {
         ) {
             // non-blocking views are ones where answers aren't showing
             $ansingb = $assessInfoOut['ansingb'];
-            if ($ansingb === 'never' || $ansingb === 'after_take') {
+            if ($ansingb === 'never' || $ansingb === 'after_take' || $ansingb === 'manual') {
                 $LPblockingView = false;
             } else if ($ansingb === 'after_due' && $now < $assessInfoOut['enddate']) {
                 $LPblockingView = false;
