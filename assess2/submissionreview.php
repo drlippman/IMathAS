@@ -69,7 +69,7 @@ if (isset($studentid)) {
         echo _('Your submission cannot be viewed at this time.');
         exit;
     }
-    if ($now > $assessInfoOut['enddate'] && $assessInfoOut['can_use_latepass'] > 0) {
+    if ($assessInfoOut['can_use_latepass'] > 0) {
         require('../header.php');
         echo '<p>'._('This assignment can still be reopened. If you review your work in the gradebook now, you will not be able to later use a LatePass.').'</p>';
         echo '<p><a href="'.Sanitize::encodeStringForDisplay($link).'">'._('Review work anyway').'</a></p>';
