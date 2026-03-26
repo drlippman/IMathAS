@@ -874,7 +874,8 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
             //echo $stu[$qn][$v];
             if ($anstypes !== null && ($anstypes[$v] === 'matrix' || $anstypes[$v] === 'calcmatrix')) {
                 if ($stu[$qn][$v] === '') { continue; }
-                $matparts = explode('|', $stu[$qn][$v]);
+                $matparts = parseMatrixToArray($stu[$qn][$v])[0];
+                if ($matparts === false) { continue; }
                 if (in_array('', $matparts)) { continue; }
                 if (in_array('NaN', $matparts)) { continue; }
                 if ($anstypes[$v] === 'matrix') {
