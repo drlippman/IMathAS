@@ -68,11 +68,15 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
     // new assesses
     $total = $scores;
   }
-    if ($aidposs > 0 && $total >= 0) {
+    /*
+	// put on hold until we add a database migration to ltiqueue for string grade
+	if ($aidposs > 0 && $total >= 0) {
 	    $grade = $total.'/'.$aidposs;
     } else {
         $grade = 0;
     }
+	*/
+	$grade = max(0,$total);
 	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow,$isstu);
 }
 
