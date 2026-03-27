@@ -59,7 +59,7 @@
         $viewonly = true;
     }
 
-	$testqpage = ($cid == 0 || $courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+	$testqpage = (!isset($courseUIver) || $courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 
 	$outputmsg = '';
 	$errmsg = '';
