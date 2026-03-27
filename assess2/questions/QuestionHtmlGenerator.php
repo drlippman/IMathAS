@@ -1452,11 +1452,18 @@ class QuestionHtmlGenerator
                     //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $vidextrefwidth, $vidextrefheight, "button", true, "video", $qref);
                 } else {
                     //$externalReferences .= formpopup($extrefpt[0], $extrefpt[1], $extrefwidth, $extrefheight, "button", true, "text", $qref);
+                    if (strpos($extrefpt[1], '3playmedia.com') !== false) {
+                        $thiswidth = 840;
+                        $thisheight = 560;
+                    } else {
+                        $thiswidth = $extrefwidth;
+                        $thisheight = $extrefheight;
+                    }
                     $externalReferences[] = [
                         'label' => $extrefpt[0],
                         'url' => $extrefpt[1],
-                        'w' => $extrefwidth,
-                        'h' => $extrefheight,
+                        'w' => $thiswidth,
+                        'h' => $thisheight,
                         'ref' => $qref,
                         'descr' => !empty($extrefpt[3]) ? $extrefpt[3] : '' 
                     ];
