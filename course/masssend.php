@@ -23,7 +23,7 @@ require_once '../includes/checkdata.php';
 
 	if (isset($_POST['message'])) {
 		$toignore = array();
-		if (intval($_POST['aidselect'])!=0) {
+		if (!empty($_POST['aidselect'])) {
 			$limitaid = $_POST['aidselect'];
 			$limittype = $_POST['limittype'];
 			$stm = $DBH->prepare("SELECT ver FROM imas_assessments WHERE id=? AND courseid=?");
