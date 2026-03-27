@@ -184,7 +184,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
                         'keytype' => $keytype,
                         'url' => $ltiurl,
                         'sourcedid' => $lti_sourcedid,
-                        'grade' => $grade
+                        'grade' => $row['grade']
                     ),
                     null, //no special callback
                     array( 	  //user-data; will get passed to response
