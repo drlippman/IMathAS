@@ -613,6 +613,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		style_formats_merge: true,
 		snippet_list: (tinymceUseSnippets==1)?imasroot+'/tinymce8/getsnippets.php':false,
         autolink_pattern: /^(https?:\/\/|www\.)(.+)$/i,
+		text_patterns: false,
 		mobile: {
 			toolbar_mode: 'sliding'
 		},
