@@ -1568,11 +1568,11 @@ fieldset.plain legend {
 	font-weight: normal;
 }
 
-details {
+details:not(.noborder) {
 	border: 1px solid #ccc;
 	padding: 1px 5px;
 }
-details[open] summary {
+details[open]:not(.noborder) summary {
 	border-bottom: 1px solid #ccc;
 }
 /* override MathJax dark mode colors */
