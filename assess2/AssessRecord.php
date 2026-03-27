@@ -4425,6 +4425,9 @@ class AssessRecord
       if (!isset($parttries[0]['raw'])) { // no scored try on this part; don't record
         return;
       }
+      if (!isset($qdata['answeights'][$pn])) { // no answeight; q changed?; don't record
+        return;
+      }
       $firstTry = $parttries[0];
       $scoreonfirst += max($firstTry['raw'],0) * $qdata['answeights'][$pn]/$answeightTot;
       $scoredet[$pn] = $firstTry['raw'];
