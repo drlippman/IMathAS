@@ -117,6 +117,8 @@
 				if (strpos($_POST['helpurl'],'ableplayer.php')!==false &&
 					strpos($_POST['helpurl'],'vtt')!==false) {
 						$captioned = 1;
+				} else if (strpos($_POST['helpurl'],'3playmedia.com')!==false) {
+					$captioned = 1;
 				} else {
 					$captioned = 0;
 				}
