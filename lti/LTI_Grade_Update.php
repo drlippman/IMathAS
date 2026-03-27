@@ -90,7 +90,8 @@ class LTI_Grade_Update {
    * Immediately send grade update (no ltiqueue)
    * @param  string $token            the token string
    * @param  string $score_url        the lineitem url
-   * @param  float|string $score      normalized to 0-1, or "pts/poss"
+   * @param  float  $score            score
+   * @param  int    $ptsposs          points possible
    * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
    * @param  string  $hash            the imathas aid-userid
    * @param  string $activityProgress default 'Submitted'
@@ -99,14 +100,14 @@ class LTI_Grade_Update {
    * @param  string $comment          default ''
    * @return false|array  false on failure, or array with body and headers
    */
-  public function send_update(string $token, string $score_url, $score,
+  public function send_update(string $token, string $score_url, float $score, int $ptsposs,
     string $ltiuserid, string $hash, string $activityProgress='Submitted',
     string $gradingProgress='FullyGraded', $isstu = 1, string $comment = ''
   ) {
     $pos = strpos($score_url, '?');
     $score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
 
-    $content = $this->get_update_body($token, $score, $ltiuserid, $hash, $isstu, null,
+    $content = $this->get_update_body($token, $score, $ptsposs, $ltiuserid, $hash, $isstu, null,
       $activityProgress, $gradingProgress, $comment);
     $this->debuglog('Sending update: '.$content['body']);
     // try to spawn a curl and don't wait for response
@@ -166,7 +167,8 @@ class LTI_Grade_Update {
   /**
    * Get body and headers for grade update
    * @param  string $token            the token string
-   * @param  float|string $score      the score, normalized 0-1, or "pts/poss"
+   * @param  float  $score            the score
+   * @param  int    $ptsposs          points possible
    * @param  string $ltiuserid        the LMS provided userid; imas_ltiusers.ltiuserid
    * @param  string  $hash            the imathas aid-userid
    * @param  boolean    $isstu            default true
@@ -176,21 +178,12 @@ class LTI_Grade_Update {
    * @param  string $comment          default ''
    * @return array [body=>, header=>]
    */
-  public function get_update_body(string $token, $score, string $ltiuserid, 
+  public function get_update_body(string $token, float $score, int $ptsposs, string $ltiuserid, 
     string $hash, $isstu = true, $addedon = null,
     string $activityProgress='Submitted', string $gradingProgress='FullyGraded',
     string $comment = ''
   ) {
-    $scoreMax = 1;
-    if (is_string($score) && strpos($score,'/')!==false) {
-      $gradepts = explode('/', $score);
-      if ($gradepts[1] > 0) {
-        $scoreMax = $gradepts[1];
-      }
-      $scoreGiven = $gradepts[0];
-    } else {
-      $scoreGiven = floatval($score);
-    }
+    $scoreMax = max(1, $ptsposs);
     $canvasext = [
         'new_submission' => ($isstu ? true : false),
         'submission_type' => 'basic_lti_launch',
@@ -200,7 +193,7 @@ class LTI_Grade_Update {
         $canvasext['submitted_at'] = date('Y-m-d\TH:i:s.uP', $addedon);
     }
     $grade = [
-      'scoreGiven' => max(0,$scoreGiven),
+      'scoreGiven' => max(0,$score),
       'scoreMaximum' => $scoreMax,
       'timestamp' => date('Y-m-d\TH:i:s.uP'),
       'userId' => $ltiuserid,

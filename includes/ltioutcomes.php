@@ -10,25 +10,27 @@ require_once __DIR__.'/../lti/LTI_Grade_Update.php';
  * @param string  $key       a unique key for the user/item.
  *                        Assessments use "assessmentid-userid", so other
  *                        types should use something different. Max 32 char.
- * @param float|string  $grade     The grade to send, between 0 and 1, or "pts/poss"
+ * @param float  $grade     The grade to send, either between 0 and 1, or value out of ptsposs
+ * @param int	 $ptsposs	Points possible
  * @param boolean $sendnow   true to send in the next update, false (default)
  *                          to send after the $CFG-set queuedelay.
  * @param boolean $isstu    whether it was a student initiated grade change
  */
-function addToLTIQueue($sourcedid, $key, $grade, $sendnow=false, $isstu=true) {
+function addToLTIQueue($sourcedid, $key, $grade, $ptsposs = 1, $sendnow=false, $isstu=true) {
 	global $DBH, $CFG;
 
 	$LTIdelay = 60*(isset($CFG['LTI']['queuedelay'])?$CFG['LTI']['queuedelay']:5);
 
-	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, failures, sendon, isstu, addedon) ';
-	$query .= 'VALUES (:hash, :sourcedid, :grade, 0, :sendon, :isstu, :addedon) ON DUPLICATE KEY UPDATE ';
-	$query .= 'grade=VALUES(grade),sendon=VALUES(sendon),sourcedid=VALUES(sourcedid),failures=0,isstu=GREATEST(isstu,VALUES(isstu)) ';
+	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, ptsposs, failures, sendon, isstu, addedon) ';
+	$query .= 'VALUES (:hash, :sourcedid, :grade, :ptsposs, 0, :sendon, :isstu, :addedon) ON DUPLICATE KEY UPDATE ';
+	$query .= 'grade=VALUES(grade),ptsposs=VALUES(ptsposs),sendon=VALUES(sendon),sourcedid=VALUES(sourcedid),failures=0,isstu=GREATEST(isstu,VALUES(isstu)) ';
 
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(
 		':hash' => $key,
 		':sourcedid' => $sourcedid,
 		':grade' => $grade,
+		':ptsposs' => $ptsposs,
 		':sendon' => (time() + ($sendnow?0:$LTIdelay)),
         ':isstu' => $isstu ? 1 : 0,
         ':addedon' => time()
@@ -68,20 +70,13 @@ function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidp
     // new assesses
     $total = $scores;
   }
-    /*
-	// put on hold until we add a database migration to ltiqueue for string grade
-	if ($aidposs > 0 && $total >= 0) {
-	    $grade = $total.'/'.$aidposs;
-    } else {
-        $grade = 0;
-    }
-	*/
+
 	$grade = max(0,$total);
-	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$allans||$sendnow,$isstu);
+	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$aidposs,$allans||$sendnow,$isstu);
 }
 
 //use this if we know the grade, or want to delete
-function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$isstu=true) {
+function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$aidposs=1,$sendnow=false,$isstu=true) {
 	global $CFG;
 
     if (empty($uid) || empty($sourcedid) || is_array($sourcedid)) {
@@ -94,12 +89,12 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$is
 		} else {
 			$logFile = fopen($logfilename, "a+");
 		}
-		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$uid,$grade,$sourcedid\n");
+		fwrite($logFile, date("j-m-y,H:i:s",time()) . ",$aid,$uid,$grade,$aidposs,$sourcedid\n");
 		fclose($logFile);
 	}
 	//if we're using the LTI message queue, and it's an update, queue it
 	if (!empty($CFG['LTI']['usequeue']) && $action=='update') {
-		return addToLTIQueue($sourcedid, $aid.'-'.$uid, $grade, $sendnow, $isstu);
+		return addToLTIQueue($sourcedid, $aid.'-'.$uid, $grade, $aidposs, $sendnow, $isstu);
 	}
 
   $sourcedidparts = explode(':|:',$sourcedid);
@@ -112,6 +107,7 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$is
     return $updater->send_update($token,
       $ltiparts[2], // lineitemurl
       $action == 'delete' ? 0 : $grade, // score
+	  $aidposs, // possible
       $ltiparts[1], // ltiuserid
 	  $aid.'-'.$uid, // local aid-userid
       $action == 'delete' ? 'Initialized' : 'Submitted', // activityProgress
@@ -119,10 +115,16 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$is
       $isstu
     );
   } else {
+	if ($aidposs > 0) {
+		$grade = $grade / $aidposs;
+	} else {
+		$grade = 0;
+	}
     updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade,$sendnow);
   }
 }
 
+// for 1.1, grade is a number 0-1
 function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
   global $DBH,$testsettings,$cid,$CFG,$userid;
 
@@ -500,14 +502,6 @@ if (!function_exists("getpts")) {
 }
 
 function normalizeGrade($grade) {
-	if (is_string($grade) && strpos($grade,'/')!==false) {
-		$gradepts = explode('/', $grade);
-		if ($gradepts[1] > 0) {
-			$grade = $gradepts[0] / $gradepts[1];
-		} else {
-			$grade = 0;
-		}
-	}
 	$grade = min(max(0,$grade), 1);
 	return number_format($grade,8);
 }

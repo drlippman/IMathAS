@@ -684,7 +684,7 @@ function recordtestdata($limit=false, $updateLTI=true) {
 				}
 				$totpossible = totalpointspossible($qi);
 				$grade = round($total/$totpossible,8);
-				$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$userid,$grade,$allans);
+				$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$userid,$grade,$totpossible,$allans);
 			}
 		}
 	}

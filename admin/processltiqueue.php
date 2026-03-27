@@ -130,6 +130,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 						'hash' => $row['hash'],
 						'platformid' => $platformid,
 						'grade' => $row['grade'],
+						'ptsposs' => $row['ptsposs'],
                         'isstu' => $row['isstu'],
                         'addedon' => $row['addedon']
 					),
@@ -175,6 +176,11 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             $secret = '';
             if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
                 debuglog('queing 1.1 request for '.$row['hash']);
+				if ($row['ptsposs'] > 0) {
+					$grade = $row['grade'] / $row['ptsposs'];
+				} else {
+					$grade = 0;
+				}
                 $RCX->addRequest(
                     $ltiurl,  //url to request
                     array( 		//post data; will get transformed before send
@@ -184,7 +190,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
                         'keytype' => $keytype,
                         'url' => $ltiurl,
                         'sourcedid' => $lti_sourcedid,
-                        'grade' => $row['grade']
+                        'grade' => $grade
                     ),
                     null, //no special callback
                     array( 	  //user-data; will get passed to response
@@ -230,6 +236,7 @@ if (count($round2)>0 &&  $timeused < 40) {
 						'hash' => $row['hash'],
 						'platformid' => $platformid,
 						'grade' => $row['grade'],
+						'ptsposs' => $row['ptsposs'],
                         'isstu' => $row['isstu'],
                         'addedon' => $row['addedon']
 					),
@@ -286,7 +293,7 @@ function LTIqueuePostdataCallback($data) {
                 $updater1p3->token_valid($data['platformid'])
             ) { // double check we have a valid token
 				$token = $updater1p3->get_access_token($data['platformid']);
-				return $updater1p3->get_update_body($token, $data['grade'], $data['ltiuserid'], $data['hash'], $data['isstu'], $data['addedon']);
+				return $updater1p3->get_update_body($token, $data['grade'], $data['ptsposs'], $data['ltiuserid'], $data['hash'], $data['isstu'], $data['addedon']);
 			} else {
 				return false;
 			}
