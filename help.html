@@ -2150,6 +2150,7 @@ Given the graph above, estimate f'(x) at x=$x.  $answerbox
 <p>There are several looping macros (such as calconarray) that can meet most needs.  For more general use
 there is a "for" loop:</p>
 
+<h4>for</h4>
 <pre>for ($i=a..b) { action }</pre>
 <p>
 Here <em>a</em> and <em>b</em> represent whole numbers, variables, or simple expressions.
@@ -2166,6 +2167,7 @@ for ($i=0..4) {
 }
 </pre>
 
+<h4>foreach</h4>
 <p>For associative arrays (arrays with non-numeric or non-consecutive keys) you can use a "foreach" loop:</p>
 
 <pre>foreach ($arr as $k=>$v) { action }</pre>
@@ -2183,6 +2185,31 @@ for ($arr as $color=>$num) {
 }
 </pre>
 
+<h4>where</h4>
+<p><code>where</code> can be used in the same way a <code>do...while</code> loop might 
+ used in other languages. Example:
+</p>
+<pre>
+{
+  $a = rand(1,10)
+  $b = rand(-10,-1)
+} where ($a+$b != 0)
+</pre>
+
+<h4>while</h4>
+<p><code>while</code> loops are similar to <code>where</code> loops, but evaluate the 
+ condition at the start rather than at the end. Example:
+</p>
+<pre>
+$index = 0
+$a = $str[$index]
+while ($a == '') {
+  $index = $index + 1
+  $a = $str[$index]
+}
+</pre>
+
+<h4>Notes</h4>
 <p>Conditions after the statement can be used <em>inside</em> a for loop, but not outside without explicit blocking</p>
 <pre>for ($i=1..5) {$a = $a+$i if ($i>2) }     WORKS
 for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK

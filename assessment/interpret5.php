@@ -82,6 +82,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 	$forloc = -1;
     $foreachloc = -1;
 	$whereloc = -1;
+	$whileloc = -1;
 	$lastsym = '';
 	$lasttype = -1;
 	$closeparens = 0;
@@ -129,7 +130,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 		}
 
 
-		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
+		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $whileloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
 			//if equality equal (not comparison or array assn), and before if/where.
 			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
@@ -193,6 +194,24 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
                         if (\$forloopcnt[{$countcnt}]>=1000) {echo \"foreach loop exceeded 1000 iterations - giving up\";}}");
 				} else {
 					echo _('error with foreach code.. must be "foreach ($arr as $a=>$b) {todo}" where $arr, $a and $b are variables only');
+					return 'error';
+				}
+			} else if ($whileloc === 0) {
+				//convert while(cond) {todo}
+				$j = $whileloc;
+				while ($j<count($bits) && $bits[$j][0]!='{') {
+					$j++;
+				}
+				$cond = implode('',array_slice($bits,$whileloc+1,$j-$whileloc-1));
+				$todo = implode('',array_slice($bits,$j));
+                if ($todo !== '' && $cond !== '') {
+					if ($countcnt==1) {
+						$bits = array('$whilecount[0]=0;$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {'.$todo.';$whilecount['.$countcnt.']++;$whilecount[0]++;}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";}; if ($whilecount[0]>=1000 && $whilecount[0]<2000 ) {echo "nested while not terminated in 1000 iterations";}');
+					} else {
+						$bits = array('$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {'.$todo.';$whilecount['.$countcnt.']++;$whilecount[0]++;}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";$whilecount[0]=5000;}; ');
+					}
+				} else {
+					echo _('error with for code.. must be "while(condition) {todo}"');
 					return 'error';
 				}
 			} else if ($ifloc == 0) {
@@ -290,6 +309,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
             $foreachloc = -1;
 			$ifloc = -1;
 			$whereloc = -1;
+			$whileloc = -1;
 			$elseloc = array();
 			//collapse bits to a line, add to lines array
 			$lines[] = implode('',$bits);
@@ -305,6 +325,11 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				$bits[] = '*';
 			}
 		} else if ($type==3) { //is num
+			if ($lastsym=='break' || $lastsym=='continue') {
+				// allow break 2 to work
+				// TODO: check break level isn't too high
+				$sym = ' ' . $sym;
+			}
 			//implicit 2 pi and $var pi
 			if ($lasttype==3 || $lasttype == 1) {
 				$bits[] = '*';
@@ -321,6 +346,8 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				$ifloc = count($bits);
 			} else if ($sym=='where') {
 				$whereloc = count($bits);
+			} else if ($sym=='while') {
+				$whileloc = count($bits);
 			} else if ($sym=='for') {
 				$forloc = count($bits);
 			} else if ($sym=='foreach') {
@@ -431,7 +458,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 				$c = $str[$i];
 			} while ($c>="a" && $c<="z" || $c>="A" && $c<="Z" || $c>='0' && $c<='9' || $c=='_');
 			//check if it's a special word, and set type appropriately if it is
-			if ($out=='if' || $out=='where' || $out=='for' || $out=='foreach' || $out=='break' || $out=='continue') {
+			if ($out=='if' || $out=='where' || $out=='for' || $out=='foreach' || $out=='while' || $out=='break' || $out=='continue') {
 				$intype = 8;
 			} else if ($out=='else' || $out=='elseif') {
 				$intype = 8;
