@@ -17,7 +17,7 @@ if (!isset($GLOBALS['allowedmacros'])) {
 array_push($GLOBALS['allowedmacros'],"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
 $GLOBALS['disallowedvar'] = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la',
   '$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips',
-  '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros',
+  '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$allowedConstants',
   '$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights',
   '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts','$teacherInGb',
   '$_SERVER','$_POST','$_GET','$_FILES','$_REQUEST','$_SESSION','$_COOKIE','$_ENV');
@@ -360,6 +360,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 	global $DBH, $allowedmacros;
 	global $mathfuncs;
 	global $disallowedvar;
+	$allowedConstants = ['PREG_SET_ORDER','PREG_PATTERN_ORDER'];
 	$i = 0;
 	$connecttolast = 0;
 	$len = strlen($str);
@@ -502,7 +503,9 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 				} else {
 					//not a function, so what is it?
                     $outlower = strtolower($out);
-					if ($outlower=='true' || $outlower=='false' || $outlower=='null' || $outlower=='as') {
+					if ($outlower=='true' || $outlower=='false' || $outlower=='null' || $outlower=='as' ||
+						in_array($out, $allowedConstants)
+					) {
 						//we like this - it's an acceptable unquoted string
 					} else {//
 						//an unquoted string!  give a warning to instructor,
