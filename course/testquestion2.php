@@ -246,7 +246,7 @@ $useeqnhelper = $eqnhelper ?? 0;
 $placeinhead = '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/style.css?v='.$lastvueupdate.'" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
 if (!empty($CFG['assess2-use-vue-dev'])) {
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=101825" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=032826" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/drawing.js?v=041920" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/AMhelpers2.js?v=071122" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/eqntips.js?v=041920" type="text/javascript"></script>';
@@ -254,12 +254,12 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=021121" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=071122" type="text/javascript"></script>';
 } else {
-  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=020326" type="text/javascript"></script>';
+  $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=032826" type="text/javascript"></script>';
   $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
 }
 
 $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v=041522" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=010726">
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=032826">
   <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=020226">';
 $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
 $placeinhead .= '<script>

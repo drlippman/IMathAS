@@ -32,9 +32,9 @@ $placeinhead .= 'var inTreeReader = ' . ($inTreeReader ? 1 : 0) . ';';
 $placeinhead .= '</script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/style.css?v=D4qbb996" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';
-$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=020326" type="text/javascript"></script>';
+$placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=032826" type="text/javascript"></script>';
 $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=010726">
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=032826">
   <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=020226">';
 if ($isltilimited || $inTreeReader) {
   $placeinhead .= '<script>var exiturl = "";</script>';

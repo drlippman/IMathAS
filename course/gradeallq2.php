@@ -384,11 +384,11 @@
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqeditor.js?v=041920" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/mathquill/mqedlayout.js?v=041920" type="text/javascript"></script>';
     } else {
-        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=020326" type="text/javascript"></script>';
+        $placeinhead .= '<script src="'.$staticroot.'/mathquill/mathquill.min.js?v=032826" type="text/javascript"></script>';
         $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     }
     
-	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=010726">
+	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=032826">
 	  <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=020226">';
 
 	$placeinhead .= "<script type=\"text/javascript\">";

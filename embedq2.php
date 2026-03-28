@@ -305,7 +305,7 @@ if (isset($_GET['theme'])) {
 
 $placeinhead = '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/vue/css/style.css?v=' . $lastvueupdate . '" />';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/assess2/print.css?v=' . $lastvueupdate . '" media="print">';
-$placeinhead .= '<script src="' . $staticroot . '/mathquill/mathquill.min.js?v=020326" type="text/javascript"></script>';
+$placeinhead .= '<script src="' . $staticroot . '/mathquill/mathquill.min.js?v=032826" type="text/javascript"></script>';
 if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/javascript/drawing.js?v=041920" type="text/javascript"></script>';
     $placeinhead .= '<script src="' . $staticroot . '/javascript/AMhelpers2.js?v=052120" type="text/javascript"></script>';
@@ -318,7 +318,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
 }
 
 $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=092224" type="text/javascript"></script>';
-$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css?v=010726">
+$placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css?v=032826">
   <link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mqeditor.css?v=020226">';
 
 // setup resize message sender

@@ -145,6 +145,12 @@ var MQeditor = (function($) {
         if (calcformat.match(/allowplusminus/)) {
             thisMQconfig.quickPlusMinus = true;
         }
+        if (calcformat.match(/ntuple/)) {
+          thisMQconfig.listCharReturnsTo = [',', 'bracket'];
+        } else if (calcformat.match(/list/)) {
+          thisMQconfig.listCharReturnsTo = [',', 'baseline'];
+        }
+        console.log(thisMQconfig);
 
         thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
             'ln log abs exp sin cos tan arcsinh arccosh arctanh arcsech arccsch arccoth argsinh argcosh argtanh argsech argcsch argcoth arsinh arcosh artanh arsech arcsch arcoth arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth';
