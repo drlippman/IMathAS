@@ -731,7 +731,7 @@ foreach ($itemsimporder as $item) {
 				$assess[$moday][$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][4];
 				//if (($greyitems[$item]&$byid['A'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
-				if (($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) || isset($hiddenitems[$item])) {  //hide link and grey if not current
+				if (!$editingon && (($byid['A'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) || isset($hiddenitems[$item]))) {  //hide link and grey if not current
 					$colors[$k] = '#ccc';
 					$assess[$moday][$k]['color'] = '#ccc';
 				}
@@ -754,7 +754,7 @@ foreach ($itemsimporder as $item) {
 				$colors[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][4];
-				if (($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) || isset($hiddenitems[$item])) {
+				if (!$editingon && (($byid['F'.$datetype.$itemsassoc[$item][1]][5]>0 && !isset($teacherid)) || isset($hiddenitems[$item]))) {
 					$colors[$k] = '#ccc';
                     $assess[$moday][$k]['color'] = '#ccc';
 				}
@@ -776,14 +776,16 @@ foreach ($itemsimporder as $item) {
 				}
 				$assess[$moday][$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][4];
-				if (($greyitems[$item]&$byid['I'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
-					$colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
-					unset($assess[$moday][$k]['id']);
-				} else if (isset($hiddenitems[$item])) {
-                    $colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
-                }
+				if (!$editingon) {
+					if (($greyitems[$item]&$byid['I'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+						$colors[$k] = '#ccc';
+						$assess[$moday][$k]['color'] = '#ccc';
+						unset($assess[$moday][$k]['id']);
+					} else if (isset($hiddenitems[$item])) {
+						$colors[$k] = '#ccc';
+						$assess[$moday][$k]['color'] = '#ccc';
+					}
+				}
 				$k++;
 			}
 		}
@@ -799,14 +801,16 @@ foreach ($itemsimporder as $item) {
 				$colors[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][4];
-				if (($greyitems[$item]&$byid['L'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
-					$colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
-					unset($assess[$moday][$k]['id']);
-				} else if (isset($hiddenitems[$item])) {
-                    $colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
-                }
+				if (!$editingon) {
+					if (($greyitems[$item]&$byid['L'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+						$colors[$k] = '#ccc';
+						$assess[$moday][$k]['color'] = '#ccc';
+						unset($assess[$moday][$k]['id']);
+					} else if (isset($hiddenitems[$item])) {
+						$colors[$k] = '#ccc';
+						$assess[$moday][$k]['color'] = '#ccc';
+					}
+				}
 				$k++;
 			}
 		}
@@ -822,14 +826,16 @@ foreach ($itemsimporder as $item) {
 				$colors[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][2];
 				$assess[$moday][$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][3];
 				$names[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][4];
-				if (($greyitems[$item]&$byid['D'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
-					$colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
-					unset($assess[$moday][$k]['id']);
-				} else if (isset($hiddenitems[$item])) {
-                    $colors[$k] = '#ccc';
-					$assess[$moday][$k]['color'] = '#ccc';
-                }
+				if (!$editingon) {
+					if (($greyitems[$item]&$byid['D'.$datetype.$itemsassoc[$item][1]][5])>0 && !isset($teacherid)) {
+						$colors[$k] = '#ccc';
+						$assess[$moday][$k]['color'] = '#ccc';
+						unset($assess[$moday][$k]['id']);
+					} else if (isset($hiddenitems[$item])) {
+						$colors[$k] = '#ccc';
+						$assess[$moday][$k]['color'] = '#ccc';
+					}
+				}
 				$k++;
 			}
 		}
