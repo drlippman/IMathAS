@@ -2050,6 +2050,7 @@ function submitChanges() {
                 document.getElementById("statusmsg").textContent = msg;
                 itemarray = olditemarray.slice();
                 refreshTable();
+                inTransit = false;
                 return;
             }
             if (!beentaken) {
