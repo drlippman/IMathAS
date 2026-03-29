@@ -897,6 +897,7 @@ function updatePts() {
         var newdefpts = Math.ceil($("#defpts").val());
         $("#defpts").val(newdefpts);
         var olddefpts = $("#defpts").attr("data-lastval");
+        var haschg = false;
         if (newdefpts == "" || newdefpts <= 0) {
             newdefpts = olddefpts;
             $("#defpts").val(olddefpts);
@@ -911,6 +912,9 @@ function updatePts() {
             if (newdefpts != olddefpts && curval == olddefpts) {
                 //update pts to match new default
                 curval = newdefpts;
+                haschg = true;
+            } else if (curval != $(this).attr("data-lastval")) {
+                haschg = true;
             }
             itemarray[qparts[1]][4] = curval == newdefpts ? 9999 : curval;
         });
@@ -923,12 +927,17 @@ function updatePts() {
             if (newdefpts != olddefpts && curval == olddefpts) {
                 //update pts to match new default
                 curval = newdefpts;
+                haschg = true;
+            } else if (curval != $(this).attr("data-lastval")) {
+                haschg = true;
             }
             for (var i = 0; i < itemarray[qparts[1]][2].length; i++) {
                 itemarray[qparts[1]][2][i][4] = curval == newdefpts ? 9999 : curval;
             }
         });
-        submitChanges();
+        if (haschg) {
+            submitChanges();
+        }
     }
 }
 
