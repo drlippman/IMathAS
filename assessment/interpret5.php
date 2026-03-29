@@ -44,7 +44,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
 		$str = str_replace("&&\n","<br/>",$str);
         $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt,$included_qs).';';
-        $r = '$wherecount[0]=0;' . $r;
+        $r = '$wherecount[0]=0;$whilecount[0]=0;' . $r;
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
         }
@@ -130,7 +130,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 		}
 
 
-		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $whileloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
+		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
 			//if equality equal (not comparison or array assn), and before if/where.
 			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
@@ -206,9 +206,9 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				$todo = implode('',array_slice($bits,$j));
                 if ($todo !== '' && $cond !== '') {
 					if ($countcnt==1) {
-						$bits = array('$whilecount[0]=0;$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {'.$todo.';$whilecount['.$countcnt.']++;$whilecount[0]++;}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";}; if ($whilecount[0]>=1000 && $whilecount[0]<2000 ) {echo "nested while not terminated in 1000 iterations";}');
+						$bits = array('$whilecount[0]=0;$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {$whilecount['.$countcnt.']++;$whilecount[0]++;'.$todo.';}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";}; if ($whilecount[0]>=1000 && $whilecount[0]<2000 ) {echo "nested while not terminated in 1000 iterations";}');
 					} else {
-						$bits = array('$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {'.$todo.';$whilecount['.$countcnt.']++;$whilecount[0]++;}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";$whilecount[0]=5000;}; ');
+						$bits = array('$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {$whilecount['.$countcnt.']++;$whilecount[0]++;'.$todo.';}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";$whilecount[0]=5000;}; ');
 					}
 				} else {
 					echo _('error with for code.. must be "while(condition) {todo}"');
@@ -275,24 +275,24 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$wherecond = implode('',array_slice($bits,$whereloc+1,$ifloc-$whereloc-1));
 					$ifcond = implode('',array_slice($bits,$ifloc+1));
 					if ($countcnt==1) { //if outermost
-						$bits = array('if ('.$ifcond.') {$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000) {echo "nested where not met in 1000 iterations";}}');
+						$bits = array('if ('.$ifcond.') {$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000) {echo "nested where not met in 1000 iterations";}}');
 					} else {
-						$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;} }');
+						$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;} }');
 					}
 				} else if (count($elseloc)==1 && $elseloc[0][1]=='else' && $elseloc[0][0]>$whereloc) {
                     $wherecond = implode('',array_slice($bits,$whereloc+1,$elseloc[0][0]-$whereloc-1));
                     $elsetodo = implode('',array_slice($bits, $elseloc[0][0]+1));
                     if ($countcnt==1) {
-						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200 || $wherecount[0]>=1000) {'.$elsetodo.';};');
+						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200 || $wherecount[0]>=1000) {'.$elsetodo.';};');
 					} else {
-						$bits = array('$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {'.$elsetodo.';}; ');
+						$bits = array('$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {'.$elsetodo.';}; ');
 					}
                 } else {
 					$wherecond = implode('',array_slice($bits,$whereloc+1));
 					if ($countcnt==1) {
-						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo "nested where not met in 1000 iterations";}');
+						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo "nested where not met in 1000 iterations";}');
 					} else {
-						$bits = array('$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;}; ');
+						$bits = array('$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;}; ');
 					}
 				}
 
