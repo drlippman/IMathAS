@@ -233,7 +233,42 @@ if ($myrights<20) {
 	} else {
 		$eqnhelper = 4;
 	}
-	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName,imas_libraries.id AS libid,imas_users.id AS uid,imas_libraries.userights,imas_users.groupid FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
+	if (($CFG['MySQL_ver'] ?? 0) >= 8) {
+		$query = 'WITH RECURSIVE ancestors AS (
+		SELECT l.id, l.name, l.parent, 0 AS depth, l.id AS root_libid
+		FROM imas_libraries l
+		INNER JOIN imas_library_items li ON l.id = li.libid
+		WHERE li.qsetid = :qsetid
+			AND l.deleted = 0
+			AND li.deleted = 0
+
+		UNION ALL
+
+		SELECT l.id, l.name, l.parent, a.depth + 1, a.root_libid
+		FROM imas_libraries l
+		INNER JOIN ancestors a ON l.id = a.parent
+		WHERE a.parent != 0
+		),
+		breadcrumbs AS (
+		SELECT root_libid AS libid,
+				GROUP_CONCAT(name ORDER BY depth DESC SEPARATOR " > ") AS breadcrumb
+		FROM ancestors
+		GROUP BY root_libid
+		)
+		SELECT l.name, u.LastName, u.FirstName, l.id AS libid, u.id AS uid,
+			l.userights, u.groupid,
+			b.breadcrumb
+		FROM imas_libraries l
+		JOIN imas_library_items li ON l.id = li.libid
+		JOIN imas_users u ON li.ownerid = u.id
+		JOIN breadcrumbs b ON l.id = b.libid
+		WHERE l.deleted = 0
+		AND li.deleted = 0
+		AND li.qsetid = :qsetid;';
+		$resultLibNames = $DBH->prepare($query);
+	} else {
+		$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName,imas_libraries.id AS libid,imas_users.id AS uid,imas_libraries.userights,imas_users.groupid FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_libraries.deleted=0 AND imas_library_items.deleted=0 AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
+	}
 	$resultLibNames->execute(array(':qsetid'=>$qsetid));
 }
 
@@ -637,7 +672,7 @@ if ($overwriteBody==1) {
             } else {
                 echo '<span>';
             }
-            echo Sanitize::encodeStringForDisplay($row['name']) . '</span>';
+            echo Sanitize::encodeStringForDisplay($row['breadcrumb'] ?? $row['name']) . '</span>';
 
 			if ($isadmin) {
                 printf(' (<span class="pii-full-name">%s, %s</span>)',
