@@ -348,6 +348,10 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				$whereloc = count($bits);
 			} else if ($sym=='while') {
 				$whileloc = count($bits);
+				if ($whileloc !== 0) {
+					echo _('invalid use of while.. must be "while (condition) {todo}".');
+					return 'error';
+				}
 			} else if ($sym=='for') {
 				$forloc = count($bits);
 			} else if ($sym=='foreach') {
