@@ -13,6 +13,7 @@ array_push(
     'comparentuples',
     'comparenumberswithunits',
     'comparesameform',
+    'comparecomplex',
     'scoreperiodic'
 );
 
@@ -34,6 +35,32 @@ function comparenumbers($a, $b, $tol = '.001') {
         }
     } else {
         if (abs($a - $b) / (abs($a) + .0001) < $tol + 1E-12) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function comparecomplex($a, $b, $tol = '.001') {
+    if (strval($tol)[0] == '|') {
+        $abstolerance = floatval(substr($tol, 1));
+    }
+    $a = evalMathParser($a, true);
+    $b = evalMathParser($b, true);
+
+    if (!is_array($a) || !is_array($b)) {
+        return false;
+    }
+    if (isset($abstolerance)) {
+        if (abs($a[0] - $b[0]) < $abstolerance + 1E-12 && 
+            abs($a[1] - $b[1]) < $abstolerance + 1E-12
+        ) {
+            return true;
+        }
+    } else {
+        if (abs($a[0] - $b[0]) / (abs($a[0]) + .0001) < $tol + 1E-12 && 
+            abs($a[1] - $b[1]) / (abs($a[1]) + .0001) < $tol + 1E-12
+        ) {
             return true;
         }
     }
