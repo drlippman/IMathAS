@@ -214,7 +214,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '</div>';
 
     $answertype = 0;
-	if (preg_match('/^inf/',$answer) || $answer==='oo' || $answer===$infsoln) {
+	if ($includeinf && (preg_match('/^inf/',$answer) || $answer==='oo' || $answer===$infsoln)) {
 		$answer = $infsoln;
         $answertype = 2;
 	}
