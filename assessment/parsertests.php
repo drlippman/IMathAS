@@ -120,6 +120,39 @@ $t = microtime(true) - $st;
 $tp = $t/count($tests);
 echo "Parser tests done in $t, $tp per<br><br>";
 
+
+$complextests = [
+ ['2+3i', [], [2,3]],
+ ['5(2+3i)+i*(2+i)', [], [9,17]],
+ ['e^(i*pi)', [], [-1,0]],
+ ['sqrt(4)+sqrt(-9)', [], [2,3]],
+ ['root(3)(8)',[], [2,0]],
+ ['root(3)(2+3i)', [], [1.451856618352665, 0.493403534104005]],
+ ['root(2-i)(2+3i)', [], [1.0927252, 0.830026485]],
+ ['sin(3+i)', [], [0.217759551,-1.163440363703]]
+];
+
+$st = microtime(true);
+foreach ($complextests as $test) {
+  $p = new MathParser(implode(',', array_keys($test[1])), [], '', true);
+  $out = 0;
+  try {
+    $p->parse($test[0]);
+    $out = $p->evaluate($test[1]);
+    if (abs($out[0] - $test[2][0]) > 1e-6 || abs($out[1] - $test[2][1]) > 1e-6) {
+      echo "Test failed on {$test[0]}: ".print_r($out,true).' vs '.print_r($test[2],true)."<br>";
+    }
+  } catch (Throwable $t) {
+    echo "Test crashed on {$test[0]}: ".print_r($out,true).' vs '.print_r($test[2],true)."<br>";
+    echo $t->getMessage();
+    $p->printTokens();
+  }
+}
+$t = microtime(true) - $st;
+$tp = $t/count($tests);
+echo "Complex Parser tests done in $t, $tp per<br><br>";
+
+
 $sameformtests = [
     ['(x+3)(-x+5)','(5-x)(3+x)',['x']],
     ['1x+3','3+x',['x']],

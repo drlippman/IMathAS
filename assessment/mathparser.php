@@ -1675,13 +1675,23 @@ function cplx_div($n,$d) {
   return [($n[0]*$d[0] + $n[1]*$d[1])/$ds, ($n[1]*$d[0]-$n[0]*$d[1])/$ds];
 }
 function cplx_sqrt($z) {
-  return cplx_nthroot($z,2);
+  return cplx_nthroot($z,[2,0]);
 }
 function cplx_nthroot($z,$b) {
+  /*if ($b[1] != 0) {
+    throw new MathParserException("Can only handle real roots of complex numbers");
+  }
   $r = $z[0]*$z[0] + $z[1]*$z[1];
-  $m = safepow($r, $b/(2*$b));
+  $m = safepow($r, 1/(2*$b[0]));
   $t = atan2($z[1],$z[0]);
-  return [$m*cos($t/$b), $m*sin($t/$b)];
+  return [$m*cos($t/$b[0]), $m*sin($t/$b[0])];
+  */
+  // z^(1/b) = exp(1/b*ln(z))   
+  $invb = cplx_div([1,0],$b);
+  $logz = [log(safepow($z[0]*$z[0]+$z[1]*$z[1], 1/2)), atan2($z[1],$z[0])];
+  $mult = cplx_mult($invb, $logz);
+  $m = exp($mult[0]);
+  return [$m*cos($mult[1]), $m*sin($mult[1])];
 }
 function cplx_log($z, $b = M_E) {
   $r = sqrt($z[0]*$z[0] + $z[1]*$z[1]);
