@@ -88,7 +88,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 	$closeparens = 0;
 	$symcnt = 0;
 	//get tokens from tokenizer
-    $syms = tokenize($str,$anstype,$countcnt,$included_qs);
+    $syms = tokenize($str,$anstype,$countcnt,$included_qs);;
 	$k = 0;
 	$symlen = count($syms);
 	//$lines holds lines of code; $bits holds symbols for the current line.
@@ -104,7 +104,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $lasttype!=8 && $syms[$k+1][0]!='=') {
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $lasttype!=8) {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b and if !a
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
@@ -291,7 +291,6 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$wherecond = implode('',array_slice($bits,$whereloc+1));
 					if ($countcnt==1) {
 						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo "nested where not met in 1000 iterations";}');
-						echo $bits[0];
 					} else {
 						$bits = array('$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;}; ');
 					}
@@ -387,7 +386,8 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 //get tokens
 //eat up extra whitespace at end
 //return array of arrays: array($symbol,$symtype)
-//types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other, 11 array index []
+//types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 
+// 7 endofline, 8 control, 9 error, 0 other, 11 array index [], 12 comparison
 function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 	global $DBH, $allowedmacros;
 	global $mathfuncs;
@@ -717,6 +717,19 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
                     $i++;
                     $c = $str[$i];
                 }
+			}
+		} else if ($c=='<' || $c=='>' || (($c=='!' || $c=='=') && ($str[$i + 1] ?? '' == '='))) {
+			$intype = 12; // comparison
+			$out .= $c;
+			$i++;
+			while ($i<$len) {
+				$c = $str[$i];
+				if ($c === '=') {
+					$out .= $c;
+					$i++;
+				} else {
+					break;
+				}
 			}
 		} else {
 			//no type - just append string.  Could be operators
