@@ -2749,6 +2749,9 @@ These macros are used to test various conditions.  They typically return true or
 	specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance. Each of a and b must be of the form: 
 	<code>[decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...</code>, though 'per' may be used for division of units, and 'unit squared', 'square unit',
 	'unit cubed' and 'cubic unit' may be used. Examples: <code>4 cm</code>, and <code>3.5E4 feet per second squared</code>
+<li><strong>comparecomplex(a,b,[tol])</strong>:  Compares complex number expressions a and b to see if there are equivalent to the specified
+  tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
+  Note this accomodates any format, so 'sqrt(-4)' and '2i' will be considered equivalent, as would 'e^(pi*i)' and '-1'.</li>
 <li><strong>comparentuples(a,b,[tol],[option])</strong>:  Compares ntuples or calcntuples a and b to see if they are equivalent to the specified
 	  tolerance.  Set a single tol to specify the relative tolerance for all entries in ntuple (defaults to .001), or prefix with | for an absolute tolerance,
 		such as "|0.5". Can make tol an array (or list) to apply by element to the ntuple. By default, function compares the parentheses/brackets containing the
