@@ -104,8 +104,8 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1][0]!='=') {
-			//convert a! to factorial(a), avoiding if(!a) and a!=b
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $lasttype!=8 && $syms[$k+1][0]!='=') {
+			//convert a! to factorial(a), avoiding if(!a) and a!=b and if !a
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
 			$bits[] = ')';
@@ -291,6 +291,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$wherecond = implode('',array_slice($bits,$whereloc+1));
 					if ($countcnt==1) {
 						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo "nested where not met in 1000 iterations";}');
+						echo $bits[0];
 					} else {
 						$bits = array('$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;}; ');
 					}
