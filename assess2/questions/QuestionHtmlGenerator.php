@@ -532,6 +532,7 @@ class QuestionHtmlGenerator
                     }
                     if ($seqPartDone !== true && empty($seqPartDone[$_pnidx]) && ($quesData['qtype'] == "conditional" || !empty($answeights[$_pnidx]))) {
                       $_thisGroupDone = false;
+                      $jsParams['hasseqnext'] = true;
                     }
                   }
                   $seqGroupDone[$kidx] = $_thisGroupDone;
@@ -928,9 +929,10 @@ class QuestionHtmlGenerator
                 }
               }
               if ($lastGroupDone) { // add html to output
-                $newqtext .= '<p class="seqsep" role="heading" tabindex="-1">';
+                $newqtext .= '<div tabindex="-1" class="seqsepwrap"><div class="seqscoreresult" hidden></div>';
+                $newqtext .= '<p class="seqsep" role="heading">';
                 $newqtext .= sprintf(_('Part %d of %d'), $k+1, count($seqParts));
-                $newqtext .= '</p><div>' . $seqPart . '</div>';
+                $newqtext .= '</p><div>' . $seqPart . '</div></div>';
               }
               $lastGroupDone = $thisGroupDone;
             }

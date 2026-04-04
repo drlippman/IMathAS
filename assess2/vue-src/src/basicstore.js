@@ -495,9 +495,6 @@ export const actions = {
     }
     this.addAutosaveData(data, Object.keys(changedQuestions));
 
-    const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
-      store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
-
     window.$.ajax({
       url: store.APIbase + 'scorequestion.php' + store.queryString,
       type: 'POST',
@@ -564,7 +561,9 @@ export const actions = {
             Router.push('/summary');
           }
         } else if (qns.length === 1) {
-          store.assessInfo.questions[qns[0]].hadSeqNext = hasSeqNext;
+          // get new value
+          const hasSeqNext = (qns.length === 1 && store.assessInfo.questions[qns[0]].jsparams &&
+            store.assessInfo.questions[qns[0]].jsparams.hasseqnext);
           // scroll to score result
           nextTick(() => {
             var el;
@@ -572,8 +571,9 @@ export const actions = {
               el = document.getElementById('questionwrap' + qns[0]).parentNode.parentNode;
               window.$(el).find('.scoreresult').focus();
             } else {
-              el = window.$('#questionwrap' + qns[0]).find('.seqsep').last().next()[0];
-              window.$('#questionwrap' + qns[0]).find('.seqsep').last().focus();
+              el = window.$('#questionwrap' + qns[0]).find('.seqsepwrap').last();
+              el.focus();
+              el = el[0];
             }
             var bounding = el.getBoundingClientRect();
             if (bounding.top < 0 || bounding.bottom > document.documentElement.clientHeight) {
@@ -1255,6 +1255,14 @@ export const actions = {
           data.questions[i].tries_remaining = 0;
           data.questions[i].canregen = false;
           data.questions[i].regens_remaining = 0;
+        }
+        // if conditional and out of tries, set hasseqnext to false
+        if (data.questions[i].jsparams && 
+            data.questions[i].jsparams.hasseqnext &&
+            data.questions[i].jsparams.submitall &&
+            data.questions[i].try == data.questions[i].tries_max
+        ) {
+          data.questions[i].jsparams.hasseqnext = false;
         }
 
         store.lastLoaded[i] = new Date();

@@ -996,7 +996,7 @@ function showSyntaxCheckMQ(qn) {
   if (document.getElementById("qn"+qn)) {
     var MQ = MathQuill.getInterface(MathQuill.getInterface.MAX);
     var mqel = document.getElementById("mqinput-qn"+qn);
-    if (mqel.className.indexOf('disabled') == -1) {
+    if (mqel && mqel.className.indexOf('disabled') == -1) {
       var mf = MQ.MathField(mqel);
       mf.setAriaPostLabel(outerr, 5);
     }

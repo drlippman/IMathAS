@@ -301,6 +301,12 @@ scoreresult-jumptolast = Zum zuletzt eingereichten Teil springen
 scoreresult-allpartscorrect = Alle eingereichten Teile sind korrekt.
 scoreresult-onepartincorrect = Mindestens ein bewerteter Teil ist falsch.
 
+# Sequential Score results
+#checkme 3
+seqresult-incorrect = One or more answers were incorrect
+seqresult-continue = Continue working on this part
+seqresult-next = Continue to the next part
+
 # Summary
 summary-no_total = Ihr Test wurde eingereicht.
 #checkme 2

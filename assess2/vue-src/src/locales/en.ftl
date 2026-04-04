@@ -296,6 +296,11 @@ scoreresult-jumptolast = Jump to last submitted part
 scoreresult-allpartscorrect = All submitted parts correct.
 scoreresult-onepartincorrect = At least one scored part is incorrect.
 
+# Sequential Score results
+seqresult-incorrect = One or more answers were incorrect
+seqresult-continue = Continue working on this part
+seqresult-next = Continue to the next part
+
 # Summary
 summary-no_total = Your assessment has been submitted.
 summary-viewwork_work = You can view your work in the gradebook.
