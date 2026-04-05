@@ -1666,7 +1666,7 @@ function gbtable() {
 				}
 
 				if ($l['score']!=null) {
-					if (isset($gb[$row][1][$col][0])) {
+					if (isset($gb[$row][1][$col][0]) && is_numeric($gb[$row][1][$col][0])) {
 						$gb[$row][1][$col][0] += 1*$l['score']; //adding up all forum scores
 					} else {
 						$gb[$row][1][$col][0] = 1*$l['score'];
@@ -1694,7 +1694,9 @@ function gbtable() {
                		!in_array($stusection[$l['userid']], $sectionlimit[$col])
                 ) {
                     // is not in this stu's section, so we won't count it, 
-                    $gb[$row][1][$col][0] = ' ';
+					if (!isset($gb[$row][1][$col][0])) {
+                    	$gb[$row][1][$col][0] = ' ';
+					}
                 } else if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
