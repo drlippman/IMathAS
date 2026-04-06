@@ -110,7 +110,11 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
 			$bits[] = ')';
-			$sym = '';
+			$lastsym = '';
+			$lasttype = 2;
+			$k++;
+			$cnt++;
+			continue;
 		} else if ($lasttype==2 && $type==4 && substr($lastsym,0,5)=='root(') {
 			$bits[] = substr($lastsym,0,-1).',';
 			$sym = substr($sym,1);
