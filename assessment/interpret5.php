@@ -44,6 +44,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
 		$str = str_replace("&&\n","<br/>",$str);
         $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt,$included_qs).';';
+
         $r = '$wherecount[0]=0;$whilecount[0]=0;' . $r;
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
@@ -104,7 +105,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $lasttype!=8) {
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $lasttype!=8 && $lasttype!=12) {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b and if !a
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
@@ -718,7 +719,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
                     $c = $str[$i];
                 }
 			}
-		} else if ($c=='<' || $c=='>' || (($c=='!' || $c=='=') && ($str[$i + 1] ?? '' == '='))) {
+		} else if ($c=='<' || $c=='>' || (($c=='!' || $c=='=') && (($str[$i + 1] ?? '') == '='))) {
 			$intype = 12; // comparison
 			$out .= $c;
 			$i++;
