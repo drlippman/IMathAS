@@ -109,6 +109,8 @@ END;
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
 	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">"._("Add/Remove Questions")."</a> &gt; "._("Categorize Questions")."</div>\n";
+	echo '<div id="headercategorize" class="pagetitle"><h1>'._('Categorize Questions').'</h1></div>';
+	
 	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 	$outcomenames = array();
@@ -171,6 +173,11 @@ END;
 		}
 	}
 
+	if (count($qsetids) == 0) {
+		echo _('No Questions in Assessment');
+		require('../footer.php');
+		exit;
+	}
 	$qsetidlist = implode(',', array_map('intval', array_values(array_unique($qsetids))));
 	//add assessment names as options
 	//find the names of assessments these questionsetids appear in
@@ -209,7 +216,6 @@ END;
 		}
 	}
 
-	echo '<div id="headercategorize" class="pagetitle"><h1>'._('Categorize Questions').'</h1></div>';
 	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&from=$from&record=true\">";
 	echo _('Check').': <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">'._('All').'</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">'._('None').'</a>';
