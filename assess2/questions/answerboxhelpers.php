@@ -439,3 +439,23 @@ function sizeToCSS($size) {
 		return $size;
 	}
 }
+
+function getdimwarnmsp($displayformat, $dim) {
+	if ($displayformat == 'point') {
+		return sprintf(_('The point should have %d components'), $dim);
+	} else if ($displayformat == 'pointlist') {
+		return sprintf(_('Each point should have %d components'), $dim);
+	} else if ($displayformat == 'vector') {
+		return sprintf(_('The vector should have %d components'), $dim);
+	} else if ($displayformat == 'vectorlist') {
+		return sprintf(_('Each vector should have %d components'), $dim);
+	} else if ($displayformat == 'set') {
+		return sprintf(_('The set should have %d components'), $dim);
+	} else if ($displayformat == 'setlist') {
+		return sprintf(_('Each set should have %d components'), $dim);
+	} else if ($displayformat == 'list') {
+		return sprintf(_('Each n-tuple should have %d components'), $dim);
+	} else {
+		return sprintf(_('The n-tuple should have %d components'), $dim);
+	}
+}

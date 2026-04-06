@@ -51,17 +51,34 @@ class AlgebraicNTupleAnswerBox implements AnswerBox
         if (empty($answerboxsize)) {$answerboxsize = 20;}
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
+        $hintdim = 2;
+        if (in_array('dimensionhint', $ansformats)) {
+            $p = parseNtuple($answer, true);
+            if (!empty($p[0][0]['vals'])) {
+                $dim = count($p[0][0]['vals']);
+                $params['ntupledim'] = $dim;
+                if ($dim == 3) {
+                    $hintdim = 3;
+                }
+            }
+        }
+        if ($hintdim == 2) {
+            $pts = ['x,x^2', '3,4x'];
+        } else if ($hintdim == 3) {
+            $pts = ['x,3,x^2', 'x,x^2+1,3x'];
+        }
+
         if ($displayformat == 'point') {
-            $tip = _('Enter your answer as an algebraic point.  Example: (x,x^2)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as an algebraic point.  Example: (%s)'), $pts[0]) . "<br/>";
             $shorttip = _('Enter an algebraic point');
         } else if ($displayformat == 'pointlist') {
-            $tip = _('Enter your answer a list of algebraic points separated with commas.  Example: (x,x^2), (3,4x)') . "<br/>";
+            $tip = sprintf(_('Enter your answer a list of algebraic points separated with commas.  Example: (%s), (%s)'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of algebraic points');
         } else if ($displayformat == 'vector') {
-            $tip = _('Enter your answer as an algebraic vector.  Example: &lt;x,x^2&gt;') . "<br/>";
+            $tip = sprintf(_('Enter your answer as an algebraic vector.  Example: &lt;%s&gt;'), $pts[0]) . "<br/>";
             $shorttip = _('Enter an algebraic vector');
         } else if ($displayformat == 'vectorlist') {
-            $tip = _('Enter your answer a list of algebraic vectors separated with commas.  Example: &lt;x,x^2&gt;, &lt;3,x&gt;') . "<br/>";
+            $tip = sprintf(_('Enter your answer a list of algebraic vectors separated with commas.  Example: &lt;%s&gt;, &lt;%s&gt;'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of algebraic vectors');
         } else if ($displayformat == 'set') {
             $tip = _('Enter your answer as a set of algebraic expressions.  Example: {x,x^2,3x}') . "<br/>";
@@ -70,10 +87,10 @@ class AlgebraicNTupleAnswerBox implements AnswerBox
             $tip = _('Enter your answer as a list of sets separated with commas.  Example: {x,3,x^2},{2x,5}') . "<br/>";
             $shorttip = _('Enter a list of algebraic sets');
         } else if ($displayformat == 'list') {
-            $tip = _('Enter your answer as a list of n-tuples of algebraic expressions separated with commas: Example: (x,x^2),(3,4x)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as a list of n-tuples of algebraic expressions separated with commas: Example: (%s),(%s)'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of algebraic n-tuples');
         } else {
-            $tip = _('Enter your answer as an n-tuple of algebraic expressions.  Example: (x,x^2)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as an n-tuple of algebraic expressions.  Example: (%s)'), $pts[0]) . "<br/>";
             $shorttip = _('Enter an algebraic n-tuple');
         }
         if (in_array('generalcomplex', $ansformats)) {
@@ -107,6 +124,9 @@ class AlgebraicNTupleAnswerBox implements AnswerBox
         ];
         $params['tip'] = $shorttip;
         $params['longtip'] = $tip;
+        if (!empty($params['ntupledim'])) {
+            $params['dimwarn'] = getdimwarnmsp($displayformat, $params['ntupledim']);
+        }
 
         $params['calcformat'] = $answerformat . (($answerformat == '') ? '' : ',') . $displayformat;
         if ($useeqnhelper) {

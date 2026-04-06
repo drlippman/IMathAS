@@ -51,17 +51,34 @@ class ComplexNTupleAnswerBox implements AnswerBox
         if (empty($answerboxsize)) {$answerboxsize = 20;}
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
+        $hintdim = 2;
+        if (in_array('dimensionhint', $ansformats)) {
+            $p = parseNtuple($answer, true);
+            if (!empty($p[0][0]['vals'])) {
+                $dim = count($p[0][0]['vals']);
+                $params['ntupledim'] = $dim;
+                if ($dim == 3) {
+                    $hintdim = 3;
+                }
+            }
+        }
+        if ($hintdim == 2) {
+            $pts = ['2+i,4.2', '3.5,i'];
+        } else if ($hintdim == 3) {
+            $pts = ['2+i,-3i,4.2', '3.5-i,5,5+2i'];
+        }
+
         if ($displayformat == 'point') {
-            $tip = _('Enter your answer as a complex point.  Example: (2+i,4.2)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as a complex point.  Example: (%s)'), $pts[0]) . "<br/>";
             $shorttip = _('Enter a complex point');
         } else if ($displayformat == 'pointlist') {
-            $tip = _('Enter your answer a list of complex points separated with commas.  Example: (1+i,2), (3.5,i)') . "<br/>";
+            $tip = sprintf(_('Enter your answer a list of complex points separated with commas.  Example: (%s), (%s)'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of complex points');
         } else if ($displayformat == 'vector') {
-            $tip = _('Enter your answer as a complex vector.  Example: <2+i,5.5i>') . "<br/>";
+            $tip = sprintf(_('Enter your answer as a complex vector.  Example: <%s>'), $pts[0]) . "<br/>";
             $shorttip = _('Enter a complex vector');
         } else if ($displayformat == 'vectorlist') {
-            $tip = _('Enter your answer a list of complex vectors separated with commas.  Example: <1+i,2>, <3.5,i>') . "<br/>";
+            $tip = sprintf(_('Enter your answer a list of complex vectors separated with commas.  Example: <%s>, <%s>'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of complex vectors');
         } else if ($displayformat == 'set') {
             $tip = _('Enter your answer as a set of complex numbers.  Example: {1.5,2+i,-i}') . "<br/>";
@@ -70,10 +87,10 @@ class ComplexNTupleAnswerBox implements AnswerBox
             $tip = _('Enter your answer as a list of sets of complex numbers separated with commas.  Example: {1+i,2,i},{4.5i,2}') . "<br/>";
             $shorttip = _('Enter a list of sets of complex numbers');
         } else if ($displayformat == 'list') {
-            $tip = _('Enter your answer as a list of n-tuples of complex numbers separated with commas: Example: (1,i),(3.5,i)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as a list of n-tuples of complex numbers separated with commas: Example: (%s),(%s)'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of n-tuples of complex numbers');
         } else {
-            $tip = _('Enter your answer as an n-tuple of complex numbers.  Example: (2+3i,5.5)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as an n-tuple of complex numbers.  Example: (%s)'), $pts[0]) . "<br/>";
             $shorttip = _('Enter an n-tuple of complex numbers');
         }
         
@@ -107,6 +124,9 @@ class ComplexNTupleAnswerBox implements AnswerBox
         ];
         $params['tip'] = $shorttip;
         $params['longtip'] = $tip;
+        if (!empty($params['ntupledim'])) {
+            $params['dimwarn'] = getdimwarnmsp($displayformat, $params['ntupledim']);
+        }
 
         if ($anstype === 'complexntuple') {
             $params['calcformat'] = $answerformat . ($answerformat == '' ? '' : ',') . 'decimal';
