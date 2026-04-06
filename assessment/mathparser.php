@@ -1594,8 +1594,7 @@ function acsc($x) {
 }
 function acot($x) {
     if (abs($x)<1e-16) {
-        echo "Invalid input for arccot";
-        return NAN;
+        return M_PI/2;
     }
     return atan(1/$x);
 }
