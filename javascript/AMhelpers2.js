@@ -1617,6 +1617,7 @@ function processCalcNtuple(qn, fullstr, format, qtype) {
   if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
     notationok=false;
   }
+  var componentcnt = 0;
   for (var i=0; i<fullstr.length; i++) {
     dec = false;
     if (NCdepth==0) {
@@ -1639,10 +1640,16 @@ function processCalcNtuple(qn, fullstr, format, qtype) {
       NCdepth--;
       dec = true;
     }
-
     if ((NCdepth==0 && dec) || (NCdepth==1 && fullstr.charAt(i)==',')) {
       sub = fullstr.substring(lastcut,i).replace(/^\s+/,'').replace(/\s+$/,'');
       if (sub == '') {notationok = false;}
+      componentcnt++;
+      if (NCdepth==0 && dec) {
+        if (allParams[qn].ntupledim && allParams[qn].ntupledim != componentcnt) {
+          err += allParams[qn].dimwarn+'. ';
+        }
+        componentcnt = 0;
+      }
       if (qtype.match(/complex/) && !sub.match(/^\s*-?oo\s*$/)) {
         res = evalcheckcomplex(sub, format);
         err += res.err;

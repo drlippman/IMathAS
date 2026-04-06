@@ -51,30 +51,71 @@ class NTupleAnswerBox implements AnswerBox
         if (empty($answerboxsize)) {$answerboxsize = 20;}
         if ($multi) {$qn = ($qn + 1) * 1000 + $partnum;}
 
+        $hintdim = 2;
+        if (in_array('dimensionhint', $ansformats)) {
+            $p = parseNtuple($answer, true);
+            if (!empty($p[0][0]['vals'])) {
+                $dim = count($p[0][0]['vals']);
+                $params['ntupledim'] = $dim;
+                if ($dim == 3) {
+                    $hintdim = 3;
+                }
+            }
+        }
+        if ($hintdim == 2) {
+            $pts = ['2,5.5172', '3.53,5'];
+        } else if ($hintdim == 3) {
+            $pts = ['2,-5.5172,1.5', '3.53,5,-2.3'];
+        }
+
         if ($displayformat == 'point') {
-            $tip = _('Enter your answer as a point.  Example: (2,5.5172)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as a point.  Example: (%s)'), $pts[0]) . "<br/>";
             $shorttip = _('Enter a point');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('The point should have %d components'), $params['ntupledim']);
+            }
         } else if ($displayformat == 'pointlist') {
-            $tip = _('Enter your answer a list of points separated with commas.  Example: (1,2), (3.5172,5)') . "<br/>";
+            $tip = sprintf(_('Enter your answer a list of points separated with commas.  Example: (%s), (%s)'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of points');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('Each point should have %d components'), $params['ntupledim']);
+            }
         } else if ($displayformat == 'vector') {
-            $tip = _('Enter your answer as a vector.  Example: <2,5.5>') . "<br/>";
+            $tip = sprintf(_('Enter your answer as a vector.  Example: <%s>'), $pts[0]) . "<br/>";
             $shorttip = _('Enter a vector');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('The vector should have %d components'), $params['ntupledim']);
+            }
         } else if ($displayformat == 'vectorlist') {
-            $tip = _('Enter your answer a list of vectors separated with commas.  Example: <1,2>, <3.5172,5>') . "<br/>";
+            $tip = sprintf(_('Enter your answer a list of vectors separated with commas.  Example: <%s>, <%s>'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of vectors');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('Each vector should have %d components'), $params['ntupledim']);
+            }
         } else if ($displayformat == 'set') {
             $tip = _('Enter your answer as a set of numbers.  Example: {1,2,3}') . "<br/>";
             $shorttip = _('Enter a set');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('The set should have %d components'), $params['ntupledim']);
+            }
         } else if ($displayformat == 'setlist') {
             $tip = _('Enter your answer as a list of sets separated with commas.  Example: {1,2,3},{4,5}') . "<br/>";
             $shorttip = _('Enter a list of sets');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('Each set should have %d components'), $params['ntupledim']);
+            }
         } else if ($displayformat == 'list') {
-            $tip = _('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (1,2),(3.5172,4)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as a list of n-tuples of numbers separated with commas: Example: (%s),(%s)'), $pts[0], $pts[1]) . "<br/>";
             $shorttip = _('Enter a list of n-tuples');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('Each n-tuple should have %d components'), $params['ntupledim']);
+            }
         } else {
-            $tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
+            $tip = sprintf(_('Enter your answer as an n-tuple of numbers.  Example: (%s)'), $pts[0]) . "<br/>";
             $shorttip = _('Enter an n-tuple');
+            if (!empty($params['ntupledim'])) {
+                $dimwarn = sprintf(_('The n-tuple should have %d components'), $params['ntupledim']);
+            }
         }
         if ($reqdecimals !== '') {
             list($reqdecimals, $exactreqdec, $reqdecoffset, $reqdecscoretype) = parsereqsigfigs($reqdecimals);
@@ -106,6 +147,9 @@ class NTupleAnswerBox implements AnswerBox
         ];
         $params['tip'] = $shorttip;
         $params['longtip'] = $tip;
+        if (!empty($params['ntupledim'])) {
+            $params['dimwarn'] = $dimwarn;
+        }
 
         if ($anstype === 'ntuple') {
             $params['calcformat'] = $answerformat . ($answerformat == '' ? '' : ',') . 'decimal';
