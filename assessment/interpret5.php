@@ -111,6 +111,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			$bits[] = $lastsym;
 			$bits[] = ')';
 			$sym = '';
+			$type = 2;
 		} else if ($lasttype==2 && $type==4 && substr($lastsym,0,5)=='root(') {
 			$bits[] = substr($lastsym,0,-1).',';
 			$sym = substr($sym,1);
@@ -132,6 +133,11 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 
 
 		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
+			if ($lasttype == 2) {
+				// can't assign to function
+				echo _('error: cannot assign to a function');
+				return 'error';
+			}
 			//if equality equal (not comparison or array assn), and before if/where.
 			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
