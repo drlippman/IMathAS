@@ -133,7 +133,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 
 
 		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1][0]!='=' && $syms[$k+1][0]!='>') {
-			if ($lasttype == 2) {
+			if ($lasttype == 2 || (count($bits)>0 && $bits[count($bits)-1] == ')')) {
 				// can't assign to function
 				echo _('error: cannot assign to a function');
 				return 'error';
