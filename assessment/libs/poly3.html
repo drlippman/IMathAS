@@ -21,7 +21,7 @@ File Version : 6
 
 <h3><a name="formpoly3fromstring">formpoly3fromstring</a></h3>
 <p>
-function formpolyfromstring(variable, polynomialstring, [IsFraction=true])<br/>
+function formpoly3fromstring(variable, polynomialstring, [IsFraction=true])<br/>
 Creates an array of coefficients whose position in the array 
 corresponds to the power of the variable
 Each element is stored in the form of an array(numerator, denominator).
@@ -32,10 +32,10 @@ variable: a string that contains the variable<br/>
 polynomialstring: a string that contains the polynomial <br/>
 <br/>
 Optional <br/>
-IsFraction: a boolan that stores the the coeificients as fractions
+IsFraction: a boolean that stores the the coefficients as fraction arrays
 </p>
 <p>
-Example: $dividend = formpolyfromstring("x","3x^4+2x^2+1") <br/>
+Example: $dividend = formpoly3fromstring("x","3x^4+2x^2+1",false) <br/>
 $dividend = array("1,0,2,0,3")
 </p>
 
@@ -64,15 +64,15 @@ Each element is stored in the form of an array(numerator, denominator).
 </p>
 <p>
 INPUTS: <br/>
-variable: a string that contains the variable <br/>
 poly3: an array of coeficients to build the polynomial <br/>
  <br/>
 Optional <br/>
-IsFraction: a boolan that stores the the coeificients as fractions <br/>
+variable: a string that contains the variable <br/>
+IsFraction: true if the elements of poly3 are fraction arrays. Set false if values are integers or decimals.<br/>
 HideZero: a boolean that stores a flag to show zero coefinents
 </p>
 <p>
-Example: $dividend = writepoly3("x",array("1,0,2,0,3")) <br/>
+Example: $dividend = writepoly3(array("1,0,2,0,3"),"x",false) <br/>
 $dividend = "3x^4+2x^2+1"
 </p>
 
@@ -97,7 +97,7 @@ $result will contain an array in the following form <br/>
  $result[0][1] = the power, array(numerator, denominator) <br/>
  $result[0][2] = a poly3 polynomial by multipling $result[0][1] and the divisor <br/>
  $result[0][3] = the poly3 polynomial that needs to be subtracted (-$result[0][2]) <br/>
- $result[1][0] = the resultant divided (at least 1 power smaller than the previous <br/>
+ $result[1][0] = the resultant divided (at least 1 power smaller than the previous) <br/>
  etc.
 </p>
 
