@@ -22,7 +22,8 @@ array_push(
     'stuansready',
     'getstuans',
     'checkreqtimes',
-    'checkanswerformat'
+    'checkanswerformat',
+    'setupmathquillfillin'
 );
 
 function makenumberrequiretimes($arr) {
@@ -1240,4 +1241,12 @@ function parsedrawgrid($str, $snaptogrid) {
         }
     }
     return [$xmin, $xmax, $ymin, $ymax, $w, $h];
+}
+
+function setupmathquillfillin($mqformat, $altformat) {
+    $mqformat = preg_replace('/\[AB(\d+)\]/', 'innertmpfield($1)', $mqformat);
+    $out = '<div class="mqinnerfillin"><span class="mqfillin-mq"></span>&nbsp;<span class="mqfillin-err"></span>';
+    $out .= '<span class="mqfillin-alt" data-form="'. Sanitize::encodeStringForDisplay($mqformat).'" style="display:none;">';
+    $out .= $altformat . '</span></div>';
+    return $out;
 }

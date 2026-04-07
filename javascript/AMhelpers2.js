@@ -143,14 +143,20 @@ function init(paramarr, enableMQ, baseel) {
         }
       }
 
-      if (enableMQ) {
+      if (enableMQ && $(el).closest('.mqinnerfillin').length===0) {
         if (params.matrixsize) {
           MQeditor.toggleMQAll("input[id^=qn"+qn+"-]", true, true);
         } else {
           MQeditor.toggleMQ(el, true, true);
         }
         $("#pbtn"+qn).hide();
+      } 
+      /* 
+      // need to not disable to allow toggling to work
+      else if (enableMQ) { // and in mqinnerfillin
+        params.preview = false; // don't show preview
       }
+      */
     }
     if (params.preview) { //setup preview TODO: check for userpref
       document.getElementById("pbtn"+qn).addEventListener('click', (function(thisqn) {
@@ -246,6 +252,7 @@ function init(paramarr, enableMQ, baseel) {
     initEnterHandler(qn);
     $("input[id^=qn"+qn+"]:not([type=file])").attr("maxlength",8000);
   }
+  toggleMQfillins(enableMQ);
   initDupRubrics();
   initShowAnswer2();
   if (baseel) {
@@ -541,6 +548,82 @@ function initShowAnswer() {
 				.removeClass("hidden");
 		});
 	});
+}
+
+function toggleMQfillins(enableMQ) {
+  if (enableMQ) {
+    $(".mqinnerfillin > .mqfillin-alt").hide();
+    $(".mqinnerfillin > .mqfillin-mq").show();
+    $(".mqinnerfillin").each(function(i,el) {
+      var inp = el.getElementsByClassName('mqfillin-mq')[0];
+      var holder = el.getElementsByClassName('mqfillin-alt')[0];
+      var map = [];
+      var thisq = parseInt($(el).closest('[id^=questionwrap]').attr('id').substring(12));
+      var innerfieldCnt = 0;
+      var initinput = holder.getAttribute('data-form').replace(/innertmpfield\((\d+)\)/g, function(m,n) {
+        var qnref = 1000*(thisq+1) + parseInt(n);
+        map[innerfieldCnt] = qnref;
+        innerfieldCnt++;
+        return 'innerfield('+(innerfieldCnt-1)+')'; // placeholder; replace below
+      })
+      inp.innerText = AMtoMQ(initinput);
+      var newmap = [];
+      for (var i=0;i<map.length;i++) {
+        var srcref = document.getElementById('qn'+map[i]);
+        if (!srcref.hasAttribute('data-mq')) {
+          srcref.setAttribute('data-mq','');
+        }
+        var innermqtext = toMQwVars(srcref.value, srcref.id);
+        if (srcref.disabled) {
+          var m;
+          var cl = 'mqinnerboxed disabled';
+          if ((m = srcref.className.match(/(ansgrn|ansred|ansyel|ansorg)/)) !== null) {
+            cl += ' ' + m[0];
+          }
+          inp.innerText = inp.innerText.replace('\\MathQuillMathField{{{'+i+'}}}', '\\class{'+cl+'}{'+innermqtext+'}');
+        } else {
+          inp.innerText = inp.innerText.replace('\\MathQuillMathField{{{'+i+'}}}', '\\MathQuillMathField{'+innermqtext+'}');
+          newmap.push(map[i]);
+        }
+      }
+      // update map after removing disabled
+      map = newmap;
+      var mqinp = MQ.StaticMath(inp);
+      for (var i=0;i<map.length;i++) {
+        var qnref = map[i];
+        var el = document.getElementById('qn'+qnref);
+        var thisconf = MQeditor.makeMQconfig(el);
+        thisconf.handlers.edit = function(mf) {
+            var target = mf.__controller.container;
+            var m;
+            if ((m = target.className.match(/(ansgrn|ansred|ansyel|ansorg)/)) !== null) {
+              $(target).removeClass(m[0]);
+            }
+            if (mqinp?.innerFields?.length == map.length) {
+              for (var i=0;i<map.length;i++) { 
+                if (mqinp.innerFields[i].__controller.container == target) {
+                  var qnref = map[i];
+                  $('#qn'+qnref).val(fromMQwText(mqinp.innerFields[i].latex())).trigger('input');
+                  imathasAssess.syntaxCheckMQ('qn'+qnref);
+                }
+              }
+            }
+          };
+        mqinp.innerFields[i].config(thisconf);
+        var m;
+        if ((m = el.className.match(/(ansred|ansyel|ansgrn|ansorg)/)) !== null) {
+          $(mqinp.innerFields[i].__controller.container).addClass(m[0]);
+        }
+        mqinp.innerFields[i].__controller.container.setAttribute('id', 'mqinner-qn'+qnref);
+        var w = parseInt(el.style.width ?? 0);
+        mqinp.innerFields[i].__controller.container.style.minWidth = ((w > 6 || w == 0)?6:w)+'ch';
+        MQeditor.attachEditor(mqinp.innerFields[i].__controller.container);
+      }
+    });
+  } else {
+    $(".mqinnerfillin > .mqfillin-alt").show();
+    $(".mqinnerfillin > .mqfillin-mq").hide();
+  }
 }
 
 function setupDraw(qn) {
@@ -991,6 +1074,12 @@ function showSyntaxCheckMQ(qn) {
     if (previewel) {
         previewel.innerHTML = outstr;
         rendermathnode(previewel);
+    }
+  }
+  if ($('#qn'+qn).closest('.mqinnerfillin').length > 0) {
+    var wrapper = $('#qn'+qn).closest('.mqinnerfillin');
+    if (!wrapper.find('.mqfillin-alt').is(':visible')) {
+      wrapper.find('.mqfillin-err').empty().append(wrapper.find('.mqfillin-alt .noticetext'));
     }
   }
   if (document.getElementById("qn"+qn)) {
@@ -2406,7 +2495,8 @@ return {
   clearLivePreviewTimeouts: clearLivePreviewTimeouts,
   syntaxCheckMQ: syntaxCheckMQ,
   clearTips: clearTips,
-  handleMQenter: handleMQenter
+  handleMQenter: handleMQenter,
+  toggleMQfillins: toggleMQfillins
 };
 
 }(jQuery));

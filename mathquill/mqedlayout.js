@@ -422,7 +422,7 @@ var myMQeditor = (function($) {
     //TODO: fix this - need to get from params
     var vars = textel.attr("data-mq-vars") || '';
     vars = (vars=='') ? [] : vars.split(/,/);
-    var calcformat = textel.attr("data-mq");
+    var calcformat = textel.attr("data-mq") || '';
     var qtype = calcformat.split(/,/)[0];
     var baselayout = [];
     if (layoutstyle === 'OSK') {

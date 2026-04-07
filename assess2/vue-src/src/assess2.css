@@ -307,7 +307,7 @@ ol.lalpha li { margin-top: .7em;}
 }
 
 /* General layout styles used many places */
-input, .mq-editable-field, .mathquill-math-field {
+input, .mq-editable-field, .mathquill-math-field, .mqinnerboxed {
   border: 1px solid #999;
   padding: 4px 6px;
   border-radius: 4px;
@@ -319,7 +319,7 @@ input, .mq-editable-field, .mathquill-math-field {
 input[type=radio], input[type=checkbox] {
   margin-right: 4px;
 }
-input[type=text]:disabled, .mathquill-math-field.disabled {
+input[type=text]:disabled, .mathquill-math-field.disabled, .mqinnerboxed.disabled {
   background-color: #eee;
   color: #444;
 }
@@ -595,26 +595,36 @@ span.inlinebtn:hover {
   div.ansgrn, div.ansred, div.ansyel, div.ansorg {
     margin: -1px;
   }
-  input[type=text].ansgrn, .mathquill-math-field.ansgrn,
-  input[type=text].ansred, .mathquill-math-field.ansred,
-  input[type=text].ansyel, .mathquill-math-field.ansyel,
-  input[type=text].ansorg, .mathquill-math-field.ansorg {
+  .mqfillin-mq .mq-editable-field {
+    padding: 0px 1px;
+  }
+  .mqfillin-mq .mqinnerboxed {
+    padding: 2px 3px;
+  }
+  input[type=text].ansgrn, .mq-editable-field.ansgrn, .mqinnerboxed.ansgrn,
+  input[type=text].ansred, .mq-editable-field.ansred, .mqinnerboxed.ansred,
+  input[type=text].ansyel, .mq-editable-field.ansyel, .mqinnerboxed.ansyel,
+  input[type=text].ansorg, .mq-editable-field.ansorg, .mqinnerboxed.ansorg {
     background-repeat: no-repeat;
     background-position: right;
   }
-  input[type=text].ansgrn, .mathquill-math-field.ansgrn {
+  input[type=text].ansgrn, .mq-editable-field.ansgrn, .mqinnerboxed.ansgrn {
     padding-right: 17px;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9ImdyZWVuIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwb2x5bGluZSBwb2ludHM9IjIwIDYgOSAxNyA0IDEyIj48L3BvbHlsaW5lPjwvc3ZnPg==");
   }
-  input[type=text].ansred, .mathquill-math-field.ansred {
+  input[type=text].ansred, .mq-editable-field.ansred, .mqinnerboxed.ansred {
     padding-right: 17px;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigxNTMsMCwwKSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMTggNiBMNiAxOCBNNiA2IEwxOCAxOCIgLz48L3N2Zz4=");
   }
-  input[type=text].ansyel, .mathquill-math-field.ansyel {
+  input[type=text].ansyel, .mq-editable-field.ansyel, .mqinnerboxed.ansyel {
     padding-right: 17px;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsMTg3LDApIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0gNS4zLDEwLjYgOSwxNC4yIDE4LjUsNC42IDIxLjQsNy40IDksMTkuOCAyLjcsMTMuNSB6IiAvPjwvc3ZnPg==");
   }
-  input[type=text].ansorg, .mathquill-math-field.ansorg {
+  input[type=text].ansorg, .mq-editable-field.ansorg, .mqinnerboxed.ansorg {
     padding-right: 17px;
     background: right no-repeat url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBzdHJva2U9InJnYigyNTUsODUsMCkiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSI+PHBhdGggZD0iTTE4IDYgTDYgMTggTTYgNiBMMTggMTgiIC8+PC9zdmc+");
   }
+  .mqinnerboxed {
+    display: inline-block;
+  }
+  

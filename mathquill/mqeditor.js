@@ -53,6 +53,94 @@ var MQeditor = (function($) {
     }
   }
 
+  function makeMQconfig(el) {
+    var calcformat = el.getAttribute("data-mq") || '';
+    var thisMQconfig = {
+      spaceBehavesLikeTab: true,
+      leftRightIntoCmdGoes: 'up',
+      supSubsRequireOperand: true,
+      charsThatBreakOutOfSupSub: '=<>',
+      charsThatBreakOutOfSupSubVar: "+-(",
+      charsThatBreakOutOfSupSubOp: "+-(",
+      restrictMismatchedBrackets: true,
+      interpretTildeAsSim: true,
+      handlers: {
+        edit: onMQedit,
+        enter: onMQenter
+      }
+    };
+    if (calcformat.match(/chem/)) {
+        thisMQconfig.charsThatBreakOutOfSupSubVar = '';
+        thisMQconfig.charsThatBreakOutOfSupSubOp = '';
+        thisMQconfig.autoSubscriptNumerals = true;
+        thisMQconfig.autoSubscriptBrackets = true;
+    }
+    if (calcformat.match(/(list|ntuple)/)) {
+        thisMQconfig.charsThatBreakOutOfSupSub = '=<>,';
+    }
+    if (calcformat.match(/allowplusminus/)) {
+        thisMQconfig.quickPlusMinus = true;
+    }
+    if (calcformat.match(/ntuple/)) {
+      thisMQconfig.listCharReturnsTo = [',', 'bracket'];
+    } else if (calcformat.match(/list/)) {
+      thisMQconfig.listCharReturnsTo = [',', 'baseline'];
+    }
+
+    thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
+        'ln log abs exp sin cos tan arcsinh arccosh arctanh arcsech arccsch arccoth argsinh argcosh argtanh argsech argcsch argcoth arsinh arcosh artanh arsech arcsch arcoth arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth';
+    thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
+    if (calcformat.match(/logic/)) {
+        thisMQconfig.autoCommands += ' neg xor or and implies iff';
+    }
+    if (calcformat.match(/setexp/)) {
+        thisMQconfig.autoCommands += ' nn xor uu ominus cap cup oplus';
+    }
+    var vars = el.getAttribute("data-mq-vars") || '';
+    var varpts;
+    if (vars != '') {
+        vars = (vars=='') ? [] : vars.split(/,/);
+        for (var i=0; i<vars.length; i++) {
+            varpts = vars[i].split(/_/);
+            for (var j=0; j<varpts.length; j++) {
+                if (varpts[j].length > 1 && varpts[j].match(/^[a-zA-Z]+$/)) {
+                    if (greekletters.indexOf(varpts[j].toLowerCase())!=-1) {
+                        thisMQconfig.autoCommands += ' ' + varpts[j];
+                    } else {
+                        thisMQconfig.autoOperatorNames += ' ' + varpts[j];
+                    }
+                }
+            }
+            if (vars[i].match(/^(hat|bar|vec)\(/)) {
+              thisMQconfig.autoCommands += ' ' + vars[i].substring(0,3);
+            }
+        }
+    }
+    if (config.hasOwnProperty("getLayoutstyle")) {
+      config.curlayoutstyle = config.getLayoutstyle();
+    } else if (config.layoutstyle == 'auto') {
+      config.curlayoutstyle = getLayoutstyle();
+    } else {
+      config.curlayoutstyle = config.layoutstyle;
+    }
+    if (config.curlayoutstyle == 'OSK') {
+      thisMQconfig.substituteTextarea = function () {
+        if (isOldiOS()) { 
+          var s = document.createElement('span');
+          s.setAttribute('tabindex', 0);
+          s.setAttribute('role', 'textbox')
+        } else {
+          var s = document.createElement('textarea');
+          s.setAttribute('tabindex', 0);
+          s.setAttribute('inputmode', 'none');
+        }
+        return s;
+      };
+      //thisMQconfig.keyboardPassthrough = true;
+    }
+    return thisMQconfig;
+  }
+
   /*
     Toggles the given input field to/from a MathQuill field
     and attaches the editor to the field
@@ -96,90 +184,8 @@ var MQeditor = (function($) {
         } 
         span.insertAfter(el);
 
-        var thisMQconfig = {
-          spaceBehavesLikeTab: true,
-          leftRightIntoCmdGoes: 'up',
-          supSubsRequireOperand: true,
-          charsThatBreakOutOfSupSub: '=<>',
-          charsThatBreakOutOfSupSubVar: "+-(",
-          charsThatBreakOutOfSupSubOp: "+-(",
-          restrictMismatchedBrackets: true,
-          interpretTildeAsSim: true,
-          handlers: {
-            edit: onMQedit,
-            enter: onMQenter
-          }
-        };
-        if (config.hasOwnProperty("getLayoutstyle")) {
-          config.curlayoutstyle = config.getLayoutstyle();
-        } else if (config.layoutstyle == 'auto') {
-          config.curlayoutstyle = getLayoutstyle();
-        } else {
-          config.curlayoutstyle = config.layoutstyle;
-        }
-        if (config.curlayoutstyle == 'OSK') {
-          thisMQconfig.substituteTextarea = function () {
-            if (isOldiOS()) { 
-              var s = document.createElement('span');
-              s.setAttribute('tabindex', 0);
-              s.setAttribute('role', 'textbox')
-            } else {
-              var s = document.createElement('textarea');
-              s.setAttribute('tabindex', 0);
-              s.setAttribute('inputmode', 'none');
-            }
-            return s;
-          };
-          //thisMQconfig.keyboardPassthrough = true;
-        }
-        
-        if (calcformat.match(/chem/)) {
-            thisMQconfig.charsThatBreakOutOfSupSubVar = '';
-            thisMQconfig.charsThatBreakOutOfSupSubOp = '';
-            thisMQconfig.autoSubscriptNumerals = true;
-            thisMQconfig.autoSubscriptBrackets = true;
-        }
-        if (calcformat.match(/(list|ntuple)/)) {
-            thisMQconfig.charsThatBreakOutOfSupSub = '=<>,';
-        }
-        if (calcformat.match(/allowplusminus/)) {
-            thisMQconfig.quickPlusMinus = true;
-        }
-        if (calcformat.match(/ntuple/)) {
-          thisMQconfig.listCharReturnsTo = [',', 'bracket'];
-        } else if (calcformat.match(/list/)) {
-          thisMQconfig.listCharReturnsTo = [',', 'baseline'];
-        }
+        var thisMQconfig = makeMQconfig(el);
 
-        thisMQconfig.autoOperatorNames = thisMQconfig.autoParenOperators = 
-            'ln log abs exp sin cos tan arcsinh arccosh arctanh arcsech arccsch arccoth argsinh argcosh argtanh argsech argcsch argcoth arsinh arcosh artanh arsech arcsch arcoth arcsin arccos arctan sec csc cot arcsec arccsc arccot sinh cosh sech csch tanh coth';
-        thisMQconfig.autoCommands = 'pi theta root sqrt ^oo degree';
-        if (calcformat.match(/logic/)) {
-            thisMQconfig.autoCommands += ' neg xor or and implies iff';
-        }
-        if (calcformat.match(/setexp/)) {
-            thisMQconfig.autoCommands += ' nn xor uu ominus cap cup oplus';
-        }
-        var vars = el.getAttribute("data-mq-vars") || '';
-        var varpts;
-        if (vars != '') {
-            vars = (vars=='') ? [] : vars.split(/,/);
-            for (var i=0; i<vars.length; i++) {
-                varpts = vars[i].split(/_/);
-                for (var j=0; j<varpts.length; j++) {
-                    if (varpts[j].length > 1 && varpts[j].match(/^[a-zA-Z]+$/)) {
-                        if (greekletters.indexOf(varpts[j].toLowerCase())!=-1) {
-                            thisMQconfig.autoCommands += ' ' + varpts[j];
-                        } else {
-                            thisMQconfig.autoOperatorNames += ' ' + varpts[j];
-                        }
-                    }
-                }
-                if (vars[i].match(/^(hat|bar|vec)\(/)) {
-                  thisMQconfig.autoCommands += ' ' + vars[i].substring(0,3);
-                }
-            }
-        }
         if (el.disabled) {
           mqfield = MQ.StaticMath(span[0]);
           span.addClass("disabled");
@@ -241,7 +247,7 @@ var MQeditor = (function($) {
     state: (optional) true to toggle to MQ; false to regular input
    */
   function toggleMQAll(selector, state) {
-    var newstate = state || null;
+    var newstate = (typeof state === 'boolean') ? state : null;
     $(selector).each(function(i,el) {
       toggleMQ(el, newstate, true);
     });
@@ -288,7 +294,7 @@ var MQeditor = (function($) {
    */
   function showEditor(event) {
     clearTimeout(blurTimer);
-    var mqel = $(event.target).closest(".mathquill-math-field");
+    var mqel = $(event.target).closest(".mq-editable-field");
     if (initialized === false) {
       // first time through: inject the mqeditor div
       $("body").append($("<div/>", {id:"mqeditor", class:"mqeditor"}));
@@ -408,7 +414,7 @@ var MQeditor = (function($) {
    */
   function positionEditor(ref) {
     if (config.curlayoutstyle == 'under' || inIframe()) {
-    	var mqfield = $(ref).closest(".mathquill-math-field");
+    	var mqfield = $(ref).closest(".mq-editable-field");
     	var offset = mqfield.offset();
     	var height = mqfield.outerHeight();
       var editorLeft = offset.left;
@@ -855,7 +861,8 @@ var MQeditor = (function($) {
     toggleMQAll: toggleMQAll,
     attachEditor: attachEditor,
     getLayoutstyle: getLayoutstyle,
-    resetEditor: resetEditor
+    resetEditor: resetEditor,
+    makeMQconfig: makeMQconfig
   }
 })(jQuery);
 

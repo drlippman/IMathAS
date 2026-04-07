@@ -1171,11 +1171,13 @@ export const actions = {
     window.$('input[type=button][id^=pbtn],button[id^=pbtn]').hide();
     window.$('span[id^=p] span[id^=lpbuf]').empty();
     window.MQeditor.toggleMQAll('input[data-mq]', true);
+    window.imathasAssess.toggleMQfillins(true);
   },
   disableMQ () {
     store.enableMQ = false;
     window.$('input[type=button][id^=pbtn],button[id^=pbtn]').show().trigger('click');
     window.MQeditor.toggleMQAll('input[data-mq]', false);
+    window.imathasAssess.toggleMQfillins(false);
   },
   copySettings (response) {
     // overwrite existing questions with new data

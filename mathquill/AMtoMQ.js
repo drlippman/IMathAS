@@ -179,6 +179,8 @@ var AMQsymbols = [
 {input:"ln",   tag:"mo",  ttype:UNARY, func:true},
 {input:"abs",   tag:"mo",  ttype:UNARY},
 
+{input:"innerfield", tag:"mo", output:"MathQuillMathField", ttype:UNARY},
+
 {input:"Sin",  tag:"mo", output:"sin", ttype:UNARY, func:true},
 {input:"Cos",  tag:"mo", output:"cos", ttype:UNARY, func:true},
 {input:"Tan",  tag:"mo", output:"tan", ttype:UNARY, func:true},
