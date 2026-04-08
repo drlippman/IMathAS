@@ -252,9 +252,9 @@ function init(paramarr, enableMQ, baseel) {
     initEnterHandler(qn);
     $("input[id^=qn"+qn+"]:not([type=file])").attr("maxlength",8000);
   }
-  toggleMQfillins(enableMQ);
   initDupRubrics();
   initShowAnswer2();
+  toggleMQfillins(enableMQ);
   if (baseel) {
     setScoreMarkers(baseel);
   }
@@ -580,6 +580,7 @@ function toggleMQfillins(enableMQ) {
           if ((m = srcref.className.match(/(ansgrn|ansred|ansyel|ansorg)/)) !== null) {
             cl += ' ' + m[0];
           }
+          cl += ' mqinnerref'+map[i];
           inp.innerText = inp.innerText.replace('\\MathQuillMathField{{{'+i+'}}}', '\\class{'+cl+'}{'+innermqtext+'}');
         } else {
           inp.innerText = inp.innerText.replace('\\MathQuillMathField{{{'+i+'}}}', '\\MathQuillMathField{'+innermqtext+'}');
@@ -587,6 +588,7 @@ function toggleMQfillins(enableMQ) {
         }
       }
       // update map after removing disabled
+      var origmap = map;
       map = newmap;
       var mqinp = MQ.StaticMath(inp);
       for (var i=0;i<map.length;i++) {
@@ -619,10 +621,38 @@ function toggleMQfillins(enableMQ) {
         mqinp.innerFields[i].__controller.container.style.minWidth = ((w > 6 || w == 0)?6:w)+'ch';
         MQeditor.attachEditor(mqinp.innerFields[i].__controller.container);
       }
+      for (var i=0;i<origmap.length;i++) {
+        var qnref = origmap[i];
+        // move keys
+        var keysrc = $("#qn"+qnref+",#mqinput-qn"+qnref).first();
+        var keywrap = keysrc.next(".keywrap");
+        if (keywrap.length == 0) {
+          keywrap = keysrc.next().next(".keywrap");
+        }
+        if (keywrap.length > 0) {
+          $("#mqinner-qn"+qnref+",.mqinnerref"+qnref).after(keywrap);
+        }
+      }
     });
   } else {
     $(".mqinnerfillin > .mqfillin-alt").show();
     $(".mqinnerfillin > .mqfillin-mq").hide();
+    $(".mq-editable-field[id^=mqinner-qn],.mqfillin-mq .mqinnerboxed").each(function(i,el) {
+      var qnref;
+      if ($(el).hasClass("mqinnerboxed")) {
+        qnref = el.className.match(/mqinnerref(\d+)/)?.[1];
+      } else {
+        qnref = el.id.substring(10);
+      }
+      if ($(el).next().hasClass("keywrap")) {
+        var key = $(el).next();
+        if ($("#mqinput-qn"+qnref).length > 0) {
+          $("#mqinput-qn"+qnref).after(key);
+        } else {
+          $("#qn"+qnref).after(key);
+        }
+      }
+    });
   }
 }
 

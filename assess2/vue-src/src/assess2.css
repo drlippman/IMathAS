@@ -50,7 +50,7 @@
    background-color: #eef;
    padding: 8px;
  }
- .keywrap {
+ .keywrap, .mq-math-mode .keywrap {
    display: inline-block;
    padding: 0;
    margin: 1px 0 1px 2px;
@@ -58,11 +58,11 @@
    border-radius: 4px;
    vertical-align: middle;
  }
- .keywrap [id^=ans] {
+ .keywrap [id^=ans], .mq-math-mode .keywrap [id^=ans] {
    padding: 2px 8px;
    display: inline-block;
  }
- .keybtn {
+ .keybtn, .mq-math-mode .keybtn {
    height: 28px;
    padding: 4px;
    margin: -1px;
@@ -75,7 +75,15 @@
  .keywrap.inwrap .keybtn {
    vertical-align: top;
  }
-
+ .mq-math-mode .keybtn {
+  height: 22px;
+ }
+ .mq-math-mode .keywrap svg {
+  position: relative;
+  width: auto;
+  height: auto;
+  fill: none;
+ }
 /* Question type supports */
 div.choice {
   padding: 5px;
