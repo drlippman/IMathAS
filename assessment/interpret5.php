@@ -741,6 +741,11 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 					break;
 				}
 			}
+		} else if ($c=='!' && ($str[$i - 1] ?? '') === ' ' && ($str[$i + 1] ?? '') === ' ' && ($str[$i + 2] ?? '') === '=' && ($str[$i + 3] ?? '') === '=') {
+			// special case of ' ! ==' handled as != for legacy/backwards-compatability
+			$intype = 12; // comparison 
+			$out .= '!==';
+			$i += 4;
 		} else if ($c=='!' && ($str[$i + 1] ?? '') === ' ' && ($str[$i + 2] ?? '') === '=' && ($str[$i + 3] ?? '') !== '=') {
 			// special case of '! = ' handled as != for legacy/backwards-compatability
 			$intype = 12; // comparison 
