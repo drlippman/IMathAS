@@ -34,9 +34,10 @@ if ($myrights<20) {
 	if (isset($_GET['a11ymode'])) {
 		$a11ymode = intval($_GET['a11ymode']);
 		if ($a11ymode > 0) {
-			$origa11ysettings = [$_SESSION['userprefs']['graphdisp'], $_SESSION['userprefs']['drawentry']];
+			$origa11ysettings = [$_SESSION['userprefs']['graphdisp'], $_SESSION['userprefs']['drawentry'], $_SESSION['userprefs']['useeqed']];
 			if (($a11ymode&1) == 1) {
 				$_SESSION['userprefs']['graphdisp'] = 0;
+				$_SESSION['userprefs']['useeqed'] = 0;
 				$_SESSION['graphdisp'] = 0;
 			}
 			if (($a11ymode&2) == 2) {
@@ -723,6 +724,7 @@ if ($a11ymode > 0) {
 	$_SESSION['userprefs']['graphdisp'] = $origa11ysettings[0];
 	$_SESSION['graphdisp'] = $origa11ysettings[0];
 	$_SESSION['userprefs']['drawentry'] = $origa11ysettings[1];
+	$_SESSION['userprefs']['useeqed'] = $origa11ysettings[2];
 }
 
 require_once "../footer.php";
