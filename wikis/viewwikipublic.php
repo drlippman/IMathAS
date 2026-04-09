@@ -57,9 +57,15 @@ require_once __DIR__ . "/../includes/sanitize.php";
 	$itemid = $stm->fetchColumn(0);
 	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	$items = unserialize($stm->fetchColumn(0));
+	$res = $stm->fetch(PDO::FETCH_NUM);
+	if ($res === false) {
+		echo 'Invalid item';
+		exit;
+	}
+	$items = unserialize($res[0]);
 	if ($fcid==0) {
-		list($coursename, $coursetheme) = $stm->fetch(PDO::FETCH_NUM);
+		$coursename = $res[1];
+		$coursetheme = $res[2];
 		$breadcrumbbase = "<a href=\"$imasroot/course/public.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	} else {
 		$breadcrumbbase = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$fcid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
