@@ -799,10 +799,36 @@ class QuestionHtmlGenerator
         $evaledsoln = str_replace(['\\{','\\}'], ['{','}'], $evaledsoln);
 
         /*
+         * Handle [SAB#-#] notation
+         */ 
+        $usingSABrange = false;
+        preg_match_all('/\[SAB(\d+)-(\d+)\]/', $evaledqtext, $matches, PREG_SET_ORDER);
+        if (!empty($matches)) {
+            $usingSABrange = true;
+            foreach ($matches as $atIdx) {
+                $_thisIsReady = true;
+                for ($iidx=$atIdx[1];$iidx<=$atIdx[2];$iidx++) {
+                    if (empty($doShowAnswerParts[$iidx]) && !$doShowAnswer) {
+                        $_thisIsReady = false;
+                        $doShowDetailedSoln = false;
+                        for ($siidx=$atIdx[1]; $siidx < $atIdx[2]; $siidx++) {
+                            $doShowAnswerParts[$siidx] = false;
+                        }
+                        break;
+                    } else if ($iidx < $atIdx[2]) {
+                        $doShowAnswerParts[$iidx] = false;
+                    }
+                }
+                $doShowAnswerParts[$atIdx[2]] = $_thisIsReady;
+                $evaledqtext = str_replace($atIdx[0], '[SAB'.$atIdx[2].']', $evaledqtext);
+            }
+        }
+
+        /*
          * Possibly adjust the showanswer if it doesn't look right
          */
         $doShowDetailedSoln = false;
-        if (isset($showanswer) && is_array($showanswer) && is_array($answerbox) && count($showanswer) < count($answerbox)) {
+        if (isset($showanswer) && is_array($showanswer) && is_array($answerbox) && count($showanswer) < count($answerbox) && !$usingSABrange) {
             $showansboxloccnt = substr_count($evaledqtext,'$showanswerloc') + substr_count($evaledqtext,'[SAB');
             if ($showansboxloccnt > 0 && count($answerbox) > $showansboxloccnt && count($showanswer) == $showansboxloccnt) {
                 // not enough showanswerloc boxes for all the parts.  
