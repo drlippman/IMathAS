@@ -362,34 +362,35 @@ class NumberScorePart implements ScorePart
                         if (is_numeric($givenans)) {
                             if ($hasUnits) {
                                 // check units type
-                                if ($gaunitsarr[$j][1] != $anssunits[$k][1]) {
+                                list($thisgaunitsarr,$thisanssunits) = units_makecomparable($gaunitsarr[$j], $anssunits[$k]);
+                                if ($thisgaunitsarr[1] != $thisanssunits[1]) {
                                     continue;
                                 }
                                 if ($thisreqdecimals !== '' && $exactreqdec == 1) {
                                     //check number of decimal places in base givenans
-                                    if ($thisreqdecimals != (($p = strpos($gaunitsarr[$j][2],'.'))===false?0:(strlen($gaunitsarr[$j][2])-$p-1))) {
+                                    if ($thisreqdecimals != (($p = strpos($thisgaunitsarr[2],'.'))===false?0:(strlen($thisgaunitsarr[2])-$p-1))) {
                                         continue;
                                     }
                                 } else if ($thisreqdecimals !== '' && $reqdecoffset > 0) {
-                                    $gadec = ($p = strpos($gaunitsarr[$j][2],'.'))===false?0:(strlen($gaunitsarr[$j][2])-$p-1);
+                                    $gadec = ($p = strpos($thisgaunitsarr[2],'.'))===false?0:(strlen($thisgaunitsarr[2])-$p-1);
                                     if ($gadec - $thisreqdecimals > $reqdecoffset) {
                                         continue;
                                     }
                                 }
                                 if ($thisreqsigfigs !== '') {
-                                    if (checkunitssigfigs($gaunitsarr[$j], $anssunits[$k], $thisreqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
+                                    if (checkunitssigfigs($thisgaunitsarr, $thisanssunits, $thisreqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
                                         $correct += $partialpts[$k]; $foundloc = $j; break 2;
                                     } else {
                                         continue;
                                     }
                                 } else if ($abstolerance !== '') {
-                                    $adjabstolerance = $abstolerance*$anssunits[$k][3];
-                                    if (abs($anans-$givenans) < $adjabstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += $partialpts[$k]; $foundloc = $j; break 2;}
+                                    $adjabstolerance = $abstolerance*$thisanssunits[3];
+                                    if (abs($thisanssunits[0]-$thisgaunitsarr[0]) < $adjabstolerance + (($thisanssunits[0]==0||abs($thisanssunits[0])>1)?1E-12:(abs($thisanssunits[0])*1E-12))) {$correct += $partialpts[$k]; $foundloc = $j; break 2;}
                                 } else {
-                                    if ($anans==0) {
-                                        if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {$correct += $partialpts[$k]; $foundloc = $j; break 2;}
+                                    if ($thisanssunits[0]==0) {
+                                        if (abs($thisanssunits[0] - $thisgaunitsarr[0]) < $reltolerance/1000 + 1E-12) {$correct += $partialpts[$k]; $foundloc = $j; break 2;}
                                     } else {
-                                        if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += $partialpts[$k]; $foundloc = $j; break 2;}
+                                        if (abs($thisanssunits[0] - $thisgaunitsarr[0])/(abs($thisanssunits[0])+(abs($thisanssunits[0])>1?1E-12:(abs($thisanssunits[0])*1E-12))) < $reltolerance+ 1E-12) {$correct += $partialpts[$k]; $foundloc = $j; break 2;}
                                     }
                                 }
                             } else { 
