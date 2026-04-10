@@ -227,6 +227,9 @@ function disp($q,$qtype,$part=-1,$answer='',$questions=array()) {
 	if (array_key_exists($q, $qdata)) {
         foreach ($qdata[$q] as $varr) {
             if ($part > -1) {
+				if (!isset($varr[0][$part])) {
+					continue;
+				}
                 $v = $varr[0][$part];
             } else {
                 $v = $varr[0];
