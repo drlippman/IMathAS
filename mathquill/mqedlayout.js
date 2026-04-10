@@ -550,6 +550,10 @@ var myMQeditor = (function($) {
         if (calcformat.match(/allowdegrees/)) {
             baselayout.tabs[2].tabcontent[0].contents[13] = {l:'\\degree'};
         }
+      } else if (calcformat.match(/allowdegrees/)) {
+        baselayout.tabs[2].enabled = true;
+        baselayout.tabs[2].tabcontent[0].contents[13] = {l:'\\degree'};
+        baselayout.tabs[2].tabcontent[0].contents.splice(0,12); // only show pi and degrees
       }
     }
     if (qtype.match(/interval/)) {

@@ -105,6 +105,9 @@ div.match li img, div.match li [role=img] {
 div[role=radiogroup].clearfix .match {
 	padding-right: 5px;
 }
+.match > ol, .match > ul {
+	margin-top: 5px;
+}
 div.spacer {
   clear: both;
   height: 1px;
