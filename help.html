@@ -2685,6 +2685,16 @@ These macros are fairly general purpose:
 			<code>$answer[3] = scoreperiodic($answer[3], getstuans($stuanswers,$thisq,3), "n")</code>
 		</li>
 	</ul>
+	</li>
+<li><strong>setupmathquillfillin(asciimath format,alt format)</strong>: For use in a multipart question, 
+  this allows you to create fill-in areas inside an otherwise static math expression. Setup a multipart 
+  question like usual, then use this function to generate an entry string you place into the question text 
+  instead of $answerboxes for the parts involved. The asciimath string should be the expression to render, with 
+  [AB#] where the fill-ins will go, corresponding to the part indexes of the multipart question. The alt format 
+  string should be a plain text string using the same [AB#] inputs, which will be used for students who have 
+  disabled the equation editor for accessibility.  Example of use:<br>
+  <code>$entry = setupmathquillfillin("int_([AB0])^([AB1]) [AB2] dx", "The integral from [AB0] to [AB1] of [AB2] dx")</code>
+</li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
@@ -4932,8 +4942,14 @@ This type of question can contain multiple parts, where each part is one of the 
 	<dd>Optionally, you can use $showanswerloc to place a single $showanswer "Show Answer" button,
 	or $showanswerloc[part] to place "Show Answer" buttons for each part.  You can also use short tags
 	of the form [SAB] or [SABn] (like [SAB2]). Note that if you use this to place one
-	Show Answer button, you must place all of them, or else the remainder will not show.  Use $showanswerstyle = 'inline' to
-	allow Show Answer to be placed inline with text rather than on its own line.</dd>
+	Show Answer button, and have defined $showanswer[n] for only some parts, you must place [SABn] for all parts, 
+	or else the remainder will not show.  To define a single Show Answer for a sequential set of parts, define
+	$showanswer[n] using the last part number in the set, and put [SABn-n] in the question text to place 
+	the Show Answer button for that set of parts. For example, if you parts 2-4 were to have a single key, you'd define 
+	$showanswer[4] and put [SAB2-4] in the question text.</dd>
+<dt>$showanswerstyle</dt>
+	<dd>Use $showanswerstyle = 'inline' to
+	allow Show Answer buttons placed using $showanswerloc or [SABn] to be placed inline with text rather than on its own line.</dd>
 <dt>[SAB#] (In Detailed Solution)</dt>
 	<dd>To include the generated "show answer" values in the detailed solution, you can use short 
 		tags like [SAB2].  Note that this will place the "show answer" directly, not wrapped in a 
