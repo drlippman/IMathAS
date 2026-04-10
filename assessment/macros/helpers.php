@@ -1214,6 +1214,18 @@ function checkanswerformat($tocheck,$ansformats) {
 }
 
 function setupmathquillfillin($mqformat, $altformat) {
+    preg_match_all('/\[AB(\d+)\]/', $mqformat, $m1, PREG_PATTERN_ORDER);
+    preg_match_all('/\[AB(\d+)\]/', $altformat, $m2, PREG_PATTERN_ORDER);
+    if (empty($m1) || empty($m2)) {
+        echo 'setupmathquillfillin: both inputs must include matching [AB#] elements';
+        return '';
+    }
+    sort($m1[1]);
+    sort($m2[1]);
+    if ($m1[1] !== $m2[1]) {
+        echo 'setupmathquillfillin: both inputs must include matching [AB#] elements';
+        return '';
+    }
     $mqformat = preg_replace('/\[AB(\d+)\]/', 'innertmpfield($1)', $mqformat);
     $out = '<span class="mqinnerfillin"><span class="mqfillin-mq"></span>&nbsp;<span class="mqfillin-err"></span>';
     $out .= '<span class="mqfillin-alt" data-form="'. Sanitize::encodeStringForDisplay($mqformat).'" style="display:none;">';
