@@ -823,6 +823,42 @@ function units_makecomparable($unit1,$unit2) {
   } else if ($unit2[1][10]==1 && $unit1[1][10]==0) { // unit 2 has cycle (unit 1 does not have rad or previous would have caught)
     $unit2[1][10] = 0; // drop cycle
   }
+  // adjust degK to degC
+  if ($unit1[1][6]!==0 && $unit2[1][6]==0) {
+    if ($unit1[1] == [0,0,0,0,0,0,1,0,0,0,0]) { // just temp - use full conversion for K to C
+      $unit1[0] -= 273.15;
+    } // no else; if not just temp, treat as change, and change in K is same as change in C
+    // change unit to C
+    $unit1[1][4] = $unit1[1][6];
+    $unit1[1][6] = 0;
+  } else if ($unit2[1][6]!=0 && $unit1[1][6]==0) {
+    if ($unit2[1] == [0,0,0,0,0,0,1,0,0,0,0]) { // just temp - use full conversion for K to C
+      $unit2[0] -= 273.15;
+    } // no else; if not just temp, treat as change, and change in K is same as change in C
+    // change unit to C
+    $unit2[1][4] = $unit2[1][6];
+    $unit2[1][6] = 0;
+  }
+  // try to get degC and degF to be comparable
+  if ($unit1[1][4] != 0 && $unit2[1][4] == 0 && $unit2[1][5] == $unit1[1][4]) {
+    // unit1 uses degC, unit2 uses degF
+    if ($unit1[1] == [0,0,0,0,1,0,0,0,0,0,0]) { // just temp - use full conversion for F to C
+      $unit2[0] = 5/9*($unit2[0] - 32);
+    } else { // not just temp; temp is probably change in temp, so just use 5/9
+      $unit2[0] = pow(5/9,$unit2[1][5])*$unit2[0];
+    }
+    $unit2[1][4] = $unit1[1][4];
+    $unit2[1][5] = 0;
+  } else if ($unit2[1][4] != 0 && $unit1[1][4] == 0 && $unit1[1][5] == $unit2[1][4]) {
+    // unit2 uses degC, unit1 uses degF
+    if ($unit2[1] == [0,0,0,0,1,0,0,0,0,0,0]) { // just temp - use full conversion for F to C
+      $unit1[0] = 5/9*($unit1[0] - 32);
+    } else { // not just temp; temp is probably change in temp, so just use 5/9
+      $unit1[0] = pow(5/9,$unit1[1][5])*$unit1[0];
+    }
+    $unit1[1][4] = $unit2[1][4];
+    $unit1[1][5] = 0;
+  } 
   return [$unit1,$unit2];
 }
 
