@@ -286,6 +286,7 @@ if (FormData){ // Only allow quicksave if FormData object exists
 				// Change outputmsg and errmsg
 				$("#outputmsgContainer").html(res.outputmsg).toggleClass("cpmid", res.outputmsg !== '');
 				$("#errmsgContainer").html(res.errmsg).toggleClass("cpmid", res.errmsg !== '');
+				$("#a11yerrContainer").html(res.a11yerr).toggleClass("cpmid", res.a11yerr !== '');
 				if (exit) {
 					$("#mainform").hide();
 					$("#outputmsgContainer")[0].scrollIntoView();

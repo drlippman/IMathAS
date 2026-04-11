@@ -12,6 +12,7 @@
 	require_once "../init.php";
 	require_once '../includes/videodata.php';
 	require_once '../includes/htmlutil.php';
+	require_once '../includes/a11yscan.php';
 
 	if ($myrights<20) {
 		require_once "../header.php";
@@ -63,6 +64,7 @@
 
 	$outputmsg = '';
 	$errmsg = '';
+	$a11yerr = '';
 	if (isset($_POST['qtext'])) {
 		require_once "../includes/filehandler.php";
 		$now = time();
@@ -801,6 +803,23 @@
         $olnames = implode(", ",$olnames);
     }
 
+	a11yscan($line['control'].';;'.$line['qtext'], '', '', '');
+	$a11yerr = '';
+	foreach ($errors[1] as $err) {
+		$a11yerr .= $err[0].'. ';
+	}
+	if (count($extref)>0) {
+		for ($i=0;$i<count($extref);$i++) {
+			$extrefpt = explode('!!',$extref[$i]);
+			if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==0) {
+				$a11yerr .= sprintf(_('Uncaptioned video (%s). '), $extrefpt[1]);
+			}
+		}
+	}
+	if ($a11yerr !== '') {
+		$a11yerr = '<span class="noticetext">'._('Potential Accessibility Issue:').'</span> '.$a11yerr;
+	}
+
 	// Build form action
 	$formAction = "moddataset.php?process=true"
 		. (isset($_GET['cid']) ? "&cid=$cid" : "")
@@ -819,6 +838,7 @@
 		$qsPacket['images'] = $images; //  Images array
 		$qsPacket['outputmsg'] = $outputmsg; // output message
 		$qsPacket['errmsg'] = $errmsg;
+		$qsPacket['a11yerr'] = $a11yerr;
 		$extrefqs = array();
 		for ($i=0;$i<count($extref);$i++) {
 			$extrefpt = explode('!!',$extref[$i]);
@@ -872,7 +892,7 @@
 	$placeinhead .= 'var canedit = ' . ($canedit ? "true" : "false") . ';';
 
 	$placeinhead .= '</script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=032226b"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=041126"></script>';
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
@@ -917,6 +937,7 @@
 
 	echo "<div id='errmsgContainer' class='noticetext".($errmsg==''?'':' cpmid')."'>$errmsg</div>";
 	echo "<div id='outputmsgContainer'".($outputmsg==''?'':' class=cpmid').">$outputmsg</div>";
+	echo "<div id='a11yerrContainer' class='".($a11yerr==''?'':' cpmid')."'>$a11yerr</div>";
 
 	if (strpos($line['control'],'end stored values - Tutorial Style')!==false) {
 		echo '<p>'._('This question appears to be a Tutorial Style question.').'  <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">'._('Open in the tutorial question editor').'</a></p>';

@@ -2,7 +2,7 @@
 
 require_once "../init.php";
 require_once "../includes/videodata.php";
-require_once "../includes/colorcontrast.php";
+require_once "../includes/a11yscan.php";
 
 $what = 'cid';
 
@@ -36,104 +36,6 @@ if (isset($_POST['qidtodisable']) && isset($teacherid)) {
     }
     header('Location: report-a11y.php?cid=' . $cid);
     exit;
-}
-
-$errors = [[],[],[]];
-$vidids = [];
-$vidlocs = [];
-$asciisvgpattern = '/^showasciisvg\(\s*((("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])+,\s*){0,2}("([^"\\\\]|\\\\.)*"|\'([^\'\\\\]|\\\\.)*\'|[^,()])?\s*)?\)$/';
-function a11yscan($content, $field, $type, $itemname, $link='',$hasa11yalt=false,$link2=null,$errorlevel=1) {
-    global $asciisvgpattern,$vidids,$vidlocs;
-    $addederror = false;
-    // ensure regex considers \" as well as " to account for encoding
-    $content = str_replace(['\\\'','\\"', "'"], ['"','"','"'], $content);
-    // look for empty text, or missing alt text.  sloppy, but works
-    if (preg_match('/(<img[^>]*?alt="(.*?)"[^>]*?>|<img[^>]*>)/', $content, $matches)) {
-        if (!isset($matches[2])) { // used second pattern; missing alt text
-            adderror($errorlevel,_('Missing alt text'), $field, $type, $itemname, $link, $link2);
-        } else if (trim($matches[2]) == '' && strpos($matches[0], 'role="presentation"') === false) {
-            adderror($errorlevel,_('Blank alt text'), $field, $type, $itemname, $link, $link2); 
-        }
-    }
-    // look for asciisvg call with undefined alt text.
-    // we'll assume if alt text is defined but blank that it was intentional
-    // does not account for use of replacealttext later in the question
-    if (!$hasa11yalt && preg_match($asciisvgpattern, $content)) {
-        adderror($errorlevel,_('Likely useless auto-generated alt text from showasciisvg'), $field, $type, $itemname, $link, $link2); 
-        $addederror = true;
-    }
-    if (!$hasa11yalt && strpos($content,'textonimage(') !== false && 
-        strpos($content,'replacealttext(') === false
-    ) {
-        // textonimage without replacealttext probably 
-        adderror($errorlevel,_('Potential issue: textonimage used without replacealttext'), $field, $type, $itemname, $link, $link2); 
-        $addederror = true;
-    }
-    if (!$hasa11yalt && preg_match('/textonimage\([^\)]*\[AB/', $content) &&
-        strpos($content,'readerlabel') === false
-    ) {
-        //textonimage with AB without readerlabel
-        adderror($errorlevel,_('Potential issue: [AB] in textonimage used without readerlabel'), $field, $type, $itemname, $link, $link2); 
-        $addederror = true;
-    }
-    if (!$hasa11yalt && strpos($content,'jsxgraph') !== false && strpos($content,'graphdispmode')===false) {
-        adderror($errorlevel,_('Potential issue: question may use jsxgraph; check for accessible alt'), $field, $type, $itemname, $link, $link2); 
-        $addederror = true;
-    }
-    if (!$hasa11yalt && strpos($content,'geogebra') !== false && strpos($content,'graphdispmode')===false) {
-        adderror($errorlevel,_('Potential issue: question may use geogebra; check for accessible alt'), $field, $type, $itemname, $link, $link2); 
-        $addederror = true;
-    }
-    // look for youtube videos
-    if (preg_match_all('/((youtube\.com|youtu\.be)[^>\s]*?)"/', $content, $matches, PREG_SET_ORDER)) {
-        foreach ($matches as $m) {
-            if (($vidid = getvideoid($m[1])) !== '') {
-                $vidids[] = $vidid;
-                $vidlocs[$vidid] = [$field, $type, $itemname, $link];
-            }
-        }
-    }
-    if (!$addederror && $errorlevel == 2) {
-        adderror($errorlevel,_('Negative accessibility reviews'), $field, $type, $itemname, $link, $link2); 
-    }
-    return $addederror;
-}
-function scancolors($items, $parent) {
-    global $errors,$cid;
-    foreach ($items as $k=>$item) {
-        if (is_array($item)) {
-            $bnum = $k+1;
-            if (!empty($item['colors'])) {
-                list($titlebg,$titletext,$blockbg) = explode(',', $item['colors']);
-                if (calculateLuminosityRatio($titletext,$titlebg) < 4.5) {
-                    adderror(1,
-                        _('Insufficient color contrast'), 
-                        _('title text and background'), 
-                        _('Block'),
-                        $item['name'],
-                        "course/addblock.php?cid=$cid&id=" . $parent.'-'.$bnum);
-                }
-            }
-            if (!empty($item['items'])) {
-                scancolors($item['items'], $parent.'-'.$bnum);
-            }
-        }
-    }
-}
-
-function adderror($errorlevel,$descr, $loc, $itemtype, $itemname, $link, $link2 = null) {
-    global $errors;
-    /*if ($itemtype !== null) {
-        if ($link2 !== null) {
-            $errors[] = [sprintf('%s in %s', $descr, $loc), $link, 
-                sprintf('of %s %s', $itemtype, $itemname), $link2];
-        } else {
-            $errors[] = [sprintf('%s in %s of %s %s', $descr, $loc, $itemtype, $itemname), $link];
-        }
-    } else {
-        $errors[] = [sprintf('%s in %s', $descr, $loc), $link];
-    }*/
-    $errors[$errorlevel][] = [$descr, $loc, $itemtype, $itemname, $link2, $link];
 }
 
 $extrefissues = [];
