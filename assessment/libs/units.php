@@ -799,28 +799,28 @@ function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $r
 
 function units_makecomparable($unit1,$unit2) {
   //['kg','m','sec','rad','degC','degF','degK','mol','amp','cd','cycle']
-  // if units1 has rad=1 and units 2 doesn't, drop rad
-  if ($unit1[1][3]==1 && $unit2[1][3]==0) {
+  //  0    1    2     3     4      5      6      7     8     9    10
+  if ($unit1[1][3]!=0 && $unit2[1][3]==0) {
     // unit 1 has rad, 2 doesn't
-    if ($unit2[1][10]==1) { //unit 2 has cycle; convert to rad
+    if ($unit2[1][10]==$unit1[1][3]) { //unit 2 has cycle; convert to rad
+      $unit2[1][3] = $unit2[1][10];
       $unit2[1][10] = 0;
-      $unit2[1][3] = 1;
-      $unit2[0] *= 2*M_PI;
+      $unit2[0] *= pow(2*M_PI, $unit2[1][3]);
     } else { // no cycle; remove rad so "1" = "1 rad"
       $unit1[1][3] = 0;
     }
-  } else if ($unit1[1][3]==0 && $unit2[1][3]==1) {
+  } else if ($unit1[1][3]==0 && $unit2[1][3]!=0) {
     // unit 2 has rad, 1 doesn't
-    if ($unit1[1][10]==1) { //unit 1 has cycle; convert to rad
+    if ($unit1[1][10]==$unit2[1][3]) { //unit 1 has cycle; convert to rad
+      $unit1[1][3] = $unit1[1][10];
       $unit1[1][10] = 0;
-      $unit1[1][3] = 1;
-      $unit1[0] *= 2*M_PI;
+      $unit1[0] *= pow(2*M_PI, $unit1[1][3]);
     } else { // no cycle; remove rad so "1" = "1 rad"
       $unit2[1][3] = 0;
     }
-  } else if ($unit1[1][10]==1 && $unit2[1][10]==0) { // unit 1 has cycle (unit 2 does not have rad or previous would have caught)
+  } else if ($unit1[1][10]!=0 && $unit2[1][10]==0) { // unit 1 has cycle (unit 2 does not have rad or previous would have caught)
     $unit1[1][10] = 0; // drop cycle
-  } else if ($unit2[1][10]==1 && $unit1[1][10]==0) { // unit 2 has cycle (unit 1 does not have rad or previous would have caught)
+  } else if ($unit2[1][10]!=0 && $unit1[1][10]==0) { // unit 2 has cycle (unit 1 does not have rad or previous would have caught)
     $unit2[1][10] = 0; // drop cycle
   }
   // adjust degK to degC
