@@ -2693,7 +2693,13 @@ These macros are fairly general purpose:
   [AB#] where the fill-ins will go, corresponding to the part indexes of the multipart question. The alt format 
   string should be a plain text string using the same [AB#] inputs, which will be used for students who have 
   disabled the equation editor for accessibility.  Example of use:<br>
-  <code>$entry = setupmathquillfillin("int_([AB0])^([AB1]) [AB2] dx", "The integral from [AB0] to [AB1] of [AB2] dx")</code>
+  <code>$entry = setupmathquillfillin("int_([AB0])^([AB1]) [AB2] dx", "The integral from [AB0] to [AB1] of [AB2] dx")</code><br><br>
+  If you want to define a single answer key for the whole fillin, define <code>$showanswer[2]</code> as 
+  the answer key you want to show (using the last part index from the range used in the fillin), and place 
+  <code>[SAB0-2]</code> after the $entry in the question text (using the range of part indexes from the fillin).  You may 
+  want to set <code>$showanswerstyle = "inline"</code> so the key shows on the same line as the fillin entry.<br><br>
+  To adjust the size of fillins, use <code>$answerboxsize[part number]</code> as usual, but be aware large sizes may be
+  reduced, since the editor will expand the input based on what's typed.
 </li>
 </ul>
 </div> <!-- h2 -->
