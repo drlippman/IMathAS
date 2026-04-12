@@ -14,6 +14,8 @@ if (isset($_GET['scan']) && $_GET['scan'] === 'myqs') {
     $what = 'myqs';
 } 
 
+$a11yscan = new A11yScanner($DBH, $cid);
+
 if (isset($_POST['qidtodisable']) && isset($teacherid)) {
     $qids = array_map('intval', explode(',', $_POST['qidtodisable']));
     $ph = Sanitize::generateQueryPlaceholders($qids);
@@ -43,38 +45,38 @@ if ($what === 'cid') {
     $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=?");
     $stm->execute([$cid]);
     $itemorder = $stm->fetchColumn(0);
-    scancolors(unserialize($itemorder), '0');
+    $a11yscan->scancolors(unserialize($itemorder), '0');
 
     // scan assessment summary, intro (including between-question text)
     $stm = $DBH->prepare("SELECT name,summary,intro,id FROM imas_assessments WHERE courseid=?");
     $stm->execute([$cid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        a11yscan($row['summary'], _('Summary'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
-        a11yscan($row['intro'], _('Intro or Between-question text'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['summary'], _('Summary'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['intro'], _('Intro or Between-question text'), _('Assessment'), $row['name'], "course/addassessment2.php?cid=$cid&id=" . $row['id']);
     }
 
     // scan inline text summary
     $stm = $DBH->prepare("SELECT title,text,id FROM imas_inlinetext WHERE courseid=?");
     $stm->execute([$cid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        a11yscan($row['text'], _('Text'), _('Inline text item'), $row['title'], "course/addinlinetext.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['text'], _('Text'), _('Inline text item'), $row['title'], "course/addinlinetext.php?cid=$cid&id=" . $row['id']);
     }
 
     // scan linked text summary, text
     $stm = $DBH->prepare("SELECT title,summary,text,id FROM imas_linkedtext WHERE courseid=?");
     $stm->execute([$cid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        a11yscan($row['summary'], _('Summary'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
-        a11yscan($row['text'], _('Text'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['summary'], _('Summary'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['text'], _('Text'), _('Link item'), $row['title'], "course/addlinkedtext.php?cid=$cid&id=" . $row['id']);
     }
 
     // scan forum summary, postinstr, replyinstr
     $stm = $DBH->prepare("SELECT name,description,postinstr,replyinstr,id FROM imas_forums WHERE courseid=?");
     $stm->execute([$cid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        a11yscan($row['description'], _('Description'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
-        a11yscan($row['postinstr'], _('Post Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
-        a11yscan($row['replyinstr'], _('Reply Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['description'], _('Description'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['postinstr'], _('Post Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
+        $a11yscan->scan($row['replyinstr'], _('Reply Instructions'), _('Forum'), $row['name'], "course/addforum.php?cid=$cid&id=" . $row['id']);
     }
 
     // scan forum post message, for sticky forum posts with type>0
@@ -82,7 +84,7 @@ if ($what === 'cid') {
         JOIN imas_forum_posts AS ifp ON ifs.id=ifp.forumid AND ifp.posttype>0 WHERE ifs.courseid=?");
     $stm->execute([$cid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        a11yscan($row['message'], _('Sticky post') . ' ' . $row['subject'], _('Forum'), $row['name']);
+        $a11yscan->scan($row['message'], _('Sticky post') . ' ' . $row['subject'], _('Forum'), $row['name']);
     }
 
     // scan questionset control, qtext
@@ -106,7 +108,7 @@ if ($what === 'cid') {
         } else {
             $thiserrorlevel = 1;
         }
-        $res = a11yscan($row['control'] . ';;' . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
+        $res = $a11yscan->scan($row['control'] . ';;' . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
             _('Assessment'), $row['name'], "course/addquestions2.php?cid=$cid&aid=" . $row['aid'], 
             $row['a11yalt']!=0,"course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
             $thiserrorlevel);
@@ -128,7 +130,7 @@ if ($what === 'cid') {
     $stm->execute([$cid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if (trim($row['alttext']) == '') {
-            adderror(1, _('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
+            $a11yscan->adderror(1, _('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
                 _('Assessment'), $row['name'],
                 "course/addquestions2.php?cid=$cid&aid=" . $row['aid'], 
                 "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
@@ -153,7 +155,7 @@ if ($what === 'cid') {
         } else {
             $thiserrorlevel = 1;
         }
-        $res = a11yscan($row['control'] . ';;' . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
+        $res = $a11yscan->scan($row['control'] . ';;' . $row['qtext'], sprintf(_('Question ID %d'), $row['id']), 
             $row['id'], null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id'],
             $row['a11yalt']!=0, null, $thiserrorlevel);
         if ($res) {
@@ -172,7 +174,7 @@ if ($what === 'cid') {
     $stm->execute([$userid]);
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if (trim($row['alttext']) == '') {
-            adderror(1, _('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
+            $a11yscan->adderror(1, _('Blank alt text'), sprintf(_('Question ID %d image variable %s'), $row['id'], $row['var']), 
                 $row['id'], null , "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
         }
     }
@@ -221,11 +223,11 @@ if (count($vidstocheck)>0) {
                     if (!$gaveerrorthisquestion) {
                         // it's a video, don't have captions, give error once
                         if ($what === 'myqs') {
-                            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
+                            $a11yscan->adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
                                 $row['id'], null, "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']); 
                             $qsreported[] = $row['id'];
                         } else {
-                            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
+                            $a11yscan->adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid), sprintf(_('Question ID %d'), $row['id']), 
                                 _('Assessment'), $row['name'], 
                                 "course/addquestions2.php?cid=$cid&aid=" . $row['aid'],
                                 "course/testquestion2.php?cid=$cid&qsetid=" . $row['id']);
@@ -252,7 +254,7 @@ if ($what === 'myqs') {
     $qscounts = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
 }
 
-a11ycheckvids();
+$a11yscan->a11ycheckvids();
 
 $pagetitle = _('Accessibility Report');
 
@@ -287,6 +289,8 @@ if (isset($qidswithuncaptioned) && count($qidswithuncaptioned)>0) {
     echo '<button type=submit>'. _('Disable videos on these questions') .'</button></p>';
     echo '</form>';
 }
+
+$errors = $a11yscan->geterrors();
 
 if (count($errors[2])>0) {
     echo '<h2>'._('The questions in these issues have accessibility reviews indicating they may "need work", suggesting they are likely legitimate issues.').'</h2>';

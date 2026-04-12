@@ -803,8 +803,10 @@
         $olnames = implode(", ",$olnames);
     }
 
-	a11yscan($line['control'].';;'.$line['qtext'], '', '', '');
-	a11ycheckvids();
+	$a11yscan = new A11yScanner($DBH, $cid);
+	$a11yscan->scan($line['control'].';;'.$line['qtext'], '', '', '');
+	$a11yscan->a11ycheckvids();
+	$errors = $a11yscan->geterrors();
 	$a11yerr = '';
 	foreach ($errors[1] as $err) {
 		$a11yerr .= $err[0].'. ';
