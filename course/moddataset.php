@@ -804,6 +804,7 @@
     }
 
 	a11yscan($line['control'].';;'.$line['qtext'], '', '', '');
+	a11ycheckvids();
 	$a11yerr = '';
 	foreach ($errors[1] as $err) {
 		$a11yerr .= $err[0].'. ';
@@ -814,6 +815,11 @@
 			if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==0) {
 				$a11yerr .= sprintf(_('Uncaptioned video (%s). '), $extrefpt[1]);
 			}
+		}
+	}
+	foreach ($images['alttext'] as $imn=>$alt) {
+		if (empty($alt)) {
+			$a11yerr .= sprintf(_('Blank alt text on image variable %s'), $images['vars'][$imn]);
 		}
 	}
 	if ($a11yerr !== '') {

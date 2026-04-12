@@ -252,43 +252,7 @@ if ($what === 'myqs') {
     $qscounts = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
 }
 
-if (count($vidids) > 0 && isset($CFG['YouTubeAPIKey'])) {
-    $vidids = array_values(array_unique($vidids));
-    $ph = Sanitize::generateQueryPlaceholders($vidids);
-    $stm = $DBH->prepare("SELECT vidid,captioned,status FROM imas_captiondata WHERE vidid IN ($ph)");
-    $stm->execute($vidids);
-    $viddata = [];
-    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-        $viddata[$row['vidid']] = [$row['captioned'], $row['status']];
-    }
-    $vidtoqueue = [];
-    foreach ($vidids as $vidid) {
-        if (!isset($viddata[$vidid]) || ($viddata[$vidid][0] == 0 && $viddata[$vidid][1] == 0)) {
-            adderror(1, sprintf(_('Potentially uncaptioned video (ID %s; this video will be scanned in the next few days to check for captions)'), $vidid),
-                $vidlocs[$vidid][0],$vidlocs[$vidid][1],$vidlocs[$vidid][2],$vidlocs[$vidid][3]);
-            if (!isset($viddata[$vidid])) {
-                $vidtoqueue[] = $vidid;
-            }
-        } else if ($viddata[$vidid][1] == 3) {
-            adderror(1, sprintf(_('Missing/broken or unscannable video (ID %s)'), $vidid),
-                $vidlocs[$vidid][0],$vidlocs[$vidid][1],$vidlocs[$vidid][2],$vidlocs[$vidid][3]);
-        } else if ($viddata[$vidid][0] == 0 && $viddata[$vidid][1] > 0) {
-            adderror(1, sprintf(_('Uncaptioned video (ID %s)'), $vidid),
-                $vidlocs[$vidid][0],$vidlocs[$vidid][1],$vidlocs[$vidid][2],$vidlocs[$vidid][3]);
-        }
-    }
-    if (count($vidtoqueue) > 0) {
-        $insarr = [];
-        $now = time();
-        foreach ($vidtoqueue as $vidid) {
-            array_push($insarr, $vidid, $now);
-        }
-        $ph = Sanitize::generateQueryPlaceholdersGrouped($insarr,2);
-        $stm = $DBH->prepare("INSERT IGNORE INTO imas_captiondata (vidid,lastchg) VALUES $ph");
-        $stm->execute($insarr);
-    }
-}
-
+a11ycheckvids();
 
 $pagetitle = _('Accessibility Report');
 

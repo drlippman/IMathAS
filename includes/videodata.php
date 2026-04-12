@@ -21,6 +21,16 @@ function getvideoid($url) {
 			$vidid = substr($vidid,0,strpos($vidid,'#'));
 		}
 		$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
+	} else if (strpos($url,'youtube.com/embed/')!==false) {
+		//youtube
+		$vidid = substr($url,strpos($url,'/embed/')+7);
+		if (strpos($vidid,'#')!==false) {
+			$vidid = substr($vidid,0,strpos($vidid,'#'));
+		}
+		if (strpos($vidid,'?')!==false) {
+			$vidid = substr($vidid,0,strpos($vidid,'?'));
+		}
+		$vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
 	} else if (strpos($url,'youtu.be/')!==false) {
 		//youtube
 		$vidid = substr($url,strpos($url,'.be/')+4);
