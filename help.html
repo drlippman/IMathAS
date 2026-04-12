@@ -1903,23 +1903,43 @@ A question is formed in several parts:
 <li><strong>Description</strong>:  A description of the question.  This is not shown to students</li>
 <li><strong>Use Rights</strong>:  The rights you wish to grant other people (you always have full rights).  Options are:
 	<ul>
-	<li><strong>Private</strong>:  Only you can use the question</li>
-	<li><strong>Use, no modification</strong>:  Anyone can use the problem, but only you can modify the problem.  Anyone can add
-	    library assignments, but cannot remove assignments.</li>
-	<li><strong>Use, allow modification</strong>:  Anyone can use or modify the problem.</li>
+	<li><strong>Private</strong>:  Only you can see the question in question searches.</li>
+	<li><strong>Allow use by all</strong>:  Anyone can use the problem, but only you can modify the problem.
+		The question will appear in question searches if it's assigned to a library.
+		Anyone can add library assignments, but cannot remove assignments.</li>
+	<li><strong>Allow use by all and modifications by group</strong>:  Like above, but 
+		anyone in your instructor group can modify the question. Use with caution.</li>
+	<li><strong>Allow use by all and modifications by all</strong>:  Like above, but 
+		anyone can modify the question. In general, do not use this. This is meant for 
+		temporary use where you're getting help from someone outside your group.</li>
 	</ul></li>
-<li><strong>Libraries</strong>:  The question libraries you wish to include this question in</li>
+<li><strong>License</strong>: The permission license to apply to the question.</li>
+<li><strong>My libraries assignments</strong>:  The question libraries you wish to include this question in.</li>
 <li><strong>Question type</strong>:  The type of question.</li>
-<li><strong>Common control</strong>:  General definitions needed for both display and scoring</li>
-<li><strong>Question control</strong>:  Definitions only needed for question display</li>
+<li><strong>Common control</strong>:  The coding that defines variables, defines question behavior, and generates
+	anything needed for display.</li>
 <li><strong>Question text</strong>:  The actual question display.  This section should be HTML based, but
     can include variables defined in the common or question control.  For convenience, a blank line
     is automatically interpreted to be a paragraph break.  Use of &lt; and &gt; signs are usually
-    handled ok, but use of the HTML &amp;lt; and &amp;gt; are recommended in their place.</li>
-<li><strong>Answer</strong>:  Code defining the answer</li>
+    handled ok, but use of the HTML &amp;lt; and &amp;gt; are recommended in their place.  You can 
+	use the Toggle Editor button to enable the rich-text editor if that is easier than working in 
+	raw HTML.</li>
+<li><strong>Detailed solution</strong>:  An optional place to define a detailed solution that display 
+	with the answer key, or a popup written example. This section should be HTML based. There are options 
+	for whether the solution uses the variables from the question, and for whether to show the solution 
+	as a popup written example, with the "show answer" answer key, or both</li>
+<li><strong>Image files</strong>: This provides a place to upload static images (.png, .jpg, .gif) and 
+	assign them to a variable for use in the question code or question text. Be sure to provide a description for 
+	accessiblity. If you're only using an image 
+	in the question text, it can be simpler to Toggle Editor in the question text and use the insert image tool 
+	there.   </li>
+<li><strong>Help buttons</strong>: Use these to provide help buttons for videos or links to reading material. These 
+	will show below the question, and can be toggled off in the assessment settings.</li>
+<li><strong>Use accessible alternative</strong>: This is only needed if your question cannot be made accessible 
+	through normal means. You probably don't need this. 
+	Read the <a href="#a11yalt">accessible alternative</a> help section for more details.</li>
 </ul>
 
-<p>Note:  All control code can be placed in the "Common Control" box; the Question Control and Answer sections do not have to be used.</p>
 
 </div> <!-- h2 -->
 <div class=h2>
@@ -1937,14 +1957,14 @@ $a is the variable a.  Most lines will take one of these forms:
 </ul>
 
 
-<p><strong>Variable Types</strong></p>
+<h3>Variable Types</h3>
 <p>
 There are a few types of variables:
 </p>
 <ul>
  <li>A number:  $a = 15.  A calculation like $a = 3^2 will also result in a number</li>
  <li>An array:  $a = array(6,8,10).  This is a collection of variables. You can reference the parts using an index (note that arrays are zero-indexed), so $a[0] = 6.</li>
- <li>A string:  $a = "hi there".</li>
+ <li>A string:  $a = "hi there", or $b = "2/3".</li>
  <li>Boolean:  $a = true</li>
 </ul>
 
@@ -1966,8 +1986,14 @@ In this example, $str now contains &quot;What is 3/5&quot;.
     then defined $b = "$a^2" you would end up with "-4^2", which may not be 
     what you intended.  Use explicit parentheses in these cases.
 </p>
+<p>Warning: Strings that we as mathematicians think of as numbers are not numbers. 
+	If <code>$a = "3/4"</code>, that defines a string, and if you try to compute 
+	<code>$b = $a*5</code>, that's going to give an error, because you can't multiply 
+	a string by a number. Usually there is an easy workaround, but if you really need 
+	to evaluate something like that, you'll need to use hte evalnumstr function.
+</p>
 
-<p><strong>Array assignment</strong></p>
+<h3>Array assignment</h3>
 <p>
 In some cases you want to define several variables at once.  There are two ways to
 do this:</p>
@@ -1989,7 +2015,7 @@ Examples:  $ar = array(2,3,4,5), or $ar = array(&quot;red&quot;,&quot;green&quot
     Example: $ar = [2,3,4,5].
 </p>
 
-<p><strong>Working with Strings</strong></p>
+<h3>Working with Strings</h3>
 <p>If needed, you can concatenate (combine) two strings using the . operator.  Example:</p>
 <pre>
 $a = &quot;string one &quot;
@@ -2028,6 +2054,7 @@ Typically it's best to put comments on their own line, but they can also be plac
 <p>
 Any assignment line can be followed by one of two conditional:  &quot;where&quot; or &quot;if&quot;.
 </p>
+<h4>where</h4>
 <p>
 &quot;where&quot; is used to repeat the previous assignment if the condition provided is not met.  The
 &quot;where&quot; condition is almost exclusively used with array randomizers.  Example: to select two
@@ -2042,6 +2069,30 @@ different numbers that are not opposites:
 </p>
 </p>
 <pre>$a = rand(1,100) where (gcd($a,$b)==1) else ($a = 7)</pre>
+
+<p>
+&quot;where&quot; can also be applied to a block of code:
+</p>
+<pre>
+{
+  $a = rand(-5,-1)
+  $b = rand(1,5)
+} where ($a+$b !==0)
+</pre>
+<p>or with a fallback</p>
+<pre>
+{
+  $a = rand(-5,-1)
+  $b = rand(1,5)
+} where ($a+$b !==0) else {
+  $a = -3
+  $b = 5
+}
+</pre>
+
+<p>Note that <code>where</code> can also be used for looping. See the help on Loops for examples.</p>
+
+<h4>if</h4>
 <p>
 &quot;if&quot; is used to make an assignment conditional.  For example:
 </p>
@@ -2054,24 +2105,6 @@ $b = &quot;cos(x)&quot; if ($a==1)
 Note the use of double equal signs (==) for testing equality.  A single equal sign (=) will
 make an assignment (change the value of $a in this example) and return &quot;true&quot;, which is probably not what you intended to do.
 </p>
-<p>
-Comparison operators available for &quot;if&quot; and &quot;where&quot; statements:
-</p>
-<ul>
-<li>==  Equal to</li>
-<li>!=  Not equal to</li>
-<li>&gt; Greater than</li>
-<li>&lt; Less than</li>
-<li>&gt;= Greater than or equal to</li>
-<li>&lt;= Less than or equal to</li>
-<li>isset($v) Whether $v is defined</li>
-</ul>
-<p>
-To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot;and&quot;.  For example:
-</p>
-<pre>
-$a = nonzerorand(-9,9) where ($a!=1 &amp;&amp; $a!=-1)
-</pre>
 <p>
 The &quot;if&quot; condition can also be used before or after a code block like this:
 </p>
@@ -2104,25 +2137,27 @@ if ($a==0) {
    $b = 2
 }
 </pre>
+
+<h4>Comparison operators</h4>
 <p>
-&quot;where&quot; can also be applied to a block of code:
+Comparison operators available for &quot;if&quot; and &quot;where&quot; statements:
+</p>
+<ul>
+<li>==  Equal to</li>
+<li>!=  Not equal to</li>
+<li>&gt; Greater than</li>
+<li>&lt; Less than</li>
+<li>&gt;= Greater than or equal to</li>
+<li>&lt;= Less than or equal to</li>
+<li>isset($v) Whether $v is defined</li>
+</ul>
+<p>
+To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot;and&quot;.  For example:
 </p>
 <pre>
-{
-  $a = rand(-5,-1)
-  $b = rand(1,5)
-} where ($a+$b !==0)
+$a = nonzerorand(-9,9) where ($a!=1 &amp;&amp; $a!=-1)
 </pre>
-<p>or with a fallback</p>
-<pre>
-{
-  $a = rand(-5,-1)
-  $b = rand(1,5)
-} where ($a+$b !==0) else {
-  $a = -3
-  $b = 5
-}
-</pre>
+
 
 <h4>Conditionals in Question Text</h4>
 <p>Within the question text, it's possible to have a section of text display based on the value of a variable.  
