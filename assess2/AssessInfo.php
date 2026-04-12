@@ -780,11 +780,11 @@ class AssessInfo
       }
     }
 
-    if ($this->assessData['shuffle']&16) {
+    if ($this->assessData['shuffle']&16 && count($qout)>0) {
         //shuffle all but first
         $firstq = array_shift($qout);
     }
-    if ($this->assessData['shuffle']&32) {
+    if ($this->assessData['shuffle']&32 && count($qout)>0) {
         //shuffle all but last
         $lastq = array_pop($qout);
     }
@@ -814,10 +814,10 @@ class AssessInfo
             $RND->shuffle($qout);
           }
     }
-    if ($this->assessData['shuffle']&16) {
+    if ($this->assessData['shuffle']&16 && !empty($firstq)) {
       array_unshift($qout, $firstq);
     }
-    if ($this->assessData['shuffle']&32) {
+    if ($this->assessData['shuffle']&32 && !empty($lastq)) {
         array_push($qout, $lastq);
     }
 
