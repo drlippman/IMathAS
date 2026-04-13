@@ -449,8 +449,8 @@ function evalbasic($str, $doextra = false, $zerofornan = false) {
     $str = str_replace('pi', '3.141592653', $str);
     $str = clean($str);
     if (is_numeric($str)) {
-        return $str;
-    } else if ($doextra || preg_match('/[^\d+\-\/\*\.\(\)]/', $str)) {
+        return floatval($str);
+    } else if ($doextra || preg_match('/[^\d+\-\/\*\.\(\)]/', $str)) {    
         if ($doextra) {
             $ret = evalnumstr($str);
             if ($zerofornan && !is_nicenumber($ret)) {
