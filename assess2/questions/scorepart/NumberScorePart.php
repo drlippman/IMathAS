@@ -282,7 +282,7 @@ class NumberScorePart implements ScorePart
                             $anssunits[$k] = $anssUnits;
                         } else {
                             //echo "Invalid answer $anans";
-                            $anssunits[$j] = [0,'invalidans',0,0];
+                            $anssunits[$k] = [0,'invalidans',0,0];
                         }
                     }
                 }

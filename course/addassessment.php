@@ -163,7 +163,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
         	$DBH->beginTransaction();
             require_once "../includes/parsedatetime.php";
-            if ($_POST['avail']==1) {
+            if ($_POST['avail']==1 && $dates_by_lti == 0) {
                 if ($_POST['sdatetype']=='0') {
                     $startdate = 0;
                 } else {

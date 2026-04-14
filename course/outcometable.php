@@ -1097,6 +1097,7 @@ function outcometable() {
 	if ($limuser<1) {
 		$gb[$ln][0][0] = "Averages";
 		$gb[$ln][0][1] = -1;
+		$gb[$ln][0][2] = 0;
 		foreach ($gb[0][1] as $i=>$inf) {
 			$avg = array();  $avgposs = array();
 			for ($j=1;$j<$ln;$j++) {

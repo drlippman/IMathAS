@@ -132,7 +132,7 @@ if (isset($_GET['launch'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
-	if (empty($_POST['tzname']) && $_POST['tzoffset']=='') {
+	if (empty($_POST['tzname']) && (!isset($_POST['tzoffset']) || $_POST['tzoffset']=='')) {
 		echo _('Uh oh, something went wrong.  Please go back and try again');
 		exit;
 	}

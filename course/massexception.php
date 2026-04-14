@@ -69,7 +69,7 @@ require_once __DIR__."/../includes/checkdata.php";
                     // if time limit is expired, then set eligibleForTimeExt
                     $adata = json_decode(Sanitize::gzexpand($row[2]), true);
                     $lastver = &$adata['assess_versions'][count($adata['assess_versions'])-1];
-                    if ($lastver['status']==0 && $lastver['timelimit_end'] > $now) {
+                    if ($lastver['status']==0 && ($lastver['timelimit_end'] ?? 0) > $now) {
                         // not submitted and time limit still active; extend now.
                         $lastver['timelimit_end'] += 60*$timelimitext;
                         if (!isset($lastver['timelimit_ext'])) {
