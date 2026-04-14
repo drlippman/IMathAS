@@ -384,7 +384,12 @@ if ($overwriteBody==1) {
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Print Test</div>\n";
 
-	echo '<div class="cpmid"><a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for in-browser printing</a> | <a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'">Generate for cut-and-paste</a></div>';
+   	echo '<div class="cpmid">';
+    if ($courseUIver == 1) {
+        echo '<a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for in-browser printing</a> | ';
+    }
+    echo '<a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for cut-and-paste</a></div>';
+
 
 	echo "<h1>"._('Generate Word Version')."</h1>";
 	echo '<p>'._('Assessment is prepared, and ready for conversion').'.</p>';
