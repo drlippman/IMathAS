@@ -117,7 +117,13 @@
 <li><a href="#writingquestions">Writing Questions</a>
 	<ul>
 	<li><a href="#questionparts">Question Parts</a></li>
-	<li><a href="#basiccontrolsyntax">Basic Control Syntax</a></li>
+	<li><a href="#basiccontrolsyntax">Basic Control Syntax</a>
+	<ul>
+		<li><a href="#vartypes">Variable Types</a></li>
+		<li><a href="#arrassign">Array assignment</a></li>
+		<li><a href="#conditionals">Conditionals</a></li>
+		<li><a href="#loops">Loops</a></li>
+	</ul></li>
 	<li><a href="#randomizers">Randomizers</a></li>
 	<li><a href="#graphtablemacros">Graph/Table Macros</a></li>
 	<li><a href="#formatmacros">Format Macros</a></li>
@@ -1950,22 +1956,23 @@ definition.  In IMathAS, variables are identified with a dollarsign ($) prefix. 
 $a is the variable a.  Most lines will take one of these forms:
 </p>
 <ul>
-<li>$var = number.  Example:  $a = 3</li>
-<li>$var = calculation.  Example:  $a = 3*$b*$c</li>
-<li>$var = function.  Example:  $a = showplot(&quot;sin(x)&quot;)</li>
-<li>$var = randomizer.  Example:  $a = rand(-5,5)</li>
+<li>$var = number.  Example:  <code>$a = 3</code></li>
+<li>$var = calculation.  Example:  <code>$a = 3*$b*$c</code></li>
+<li>$var = function.  Example:  <code>$a = showplot(&quot;sin(x)&quot;)</code></li>
+<li>$var = randomizer.  Example:  <code>$a = rand(-5,5)</code></li>
 </ul>
 
 
-<h3>Variable Types</h3>
+<h3 id="vartypes">Variable Types</h3>
 <p>
 There are a few types of variables:
 </p>
 <ul>
- <li>A number:  $a = 15.  A calculation like $a = 3^2 will also result in a number</li>
- <li>An array:  $a = array(6,8,10).  This is a collection of variables. You can reference the parts using an index (note that arrays are zero-indexed), so $a[0] = 6.</li>
- <li>A string:  $a = "hi there", or $b = "2/3".</li>
- <li>Boolean:  $a = true</li>
+ <li>A number:  <code>$a = 15</code>.  A calculation like <code>$a = 3^2</code> will also result in a number</li>
+ <li>An array:  <code>$a = array(6,8,10)</code> or <code>$a = [6,8,10]</code>.  This is a collection of variables. You can reference the parts using an index (note that arrays are zero-indexed), so <code>$a[0] = 6</code>.</li>
+ <li>An associative array:  <code>$a = array('x'=>3, 'y'=>5)</code> or <code>$a = ['x'=>3, 'y'=>5]</code>.  This is a collection of variables, referenced by keys. You can reference the parts using the key as index so <code>$a['x'] = 3</code>.</li>
+ <li>A string:  <code>$a = "hi there"</code>, or <code>$b = "2/3"</code>.</li>
+ <li>Boolean:  <code>$a = true</code></li>
 </ul>
 
 <p>
@@ -1993,7 +2000,7 @@ In this example, $str now contains &quot;What is 3/5&quot;.
 	to evaluate something like that, you'll need to use hte evalnumstr function.
 </p>
 
-<h3>Array assignment</h3>
+<h3 id="arrassign">Array assignment</h3>
 <p>
 In some cases you want to define several variables at once.  There are two ways to
 do this:</p>
@@ -2044,6 +2051,8 @@ Then do this."
 <pre>
 $showanswer = "Do this first. &lt;br/&gt;Then do this."
 </pre>
+
+<p>For more ways to work with strings, see the <a href="#stringmacros">string macros</a> section.</p>
 
 <p><strong>Comments</strong></p>
 <p>You can insert comments in your code by starting the comment with two forward slashes: //this is a comment.
@@ -2136,6 +2145,31 @@ if ($a==0) {
 } else {
    $b = 2
 }
+</pre>
+
+<h4>Other conditional operators and functions</h4>
+
+<p>For very simple if/else cases, you can use the shorthand <code>condition ? then : else</code> ternary syntax.  For example:</p>
+<pre>$b = ($a > 0) ? "increasing" : "decreasing"</pre>
+
+<p>An equivalent but potentially friendlier looking option is the <code>ifthen(condition,trueval,falseval)</code> macro (see <a href="#generalmacros">General Macros</a>)</p>
+<pre>$b = ifthen($a > 0, "increasing", "decreasing")</pre>
+
+<p>For situations where you want to do a series of conditions based on the value options of a variable, you can use the <code>cases</code> macro (see <a href="#generalmacros">General Macros</a>). 
+	For example, these two code blocks do the same thing:</p>
+<pre>
+$a = rand(0,5)
+if ($a==0) {
+   $b = "AA"
+} elseif ($a==2) {
+   $b = "BB"
+} else {
+   $b = "CC"
+}
+</pre>
+<pre>
+$a = rand(0,5)
+$b = cases($a, [0, 2], ["AA", "BB"], "CC")
 </pre>
 
 <h4>Comparison operators</h4>
