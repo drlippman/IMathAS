@@ -177,8 +177,16 @@ if (isset($_POST['cidlookup'])) {
 		$printed = [];
 		getCourseTree($userjson['courseListOrder']['teach'], $myCourses, $printed, $mycoursetree, -1);
 		$notlisted = array_diff(array_keys($myCourses), $printed);
+		$notlistedtree = [];
 		foreach ($notlisted as $course) {
-			$mycoursetree[] = getCourseTreeitem($myCourses[$course], -1);
+			$notlistedtree[] = getCourseTreeitem($myCourses[$course], -1);
+		}
+		if (count($notlistedtree) > 0) {
+			$mycoursetree[] = [
+				'id' => 'mynotlisted',
+				'label' => _('Hidden Courses'),
+				'children' => $notlistedtree
+			];
 		}
 	} else {
 		foreach ($myCoursesDefaultOrder as $course) {
