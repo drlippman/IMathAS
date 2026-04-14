@@ -819,9 +819,11 @@
 			}
 		}
 	}
-	foreach ($images['alttext'] as $imn=>$alt) {
-		if (empty($alt)) {
-			$a11yerr .= sprintf(_('Blank alt text on image variable %s'), $images['vars'][$imn]);
+	if (!empty($images['alttext'])) {
+		foreach ($images['alttext'] as $imn=>$alt) {
+			if (empty($alt)) {
+				$a11yerr .= sprintf(_('Blank alt text on image variable %s'), $images['vars'][$imn]);
+			}
 		}
 	}
 	if ($a11yerr !== '') {

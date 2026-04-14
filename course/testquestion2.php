@@ -46,6 +46,9 @@ if ($myrights<20) {
 		}
 	}
   if (isset($_POST['a11yreview'])) {
+	if (empty($_GET['qsetid'])) {
+		exit;
+	}
     if ($_POST['a11yreview'] === 'remove') {
       $query = 'DELETE FROM imas_a11yreviews WHERE qsetid=? AND userid=?';
       $stm = $DBH->prepare($query);
@@ -101,6 +104,10 @@ if ($myrights<20) {
 		$onlychk = 0;
 	}
   	$qsetid = Sanitize::onlyInt($_GET['qsetid']);
+	if (empty($qsetid)) {
+		echo 'Missing qsetid';
+		exit;
+	}
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
 		$formn = Sanitize::encodeStringForJavascript($_GET['formn']);
 		$loc = Sanitize::encodeStringForJavascript($_GET['loc']);
