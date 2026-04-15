@@ -143,9 +143,15 @@ class ScoreEngine
         $drawentrymode = $_SESSION['userprefs']['drawentry'];
         try {
           $db_qsetid = $scoreQuestionParams->getDbQuestionSetId();
-          eval(interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]));
+          $controlinterpcode = interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]);
+          if ($controlinterpcode !== 'error;') {
+            eval($controlinterpcode);
+          }
+          unset($controlinterpcode);
           $this->randWrapper->srand($scoreQuestionParams->getQuestionSeed() + 1);
-          eval(interpret('answer', $quesData['qtype'], $quesData['answer'], 1, [$db_qsetid]));
+          if (!empty($quesData['answer'])) {
+            eval(interpret('answer', $quesData['qtype'], $quesData['answer'], 1, [$db_qsetid]));
+          }
         } catch (\Throwable $t) {
             $this->addError(
                 _('Caught error while evaluating the code in this question: ')

@@ -44,7 +44,9 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
 		$str = str_replace("&&\n","<br/>",$str);
         $str = preg_replace('/&\s*\n/', ' ', $str);
         $r =  interpretline($str.';',$anstype,$countcnt,$included_qs).';';
-
+		if ($r === 'error;') { 
+			return $r;
+		}
         $r = '$wherecount[0]=0;$whilecount[0]=0;' . $r;
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
@@ -615,6 +617,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 			$j = $i+1;
             $len = strlen($str);
             $newcnt = 0;
+			$lastwascomma = false;
 			while ($j<$len) {
 				//read terms until we get to right bracket at same nesting level
 				//we have to avoid strings, as they might contain unmatched brackets
@@ -624,6 +627,17 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 						$inq = false;
 					}
 				} else {
+					if ($d == ',') {
+						if ($lastwascomma) {
+							if (!empty($GLOBALS['inQuestionTesting'])) {
+								echo _('Fatal error: cannot have empty or missing array elements or function arguments');
+							}
+							return array(array('',9));
+						}
+						$lastwascomma = true;
+					} else if ($d != ' ') {
+						$lastwascomma = false;
+					}
 					if ($d=='"' || $d=="'") {
 						$inq = true; //entering quotes
 						$qtype = $d;

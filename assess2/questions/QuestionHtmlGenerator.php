@@ -262,9 +262,17 @@ class QuestionHtmlGenerator
         // In "modern" questions, the last two parts are empty.
         try {
           $db_qsetid = $this->questionParams->getDbQuestionSetId();
-          eval(interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]));
-          eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol'], 1, [$db_qsetid]));
-          eval(interpret('answer', $quesData['qtype'], $quesData['answer'], 1, [$db_qsetid]));
+          $controlinterpcode = interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]);
+          if ($controlinterpcode !== 'error;') {
+            eval($controlinterpcode);
+          }
+          unset($controlinterpcode);
+          if (!empty($quesData['qcontrol'])) {
+            eval(interpret('qcontrol', $quesData['qtype'], $quesData['qcontrol'], 1, [$db_qsetid]));
+          }
+          if (!empty($quesData['answer'])) {
+            eval(interpret('answer', $quesData['qtype'], $quesData['answer'], 1, [$db_qsetid]));
+          }
         } catch (\Throwable $t) {
           $errsource = basename($t->getFile());
           if (strpos($errsource, 'QuestionHtmlGenerator.php') !== false) {
