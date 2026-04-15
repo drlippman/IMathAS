@@ -174,6 +174,49 @@ function processShortScript($script) {
 	}
 }
 
+function commasToSemicolons($input) {
+    $result = '';
+    $depth = 0;          // parenthesis/bracket nesting depth
+    $inString = false;
+    $stringChar = '';    // which quote started the string (' or ")
+    $len = strlen($input);
+
+    for ($i = 0; $i < $len; $i++) {
+        $char = $input[$i];
+
+        if ($inString) {
+            $result .= $char;
+            // Handle escaped characters (e.g. \' or \")
+            if ($char === '\\') {
+                // Consume the next character as-is
+                if ($i + 1 < $len) {
+                    $result .= $input[++$i];
+                }
+            } elseif ($char === $stringChar) {
+                $inString = false;
+            }
+        } else {
+            if ($char === '"' || $char === "'") {
+                $inString = true;
+                $stringChar = $char;
+                $result .= $char;
+            } elseif ($char === '(' || $char === '[' || $char === '{') {
+                $depth++;
+                $result .= $char;
+            } elseif ($char === ')' || $char === ']' || $char === '}') {
+                $depth--;
+                $result .= $char;
+            } elseif ($char === ',' && $depth === 0) {
+                $result .= ';';  // <-- the key substitution
+            } else {
+                $result .= $char;
+            }
+        }
+    }
+
+    return $result;
+}
+
 function processScript($script) {
 	//$xmin = -5; $xmax = 5; $ymin = -5; $ymax = 5; $border = 5;
 	//$stroke = 'black'; $fill = 'none'; $curdash=''; $isdashed=false; $marker='none';
@@ -181,7 +224,7 @@ function processScript($script) {
 	//$strokewidth = 1; $dotradius=8; $ticklength=4; $fontfill = ''; $fontsize = 12;
 	//$script = preg_replace('/&[^\s]*;
 	$script = html_entity_decode($script, ENT_COMPAT, 'UTF-8');
-	$this->AScom =  explode(';',$script);
+	$this->AScom =  explode(';', $this->commasToSemicolons($script));
 	foreach ($this->AScom as $com) {
 		if (preg_match('/\s*(\w+)\s*=(.+)/',$com,$matches)) { //is assignment operator
 			$matches[2] = trim(str_replace(array('"','\''),'',$matches[2]));
@@ -1178,8 +1221,8 @@ function ASplot($function) {
 	}
 	$xmin += ($xmax - $xmin)/100000; //avoid divide by zero errors
 	if (isset($function[3]) && $function[3]!='' && $function[3]!='null') {
-		$dx = ($xmax - $xmin)/($function[3]-1);
-		$stopat = $function[3];
+		$stopat = $this->evalifneeded($function[3]);
+		$dx = ($xmax - $xmin)/($stopat-1);
 	} else {
 		$dx = ($xmax - $xmin)/100;
 		$stopat = 101;

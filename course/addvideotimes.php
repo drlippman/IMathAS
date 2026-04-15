@@ -102,7 +102,7 @@ for ($i=0;$i<count($qorder);$i++) {
 }
 
 //Get question titles
-$qtitlebyid = array();
+$qtitle = array();
 $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid=:assessmentid";
 $stm = $DBH->prepare($query);

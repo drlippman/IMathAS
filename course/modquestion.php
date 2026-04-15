@@ -20,13 +20,16 @@ if (!(isset($teacherid))) {
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
 	$cid = Sanitize::courseId($_GET['cid']);
-	$aid = Sanitize::onlyInt($_GET['aid']);
+	$aid = Sanitize::onlyInt($_GET['aid'] ?? 0);
 
-  $query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-  $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
-  $stm = $DBH->prepare($query);
-  $stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
-  $beentaken = ($stm->rowCount() > 0);
+	$beentaken = false;
+	if ($aid > 0) {
+		$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+		$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+		$beentaken = ($stm->rowCount() > 0);
+	}
   $page_beenTakenMsg = '';
 
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
@@ -179,6 +182,10 @@ if (!(isset($teacherid))) {
 			if ($line['fixedseeds']===null) {$line['fixedseeds'] = '';}
 			$qsetid = $line['questionsetid'];
 		} else {
+			if (empty($_GET['qsetid'])) {
+				echo 'Missing qsetid';
+				exit;
+			}
 			//set defaults
 			$line['points']="";
 			$line['attempts']="";
