@@ -118,7 +118,9 @@ where days is the number of days since last login to consider old, and userid is
 - `$CFG['assess_upgrade_optout']`: Set to true to allow users to opt out of an upgrade
 to the new assessment interface.
 - `$CFG['reqadminmfa']`: Require admins to enable two-factor authentication.
-- `$CFG['logquestionerrors']`: Enable logging of question errors.
+- `$CFG['logquestionerrors']`: Enable logging of question errors in database
+- `$CFG['skip_errorlog_question_errors']`: Enable to skip logging question errors to system error_log
+- `$CFG['newrelic_log_question_errors']`: Enable to log question errors to newrelic, if extension is installed
 - `$CFG['GEN']['sessionmaxlife']`: Overrides session.gc_maxlifetime.
 - `$CFG['GEN']['gc_divisor']`: Overrides session.gc_divisor.
 
