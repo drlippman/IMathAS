@@ -156,9 +156,9 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 break;
             }
         }
-        if ($haspos && !$searchintext && 
-            ($searchtype == 'all' || ($searchtype == 'libs' && count($libs)>5))
-        ) {
+        if ($haspos && !$searchintext) {
+            // rolled back: didn't seem to help, maybe made it worse
+            //&& ($searchtype == 'all' || ($searchtype == 'libs' && count($libs)>5))
             foreach ($search['terms'] as $k => $v) {
                 $sgn = '+';
                 if ($v[0] == '!') {
