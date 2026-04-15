@@ -2478,9 +2478,15 @@ class AssessRecord
           } else { // last
             $tryn = max(0, count($curq['tries'][$pn]) - 1);
           }
-          $lasttry = $curq['tries'][$pn][$tryn];
-          $stuansparts[$pn] = ($lasttry['stuans'] === '') ? null : $lasttry['stuans'];
-          $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
+          if (isset($curq['tries'][$pn][$tryn])) {
+            $lasttry = $curq['tries'][$pn][$tryn];
+            $stuansparts[$pn] = ($lasttry['stuans'] === '') ? null : $lasttry['stuans'];
+            $stuansvalparts[$pn] = isset($lasttry['stuansval']) ? $lasttry['stuansval'] : null;
+          } else {
+            // catch case where $tryn==-1
+            $stuansparts[$pn] = null;
+            $stuansvalparts[$pn] = null;
+          }
         }
       }
       // stuanswers array is 1-indexed
