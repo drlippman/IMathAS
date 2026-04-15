@@ -141,6 +141,7 @@ if (!(isset($teacherid))) {
                 }
             }
             if ($stm->rowCount() > 0 && $beentaken && count($changes) > 0) {
+                $changes['aid'] = $aid;
                 TeacherAuditLog::addTracking(
                     $cid,
                     "Question Settings Change",

@@ -85,6 +85,11 @@ function mapMetadata($action) {
     global $stunames, $assessnames, $forumnames, $exttoolnames, $offlinenames;
     if ($action['action'] == 'Delete Item' || $action['action'] == 'Clear Attempts') {
         $data = json_decode($action['metadata'], true);
+        if ($action['action'] == 'Delete Item' && isset($data['item_name'])) {
+           $action['itemname'] = $data['item_name']; 
+        } else if ($action['action'] == 'Delete Item' && ($data['type']??'')== 'Delete Offline') {
+           $action['itemname'] = 'Offline Grades';
+        }
         if (isset($data['grades'])) {
             $newgrades = [];
             if (isset($data['type']) && $data['type']=='Delete Offline') {
@@ -105,7 +110,7 @@ function mapMetadata($action) {
         $data = json_decode($action['metadata'], true);
         $data['unenrolled'] = explode(',',$data['unenrolled']);
         foreach ($data['unenrolled'] as $k=>$v) {
-            $data['unenrolled'][$k] = $stunames[$v];
+            $data['unenrolled'][$k] = $stunames[$v] ?? $v;
         }
         $newgrades = [];
         foreach ($data['grades'] as $uid=>$grades) {
@@ -137,9 +142,51 @@ function mapMetadata($action) {
         }
         $data['grades'] = $newgrades;
         $action['metadata'] = json_encode($data);
+    } 
+    if (in_array($action['action'], [
+        "Assessment Settings Change",
+        "Clear Attempts",
+        "Clear Scores",
+        "Change Grades"])
+    ) {
+        if (count($assessnames)==0) { loadAssess(); }
+        $action['itemname'] = $assessnames[$action['itemid']] ?? '';
+    } else if ($action['action'] == 'Question Settings Change') {
+        $data = json_decode($action['metadata'], true);
+        if (isset($data['aid'])) {
+            if (count($assessnames)==0) { loadAssess(); }
+            $action['itemname'] = $assessnames[$data['aid']] ?? '';
+        }
     }
+    
     return $action;
 }
+/*
+        
+        "Question Settings Change",
+        "Clear Attempts",
+        "Clear Scores",
+        "Delete Item",
+        "Unenroll",
+        "Change Grades",
+        "Course Settings Change",
+        "Inlinetext Settings Change",
+        "Link Settings Change",
+        "Forum Settings Change",
+        "Mass Forum Settings Change",
+        "Block Settings Change",
+        "Mass Block Settings Change",
+        "Wiki Settings Change",
+        "Drill Settings Change",
+        "Gradebook Settings Change",
+        "Roster Action",
+        "Exception Change",
+        "Delete Post",
+        "Offline Grade Settings Change",
+        "Change Offline Grades",
+        "Change Forum Grades",
+        "Change External Tool Grades"
+*/
 
 //set some page specific variables and counters
 $overwriteBody = 0;
@@ -217,32 +264,38 @@ if ($overwriteBody==1) {
     echo '</h1></div>';
 
     echo '<p class="noticetext">'._('Warning: A lot of things in this record are not very human-readable, as they use reference IDs rather than item names.').'</p>';
-
+    echo '<p>'._('Note that many course-building instructor actions, such as editing questions and changing assessment content, are not logged.').'</p>';
     $teacher_actions = TeacherAuditLog::findActionsByCourse($cid);
     if (empty($teacher_actions)) {
         echo "<p>Nothing to report</p>";
     } else {
         getAllNames($teacher_actions);
-        echo '<table><tr>';
+        echo '<table class="gb"><thead><tr>';
         echo '<th>Date/Time</th>';
         echo '<th>Teacher</th>';
         echo '<th>Action</th>';
         echo '<th>ItemID</th>';
+        echo '<th>ItemName</th>';
         echo '<th>Details</th>';
-        echo '</tr>';
+        echo '</tr><thead><tbody>';
 
+        $c = "odd";
         foreach ($teacher_actions as $action) {
             $action = mapMetadata($action);
-            echo '<tr>';
+            $c = $c=="odd"?"even":"odd";
+            echo '<tr class="'.$c.'">';
             echo '<td>' . formatdate($action['created_at']) . '</td>';
             echo "<td><span class='pii-full-name'>";
 						echo Sanitize::encodeStringForDisplay($stunames[$action['userid']]);
 						echo " (" . Sanitize::onlyInt($action['userid']) . ')</span></td>';
             echo '<td>' . Sanitize::encodeStringForDisplay($action['action']) . '</td>';
             echo '<td>' . Sanitize::onlyInt($action['itemid']) . '</td>';
+            echo '<td>' . Sanitize::encodeStringForDisplay($action['itemname'] ?? '') . '</td>';
+            echo '</td>';
             echo '<td><a href="#" onclick="GB_show(\'Details\',\'<span>' . Sanitize::encodeStringForDisplay(str_replace(',',', ',$action['metadata'])) . '</span>\'); return false;">Details</a></td>';
             echo '</tr>'."\n";
         }
+        echo '</tbody></table>';
     }
 }
 
