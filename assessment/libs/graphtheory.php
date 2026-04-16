@@ -554,6 +554,7 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 //length of the path on graph g
 //options needed for vertex labels
 function graphgetpathlength($g,$op,$seq) {
+	$seq = explode(' or ', $seq)[0];
 	$n = count($g[0]);
 	if ($op['labels'] != 'letters') {
 		$lbl = $op['labels'];
