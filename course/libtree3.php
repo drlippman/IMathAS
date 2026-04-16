@@ -52,9 +52,17 @@ else if (isset($_GET['getsubs']) && isset($_GET['cid']) && $_GET['cid']=="admin"
     $includecounts = !empty($_GET['counts']);
     
     $parent = Sanitize::onlyInt($_GET['getsubs']);
-    if ($parent > 0) {
+    if ($parent > 0 || $_GET['type'] == 'grouproot' || $_GET['type'] == 'privateroot') {
+        $qarr = [$parent];
         $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,imas_libraries.federationlevel,COUNT(imas_library_items.id) AS count ";
         $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 WHERE imas_libraries.deleted=0 AND imas_libraries.parent=? ";
+        if (isset($_GET['type']) && $_GET['type'] == 'grouproot') {
+            $query .= 'AND imas_libraries.userights > 0 AND imas_libraries.userights < 4 AND imas_libraries.groupid<>? ';
+            $qarr[] = $groupid;
+        } else if (isset($_GET['type']) && $_GET['type'] == 'privateroot') {
+            $query .= 'AND imas_libraries.userights = 0 AND imas_libraries.ownerid<>? ';
+            $qarr[] = $userid;
+        }
         $query .= 'GROUP BY imas_libraries.id ';
         if (!empty($_GET['sortorder'])) {
             $query .= " ORDER BY imas_libraries.name";
@@ -62,7 +70,7 @@ else if (isset($_GET['getsubs']) && isset($_GET['cid']) && $_GET['cid']=="admin"
             $query .= " ORDER BY imas_libraries.id";
         }
         $stm = $DBH->prepare($query);
-        $stm->execute([$parent]);
+        $stm->execute($qarr);
         $out = [];
         $locked = [];
         $checked = [];
@@ -140,9 +148,7 @@ $checked = array_merge($checked,$locked);
 $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,imas_libraries.federationlevel,COUNT(imas_library_items.id) AS count ";
 $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id AND imas_library_items.deleted=0 WHERE imas_libraries.deleted=0 ";
 $qarr = array();
-if ($isadmin) {
-    //no filter
-} else if ($isgrpadmin) {
+if ($isadmin || $isgrpadmin) {
     //any group owned library or visible to all
     $query .= "AND (imas_libraries.groupid=:groupid OR imas_libraries.userights>2) ";
     $qarr[':groupid'] = $groupid;
@@ -293,11 +299,12 @@ function getChildren($parent) {
                 }
             }
             
-            if ($isadmin && $parent==0 && $rights<5 && 
+            if ($isadmin && $parent==0 && $rights<4 && 
                 $libdata[$child]['ownerid']!=$userid && 
                 ($rights==0 || $libdata[$child]['groupid']!=$groupid) &&
                 !containsChecked($child)
             ) {
+                // shouldn't be hitting this code block anymore, but keeping for backreference
                 if (!empty($childlibs[$child])) {
                     $item['childrenUrl'] = "libtree3.php?cid=$cid&getsubs=".$child."&sortorder=".intval($libdata[$child]['sortorder']).($includecounts? '&counts=true':'');
                 }
@@ -314,22 +321,22 @@ function getChildren($parent) {
             }
         }
     }
-    if ($isadmin && $parent==0 && count($toplevelprivate)>0) {
+    if ($isadmin && $parent==0) {
         $out[] = [
             'id'=>"librlp",
             'label'=>_('Root Level Private Libraries'),
             'userights'=>0,
             'notselectable'=>true,
-            'children' => $toplevelprivate
+            'childrenUrl' => "libtree3.php?cid=$cid&type=privateroot&getsubs=0&sortorder=".intval($libdata[$child]['sortorder']).($includecounts? '&counts=true':'')
         ];
     }
-    if ($isadmin && $parent==0 && count($toplevelgroup)>0) {
+    if ($isadmin && $parent==0) {
         $out[] = [
             'id'=>"librlg",
             'label'=>_('Root Level Group Libraries'),
             'userights'=>2,
             'notselectable'=>true,
-            'children' => $toplevelgroup
+            'childrenUrl' => "libtree3.php?cid=$cid&type=grouproot&getsubs=0&sortorder=".intval($libdata[$child]['sortorder']).($includecounts? '&counts=true':'')
         ];
     }
     return $out;
