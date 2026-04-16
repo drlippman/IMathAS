@@ -365,8 +365,8 @@ if ($report=='overview') {
 				list($subhtml,$subtots) = printoutcomestu($oi['outcomes'],$ind+1);
 				//$html .= '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
 				$html .= '<tr class="'.$class.'"><th scope=row><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></th>';
-				for ($i=0;$i<count($ot[0][2])+1;$i++) {
-                    if (!empty($ot[0][2][$i][2])) { continue; } // hidden
+				for ($i=0;$i<count($ot[0][2])+1;$i++) { // 0 index is total
+                    if ($i>0 && !empty($ot[0][2][$i+1][2])) { continue; } // hidden
 					if (count($subtots[$i])>0) {
 						$html .= '<td><b>'.round(array_sum($subtots[$i])/count($subtots[$i]),1).'%</b></td>';
 					} else {
@@ -388,6 +388,7 @@ if ($report=='overview') {
 				}
 				for ($i=0;$i<count($ot[0][2]);$i++) {
                     if ($ot[0][2][$i][2] == 1) { continue; } // hidden
+					if (!isset($tots[$i+1])) { $tots[$i+1] = []; }
 					if (isset($ot[1][2][$i]) && isset($ot[1][2][$i][2*$type+1][$oi])) {
 						if ($ot[1][2][$i][2*$type+1][$oi]>0) {
 							$html .= '<td>'.round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1).'%</td>';

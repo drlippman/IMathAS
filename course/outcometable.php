@@ -44,6 +44,8 @@ row[1][2][#][0][outc#] = cat total past on outcome
 row[1][2][#][1][outc#] = cat poss past on outcome
 row[1][2][#][2][outc#] = cat total attempted on outcome
 row[1][2][#][3][outc#] = cat poss attempted on outcome
+row[1][2][#][4][outc#] = # of cat scores past on outcome
+row[1][2][#][5][outc#] = # of cat scores attempted on outcome
 
 row[1][3] total totals
 row[1][3][0][outc#] = % past on outcome
@@ -1038,6 +1040,7 @@ function outcometable() {
 
 					$gb[$ln][2][$pos][0][$oc] = $cattotpast[$ln][$cat][$oc];
 					$gb[$ln][2][$pos][1][$oc] = $catposspast[$ln][$cat][$oc];
+					$gb[$ln][2][$pos][4][$oc] = count($scs);
 
 					if (!isset($totpast[$oc])) {
 						$totpast[$oc] = 0;
@@ -1065,6 +1068,7 @@ function outcometable() {
 
 					$gb[$ln][2][$pos][2][$oc] = $cattotcur[$ln][$cat][$oc];
 					$gb[$ln][2][$pos][3][$oc] = $catposscur[$ln][$cat][$oc];
+					$gb[$ln][2][$pos][5][$oc] = count($scs);
 
 					if (!isset($totcur[$oc])) {
 						$totcur[$oc] = 0;
