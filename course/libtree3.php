@@ -180,8 +180,14 @@ while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 }
 
 //if parent has lower userights, up them to match child library
-function setparentrights($alibid) {
+function setparentrights($alibid, &$visited = []) {
     global $rights,$libdata;
+    if (isset($visited[$alibid])) {
+        error_log("Circular reference detected in libtree3 setparentrights at node: $alibid");
+        return;
+    }
+    $visited[$alibid] = true;
+
     if (!empty($libdata[$alibid]['parent'])) {
         $parent = $libdata[$alibid]['parent'];
         if (!isset($libdata[$parent])) {
@@ -190,7 +196,7 @@ function setparentrights($alibid) {
         if ($libdata[$parent]['userights'] < $libdata[$alibid]['userights']) {
             $libdata[$parent]['userights'] = $libdata[$alibid]['userights'];
         }
-        setparentrights($parent);
+        setparentrights($parent, $visited);
     }
 }
 foreach ($libdata as $k=>$n) {
@@ -264,11 +270,13 @@ function containsChecked($child) {
     return false;
 }
 
+$visited = [];
+
 // generate json for output
 // returns an array of data for the children of the given parent ID
 function getChildren($parent) {
     global $childlibs,$libdata,$allsrights,$selectrights,$userid,$groupid,$isadmin,$isgrpadmin;
-    global $locked, $checked, $cid, $includecounts;
+    global $locked, $checked, $cid, $includecounts, $visited;
 
     $out = [];
     $children = $childlibs[$parent];
@@ -283,6 +291,11 @@ function getChildren($parent) {
         $children = array_keys($orderarr);
     }
     foreach ($children as $child) {
+        if (isset($visited[$child])) {
+            error_log("Circular reference in libtree3 detected for library: $child");
+            continue;
+        }
+        $visited[$child] = true;
         if (
             $libdata[$child]['userights']>$allsrights || 
             (($libdata[$child]['userights']%3)>$selectrights && $libdata[$child]['groupid']==$groupid) || 
