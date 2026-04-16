@@ -862,6 +862,11 @@ function AMTparseExpr($str,$rightbracket) {
 function AMTparseAMtoTeX($str) {
 	$this->AMnestingDepth = 0;
 	$str = str_replace(array('&nbsp;','&gt;','&lt;'),array('','>','<'),$str);
+	$str = preg_replace_callback('/&(\w+);/', function($m) {
+		if (in_array($m[1], $this->AMnames)) {
+			return $m[1];
+		}
+	}, $str);
 	$str = preg_replace('/^\s+/','',$str);
 	if (trim($str)=='') {return '';}
 	
