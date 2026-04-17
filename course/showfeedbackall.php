@@ -108,7 +108,7 @@ for ($i=0;$i<count($gbt[0][1]);$i++) {
 
 	echo '<h3>';
 	echo Sanitize::encodeStringForDisplay($gbt[0][1][$i][0]);
-	echo ' '.sprintf(_('(Score: %g/%g)'), $gbt[1][1][$i][0], $gbt[0][1][$i][2]);
+	echo ' '.sprintf(_('(Score: %g/%g)'), $gbt[1][1][$i][0] ?? '-', $gbt[0][1][$i][2]);
 	echo '</h3>';
 	echo '<div class="fbbox">';
 	echo Sanitize::outgoingHtml($gbt[1][1][$i][1]);

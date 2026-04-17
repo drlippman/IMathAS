@@ -214,7 +214,7 @@
                         $partscores[$questionId][$pn][] = $scoredQuestion['scoreoverride'][$pn];
                     } else if (!empty($scoredQuestion['scoreoverride']) && !is_array($scoredQuestion['scoreoverride'])) {
                         $partscores[$questionId][$pn][] = $scoredQuestion['scoreoverride'];
-                    } else if (!empty($scoredQuestion['scored_try']) && $scoredQuestion['scored_try'][$pn] > -1) {
+                    } else if (!empty($scoredQuestion['scored_try'][$pn]) && $scoredQuestion['scored_try'][$pn] > -1) {
                         $partscores[$questionId][$pn][] = $scoredQuestion['tries'][$pn][$scoredQuestion['scored_try'][$pn]]['raw'];
                         $parttries[$questionId][$pn][] = count($scoredQuestion['tries'][$pn]);
                     }
