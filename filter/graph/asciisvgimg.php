@@ -276,6 +276,10 @@ function processScript($script) {
 					$this->ASinitPicture($argarr);
 					break;
 				case 'setBorder':
+					//(left,bottom,right,top)
+					if (count($argarr) < 4) {
+						$argarr = [$argarr[0],$argarr[0],$argarr[0],$argarr[0]];
+					}
 					$this->border = $argarr;
 					break;
 				case 'axes':
