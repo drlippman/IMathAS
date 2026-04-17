@@ -62,7 +62,7 @@ RewriteRule ^ - [R=404,L]
 
 # Only pass existing PHP files to PHP-FPM
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule \.php$ - [R=404,L]
+RewriteRule \.php([0-9]?|/|$) - [R=404,L]
 
 # Annoying vulnerability scans
 RewriteCond %{REQUEST_FILENAME} !-f
