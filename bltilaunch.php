@@ -102,7 +102,10 @@ function do112relaunch() {
 }
 
 function verify112relaunch() {
-	if ($_REQUEST['tool_state'] != $_SESSION['lti_tool_state']) {
+	if (empty($_SESSION['lti_tool_state'])) {
+		reporterror(_("Invalid tool_state. May have been unable to set cookie."));
+		exit;
+	} else if ($_REQUEST['tool_state'] != $_SESSION['lti_tool_state']) {
 		reporterror(_("Invalid tool_state"));
 		exit;
 	}
