@@ -2153,13 +2153,13 @@ class AssessRecord
       if ($showscores && $partattemptn[$pn] > 0 && !isset($autosave['stuans'][$pn])) {
         if ($tryToShow === 'scored' && isset($qver['scoreoverride'][$pn]) && !$this->teacherInGb) {
           $qcolors[$pn] = $qver['scoreoverride'][$pn];
-        } else if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
+        } else if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn]) && $qver['scored_try'][$pn] > -1) {
           $qcolors[$pn] = $qver['tries'][$pn][$qver['scored_try'][$pn]]['raw'];
         } else {
           $qcolors[$pn] = $qver['tries'][$pn][$partattemptn[$pn] - 1]['raw'];
         }
       } 
-      if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn])) {
+      if ($tryToShow === 'scored' && isset($qver['scored_try'][$pn]) && $qver['scored_try'][$pn] > -1) {
         $correctAnswerWrongFormat[$pn] = 
           !empty($qver['tries'][$pn][$qver['scored_try'][$pn]]['wrongfmt']);
       } else {
@@ -2473,7 +2473,7 @@ class AssessRecord
         } else {
           if (is_numeric($try)) {
             $tryn = $try;
-          } else if ($try === 'scored' && isset($curq['scored_try'][$pn])) {
+          } else if ($try === 'scored' && isset($curq['scored_try'][$pn]) && $curq['scored_try'][$pn] > -1) {
             $tryn = $curq['scored_try'][$pn];
           } else { // last
             $tryn = max(0, count($curq['tries'][$pn]) - 1);
