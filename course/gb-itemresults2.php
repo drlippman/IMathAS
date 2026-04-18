@@ -171,7 +171,7 @@ foreach ($itemarr as $k=>$q) {
 		'qsid' => array($k => $qsids[$q])
 	);
 	$a2->setState($state);
-    $res = $a2->displayQuestion($k, ['showhints'=>false, 'includeans'=>true]);
+    $res = $a2->displayQuestion($k, ['showhints'=>false, 'includeans'=>true, 'showallparts'=>true]);
 
 	echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
 	echo '<p><span style="float:right">(Question ID '.Sanitize::onlyInt($qsids[$q]).')</span><b>'.Sanitize::encodeStringForDisplay($qsdata[$qsids[$q]]['description']).'</b></p>';

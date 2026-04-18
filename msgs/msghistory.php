@@ -24,7 +24,7 @@
 	}
 	$view = 0;
 
-	$cid = Sanitize::courseId($_GET['cid']);
+	$cid = Sanitize::courseId($_GET['cid'] ?? 0);
 	$msgid = Sanitize::onlyInt($_GET['msgid']);
 	$page = Sanitize::onlyInt($_GET['page']);
 	$type =  Sanitize::encodeStringForDisplay($_GET['type']);
