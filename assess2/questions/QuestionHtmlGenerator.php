@@ -806,6 +806,15 @@ class QuestionHtmlGenerator
         $evaledqtext = str_replace(['\\{','\\}'], ['{','}'], $evaledqtext);
         $evaledsoln = str_replace(['\\{','\\}'], ['{','}'], $evaledsoln);
 
+        // scope CSS
+        $evaledqtext = preg_replace_callback('/(<style[^>]*?>)(.*?)<\/style>/s', function($m) use ($thisq) {
+            return $m[1] . $this->scopeCssToParent($m[2], ".qscope$thisq") . '</style>';
+        }, $evaledqtext);
+        // scope CSS
+        $evaledsoln = preg_replace_callback('/(<style[^>]*?>)(.*?)<\/style>/s', function($m) use ($thisq) {
+            return $m[1] . $this->scopeCssToParent($m[2], ".qscope$thisq") . '</style>';
+        }, $evaledsoln);
+
         /*
          * Handle [SAB#-#] notation
          */ 
@@ -991,7 +1000,7 @@ class QuestionHtmlGenerator
             }
         }
 
-        $evaledqtext = "<div class=\"question\" role=region aria-label=\"" . _('Question') . ' ' 
+        $evaledqtext = "<div class=\"question qscope$thisq\" role=region aria-label=\"" . _('Question') . ' ' 
             . ($this->questionParams->getDisplayQuestionNumber()+1) . "\">\n"
             . filter($evaledqtext);
 
@@ -1039,14 +1048,14 @@ class QuestionHtmlGenerator
         // display detailed solution, if allowed and set
         if (($doShowAnswer || $doShowDetailedSoln) && ($quesData['solutionopts']&4)==4 && $quesData['solution'] != '') {
           if (($quesData['solutionopts']&1)==0) {
-            $evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
+            $evaledsoln = "<div class=\"qscope$thisq\">".'<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln.'</div>';
           }
           if ($nosabutton) {
-            $sadiv .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
+            $sadiv .= filter("<div class=\"qscope$thisq\"><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
           } else {
             $qnidx = $this->questionParams->getDisplayQuestionNumber();
             $sadiv .= "<div><input class=\"dsbtn\" type=button value=\""._('Show Detailed Solution')."\" />";
-            $sadiv .= filter(" <div class=\"hidden dsbox\" id=\"dsbox$qnidx\">$evaledsoln </div></div>\n");
+            $sadiv .= filter(" <div class=\"hidden dsbox qscope$thisq\" id=\"dsbox$qnidx\">$evaledsoln </div></div>\n");
           }
         }
         if ($sadiv !== '') {
@@ -1640,4 +1649,80 @@ class QuestionHtmlGenerator
         }
         return $arr;
     }
+
+    /*
+     *  Scopes css styles to a parent selector
+     */ 
+    private function scopeCssToParent(string $css, string $prefix): string {
+        // Handle @rules with blocks (e.g. @media, @supports, @layer)
+        $css = preg_replace_callback(
+            '/(@(?:media|supports|layer|container)[^{]+)\{(.*)\}/s',
+            function (array $matches) use ($prefix): string {
+                $atRule     = trim($matches[1]);
+                $innerCss   = $matches[2];
+                // Recursively scope the contents
+                $innerScoped = scopeCssToParent($innerCss, $prefix);
+                return "$atRule {\n$innerScoped}";
+            },
+            $css
+        );
+
+        // Match CSS rule blocks: selectors { declarations }
+        return preg_replace_callback(
+            '/([^{}]+)\{([^{}]*)\}/s',
+            function (array $matches) use ($prefix): string {
+                $selectors    = $matches[1];
+                $declarations = $matches[2];
+
+                // Split on commas, but only top-level ones (not inside parens)
+                $selectorList = $this->splitCSSSelectors($selectors);
+
+                $scoped = array_map(function (string $sel) use ($prefix): string {
+                    $sel = preg_replace('/^\s*(body|html|#questionwrap\d+)/', '', $sel);
+                    $sel = trim($sel);
+                    // If the selector already starts with the prefix, leave it alone
+                    if (str_starts_with($sel, $prefix)) {
+                        return $sel;
+                    }
+                    return "$prefix $sel";
+                }, $selectorList);
+
+                return implode(",\n  ", $scoped) . " {" . $declarations . "}\n";
+            },
+            $css
+        );
+    }
+
+    /**
+     * Split a CSS selector string on commas, respecting parentheses
+     * (e.g. :is(), :not(), calc()) so we don't split inside them.
+     */
+    function splitCSSSelectors(string $selectors): array {
+        $list  = [];
+        $depth = 0;
+        $current = '';
+
+        for ($i = 0, $len = strlen($selectors); $i < $len; $i++) {
+            $char = $selectors[$i];
+            if ($char === '(') {
+                $depth++;
+                $current .= $char;
+            } elseif ($char === ')') {
+                $depth--;
+                $current .= $char;
+            } elseif ($char === ',' && $depth === 0) {
+                $list[] = $current;
+                $current = '';
+            } else {
+                $current .= $char;
+            }
+        }
+
+        if (trim($current) !== '') {
+            $list[] = $current;
+        }
+
+        return $list;
+}
+
 }
