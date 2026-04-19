@@ -807,11 +807,11 @@ class QuestionHtmlGenerator
         $evaledsoln = str_replace(['\\{','\\}'], ['{','}'], $evaledsoln);
 
         // scope CSS
-        $evaledqtext = preg_replace_callback('/(<style[^>]*?>)(.*?)<\/style>/s', function($m) use ($thisq) {
+        $evaledqtext = preg_replace_callback('/(<style[^>]*?>)(.*?)(<\/style>|$)/s', function($m) use ($thisq) {
             return $m[1] . $this->scopeCssToParent($m[2], ".qscope$thisq") . '</style>';
         }, $evaledqtext);
         // scope CSS
-        $evaledsoln = preg_replace_callback('/(<style[^>]*?>)(.*?)<\/style>/s', function($m) use ($thisq) {
+        $evaledsoln = preg_replace_callback('/(<style[^>]*?>)(.*?)(<\/style>|$)/s', function($m) use ($thisq) {
             return $m[1] . $this->scopeCssToParent($m[2], ".qscope$thisq") . '</style>';
         }, $evaledsoln);
 
