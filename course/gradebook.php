@@ -278,7 +278,7 @@ if ($isteacher) {
 			array_push($qarr, $id, 'offline', $stu, $val);
 		}
 		if (count($toins)>0) {
-			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score) VALUES ".implode(',',$toins);
+			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score) VALUES ".implode(',',$toins)." ON DUPLICATE KEY UPDATE score=VALUES(score)";
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 		}
