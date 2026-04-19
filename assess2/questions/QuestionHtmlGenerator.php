@@ -1661,7 +1661,7 @@ class QuestionHtmlGenerator
                 $atRule     = trim($matches[1]);
                 $innerCss   = $matches[2];
                 // Recursively scope the contents
-                $innerScoped = scopeCssToParent($innerCss, $prefix);
+                $innerScoped = $this->scopeCssToParent($innerCss, $prefix);
                 return "$atRule {\n$innerScoped}";
             },
             $css
