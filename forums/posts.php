@@ -331,6 +331,52 @@ if ($oktoshow) {
 		($CFG['MySQL_ver']>=8 && ($page==-2 || $page==-1))
 	) { //came from new threads or flagged threads
 		if ($CFG['MySQL_ver']>=8) {
+			/* possible alternate:
+
+			$qarr = [':userid'=>$userid, ':curthread'=>$threadid];
+			$query = 'WITH eligible_threads AS (
+				SELECT
+					t.id AS threadid,
+					t.forumid,
+					t.lastposttime,
+					ROW_NUMBER() OVER (ORDER BY t.lastposttime DESC, t.id ASC) AS rn
+				FROM imas_forum_threads t
+				JOIN imas_forums f ON t.forumid = f.id
+				LEFT JOIN imas_forum_views mv
+					ON mv.threadid = t.id AND mv.userid = :userid ';
+			if (!isset($teacherid)) {
+				$query .= ' LEFT JOIN imas_stugroupmembers sm
+    				ON sm.userid = :userid AND sm.stugroupid = t.stugroupid';
+			}
+			if ($page==-1 || $page==-2) {
+				$query .= ' WHERE f.id = :forumid';
+				$qarr[':forumid'] = $forumid;
+			} else {
+				$query .= ' WHERE f.courseid = :courseid';
+				$qarr[':courseid'] = $cid;
+			}
+			$query .= ' AND t.lastposttime < ' . $now;
+				
+			if (!isset($teacherid)) {
+				$query .= ' AND (f.avail = 2 OR (f.avail = 1 AND f.startdate < '.$now.' AND f.enddate > '.$now.'))
+					AND (t.stugroupid = 0 OR sm.stugroupid IS NOT NULL)';
+			}
+			if ($page == -3 || $page == -1) {
+				$query .= ' AND (mv.lastview IS NULL OR t.lastposttime > mv.lastview)';
+			} else if ($page == -5 || $page==-2) {
+				$query .= ' AND mv.tagged=1';
+			}
+			$query .= ') SELECT
+				e.threadid,
+				prev.threadid AS prev_threadid,
+				prev.forumid AS prev_forumid,
+				nxt.threadid AS next_threadid,
+				nxt.forumid AS next_forumid
+				FROM eligible_threads e
+				LEFT JOIN eligible_threads prev ON prev.rn = e.rn - 1
+				LEFT JOIN eligible_threads nxt  ON nxt.rn = e.rn + 1
+				WHERE e.threadid = :curthread';
+			*/
 			$query = 'SELECT threadid, prev_threadid, prev_forumid, next_threadid, next_forumid
 				FROM (
 				SELECT 
@@ -344,10 +390,14 @@ if ($oktoshow) {
 			if (!isset($teacherid)) {
 				$query .= ' AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<'.$now.' AND imas_forums.enddate>'.$now.'))';
 			}
-			$query .= ' LEFT JOIN imas_forum_views AS mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid
-				WHERE imas_forums.courseid=:courseid ';
+			$query .= ' LEFT JOIN imas_forum_views AS mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid';
 			if (!isset($teacherid)) {
-				$query .= ' AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid)) ';
+				$query .= ' LEFT JOIN imas_stugroupmembers ON imas_stugroupmembers.userid = :userid 
+					AND imas_stugroupmembers.stugroupid = imas_forum_threads.stugroupid ';
+			}
+			$query .= '	WHERE imas_forums.courseid=:courseid ';
+			if (!isset($teacherid)) {
+				$query .= ' AND (imas_forum_threads.stugroupid=0 OR imas_stugroupmembers.stugroupid IS NOT NULL) ';
 			}
 			if ($page==-3 || $page==-1) {	
 				$query .= ' AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))';
@@ -361,6 +411,7 @@ if ($oktoshow) {
 			}
 			$query .= ') AS threads_with_neighbors
 				WHERE threadid = :curthread';
+
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 			$row = $stm->fetch(PDO::FETCH_ASSOC);
