@@ -1127,6 +1127,9 @@ function arraystodoteqns($x, $y, $color = 'blue') {
 function textonimage() {
     $args = func_get_args();
     $img = array_shift($args);
+    if (count($args)==1 && is_array($args[0])) {
+        $args = $args[0];
+    }
 
     if (substr($img, 0, 4) == 'http') {
         $img = '<img src="' . Sanitize::encodeStringForDisplay($img) . '" alt="" />';
