@@ -23,7 +23,7 @@ function parseSearchString($str)
         $str = preg_replace('/(author|type|uid|id|regex|used|avgtime|mine|intext|unused|private|public|res|order|lastmod|created|avgscore|isrand|isbroken|wronglib)(:|=)("[^"]+?"|\w+)/', '', $str);
     }
 
-    $out['terms'] = preg_split('/\s+/', trim($str));
+    $out['terms'] = preg_split('/\s+|(?<=[a-zA-Z]{3})-(?=[a-zA-Z])|(?<=[a-zA-Z])-(?=[a-zA-Z]{3})/', trim($str));
     foreach ($out['terms'] as $k => $v) {
         if ($v=='') { 
             unset($out['terms'][$k]);
