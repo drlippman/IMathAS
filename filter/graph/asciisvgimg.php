@@ -154,6 +154,7 @@ function processShortScript($script) {
 			if ($sa[$inx]=='slope') {
 				$this->ASslopefield(array($sa[$inx+1],$sa[$inx+2],$sa[$inx+2]));
 			} else if ($sa[$inx]=='label') {
+				$sa[$inx+1] = str_replace(['&amp;x44;', '&x44;', '&amp;quot;', '&quot;'], [',', ',', '"', '"'], $sa[$inx+1]);
 				$this->AStext(array($sa[$inx+5].','.$sa[$inx+6],$sa[$inx+1]));
 			} else {
 				if ($sa[$inx]=='func') {

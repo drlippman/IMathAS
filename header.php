@@ -139,7 +139,7 @@ if (!isset($_SESSION['mathdisp'])) {
 }
 echo "<script src=\"$staticroot/javascript/mathparser_min.js?v=031126\"></script>\n";
 if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
-	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=031625\"></script>\n";
+	echo "<script src=\"$staticroot/javascript/ASCIIsvg_min.js?v=041926\"></script>\n";
 	echo "<script>var usingASCIISvg = true;</script>";
 	//echo "<script src=\"$imasroot/course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js\"></script>\n";
 } else if (isset($_SESSION['graphdisp'])) {

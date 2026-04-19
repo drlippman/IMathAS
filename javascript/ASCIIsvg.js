@@ -1177,6 +1177,7 @@ function parseShortScript(sscript,gw,gh) {
 			commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');';
 		   } else if (sa[inx]=="label") {
 			   eqnlist += "label with text "+sa[inx+1] + ' at the point ('+sa[inx+5]+','+sa[inx+6]+'). ';
+         sa[inx+1] = sa[inx+1].replace(/&(amp;)?x44;/g,',').replace(/&(amp;)?quot;/g,'\\"').replace(/\\"|"/g,'\\"');
 			   commands += 'text(['+sa[inx+5]+','+sa[inx+6]+'],"'+sa[inx+1]+'");';
 		   } else {
 			if (sa[inx]=="func") {

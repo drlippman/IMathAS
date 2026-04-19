@@ -96,7 +96,8 @@ var AsciisvgDialog = {
 			newopt.text = 'dy/dx='+eq1;
 			eq2= document.getElementById("eqn2").value;
 		} else if (type == "label") {
-			newopt.text = 'label='+eq1;
+			eq1 = eq1.replace(/,/g, '&x44;').replace(/"/g, '&quot;');
+			newopt.text = 'label='+eq1.replace(/&(amp;)?x44;/g, ',').replace(/&(amp;)?quot;/g, '"');
 		}
 
 
@@ -287,7 +288,7 @@ var AsciisvgDialog = {
 			document.getElementById("eqntype").selectedIndex = 4;
 		}
 		this.changetype();
-		document.getElementById("equation").value = sa[1];
+		document.getElementById("equation").value = sa[1].replace(/&(amp;)?x44;/g, ',').replace(/&(amp;)?quot;/g, '"');
 		if ((sa[0] == "param")||(sa[0] == "slope")) {
 			document.getElementById("eqn2").value = sa[2];
 		}
@@ -354,7 +355,8 @@ var AsciisvgDialog = {
 			} else if (sa[inx] == "slope") {
 				newopt.text = 'dy/dx='+ sa[inx+1];
 			} else if (sa[inx] == "label") {
-				newopt.text = 'label='+ sa[inx+1];
+				sa[inx+1] = sa[inx+1].replace(/,/g, '&x44;').replace(/"/g, '&quot;');
+				newopt.text = 'label='+ sa[inx+1].replace(/&(amp;)?x44;/g, ',').replace(/&(amp;)?quot;/g, '"');
 			}
 			newopt.value = sa[inx]+','+sa[inx+1]+','+sa[inx+2]+','+sa[inx+3]+','+sa[inx+4]+','+sa[inx+5]+','+sa[inx+6]+','+sa[inx+7]+','+sa[inx+8]+','+sa[inx+9];
 			graphs = document.getElementById("graphs");
