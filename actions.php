@@ -10,8 +10,16 @@ if (isset($CFG['hooks']['actions'])) {
 	require_once $CFG['hooks']['actions'];
 }
 function obfuscateEmail(string $email): string {
-    [$user, $domain] = explode('@', $email);
-    [$domainName, $tld] = explode('.', $domain, 2);
+	$emailpts = explode('@', $email);
+	if (count($emailpts)!=2) {
+		return $email;
+	}
+    [$user, $domain] = $emailpts;
+	$domainpts = explode('.', $domain, 2);
+	if (count($domainpts)!=2) {
+		return $email;
+	}
+    [$domainName, $tld] = $domainpts;
 
     $obfuscatedUser = substr($user, 0, 2) . str_repeat('*', max(0, strlen($user) - 3)) . (strlen($user)>2?substr($user, -1):'');
     $obfuscatedDomain = substr($domainName, 0, 1) . str_repeat('*', max(1, strlen($domainName) - 1));
