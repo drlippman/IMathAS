@@ -873,7 +873,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 
 				}
-				if ($searchall==1) {
+				//if ($searchall==1) {
 					$query .= " LIMIT 300";
 					$offset = 0;
 					if (isset($_REQUEST['offset'])) {
@@ -882,7 +882,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$query .= " OFFSET $offset";
 						}
 					}
-				}
+				//}
 
 				if ($search=='recommend' && count($existingq)>0) {
 					$existingqlist = implode(',', array_map('intval',$existingq));  //pulled from database, so no quotes needed
@@ -1473,7 +1473,7 @@ if ($overwriteBody==1) {
 <?php
 					}
 				}
-				if ($searchall==1 && ($searchlimited || $offset>0)) {
+				if ($searchlimited || $offset>0) {
 					echo '<tr><td></td><td><i>'._('Search cut off at 300 results');
 					echo '<br>'._('Showing ').($offset+1).'-'.($offset + 300).'. ';
 					if ($offset>0) {
