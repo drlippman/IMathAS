@@ -488,7 +488,7 @@ if ($oktoshow) {
 	} else {
 		$lastview = 0;
 		$tagged = 0;
-		$stm = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview)");
+		$stm = $DBH->prepare("INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES (:userid, :threadid, :lastview) ON DUPLICATE KEY UPDATE lastview=VALUES(lastview)");
 		$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid, ':lastview'=>$now));
 	}
 }
