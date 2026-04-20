@@ -39,7 +39,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$stm = $DBH->prepare("SELECT courseid,ver,submitby FROM imas_assessments WHERE id=?");
 	$stm->execute(array($aid));
 	$row = $stm->fetch(PDO::FETCH_ASSOC);
-	if ($row === null || $row['courseid'] != $cid) {
+	if ($row === false || $row['courseid'] != $cid) {
 		echo _("Invalid ID");
 		exit;
 	} else if ($row['ver'] > 1) {
