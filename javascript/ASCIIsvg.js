@@ -1154,6 +1154,7 @@ function parseShortScript(sscript,gw,gh) {
 		var inx = 11;
 		var varlet = '';
 		var eqnlist = 'Graphs on the window x='+sa[0]+' to '+sa[1]+' and y='+sa[2]+' to '+sa[3]+': ';
+    var origfontfill = fontfill;
 
 		while (sa.length > inx+9) {
 		   commands += 'stroke="' + sa[inx+7] + '";';
@@ -1174,11 +1175,11 @@ function parseShortScript(sscript,gw,gh) {
 		   }
 		   if (sa[inx]=="slope") {
 			   eqnlist += "slopefield where dy/dx="+sa[inx+1] + ". ";
-			commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');';
+			   commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');';
 		   } else if (sa[inx]=="label") {
 			   eqnlist += "label with text "+sa[inx+1] + ' at the point ('+sa[inx+5]+','+sa[inx+6]+'). ';
          sa[inx+1] = sa[inx+1].replace(/&(amp;)?x44;/g,',').replace(/&(amp;)?quot;/g,'\\"').replace(/\\"|"/g,'\\"');
-			   commands += 'text(['+sa[inx+5]+','+sa[inx+6]+'],"'+sa[inx+1]+'");';
+			   commands += 'fontfill="'+sa[inx+7]+'";text(['+sa[inx+5]+','+sa[inx+6]+'],"'+sa[inx+1]+'");fontfill="'+origfontfill+'";';
 		   } else {
 			if (sa[inx]=="func") {
 				eqnlist += "graph of y="+sa[inx+1];
