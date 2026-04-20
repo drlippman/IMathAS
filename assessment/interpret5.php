@@ -89,6 +89,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 	$lastsym = '';
 	$lasttype = -1;
 	$closeparens = 0;
+	$sawequals = false;
 	$symcnt = 0;
 	//get tokens from tokenizer
     $syms = tokenize($str,$anstype,$countcnt,$included_qs);;
@@ -143,6 +144,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				echo _('error: cannot assign to a function');
 				return 'error';
 			}
+			$sawequals = true;
 			//if equality equal (not comparison or array assn), and before if/where.
 			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
@@ -322,11 +324,16 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			$ifloc = -1;
 			$whereloc = -1;
 			$whileloc = -1;
+			$sawequals = false;
 			$elseloc = array();
 			//collapse bits to a line, add to lines array
 			$lines[] = implode('',$bits);
 			$bits = array();
 		} else if ($type==1) { //is var
+			if ($sawequals && substr($sym,-2)=='[]') {
+				echo 'Error: cannot use [] for reading';
+				return 'error';
+			}
 			//implict 3$a and $a $b and (3-4)$a
 			if ($lasttype==3 || $lasttype==1 || $lasttype==4) {
 				$bits[] = '*';
