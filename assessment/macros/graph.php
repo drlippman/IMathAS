@@ -1141,7 +1141,7 @@ function textonimage() {
     $align = '';
     while (count($args) > 2) {
         $text = array_shift($args);
-        if ($text == "centered") {
+        if ($text == "centerelements") {
             $align = 'transform:translate(-50%,-50%);';
             continue;
         }
