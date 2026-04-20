@@ -74,24 +74,28 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             continue;
         }
 
+		$qtype = $qsdata[$qsids[$questionId]]['qtype'];
+
         $qscore = array();
         $qatt = array();
-
         for ($pn = 0; $pn < count($scoredQuestion['tries']); $pn++) {
-            $scoredTryIndex = $scoredQuestion['scored_try'][$pn];
+            $scoredTryIndex = $scoredQuestion['scored_try'][$qtype=='conditional'?0:$pn];
             if (-1 == $scoredTryIndex) {
                 // No answer/attempt found.
                 $qscore[$pn] = 0;
                 $qatt[$pn] = '';
             } else {
                 $scoredTry = $scoredQuestion['tries'][$pn][$scoredTryIndex];
-                $qscore[$pn] = $scoredTry['raw'];
+                $qscore[$pn] = $scoredTry['raw'] ?? 0;
                 $qatt[$pn] = $scoredTry['stuans'];
             }
         }
 
         // Is this is a single part question?
-        if (1 == count($scoredQuestion['answeights'])) {
+		if ($qtype == 'conditional') {
+			$qscore = $qscore[0];
+			$qatt = implode('~', $qatt);
+		} else if ($qtype != 'multipart') {
             $qatt = $qatt[0];
             $qscore = $qscore[0];
         }
