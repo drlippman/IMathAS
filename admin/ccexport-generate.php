@@ -34,6 +34,36 @@ function dir_is_empty($dirname) {
   return true;
 }
 
+function canvasfiltermath($str) {
+	$str = str_replace('\\`','&grave;',$str);
+	if (strpos($str,'`')!==FALSE) {
+		$str = preg_replace_callback('/`(.*?)`/s', 'canvasmathfiltercallback', $str);
+	}
+	$str = str_replace('&grave;','`',$str);
+	return $str;
+}
+
+function canvasmathfiltercallback($arr) {
+	global $AMT,$mathimgurl,$coursetheme;
+	//$arr[1] = str_replace(array('&ne;','&quot;','&lt;','&gt;','&le;','&ge;'),array('ne','"','lt','gt','le','ge'),$arr[1]);
+	$arr[1] = str_replace(array('&ne;','&quot;','&le;','&ge;','<','>'),array('ne','"','le','ge','&lt;','&gt;'),$arr[1]);
+	$tex = $AMT->convert($arr[1]);
+	$tex = str_replace('\\displaystyle','',$tex);
+	if (trim($tex)=='') {
+		return '';
+	} else {
+		if (!empty($GLOBALS['texdisp'])) {
+			if (isset($GLOBALS['texdoubleescape'])) {
+				return ' \\\\('.htmlentities($tex).'\\\\) ';
+			} else {
+				return ' '.htmlentities($tex).' ';
+			}
+		} else {
+			return ('<img class="equation_image" title="'.str_replace('"','&quot;',$tex).'" src="/equation_images/'.rawurlencode($tex).'" alt="LaTeX: '.str_replace('"','&quot;',$tex).'" data-equation-content="'.str_replace('"','&quot;',$tex).'">');
+		}
+	}
+}
+
 $usechecked = ($_POST['whichitems']=='select' || empty($_POST['whichitems']));
 if ($usechecked && !empty($_POST['checked'])) {
 	$checked = $_POST['checked'];
@@ -255,6 +285,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				if ($linktype=="canvas") {
 					fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
 					fwrite($fp,'<meta name="workflow_state" content="'.($row[3]==0?'unpublished':'active').'"/>');
+					$row[1] = canvasfiltermath($row[1]);
 				}
 				fwrite($fp,"</head><body>");
 				fwrite($fp,filtercapture($row[1],$res));
@@ -345,6 +376,7 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					if ($linktype=="canvas") {
 						fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
 						fwrite($fp,'<meta name="workflow_state" content="'.($row[3]==0?'unpublished':'active').'"/>');
+						$row[1] = canvasfiltermath($row[1]);
 					}
 					fwrite($fp,"</head><body>");
 					fwrite($fp,filtercapture($row[1],$res));
@@ -372,6 +404,9 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 				$fp = fopen($newdir.'/forum'.intval($iteminfo[$item][1]).'.xml','w');
 				fwrite($fp,'<topic xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imsdt_v1p1">');
 				fwrite($fp,' <title >'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>');
+				if ($linktype=='canvas') {
+					$row[1] = canvasfiltermath($row[1]);
+				}
 				fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res),ENT_XML1,'UTF-8',false).'</text>');
 				fwrite($fp,'</topic>');
 				fclose($fp);
@@ -528,6 +563,9 @@ function getorg($it,$parent,&$res,$ind,$mod_depth) {
 					if (strlen($text)>6 && substr($text,0,6)=='**wver') {
 						$wikiver = substr($text,6,strpos($text,'**',6)-6);
 						$text = substr($text,strpos($text,'**',6)+2);
+					}
+					if ($linktype=='canvas') {
+						$text = canvasfiltermath($text);
 					}
 					fwrite($fp,filtercapture($text,$res));
 				}
