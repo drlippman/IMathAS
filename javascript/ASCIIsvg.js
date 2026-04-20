@@ -202,7 +202,7 @@ function asciisvgexpand(evt) {
 		var sscrarr = el.getAttribute("data-sscr").split(',');
 		sscrarr[9] = w;
 		sscrarr[10] = h;
-		html += 'sscr="' + sscrarr.join(',') + '"';
+		html += 'sscr="' + sscrarr.join(',').replace(/"/g,'&quot;') + '"';
 	}
 	html += ' /></div>';
 	GB_show(_("Enlarged Graph"), html, w+6, h+66);
