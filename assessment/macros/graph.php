@@ -1138,8 +1138,13 @@ function textonimage() {
     $out = '<div style="position: relative;" class="txtimgwrap">';
     $out .= '<div class="txtimgwrap" style="position:relative;top:0px;left:0px;">' . $img . '</div>';
 
+    $align = '';
     while (count($args) > 2) {
         $text = array_shift($args);
+        if ($text == "centered") {
+            $align = 'transform:translate(-50%,-50%);';
+            continue;
+        }
         $left = array_shift($args);
         $top = array_shift($args);
         $hidden = (strpos($text, '[AB') === false) ? 'aria-hidden=true' : '';
@@ -1148,7 +1153,7 @@ function textonimage() {
                 $out .= "<span>$text</span>";
             }
         } else {
-            $out .= "<div $hidden style=\"position:absolute;top:{$top}px;left:{$left}px;\">$text</div>";
+            $out .= "<div $hidden style=\"position:absolute;top:{$top}px;left:{$left}px;{$align}\">$text</div>";
         }
     }
     $out .= '</div>';
