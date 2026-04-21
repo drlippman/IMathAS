@@ -697,7 +697,6 @@ function settool(curel,tarnum,mode) {
 	drawTarget();
 }
 function setDrawMode(tarnum,mode) {
-	console.log(mode);
 	targets[tarnum].mode = mode;
 }
 function setDotLine(tarnum,onoff) {
