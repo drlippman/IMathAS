@@ -483,6 +483,12 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 9.2;}
                         $out .= ' alt="Tangent"/>';
                     }
+                    if (in_array('sec', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tpsvg/tpsec.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9.3\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'sec') {$out .= 'class="sel" ';
+                            $def = 9.3;}
+                        $out .= ' alt="Secant"/>';
+                    }
                     if (count($answerformat) == 1 || in_array('dot', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpsvg/tpdot.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"1\" ";
                         if (count($answerformat) > 1 && $answerformat[1] == 'dot') {$out .= 'class="sel" ';

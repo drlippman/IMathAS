@@ -296,6 +296,7 @@ class DrawingScorePart implements ScorePart
             $ansexps = array();
             $anslogs = array();
             $anscoss = array();
+            $anssecs = array();
             $anstans = array();
             $ansvecs = array();
             $ansrats = array();
@@ -630,6 +631,38 @@ class DrawingScorePart implements ScorePart
                             $secyp = $settings[7] - ($secy-$settings[2])*$pixelspery - $imgborder;
                             $anstans[$key] = array($xintp,$yintp,$secxp,$secyp);
                         }
+                    } else if (($p = strpos($function[0],'sec('))!==false || ($q = strpos($function[0],'csc('))!==false) { //is sin/cos
+                        if ($p===false) { $p = $q;}
+                        $nested = 1;
+                        for ($i=$p+4;$i<strlen($function[0]);$i++) {
+                            if ($function[0][$i]=='(') {$nested++;}
+                            else if ($function[0][$i]==')') {$nested--;}
+                            if ($nested==0) {break;}
+                        }
+                        if ($nested==0) {
+                            $infunc = makepretty(substr($function[0],$p+4,$i-$p-4));
+                            $infunc = makeMathFunction($infunc, 'x');
+                            if ($func === false) { continue; }
+                            $y0 = $infunc(['x'=>0]);
+                            $y1 = $infunc(['x'=>1]);
+                            $period = 2*M_PI/($y1-$y0); //slope of inside function
+                            $xint = -$y0/($y1-$y0);
+                            if (strpos($function[0],'csc')!==false) {
+                                $xint += $period/4;
+                            }
+                            $secx = $xint + $period/2;
+                            $xintp = ($xint - $settings[0])*$pixelsperx + $imgborder;
+                            $secxp = ($secx - $settings[0])*$pixelsperx + $imgborder;
+                            $yint = $func(['x'=>$xint]);
+                            $yintp = $settings[7] - ($yint-$settings[2])*$pixelspery - $imgborder;
+                            $secy = $func(['x'=>$secx]);
+                            $secyp = $settings[7] - ($secy-$settings[2])*$pixelspery - $imgborder;
+                            if ($yintp>$secyp) {
+                                $anssecs[$key] = array($xintp,$secxp,$yintp,$secyp);
+                            } else {
+                                $anssecs[$key] = array($secxp,$xintp,$secyp,$yintp);
+                            }
+                        }
                     } else if (strpos($function[0],'^3')!==false) { //cubic
                         $y4p = $ytopix($func(['x'=>$x4]));
                         $a1 = safepow($x3p,3)-2*safepow($x2p,3)+safepow($x1p,3);
@@ -770,6 +803,7 @@ class DrawingScorePart implements ScorePart
             $abs = array();
             $sqrts = array();
             $coss = array();
+            $secs = array();
             $tans = array();
             $exps = array();
             $logs = array();
@@ -985,7 +1019,13 @@ class DrawingScorePart implements ScorePart
                             $yt = $pts[2] + $amp;
                             $tans[] = array($pts[1], $pts[2], $xt, $yt);
                         }
-                    }
+                    }  else if ($pts[0]==9.3) {
+                        if ($pts[4]>$pts[2]) {
+                            $secs[] = array($pts[3],$pts[1],$pts[4],$pts[2]);
+                        } else {
+                            $secs[] = array($pts[1],$pts[3],$pts[2],$pts[4]);
+                        }
+                    } 
                 }
             }
             if ($dots=='') {
@@ -1518,6 +1558,34 @@ class DrawingScorePart implements ScorePart
                     }
                     $scores[$scoretype[$key]][$key] = 1;
                     $usedcos[$i] = 1;
+                    break;
+                }
+            }
+            $usedsec = [];
+            foreach ($anssecs as $key=>$anssec) {
+                $scores[$scoretype[$key]][$key] = 0;
+                for ($i=0; $i<count($secs); $i++) {
+                    if (!empty($usedsec[$i])) { continue; }
+                    $per = abs($anssec[0] - $anssec[1])*2;
+                    // make sure horizontal shift is ok
+                    $adjdiff = abs($anssec[0]-$secs[$i][0]);
+                    $adjdiff = abs($adjdiff - $per*round($adjdiff/$per));
+                    if ($adjdiff>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    // check period is OK
+                    $per2 = abs($secs[$i][0] - $secs[$i][1])*2;
+                    if (abs($per - $per2) > 2*$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    if (abs($anssec[2]-$secs[$i][2])>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    if (abs($anssec[3]-$secs[$i][3])>$defpttol*$reltolerance) {
+                        continue;
+                    }
+                    $scores[$scoretype[$key]][$key] = 1;
+                    $usedsec[$i] = 1;
                     break;
                 }
             }
