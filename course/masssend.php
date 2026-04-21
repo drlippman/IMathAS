@@ -78,6 +78,7 @@ require_once '../includes/checkdata.php';
 			$emailaddys = array();
 			$FCMtokens = array();
 			$toarr = [];
+			$fullnames = [];
 			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				if (!in_array($row['id'],$toignore)) {
 					$fullnames[$row['id']] = strip_tags($row['LastName']. ', '.$row['FirstName']);

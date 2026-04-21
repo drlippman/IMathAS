@@ -527,6 +527,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if (!isset($page_grpmembers[$row[0]])) {
 					$page_grpmembers[$row[0]] = array();
 				}
+				if (!isset($stunames[$row[1]])) { 
+					continue; // non-student in imas_stugroupmembers. Shouldn't happen, but ignore them
+				}
 				$page_grpmembers[$row[0]][$row[1]] = $stunames[$row[1]];
 				$stuuseridsingroup[] = $row[1];
 			}

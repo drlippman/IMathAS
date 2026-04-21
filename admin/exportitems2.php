@@ -33,7 +33,9 @@ function exportcopysub($items,$parent,&$addtoarr) {
 			if (array_search($parent.'-'.($k+1),$checked)!==FALSE) { //copy block
 				$newblock = array();
 				foreach ($db_fields['block'] as $field) {
-					$newblock[$field] = $item[$field];
+					if (isset($item[$field])) {
+						$newblock[$field] = $item[$field];
+					}
 				}
 				$newblock['items'] = array();
 				exportcopysub($item['items'],$parent.'-'.($k+1),$newblock['items']);
