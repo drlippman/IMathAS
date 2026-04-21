@@ -923,17 +923,27 @@ function normrand($mu,$sig,$n,$rnd=null,$pos=false,$skew=0) {
 			$r = $a*$a+$b*$b;
 		} while ($r==0||$r>1);
         $r = sqrt(-2*log($r)/$r);
-        $v1 = $sig*$a*$r + $mu;
-        $v2 = $sig*$b*$r + $mu;
+		$u1 = $a * $r;
+		$u2 = $b * $r;
         if ($skew != 0) {
-            $v3 = $d*$v1 + $d2*$v2;
-            $v3 = $v1 >=0 ? $v3 : -$v3;
-            if (!$pos || $v3 > 0) {
-                $z[] = round($v3, $rnd);
-            }
-            $icnt += 0.5;
-            continue;
+             // Apply skew-normal transform on standard normals, THEN scale/shift
+			$v3 = $d * $u1 + $d2 * $u2;
+			$v3 = ($u1 >= 0 ? $v3 : -$v3) * $sig + $mu;  // sign check on raw u1
+			if (!$pos || $v3 > 0) {
+				$z[] = ($rnd === null) ? $v3 : round($v3, $rnd);
+			}
+
+			$v4 = $d * $u2 + $d2 * $u1;
+			$v4 = ($u2 >= 0 ? $v4 : -$v4) * $sig + $mu;  // use both values
+			if (!$pos || $v4 > 0) {
+				$z[] = ($rnd === null) ? $v4 : round($v4, $rnd);
+			}
+
+			$icnt++;
+			continue;
         }
+		$v1 = $sig * $u1 + $mu;
+		$v2 = $sig * $u2 + $mu;
         if (!$pos || $v1 > 0) {
             $z[] = ($rnd===null) ? $v1 : round($v1, $rnd);
         }
