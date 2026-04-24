@@ -144,7 +144,7 @@ if (isset($_POST['message'])) {
             $a2->loadQuestionData();
             $res = $a2->displayQuestion($parts[0], ['showhints'=>false]);
             $message = $res['html'];
-            $message = preg_replace('/<div class="question"[^>]*>/','<div>', $message);
+            $message = preg_replace('/<div class="question[^>]*>/','<div>', $message);
         } else {
             require_once "../assessment/displayq2.php";
             $message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
