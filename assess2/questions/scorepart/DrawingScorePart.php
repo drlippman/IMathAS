@@ -407,7 +407,7 @@ class DrawingScorePart implements ScorePart
                             $anshparabs[$key] = array('x', $xv, $yv, $xatyt);
                         }
                     } else { //vertical line
-                        $xp = $xtopix(substr($function[0],2));
+                        $xp = $xtopix(evalbasic(substr($function[0],2)));
                         if (count($function)==3) { //line segment or ray
                             if ($function[1]=='-oo') { //ray down
                                 $function[2] = evalbasic($function[2],true);
