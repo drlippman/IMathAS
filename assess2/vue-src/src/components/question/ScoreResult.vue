@@ -20,7 +20,7 @@
         <icons name="info"/>
         {{ $t('scoreresult-manual_grade') }}
       </p>
-      <p v-if="showScores && status.general !== 'correct' && status.partcount > 1 && (status.firstincorrect > -1 || status.untried > 0)">
+      <p v-if="showScores && showRetryButtons && status.general !== 'correct' && status.partcount > 1 && (status.firstincorrect > -1 || status.untried > 0)">
         {{ partStatusMessage }}
         <a v-if="status.firstincorrect > -1"
           href="#" @click.prevent="jumpToIncorrect">
