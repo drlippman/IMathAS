@@ -50,7 +50,7 @@ if (isset($_POST['catfilter'])) {
 }
 
 
-$query = 'SELECT iar.assessmentid,ia.name,iar.userid,iu.FirstName,iu.LastName,iar.lastchange,iar.score,iar.status,
+$query = 'SELECT iar.assessmentid,ia.name,ia.ptsposs,iar.userid,iu.FirstName,iu.LastName,iar.lastchange,iar.score,iar.status,
     IF(ia.submitby="by_assessment",iar.scoreddata,"") AS scoreddata
     FROM imas_assessment_records AS iar
     JOIN imas_assessments AS ia ON ia.id=iar.assessmentid AND ia.courseid=? ';
@@ -125,7 +125,7 @@ if ($stm->rowCount()==0) {
         echo '<tr><td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
         echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></td>';
         echo '<td><a href="../assess2/gbviewassess.php?'.$qs.'" target="_blank">';
-        echo Sanitize::encodeStringForDisplay($row['score']);
+        echo Sanitize::encodeStringForDisplay(round(100*$row['score']/$row['ptsposs'],1)).'%';
         if (($row['status']&3) == 1) { // has unsubmitted attempt or questions
             echo ' (IP)';
         }
