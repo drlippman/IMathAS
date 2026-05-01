@@ -211,25 +211,28 @@ if ($postbeforeview && !$canviewall) {
 
 if ($oktoshow) {
 	if ($haspoints) {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section,imas_students.id AS stuid FROM ";
-		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
-		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
-		$query .= "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
-		$query .= "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section,imas_students.id AS stuid,imas_teachers.id AS teacherid,imas_tutors.id AS tutorid "
+			. "FROM imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id "
+			. "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid "
+			. "LEFT JOIN imas_teachers ON imas_teachers.userid=imas_forum_posts.userid AND imas_teachers.courseid=:courseid "
+			. "LEFT JOIN imas_tutors ON imas_tutors.userid=imas_forum_posts.userid AND imas_tutors.courseid=:courseid "
+			. "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id "
+			. "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";	
 	} else {
-		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section,imas_students.id AS stuid FROM ";
-		$query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
-		$query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid ";
-		$query .= "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
-		//$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg from imas_forum_posts,imas_users ";
-		//$query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id='$threadid' OR imas_forum_posts.threadid='$threadid') ORDER BY imas_forum_posts.id";
+		$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section,imas_students.id AS stuid,imas_teachers.id AS teacherid,imas_tutors.id AS tutorid "
+			. "FROM imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id "
+			. "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseid "
+			. "LEFT JOIN imas_teachers ON imas_teachers.userid=imas_forum_posts.userid AND imas_teachers.courseid=:courseid "
+			. "LEFT JOIN imas_tutors ON imas_tutors.userid=imas_forum_posts.userid AND imas_tutors.courseid=:courseid "
+			. "WHERE (imas_forum_posts.id=:id OR imas_forum_posts.threadid=:threadid) "
+			. "ORDER BY imas_forum_posts.id";
 	}
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid, ':id'=>$threadid, ':threadid'=>$threadid));
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
-	$isstu = array(); $stus = []; $posttoforumaid = null;
+	$isstu = array(); $stus = []; $posttoforumaid = null; 
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -244,6 +247,7 @@ if ($oktoshow) {
         if ($line['stuid'] !== null) {
             $stus[] = $line['userid'];
         }
+
 		$children[$line['parent']][] = $line['id'];
 		$date[$line['id']] = $line['postdate'];
 		$n = 0;
@@ -285,6 +289,11 @@ if ($oktoshow) {
 			$poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
 			$section[$line['id']] = $line['section'];
 			$email[$line['id']] = $line['email'];
+			if ($line['teacherid'] !== null) {
+				$poster[$line['id']] .= ' ' . _('(Instructor)');
+			} else if ($line['tutorid'] !== null) {
+				$poster[$line['id']] .= ' ' . _('(Tutor/TA)');
+			}
 		}
 		$likes[$line['id']] = array(0,0,0);
 
