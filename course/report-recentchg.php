@@ -80,6 +80,8 @@ $placeinhead .= '<script>
         return false;
     }
 </script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=051820\"></script>\n";
+
 require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';
 echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
@@ -111,7 +113,7 @@ echo '<p><button type=submit>'._('Update').'</button></p>';
 if ($stm->rowCount()==0) {
     echo '<p>'._('Nothing has been submitted in the specified time interval').'</p>';
 } else {
-    echo '<table class=gb><thead><tr>';
+    echo '<table class=gb id=maintable><thead><tr>';
     echo '<th>'._('Assessment').'</th>';
     echo '<th>'._('Student').'</th>';
     echo '<th>'._('Score').'</th>';
@@ -152,5 +154,6 @@ if ($stm->rowCount()==0) {
     }
     echo '</tbody></table>';
     echo '<p>&nbsp;</p><p>'._('Note: For quiz-style assessments, an IP marker here indicates either an in-progress or unsubmitted attempt.').'</p>';
+    echo "<script>initSortTable('maintable',['S','S','P','N','D','S'],false);</script>\n";
 }
 require_once '../footer.php';
