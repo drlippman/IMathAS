@@ -232,7 +232,7 @@ if ($oktoshow) {
 	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$children = array(); $date = array(); $subject = array(); $re = array(); $message = array(); $posttype = array(); $likes = array(); $mylikes = array();
 	$ownerid = array(); $files = array(); $points= array(); $feedback= array(); $poster= array(); $email= array(); $hasuserimg = array(); $section = array();
-	$isstu = array(); $stus = []; $posttoforumaid = null; 
+	$isstu = array(); $stus = []; $posttoforumaid = null; $userrole = [];
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['parent']==0) {
 			if ($line['replyby']!=null) {
@@ -291,8 +291,10 @@ if ($oktoshow) {
 			$email[$line['id']] = $line['email'];
 			if ($line['teacherid'] !== null) {
 				$poster[$line['id']] .= ' ' . _('(Instructor)');
+				$userrole[$line['id']] = 'instructor';
 			} else if ($line['tutorid'] !== null) {
 				$poster[$line['id']] .= ' ' . _('(Tutor/TA)');
+				$userrole[$line['id']] = 'tutor';
 			}
 		}
 		$likes[$line['id']] = array(0,0,0);
@@ -615,7 +617,7 @@ echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&page=$page&thread=$
 function printchildren($base,$restricttoowner=false) {
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	global $DBH,$children,$date,$subject,$re,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
-	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
+	global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg,$userrole;
 	global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
 	global $canviewall, $caneditscore, $canviewscore, $isstu, $posttoforumaidver, $posttoforumqn, $posttoforumaid, $staticroot;
 	if (!isset($CFG['CPS']['itemicons'])) {
@@ -636,6 +638,9 @@ function printchildren($base,$restricttoowner=false) {
 		echo '<div class="postwrap';
 		if ($date[$child]>$lastview) {
 			echo ' newglow';
+		}
+		if (!empty($userrole[$child])) {
+			echo ' postrole-'.$userrole[$child];
 		}
 		echo '" tabindex=-1>';
 		echo '<div class="block flexgroup">';
