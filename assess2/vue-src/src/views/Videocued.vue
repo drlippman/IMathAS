@@ -199,6 +199,7 @@ export default {
         rel: 0,
         modestbranding: 1,
         showinfo: 0,
+        start: (this.cue > 0 ? store.assessInfo.videocues[this.cue-1].time : 0),
         origin: window.location.protocol + '//' + window.location.host
       };
       const ar = store.assessInfo.videoar.split(':');
