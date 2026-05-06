@@ -290,10 +290,8 @@ if ($oktoshow) {
 			$section[$line['id']] = $line['section'];
 			$email[$line['id']] = $line['email'];
 			if ($line['teacherid'] !== null) {
-				$poster[$line['id']] .= ' ' . _('(Instructor)');
 				$userrole[$line['id']] = 'instructor';
 			} else if ($line['tutorid'] !== null) {
-				$poster[$line['id']] .= ' ' . _('(Tutor/TA)');
 				$userrole[$line['id']] = 'tutor';
 			}
 		}
@@ -681,6 +679,13 @@ function printchildren($base,$restricttoowner=false) {
 		echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($poster[$child]).'</span>'; // This is the user's first and last name.
 		if (($canviewall || $allowmsg) && $ownerid[$child]!=0) {
 			echo "<span class=\"sr-only\">send message</span></a>";
+		}
+		if (!empty($userrole[$child])) {
+			if ($userrole[$child] === 'instructor') {
+				echo ' ('._('Instructor').')';
+			} else if ($userrole[$child] === 'tutor') {
+				echo ' ('._('Tutor/TA').')';
+			} 
 		}
 		if ($isteacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
 			echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_blank\">[GB]</a>";
