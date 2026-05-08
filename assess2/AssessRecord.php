@@ -3672,7 +3672,7 @@ class AssessRecord
           $qdata['scoreoverride'][$pn] = floatval($score);
         }
       }
-      if (is_array($qdata['scoreoverride']) && count($qdata['scoreoverride']) == 0) {
+      if (isset($qdata['scoreoverride']) && is_array($qdata['scoreoverride']) && count($qdata['scoreoverride']) == 0) {
         unset($qdata['scoreoverride']);
       }
     }
