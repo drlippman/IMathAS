@@ -127,7 +127,8 @@ if ($stm->rowCount()==0) {
         echo '<tr><td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
         echo '<td><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</span></td>';
         echo '<td><a href="../assess2/gbviewassess.php?'.$qs.'" target="_blank">';
-        echo Sanitize::encodeStringForDisplay(round(100*$row['score']/$row['ptsposs'],1)).'%';
+        echo Sanitize::encodeStringForDisplay($row['score']);
+        echo ' ('.Sanitize::encodeStringForDisplay(round(100*$row['score']/$row['ptsposs'],1)).'%)';
         if (($row['status']&3) == 1) { // has unsubmitted attempt or questions
             echo ' (IP)';
         }
