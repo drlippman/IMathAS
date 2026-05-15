@@ -30,7 +30,7 @@ window.MathJax = {
         AM.newsymbol({input: "iint", tag:"mo", output:"\u222C", ttype:AM.TOKEN.CONST});
         AM.newsymbol({input: "iiint", tag:"mo", output:"\u222D", ttype:AM.TOKEN.CONST});
         AM.newsymbol({input: "thinspace", tag:"mo", output:"\u202F", ttype:AM.TOKEN.CONST});
-        ["arcsec","arccsc","arccot"].forEach(function(v) {
+        ["arcsec","arccsc","arccot","arcsinh","arccosh","arctanh"].forEach(function(v) {
             AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
         });
         if (mathjaxdisp > 8) { // MJ4
