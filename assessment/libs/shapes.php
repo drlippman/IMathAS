@@ -372,6 +372,8 @@ function draw_circle() {
           $yCentLab = 0.15*sin(M_PI*225/180);
         }
         $in[1] = str_replace(';',',',$in[1]);
+        // fix html entity
+        $in[1] = preg_replace('/&(\w+),/','&$1;', $in[1]);
         $centerLab = $in[1];
         $lab = "text([$xCentLab,$yCentLab],'".$centerLab."');";
       } else if (isset($in[1])) {
@@ -482,6 +484,8 @@ function draw_circle() {
       if (isset($in[2])) {
         $hasPointLabel[] = true;
         $in[2] = str_replace(';',',',$in[2]);
+        // fix html entity
+        $in[2] = preg_replace('/&(\w+),/','&$1;', $in[2]);
         $altPointLab[] = $in[2];
         if (abs($angForPt%360) < $minDiff || abs($angForPt%360-360) < $minDiff) {
           if ($angForPt%360 < 2*$minDiff) {
