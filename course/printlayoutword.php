@@ -41,6 +41,134 @@ if ($line === false) {
 	exit;
 }
 
+function getQuestions($line) {
+	$ioquestions = explode(",",$line['itemorder']);
+	$questions = array();
+	foreach($ioquestions as $k=>$q) {
+		if (strpos($q,'~')!==false) {
+			$sub = explode('~',$q);
+			if (strpos($sub[0],'|')===false) { //backwards compat
+				$questions[] = $sub[array_rand($sub,1)];
+			} else {
+				$grpqs = array();
+				$grpparts = explode('|',$sub[0]);
+				array_shift($sub);
+				if ($grpparts[1]==1) { // With replacement
+					for ($i=0; $i<$grpparts[0]; $i++) {
+						$questions[] = $sub[array_rand($sub,1)];
+					}
+				} else if ($grpparts[1]==0) { //Without replacement
+					shuffle($sub);
+					for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
+						$questions[] = $sub[$i];
+					}
+					//$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
+					if ($grpparts[0]>count($sub)) { //fix stupid inputs
+						for ($i=count($sub); $i<$grpparts[0]; $i++) {
+							$questions[] = $sub[array_rand($sub,1)];
+						}
+					}
+				}
+			}
+		} else {
+			$questions[] = $q;
+		}
+	}
+
+	$introjson = json_decode($line['intro'], true);
+    $pagebreaks = [];
+    if ($introjson !== null && $line['displaymethod'] === 'full') {
+      $iqtext = array_slice($introjson, 1);
+      foreach ($iqtext as $k=>$v) {
+        if (!empty($v['ispage'])) {
+            $pagebreaks[] = $v['displayBefore'];
+        }
+      }
+    }
+
+	if ($line['shuffle']&16 && count($questions)>0) {
+        //shuffle all but first
+        $firstq = array_shift($questions);
+    }
+    if ($line['shuffle']&32 && count($questions)>0) {
+        //shuffle all but last
+        $lastq = array_pop($questions);
+    }
+    if ($line['shuffle']&(1+16+32)) {
+          // has any shuffle flag set
+          if (!empty($pagebreaks)) {
+            $shift = ($line['shuffle']&16)?1:0;
+            $lastgroupq = 0;
+            $newqout = [];
+            foreach ($pagebreaks as $breakn=>$breakq) {
+                if ($breakq === 0) { continue; }
+                $thisgroup = [];
+                for ($i=$lastgroupq; $i < $breakq - $shift; $i++) {
+                    $thisgroup[] = $questions[$i];
+                }
+                $lastgroupq = $breakq - $shift;
+                shuffle($thisgroup);
+                $newqout = array_merge($newqout, $thisgroup);
+            }
+            $thisgroup = [];
+            for ($i=$lastgroupq;$i < count($questions); $i++) {
+                $thisgroup[] = $questions[$i];
+            }
+            shuffle($thisgroup);
+            $qout = array_merge($newqout, $thisgroup);
+          } else {
+            shuffle($questions);
+          }
+    }
+    if ($line['shuffle']&16 && !empty($firstq)) {
+      array_unshift($questions, $firstq);
+    }
+    if ($line['shuffle']&32 && !empty($lastq)) {
+        array_push($questions, $lastq);
+    }
+
+	return $questions;
+}
+
+$fixedn = array();
+function getSeeds($line,$fixedseeds,$questions,$j) {
+	global $aid, $fixedn;
+
+	$seeds = array();
+	if ($line['shuffle']&2) {  //all questions same random seed
+		if ($line['shuffle']&4) { //all students same seed
+			$seeds = array_fill(0,count($questions),$aid+$j);
+		} else {
+			$seeds = array_fill(0,count($questions),rand(1,9999));
+		}
+	} else {
+		if ($line['shuffle']&4) { //all students same seed
+			for ($i = 0; $i<count($questions);$i++) {
+				if (isset($fixedseeds[$questions[$i]])) {
+					$seeds[] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
+				} else {
+				$seeds[] = $aid + $i + $j;
+			}
+			}
+		} else {
+			for ($i = 0; $i<count($questions);$i++) {
+				if (isset($fixedseeds[$questions[$i]])) {
+					$n = count($fixedseeds[$questions[$i]]);
+					if (isset($fixedn[$questions[$i]])) {
+						$x = $fixedn[$questions[$i]];
+					} else {
+						$x = rand(0,$n-1);
+						$fixedn[$questions[$i]] = $x;
+					}
+					$seeds[] = $fixedseeds[$questions[$i]][($x+$j)%$n];
+				} else {
+					$seeds[] = rand(1,9999);
+				}
+			}
+		}
+	}
+	return $seeds;
+}
 
 if ($overwriteBody==1) {
 	require_once "../header.php";
@@ -69,7 +197,9 @@ if ($overwriteBody==1) {
 
 	echo "<form method=\"post\" action=\"printlayoutword.php?cid=$cid&aid=$aid&from=$from\" class=\"nolimit\">\n";
 	echo '<span class="form">Number of different versions to generate:</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
-	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3<br/><input type="radio" name="format" value="inter"/> Multiple forms grouped by question - 1a 1b 2a 2b</span><br class="form"/>';
+	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3.<br/>';
+	echo '<input type="radio" name="format" value="trad2" /> Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3, but repick questions from question pools on each version, and reshuffle questions (if enabled in assessment settings) on each version.<br/>';
+	echo '<input type="radio" name="format" value="inter"/> Multiple forms grouped by question - 1a 1b 2a 2b</span><br class="form"/>';
 	echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
 	echo '<span class="form">Question separator:</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
 	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> Use PAGEBREAK for a page break</span><br class="form"/>';
@@ -110,47 +240,13 @@ if ($overwriteBody==1) {
         $texts = array_slice($introjson, 1);
 	}
 
-	$ioquestions = explode(",",$line['itemorder']);
 	$aname = $line['name'];
-	$questions = array();
-	foreach($ioquestions as $k=>$q) {
-		if (strpos($q,'~')!==false) {
-			$sub = explode('~',$q);
-			if (strpos($sub[0],'|')===false) { //backwards compat
-				$questions[] = $sub[array_rand($sub,1)];
-			} else {
-				$grpqs = array();
-				$grpparts = explode('|',$sub[0]);
-				array_shift($sub);
-				if ($grpparts[1]==1) { // With replacement
-					for ($i=0; $i<$grpparts[0]; $i++) {
-						$questions[] = $sub[array_rand($sub,1)];
-					}
-				} else if ($grpparts[1]==0) { //Without replacement
-					shuffle($sub);
-					for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
-						$questions[] = $sub[$i];
-					}
-					//$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
-					if ($grpparts[0]>count($sub)) { //fix stupid inputs
-						for ($i=count($sub); $i<$grpparts[0]; $i++) {
-							$questions[] = $sub[array_rand($sub,1)];
-						}
-					}
-				}
-			}
-		} else {
-			$questions[] = $q;
-		}
-	}
 
 	$points = array();
 	$qn = array();
 	$fixedseeds = array();
-	$qlist = array_map('Sanitize::onlyInt', $questions);
-	$query_placeholders = Sanitize::generateQueryPlaceholders($qlist);
-	$stm = $DBH->prepare("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE id IN ($query_placeholders)");
-	$stm->execute($qlist);
+	$stm = $DBH->prepare("SELECT id,points,questionsetid,fixedseeds FROM imas_questions WHERE assessmentid=?");
+	$stm->execute([$aid]);
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
@@ -160,10 +256,10 @@ if ($overwriteBody==1) {
 		$qn[$row[0]] = $row[2];
 		if ($row[3]!==null && $row[3]!='') {
 			$fixedseeds[$row[0]] = explode(',',$row[3]);
-	}
+		}
 	}
 
-
+	$questions = getQuestions($line);
 	$numq = count($questions);
 
 	if ($courseUIver > 1) {
@@ -185,48 +281,17 @@ if ($overwriteBody==1) {
 	}
 	//add interlace output
 	//add prettyprint along with text-based output option
-	$seeds = array();
-	$fixedn = array();
-	for ($j=0; $j<$copies; $j++) {
-		$seeds[$j] = array();
-		if ($line['shuffle']&2) {  //all questions same random seed
-			if ($line['shuffle']&4) { //all students same seed
-				$seeds[$j] = array_fill(0,count($questions),$aid+$j);
-			} else {
-				$seeds[$j] = array_fill(0,count($questions),rand(1,9999));
-			}
-		} else {
-			if ($line['shuffle']&4) { //all students same seed
-				for ($i = 0; $i<count($questions);$i++) {
-					if (isset($fixedseeds[$questions[$i]])) {
-						$seeds[$j][] = $fixedseeds[$questions[$i]][$j%count($fixedseeds[$questions[$i]])];
-					} else {
-					$seeds[$j][] = $aid + $i + $j;
-				}
-				}
-			} else {
-				for ($i = 0; $i<count($questions);$i++) {
-					if (isset($fixedseeds[$questions[$i]])) {
-						$n = count($fixedseeds[$questions[$i]]);
-						if (isset($fixedn[$i])) {
-							$x = $fixedn[$i];
-						} else {
-							$x = rand(0,$n-1);
-							$fixedn[$i] = $x;
-						}
-						$seeds[$j][] = $fixedseeds[$questions[$i]][($x+$j)%$n];
-					} else {
-					$seeds[$j][] = rand(1,9999);
-				}
-			}
-		}
-	}
-	}
 
     $sa = [];
     $detsol = [];
-	if ($_REQUEST['format']=='trad') {
+	if ($_REQUEST['format']=='trad' || $_REQUEST['format']=='trad2') {
 		for ($j=0; $j<$copies; $j++) {
+			if ($j==0 || $_REQUEST['format']=='trad2') {
+				$questions = getQuestions($line);
+				$numq = count($questions);
+			}
+			$seeds = getSeeds($line, $fixedseeds, $questions, $j);
+
 			if ($j>0) { $out .= '<p>'.$_REQUEST['vsep'].'</p>';}
 
 			$headerleft = '';
@@ -260,9 +325,9 @@ if ($overwriteBody==1) {
                     }
                 }
 				if ($courseUIver > 1) {
-					list($newout,$sa[$j][$i],$detsol[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[$j][$i],$detsol[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				} else {
-					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
 				}
 				$out .= $newout;
 			}
@@ -303,6 +368,12 @@ if ($overwriteBody==1) {
 			}
 		}
 	} else if ($_REQUEST['format']=='inter') {
+		$questions = getQuestions($line);
+		$numq = count($questions);
+		$seeds = [];
+		for ($j=0; $j<$copies;$j++) {
+			$seeds[$j] = getSeeds($line, $fixedseeds, $questions, $j);
+		}
 
 		$headerleft = '';
 		$headerleft .= $line['name'];
