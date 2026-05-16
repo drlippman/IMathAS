@@ -18,10 +18,47 @@
 	} else {
 		$editingon = false;
 	}
+	
+	if (isset($teacherid)) {
+		$stm = $DBH->prepare("SELECT iu.id,iu.LastName,iu.FirstName,istu.section,istu.latepass FROM imas_users AS iu JOIN imas_students AS istu ON istu.userid=iu.id WHERE istu.courseid=:id ORDER BY iu.LastName,iu.FirstName");
+		$stm->execute(array(':id'=>$cid));
+		$stunames = [];
+		$stulatepasses = [];
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$stunames[$row['id']] = $row['LastName'].', '.$row['FirstName'].($row['section'] != '' ? ' ('.$row['section'].')':'');
+			$stulatepasses[$row['id']] = $row['latepass'];
+		}
+	}
+
+	$viewcalasstu = false;
+	if (!$editingon && isset($teacherid)) {
+		if (isset($_GET['viewcalas'])) {
+			if ($_GET['viewcalas'] == 0) {
+				unset($_SESSION[$cid.'viewcalas']);
+			} else {
+				$userid = intval($_GET['viewcalas']);
+				if (!isset($stunames[$userid])) {
+					echo 'Error - invalid user';
+					exit;
+				}
+				$viewcalasstu = true;
+				$_SESSION[$cid.'viewcalas'] = $userid;
+			}
+		} else if (isset($_SESSION[$cid.'viewcalas'])) {
+			$userid = $_SESSION[$cid.'viewcalas'];
+			$viewcalasstu = true;
+		}
+		if ($viewcalasstu) {
+			$studentid = $userid;
+			unset($teacherid);
+		}
+	}
 
 	require_once "../includes/exceptionfuncs.php";
 
-	if (isset($studentid) && !isset($_SESSION['stuview'])) {
+	if ($viewcalasstu) {
+		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $stulatepasses[$userid], $latepasshrs);
+	} else if (isset($studentid) && !isset($_SESSION['stuview'])) {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
 	} else {
 		$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
@@ -253,18 +290,35 @@
 	</script>
 	<?php
 	} //end $editingon block
+	echo '<script>function changeviewcalas(el) {
+		window.location.href = "showcalendar.php?cid='.$cid.'&viewcalas="+el.value;
+		}</script>';
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 	echo "&gt; Calendar</div>";
 	echo '<div id="headercalendar" class="pagetitle"><h1>Calendar</h1></div>';
 
-	 if (isset($teacherid)) {
-		echo "<div class=\"cpmid\"><a id=\"mcelink\" href=\"managecalitems.php?from=cal&cid=$cid\">Manage Events</a> | ";
+	if (isset($teacherid) || $viewcalasstu) {
+		echo "<div class=\"cpmid\">";
+	}
+	if (isset($teacherid)) {
+		echo "<a id=\"mcelink\" href=\"managecalitems.php?from=cal&cid=$cid\">Manage Events</a> | ";
 		if ($editingon) {
 			echo '<a href="showcalendar.php?cid='.$cid.'&editing=off">'._('Disable Drag-and-drop Editing').'</a> ';
 		} else {
 			echo '<a href="showcalendar.php?cid='.$cid.'&editing=on">'._('Enable Drag-and-drop Editing').'</a> ';
 		}
 		//echo '<a href="exportcalfeed.php?cid='.$cid.'">'._('Export Calendar Feed').'</a>';
+		echo '<br>';
+	 }
+	 if ((isset($teacherid) || $viewcalasstu)) {
+		if (!$editingon) {
+			echo '<label>'._('View calendar as:').' <select onchange="changeviewcalas(this)">';
+			echo '<option value=0'.(!$viewcalasstu ? ' selected':'').'>'._('Instructor').'</option>';
+			foreach ($stunames as $id=>$name) {
+				echo '<option value='.$id.($userid == $id ? ' selected':'').'>'.Sanitize::encodeStringForDisplay($name).'</option>';
+			}
+			echo '</select>';
+		}
 		echo "</div>";
 	 }
 	 if ($editingon) {
@@ -294,7 +348,9 @@
 
 	 showcalendar("showcalendar");
 
-	 if (isset($studentid)) {
+	 if ($viewcalasstu) {
+		echo '<p></p><p>'._('Note: The due dates shown here are the due dates <em>for the student you are viewing as</em>, reflecting any LatePasses or exceptions that have been applied.').'</p>';		
+	 } else if (isset($studentid)) {
 		echo '<p></p><p>'._('Note: The due dates shown here are <em>your</em> due dates, reflecting any LatePasses or exceptions that have been applied.').'</p>';
 	 }
 
