@@ -12,6 +12,7 @@ A library of graph theory and scheduling functions.  Version 1.1, April 3, 2012
 <BR>  options['width'] = width of output, in pixels.  Defaults to 300.
 <BR>  options['height'] = height of output, in pixels.  Defaults to 300.
 <BR>  options['digraph'] = true/false.  If true, g[i][j] > 0 means i leads to j
+<BR>  options['arrowoffset'] = position (0-1) along edge where digraph arrow should go.
 <BR>  options['useweights'] = true/false.  If true, g[i][j] used as weight
 <BR>  options['labels'] = "letters" or array of labels.  If "letters", letters
 <BR>    A-Z used for labels.  If array, label[i] used for vertex g[i]
@@ -22,6 +23,7 @@ A library of graph theory and scheduling functions.  Version 1.1, April 3, 2012
 <BR>  options['randweights'] = max or array(min,max).  Randomizes weights of edges
 <BR>  options['randedges'] = probability (0-1).  Randomly keeps edges of original 
 <BR>    graph with given probability.
+<BR>  options['colors'] = array of colors for verticies and labels.
 <BR>  options['tree'] = true.  Creates a minimum cost spanning tree from the original graph
 <BR>  options['labelposition'] = "above","below","right","left","aboveright",etc.
 <BR>    position of vertex labels.  

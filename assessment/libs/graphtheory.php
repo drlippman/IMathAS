@@ -920,6 +920,9 @@ function graphmaketable($g,$op=array()) {
 	$table = '<table class="stats"><thead>';
 	$table .= '<tr><th></th>';
 	for ($i=0; $i<$n; $i++) {
+		if (!empty($op['colors'][$i])) {
+			$op['labels'][$i] .= ' ('._('color').' '.$op['colors'][$i].')';
+		}
 		$table .= '<th>'.$op['labels'][$i].'</th>';
 	}
 	$table .= '</tr></thead><tbody>';
@@ -1199,6 +1202,9 @@ function graphprocessoptions($g,$op) {
 //can get called with graph matrix g, g[i][j] if vertex i has edge to j
 //pos is array where pos[i] = array(x,y) positions for vertices
 function graphdrawit($pos,$g,$op) {
+	if ($_SESSION['graphdisp'] == 0) {
+		return _('Graph with this adjacency table:') . graphmaketable($g, $op);
+	}
 	if (!isset($op['width'])) {$op['width'] = 360;}
 	if (!isset($op['height'])) {$op['height'] = 300;}
 	if (!isset($op['weightoffset'])) { $op['weightoffset'] = .5; }
@@ -1227,26 +1233,24 @@ function graphdrawit($pos,$g,$op) {
 	$cy = ($op['ymin'] + $op['ymax'])/2;
 
 	$com .= "fontstyle='none';";
-	if (!empty($op['digraph'])) {
-		$com .= 'marker="arrow";';
-	} else {
-		$com .= 'marker=null;';
-	}
- 
+	 
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
+			if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
+				$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
+			}
 			if (!empty($op['digraph'])) {
-				if ((isset($g[$j][$i]) && $g[$j][$i]>0) && (!isset($g[$i][$j]) || $g[$i][$j]<=0)) {
-					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);";
-				} else if ((isset($g[$i][$j]) && $g[$i][$j]>0) && (!isset($g[$j][$i]) || $g[$j][$i]<=0)) {
-					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
-				} else if ((isset($g[$i][$j]) && $g[$i][$j]>0) && (isset($g[$j][$i]) && $g[$j][$i]>0)) {
-					$com .= "line([".$pos[$j][0].",".$pos[$j][1]."],[".$pos[$i][0].",".$pos[$i][1]."]);line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
-				}
-			} else {
-				if ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0)) {
-					$com .= "line([".$pos[$i][0].",".$pos[$i][1]."],[".$pos[$j][0].",".$pos[$j][1]."]);";
-				}
+				$offset = $op['arrowoffset'] ?? 0;
+				if (isset($g[$j][$i]) && $g[$j][$i]>0) {
+					$endx = $pos[$i][0] + $offset*($pos[$j][0] - $pos[$i][0]);
+					$endy = $pos[$i][1] + $offset*($pos[$j][1] - $pos[$i][1]);
+					$com .= "arrowhead([".$pos[$j][0].",".$pos[$j][1]."],[".$endx.",".$endy."]);";
+				} 
+				if (isset($g[$i][$j]) && $g[$i][$j]>0) {
+					$endx = $pos[$j][0] + $offset*($pos[$i][0] - $pos[$j][0]);
+					$endy = $pos[$j][1] + $offset*($pos[$i][1] - $pos[$j][1]);
+					$com .= "arrowhead([".$pos[$i][0].",".$pos[$i][1]."],[".$endx.",".$endy."]);";
+				} 
 			}
 		}
 	}
@@ -1259,12 +1263,10 @@ function graphdrawit($pos,$g,$op) {
 				if ($pos[$i][1]>$cy) { $ps = "above"; } else {$ps = "below";}
 				if ($pos[$i][0]>$cx) { $ps .= "right"; } else {$ps .= "left";}
 			}
-			if (is_array($op['labels'])) {
-				$com .= "fontfill='blue';text([".$pos[$i][0].",".$pos[$i][1]."],'".$op['labels'][$i]."','$ps');";
-			} else {
-				$com .= "fontfill='blue';text([".$pos[$i][0].",".$pos[$i][1]."],'".$lettersarray[$i]."','$ps');";
-			}
+			$com .= "fontfill='".($op['colors'][$i] ?? 'blue')."';";
+			$com .= "text([".$pos[$i][0].",".$pos[$i][1]."],'".(is_array($op['labels']) ? $op['labels'][$i] : $lettersarray[$i])."','$ps');";
 		}
+		$com .= "stroke='".($op['colors'][$i] ?? 'black')."';";
 		$com .= "dot([".$pos[$i][0].",".$pos[$i][1]."]);";
 		for ($j=$i+1; $j<$n; $j++) {
 			if (!empty($op['useweights']) && ((isset($g[$i][$j]) && $g[$i][$j]>0) || (isset($g[$j][$i]) && $g[$j][$i]>0))) {
