@@ -283,6 +283,10 @@ if ($haslogin && !$hasusername) {
         unset($loginmfaverified);
         unset($_SESSION['challenge']); //challenge is used up - forget it.
 
+        if (isset($CFG['cloudwatch_loginlog'])) {
+            require_once __DIR__.'/includes/CloudWatchLogger.php';
+            addLoginLog('login_success', $userid);
+        }
         //call hook, if defined
         if (function_exists('onLogin')) {
             onLogin();
@@ -337,6 +341,12 @@ if ($haslogin && !$hasusername) {
             }
             $stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
             $stm->execute(array(':jsondata' => json_encode($json_data), ':id' => $line['id']));
+            if (isset($CFG['cloudwatch_loginlog'])) {
+                require_once __DIR__.'/includes/CloudWatchLogger.php';
+                addLoginLog('login_failure', $line['id'], [
+                    'reason' => ($_SESSION['challenge']!=$_POST['challenge']) ? 'bad_challenge' : 'bad_pw'
+                ]);
+            }
         }
         /*  For login error tracking - requires add'l table
     if ($line==null) {

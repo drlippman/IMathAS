@@ -26,7 +26,7 @@ function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
 }
 
 function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
-    global $DBH, $imasroot;
+    global $DBH, $imasroot, $CFG;
     $error = '';
     require_once __DIR__.'/GoogleAuthenticator.php';
     $MFA = new GoogleAuthenticator();
@@ -68,6 +68,13 @@ function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
             }
             $stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
             $stm->execute(array(':uid'=>$uid, ':mfa'=>json_encode($mfadata)));
+            if (isset($CFG['cloudwatch_loginlog'])) {
+                require_once __DIR__.'/CloudWatchLogger.php';
+                addLoginLog('login_failure', $uid, [
+                    'reason' => 'bad_mfa',
+                    'mfafailcnt' => $mfadata['failcnt']
+                ]);
+            }
             if ($mfadata['failcnt'] > 3) {
                 echo _("Too many failed attempts.  Wait a minute and try again");
                 exit;

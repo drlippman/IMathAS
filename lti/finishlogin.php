@@ -78,6 +78,14 @@ if ($localuserid === false) {
         }
       } else {
         $err = _('Existing username or password is not valid');
+        if (isset($CFG['cloudwatch_loginlog'])) {
+            require_once __DIR__.'/../includes/CloudWatchLogger.php';
+            addLoginLog('login_failure', $tmpuserid, [
+                'reason' => 'bad_pw',
+                'via' => 'LTI1.3',
+                'ltiuser' => [$ltiuserid, $platform_id]
+            ]);
+        }
         unset($tmpuserid);
       }
     }
@@ -164,7 +172,18 @@ if ($localuserid === false) {
 
 // We have a local userid, so log them in.
 if (isset($_SESSION['userid']) && $_SESSION['userid'] != $localuserid) {
-    $_SESSION = [];
+  // had existing session, but doesn't match connection userid, so reset session
+  $_SESSION = [];
+} 
+if (!isset($_SESSION['userid'])) {
+  // new login
+  if (isset($CFG['cloudwatch_loginlog'])) {
+      require_once __DIR__.'/../includes/CloudWatchLogger.php';
+      addLoginLog('login_success', $localuserid, [
+          'via' => 'LTI1.3',
+          'ltiuser' => [$ltiuserid, $platform_id]
+      ]);
+  }
 }
 $_SESSION['lti_user_id'] = $ltiuserid;
 $_SESSION['userid'] = $localuserid;

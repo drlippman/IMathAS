@@ -12,7 +12,7 @@ IMathAS powers MyOpenMath.com, WAMAP.org, Lumen OHM, XYZhomework, and others.
 
 ### Requirements
 IMathAS is designed for simple installation with minimal requirements.  The system
-requires PHP 7.4+, and MySQL 5.6+.  PHP has the following recommended or required extensions:
+requires PHP 7.4+, and MySQL 5.7+.  PHP has the following recommended or required extensions:
 - mbstring (required)
 - pdo_mysql (required)
 - gettext (required)
@@ -123,6 +123,9 @@ to the new assessment interface.
 - `$CFG['newrelic_log_question_errors']`: Enable to log question errors to newrelic, if extension is installed
 - `$CFG['GEN']['sessionmaxlife']`: Overrides session.gc_maxlifetime.
 - `$CFG['GEN']['gc_divisor']`: Overrides session.gc_divisor.
+- `$CFG['cloudwatch_loginlog']`: Enable login logging to AWS Cloudwatch.  Set to array with keys 
+    `region, logGroup, logStream, accessKey, secretKey`. See `includes/CloudWatchLogger.php` for details on 
+    Cloudwatch setup.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.

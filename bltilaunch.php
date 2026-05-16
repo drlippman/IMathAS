@@ -310,6 +310,14 @@ if (isset($_GET['launch'])) {
                         $userid= $tmpuserid;
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
+						if (isset($CFG['cloudwatch_loginlog'])) {
+							require_once __DIR__.'/includes/CloudWatchLogger.php';
+							addLoginLog('login_failure', $tmpuserid, [
+								'reason' => 'bad_pw',
+								'via' => 'LTI1.1',
+								'ltiuser' => [$ltiuserid, $_SESSION['lti_key']]
+							]);
+						}
 						unset($tmpuserid);
 					}
 				}
@@ -1727,6 +1735,15 @@ $_SESSION['ltiuserid'] = $SESS['ltiuserid'];
 $_SESSION['userid'] = $userid;
 $_SESSION['time'] = $now;
 $_SESSION['started'] = $now;
+if ($createnewsession) {
+	if (isset($CFG['cloudwatch_loginlog'])) {
+		require_once __DIR__.'/includes/CloudWatchLogger.php';
+		addLoginLog('login_success', $userid, [
+			'via' => 'LTI1.1',
+			'ltiuser' => [$_SESSION['ltiuserid'], $_SESSION['lti_key']]
+		]);
+	}
+}
 
 if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwrds != '')) {
 
@@ -1957,6 +1974,14 @@ if (isset($_GET['launch'])) {
                         }
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
+						if (isset($CFG['cloudwatch_loginlog'])) {
+							require_once __DIR__.'/includes/CloudWatchLogger.php';
+							addLoginLog('login_failure', $queryuserid, [
+								'reason' => 'bad_pw',
+								'via' => 'LTI1.1',
+								'ltiuser' => [$ltiuserid, $_SESSION['lti_key']]
+							]);
+						}
 					}
 				}
 			} else {
@@ -2983,6 +3008,15 @@ $_SESSION['ltiuserid'] = $SESS['ltiuserid'];
 $_SESSION['userid'] = $userid;
 $_SESSION['time'] = $now;
 $_SESSION['started'] = $now;
+if ($createnewsession) {
+	if (isset($CFG['cloudwatch_loginlog'])) {
+		require_once __DIR__.'/includes/CloudWatchLogger.php';
+		addLoginLog('login_success', $userid, [
+			'via' => 'LTI1.1',
+			'ltiuser' => [$_SESSION['ltiuserid'], $_SESSION['lti_key']]
+		]);
+	}
+}
 
 if ($_SESSION['lti_keytype']=='cc-vf' || (!$promptforsettings && !$createnewsession && !($keyparts[0]=='aid' && $tlwrds != ''))) {
 	//redirect now if already have session and no timelimit
