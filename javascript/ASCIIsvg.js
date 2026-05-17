@@ -750,9 +750,27 @@ function textabs(p,st,pos,angle,id,fontsty) {
     node = myCreateElementSVG("text");
     if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
-    node.appendChild(doc.createTextNode(st));
+  } else {
+    node.replaceChildren();
   }
-  node.lastChild.nodeValue = st;
+  st = st.replace(/[₀-₉]/g, function(ch) {return '<sub>'+(ch.codePointAt(0) - 0x2080)+'</sub>'});
+  st = st.replace(/<\/sub><sub>/g,'');
+  var parts = st.split(/(<sub>.*?<\/sub>)/i);
+  var subMatch;
+  var part;
+  for (part of parts) {
+      subMatch = part.match(/^<sub>(.*?)<\/sub>$/i);
+      if (subMatch) {
+          var tspan = myCreateElementSVG("tspan");
+          tspan.setAttribute("baseline-shift", "sub");
+          tspan.setAttribute("font-size", "0.7em");
+          tspan.appendChild(doc.createTextNode(subMatch[1]));
+          node.appendChild(tspan);
+      } else if (part !== "") {
+          node.appendChild(doc.createTextNode(part));
+      }
+  }
+  
   node.setAttribute("x",p[0]+dx);
   node.setAttribute("y",height-p[1]+dy);
   if (angle != 0) {
