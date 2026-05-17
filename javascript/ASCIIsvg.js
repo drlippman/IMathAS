@@ -753,7 +753,7 @@ function textabs(p,st,pos,angle,id,fontsty) {
   } else {
     node.replaceChildren();
   }
-  st = st.replace(/[₀-₉]/g, function(ch) {return '<sub>'+(ch.codePointAt(0) - 0x2080)+'</sub>'});
+  st = st.toString().replace(/[₀-₉]/g, function(ch) {return '<sub>'+(ch.codePointAt(0) - 0x2080)+'</sub>'});
   st = st.replace(/<\/sub><sub>/g,'');
   var parts = st.split(/(<sub>.*?<\/sub>)/i);
   var subMatch;
