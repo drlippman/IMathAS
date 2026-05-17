@@ -153,7 +153,11 @@ class LTI_Grade_Update {
         return false;
     }
     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-    curl_close ($ch);
+    if (PHP_VERSION_ID >= 80000) {
+			unset($ch);
+		} else {
+			curl_close($ch);
+		};
 
     $resp_headers = substr($response, 0, $header_size);
     $resp_body = substr($response, $header_size);
@@ -276,7 +280,11 @@ class LTI_Grade_Update {
     $resp = curl_exec($ch);
     $token_data = json_decode($resp, true);
     $error = curl_error($ch);
-    curl_close ($ch);
+    if (PHP_VERSION_ID >= 80000) {
+			unset($ch);
+		} else {
+			curl_close($ch);
+		};
 
     if (!empty($token_data['access_token']) && !empty($token_data['expires_in'])) {
       $this->store_access_token($platform_id, $token_data);

@@ -77,7 +77,11 @@ class LTI_Service_Connector {
         $resp = curl_exec($ch);
         $error = curl_error($ch);
         $token_data = json_decode($resp, true);
-        curl_close ($ch);
+        if (PHP_VERSION_ID >= 80000) {
+          unset($ch);
+        } else {
+          curl_close($ch);
+        };
 
         if (isset($token_data['access_token'])) {
 
@@ -137,7 +141,11 @@ class LTI_Service_Connector {
             return false;
         }
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        curl_close ($ch);
+        if (PHP_VERSION_ID >= 80000) {
+          unset($ch);
+        } else {
+          curl_close($ch);
+        };
 
         $resp_headers = substr($response, 0, $header_size);
         $resp_body = substr($response, $header_size);

@@ -132,7 +132,11 @@ function get_FCM_token() {
 		return false;
 	}
 	$token_data = json_decode($resp, true);
-	curl_close ($ch);
+	if (PHP_VERSION_ID >= 80000) {
+		unset($ch);
+	} else {
+		curl_close($ch);
+	};
 
 	if ($token_data === null || !isset($token_data['access_token'])) {
 		return $false;
