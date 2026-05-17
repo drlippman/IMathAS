@@ -63,7 +63,11 @@ function sendFCM2($token,$title,$body,$url='') {
 		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
 	
 		$result = curl_exec($ch);
-        curl_close($ch);
+        if (PHP_VERSION_ID >= 80000) {
+			unset($ch);
+		} else {
+			curl_close($ch);
+		};
 
         if ($result !== FALSE) {
 			return true;

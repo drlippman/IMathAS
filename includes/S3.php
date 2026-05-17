@@ -2486,7 +2486,11 @@ final class S3Request
 				'resource' => $this->resource
 			);
 
-		@curl_close($curl);
+		if (PHP_VERSION_ID >= 80000) {
+			unset($curl);
+		} else {
+			@curl_close($curl);
+		};
 
 		// Parse body into XML
 		if ($this->response->error === false && isset($this->response->headers['type']) &&

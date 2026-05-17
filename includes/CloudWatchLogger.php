@@ -175,6 +175,9 @@ class CloudWatchLogger
         }
  
         // Check HTTP status
+        if (function_exists('http_get_last_response_headers')) {
+            $http_response_header = http_get_last_response_headers(); // PHP 8.4+
+        }
         $statusLine = $http_response_header[0] ?? '';
         if (!preg_match('/\s(2\d{2})\s/', $statusLine, $m)) {
             throw new RuntimeException(

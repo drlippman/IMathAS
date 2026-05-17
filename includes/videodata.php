@@ -66,6 +66,9 @@ function getCaptionDataByVidId($vidid) {
         $ctx = stream_context_create(array('http'=>array('timeout' => 1)));
         $resp = @file_get_contents('https://youtube.googleapis.com/youtube/v3/captions?part=snippet&videoId='.Sanitize::encodeUrlParam($vidid).'&key='.Sanitize::encodeUrlParam($CFG['YouTubeAPIKey']), false, $ctx);
         if ($resp === false) {
+            if (function_exists('http_get_last_response_headers')) {
+                $http_response_header = http_get_last_response_headers(); // PHP 8.4+
+            }
             $code = explode(' ', $http_response_header[0])[1];
             if ($code == '404') {
                 $query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES (?,0,3,?) ";

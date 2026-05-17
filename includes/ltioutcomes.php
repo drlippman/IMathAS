@@ -397,7 +397,11 @@ function sendXmlOverPost($url, $xml, $header) {
 
   // Send to remote and return data to caller.
   $result = curl_exec($ch);
-  curl_close($ch);
+  if (PHP_VERSION_ID >= 80000) {
+     unset($ch);
+  } else {
+	curl_close($ch);
+  };
   return $result;
 }
 
@@ -451,11 +455,15 @@ function newXMLoverPost($url, $request, $requestHeaders, $method = 'POST') {
 				echo htmlentities(curl_error());
 			}*/
 		} else {
-      if (curl_errno($ch)) {
-        $resp = curl_error($ch);
-      }
-    }
-		curl_close($ch);
+			if (curl_errno($ch)) {
+				$resp = curl_error($ch);
+			}
+		}
+		if (PHP_VERSION_ID >= 80000) {
+			unset($ch);
+		} else {
+			curl_close($ch);
+		};
 	} else {
 		// Try using fopen if curl was not available
 		$opts = array('method' => $method,

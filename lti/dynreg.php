@@ -118,7 +118,11 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
 $result = curl_exec($ch); // Execute the cURL statement
-curl_close($ch); // Close the cURL connection
+if (PHP_VERSION_ID >= 80000) {
+    unset($ch);
+} else {
+    curl_close($ch);
+}; // Close the cURL connection
 
 // Get the client_id from the registration result
 $regdata = json_decode($result, true); // Return the received data
