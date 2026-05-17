@@ -50,7 +50,6 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
         $temp = imagecreatetruecolor( (int) $tmpw, (int) $th );
         imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
         imagecopyresampled( $imT, $temp, 0, 0, (int) round($tmpw/2-$tw/2),0, $tw, $th, $tw, $th ); // crop
-        imagedestroy( $temp );
     }else
     { // taller
         /* crops
@@ -59,7 +58,6 @@ function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
         $temp = imagecreatetruecolor( $tw, $tmph );
         imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tw, $tmph, $w, $h ); // resize to height
         imagecopyresampled( $imT, $temp, 0, 0, 0, $tmph/2-$th/2, $tw, $th, $tw, $th ); // crop
-	imagedestroy( $temp );
 	*/
 	//nocrop version
 	$tmpw = round($w*($th/$h));

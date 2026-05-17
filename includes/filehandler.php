@@ -302,7 +302,6 @@ function downsizeimage($fileinfo) {
 				}
 				$dst = imagecreatetruecolor($neww, $newh);
 				imagecopyresampled($dst, $image, 0, 0, 0, 0, $neww, $newh, $imgdata[0], $imgdata[1]);
-				imagedestroy($image);
                 $changed = true;
 			} else {
 				$dst = imagecreatefromjpeg($fileinfo['tmp_name']);
@@ -325,7 +324,6 @@ function downsizeimage($fileinfo) {
 			}
             if ($changed) {
 			    imagejpeg($dst, $fileinfo['tmp_name'], 90);
-			    imagedestroy($dst);
             }
 		}
 	}
