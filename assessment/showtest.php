@@ -189,7 +189,7 @@
 			$query .= "WHERE ia.id=:assessmentid";
 			$bestscores_stm = $DBH->prepare($query);
 			$bestscores_stm->execute(array(':assessmentid'=>$adata['reqscoreaid'], ':userid'=>$userid));
-			list($prereqscore,$reqscoreptsposs,$reqscorename) = $bestscores_stm->fetch(PDO::FETCH_NUM);
+			list($prereqscore,$reqscoreptsposs,$reqscorename) = $bestscores_stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 
 			if ($prereqscore === null) {
 				$isBlocked = true;

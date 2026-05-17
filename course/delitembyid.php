@@ -11,7 +11,7 @@ function delitembyid($itemid) {
 	global $DBH, $cid;
 	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id AND courseid=:courseid");
 	$stm->execute(array(':id'=>$itemid, ':courseid'=>$cid));
-	list($itemtype,$typeid) = $stm->fetch(PDO::FETCH_NUM);
+	list($itemtype,$typeid) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
 	if (empty($itemtype)) {
 		echo 'Invalid ID';
 		exit;
@@ -56,14 +56,14 @@ function delitembyid($itemid) {
 		$stm->execute(array(':id'=>$typeid));
 		list($itemname,$text,$points,$fileid) = $stm->fetch(PDO::FETCH_NUM);
 		TeacherAuditLog::addTracking(
-      $cid,
-      "Delete Item",
-      $typeid,
-      array(
-        'item_type'=>$itemtype,
-        'item_name'=>$itemname
-      )
-    );
+			$cid,
+			"Delete Item",
+			$typeid,
+			array(
+				'item_type'=>$itemtype,
+				'item_name'=>$itemname
+			)
+		);
 		if ($fileid > 0) { // has file id - can use that approach
 			$stm = $DBH->prepare("SELECT count(id) FROM imas_linkedtext WHERE fileid=?");
 			$stm->execute(array($fileid));

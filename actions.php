@@ -304,7 +304,7 @@ require_once "includes/sanitize.php";
 			$query = "SELECT id,email,rights,jsondata FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':sid'=>$_POST['username']));
-			list($id,$email,$rights,$jsondata) = $stm->fetch(PDO::FETCH_NUM);
+			list($id,$email,$rights,$jsondata) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null,null];
 			if ($id !== null) {
                 $jsondata = json_decode($jsondata,true);
 				if (isset($jsondata['lastemail']) && time() - $jsondata['lastemail'] < 60) {

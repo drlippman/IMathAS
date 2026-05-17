@@ -648,7 +648,7 @@ class AssessInfo
 			$query .= "WHERE ia.id=?";
       $stm = $this->DBH->prepare($query);
       $stm->execute(array($uid, $this->assessData['reqscoreaid']));
-      list($prereqscore,$reqscoreptsposs,$prereqname) = $stm->fetch(PDO::FETCH_NUM);
+      list($prereqscore,$reqscoreptsposs,$prereqname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
       if ($prereqscore === null) {
 				$isBlocked = true;
 			} else {

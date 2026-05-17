@@ -59,7 +59,7 @@ if ($cid==0) {
 				$groupid = intval($_GET['grp']);
 				$stm = $DBH->prepare("SELECT ig.name,igs.name AS igsname FROM imas_stugroups AS ig JOIN imas_stugroupset AS igs ON ig.groupsetid=igs.id WHERE ig.id=:id AND igs.courseid=:cid");
 				$stm->execute(array(':id'=>$groupid, ':cid'=>$cid));
-                list($groupname, $groupsetname) = $stm->fetch(PDO::FETCH_NUM);
+                list($groupname, $groupsetname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
 				if ($groupname === null) {
 					echo 'Invalid group id';
 					exit;

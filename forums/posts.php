@@ -48,11 +48,13 @@ $query = "SELECT ifs.settings,ifs.replyby,ifs.defdisplay,ifs.name,ifs.points,ifs
 $query .= "FROM imas_forums AS ifs JOIN imas_forum_threads AS ift ON ifs.id=ift.forumid LEFT JOIN imas_stugroupset AS igs ON igs.id=ifs.groupsetid WHERE ifs.id=:id AND ift.id=:threadid AND ifs.courseid=:cid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$forumid, ':threadid'=>$threadid, ':cid'=>$cid));
-list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $groupsetname, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore, $forumcourseid, $threadforum) = $stm->fetch(PDO::FETCH_NUM);
-if ($forumsettings === null) {
+$row = $stm->fetch(PDO::FETCH_NUM);
+if ($row === false) {
 	echo "Invalid forum ID or thread ID";
 	exit;
 }
+list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupsetid, $groupsetname, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate, $autoscore, $forumcourseid, $threadforum) = $row;
+
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";
 	exit;

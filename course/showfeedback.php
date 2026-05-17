@@ -30,7 +30,7 @@ if ($type=='A') {
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 
-	list($aname, $aid,$origfeedback) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname, $aid,$origfeedback) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 	if ($aname === false || $aname === null) {
 		echo 'Invalid aid';
 		exit;
@@ -74,7 +74,7 @@ if ($type=='A') {
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($id, $uid, $cid));
 
-	list($aname, $submitby, $deffb, $scoreddata) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname, $submitby, $deffb, $scoreddata) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null,null];
 	if ($aname === false || $aname === null) {
 		echo 'Invalid aid';
 		exit;
@@ -158,7 +158,7 @@ if ($type=='A') {
 	$stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 
-	list($aname, $typeid, $feedback) = $stm->fetch(PDO::FETCH_NUM);
+	list($aname, $typeid, $feedback) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 	if ($aname === false || $aname === null) {
 		echo 'Invalid aid';
 		exit;

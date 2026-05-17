@@ -25,7 +25,7 @@
 	$istutor = isset($tutorid);
 	$stm = $DBH->prepare("SELECT text,title,target FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$linkedtextid, ':cid'=>$cid));
-	list($text,$title,$target) = $stm->fetch(PDO::FETCH_NUM);
+	list($text,$title,$target) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 	if ($text === null) {
 		echo "Invalid ID";
 		exit;

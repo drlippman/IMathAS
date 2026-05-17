@@ -23,11 +23,13 @@
 
 	$stm = $DBH->prepare("SELECT settings,replyby,defdisplay,name,points,rubric,tutoredit, groupsetid,autoscore FROM imas_forums WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$forumid, ':cid'=>$cid));
-	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid,$autoscore) = $stm->fetch(PDO::FETCH_NUM);
-	if ($forumsettings === null) {
+	$row = $stm->fetch(PDO::FETCH_NUM);
+	if ($row === false) {
 		echo 'Invalid forum';
 		exit;
 	}
+	list($forumsettings, $replyby, $defdisplay, $forumname, $pointspos, $rubric, $tutoredit, $groupsetid,$autoscore) = $row;
+	
 
 	if (isset($_GET['markallread'])) {
 		$stm = $DBH->prepare("SELECT DISTINCT threadid FROM imas_forum_posts WHERE forumid=:forumid");

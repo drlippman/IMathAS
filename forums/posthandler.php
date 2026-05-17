@@ -386,7 +386,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id=:id AND ifp.forumid=:fid";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>$_GET['replyto'], ':fid'=>$forumid));
-				list($sub,$points) = $stm->fetch(PDO::FETCH_NUM);
+				list($sub,$points) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
 				if ($sub === null) {
 					echo 'Invalid reply id';
 					exit;
@@ -772,7 +772,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			require_once "../includes/filehandler.php";
 			$stm = $DBH->prepare("SELECT parent,files,userid FROM imas_forum_posts WHERE id=:id AND forumid=:fid");
 			$stm->execute(array(':id'=>$toremove, ':fid'=>$forumid));
-			list($parent,$files,$postowner) = $stm->fetch(PDO::FETCH_NUM);
+			list($parent,$files,$postowner) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 			if ($parent === null || (!$isteacher && $postowner !== $userid)) {
 				echo 'Invalid post';
 				exit;

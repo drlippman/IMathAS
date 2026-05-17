@@ -56,7 +56,7 @@ if (isset($_POST['mergefrom'])) {
 	for ($i=0;$i<count($seta);$i++) {
 		$stm = $DBH->prepare("SELECT itemorder,intro,name,defpoints FROM imas_assessments WHERE id=:id AND courseid=:cid");
 		$stm->execute(array(':id'=>$seta[$i], ':cid'=>$cid));
-		list($itemorder, $curintro, $thisname, $thisdefpoints) = $stm->fetch(PDO::FETCH_NUM);
+		list($itemorder, $curintro, $thisname, $thisdefpoints) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null,null];
 		if (empty($itemorder)) {
 			continue;
 		}

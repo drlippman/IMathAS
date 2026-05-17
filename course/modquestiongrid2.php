@@ -15,7 +15,7 @@
 		if (isset($_POST['add'])) { //adding new questions
 			$stm = $DBH->prepare("SELECT itemorder,viddata,defpoints FROM imas_assessments WHERE id=:id AND courseid=:cid");
 			$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-			list($itemorder, $viddata, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+			list($itemorder, $viddata, $defpoints) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 			if ($itemorder === null || $itemorder === false) {
 				echo 'Invalid aid';
 				exit;
@@ -101,7 +101,7 @@
 		} else if (isset($_POST['mod'])) { //modifying existing
 			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id AND courseid=:cid");
 			$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
 			if ($itemorder === null || $itemorder === false) {
 				echo 'Invalid aid';
 				exit;

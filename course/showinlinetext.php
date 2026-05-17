@@ -22,7 +22,7 @@
 		
 	$stm = $DBH->prepare("SELECT text,title,fileorder FROM imas_inlinetext WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$inlinetextid, ':cid'=>$cid));
-	list($text,$title,$fileorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($text,$title,$fileorder) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 	if ($text === null || $text === false) {
 		echo "Invalid ID";
 		exit;

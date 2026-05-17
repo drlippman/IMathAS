@@ -33,7 +33,12 @@ $query = "SELECT f.name,f.postby,f.replyby,f.settings,f.groupsetid,igs.name AS i
     FROM imas_forums AS f LEFT JOIN imas_stugroupset AS igs ON igs.id=f.groupsetid WHERE f.id=:id";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':id'=>$forumid));
-list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $groupsetname, $sortby, $taglist, $enddate, $avail, $description, $postinstr,$replyinstr, $allowlate, $autoscore, $forumcourseid) = $stm->fetch(PDO::FETCH_NUM);
+$row = $stm->fetch(PDO::FETCH_NUM);
+if ($row === false) {
+	echo "Invalid forum ID";
+	exit;
+}
+list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $groupsetname, $sortby, $taglist, $enddate, $avail, $description, $postinstr,$replyinstr, $allowlate, $autoscore, $forumcourseid) = $row;
 
 if ($forumcourseid != $cid) {
 	echo "Invalid forum ID";

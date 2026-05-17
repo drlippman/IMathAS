@@ -12,7 +12,7 @@ if (!isset($teacher) && !isset($tutorid) && !isset($studentid)) {
 $linkid = Sanitize::onlyInt($_GET['linkid']);
 $stm = $DBH->prepare("SELECT text,title,points FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
 $stm->execute(array(':id'=>$linkid, ':cid'=>$cid));
-list($text,$title,$points) = $stm->fetch(PDO::FETCH_NUM);
+list($text,$title,$points) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 if ($text === null) {
 	echo 'Invalid linkid';
 	exit;

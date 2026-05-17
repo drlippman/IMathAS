@@ -18,7 +18,7 @@ if ($cid==0) {
 
 $stm = $DBH->prepare("SELECT ic.name,ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=?");
 $stm->execute(array($cid));
-list($coursename, $courseownerid, $coursegroupid) = $stm->fetch(PDO::FETCH_NUM);
+list($coursename, $courseownerid, $coursegroupid) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];;
 
 if (!($myrights==100 || ($myrights>=75 && $coursegroupid==$groupid) || $courseownerid==$userid)) {
 	echo "Not authorized to transfer ownership of this course.";

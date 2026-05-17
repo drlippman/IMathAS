@@ -69,7 +69,7 @@ switch($_GET['action']) {
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
 		$stm = $DBH->prepare("SELECT ic.name,ic.ownerid,iu.groupid FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ic.id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
-		list($name,$courseowner,$coursegroup) = $stm->fetch(PDO::FETCH_NUM);
+		list($name,$courseowner,$coursegroup) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 		if (empty($courseowner) ||
 			($myrights < 75 && $courseowner !== $userid) ||
 			($myrights < 100 && $coursegroup !== $groupid)

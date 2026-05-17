@@ -129,7 +129,7 @@ if ($cid==0) {
 			$query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':userid'=>$userid, ':groupsetid'=>$groupsetid));
-			list($groupid, $curgroupname) = $stm->fetch(PDO::FETCH_NUM);
+			list($groupid, $curgroupname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
 			if ($groupid === null) {
 				$overwriteBody=1;
 				$body = "You need to be a member of a group before you can view or edit this wiki";

@@ -339,7 +339,7 @@ class Imathas_LTI_Database implements LTI\Database
 
         $stm = $this->dbh->prepare($query);
         $stm->execute(array($ltiuserid, 'LTI13-' . $platform_id));
-        list($userid,$lastname,$refid) = $stm->fetch(PDO::FETCH_NUM);
+        list($userid,$lastname,$refid) = $stm->fetch(PDO::FETCH_NUM) ?: [false,null,null];
 
         if ($userid === null) {
             $userid = false;

@@ -40,7 +40,7 @@
 		$page_newaccounterror = checkNewUserValidation();
 		$stm = $DBH->prepare("SELECT enrollkey,deflatepass,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['cid']));
-        list($enrollkey,$deflatepass,$allowunenroll,$msgset) = $stm->fetch(PDO::FETCH_NUM);
+        list($enrollkey,$deflatepass,$allowunenroll,$msgset) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null,null];
         if ($enrollkey === null) {
             $page_newaccounterror .= _('Invalid course ID');
 		} else if (($allowunenroll&2)==2) {
@@ -136,7 +136,7 @@
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
 			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass,allowunenroll,msgset FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['cid']));
-			list($coursename,$enrollkey,$deflatepass,$allowunenroll,$msgset) = $stm->fetch(PDO::FETCH_NUM);
+			list($coursename,$enrollkey,$deflatepass,$allowunenroll,$msgset) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null,null,null];
             if ($enrollkey === null) {
 				echo "Invalid course ID";
 				exit;
@@ -210,7 +210,7 @@
 		}
 		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll FROM imas_courses WHERE id=:id");
         $stm->execute(array(':id'=>$cid));
-        list($enrollkey,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM);
+        list($enrollkey,$allowunenroll) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
         if ($enrollkey === null) {
             echo "Invalid course ID";
 			exit;

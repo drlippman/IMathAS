@@ -97,7 +97,7 @@
 		//$addtime = $latepasshrs*60*60;
 		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,LPcutoff FROM imas_assessments WHERE id=:id AND courseid=:cid");
 		$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-		list($allowlate,$enddate,$startdate,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM);
+		list($allowlate,$enddate,$startdate,$LPcutoff) =$stm->fetch(PDO::FETCH_NUM) ?: [null,null,null,null];
 		if ($enddate === null || $enddate === false) {
 			echo 'Invalid aid';
 			exit;
@@ -189,7 +189,7 @@
 		//echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 		$stm = $DBH->prepare("SELECT allowlate,enddate,startdate,timelimit,LPcutoff,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
 		$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-		list($allowlate,$enddate,$startdate,$timelimit,$LPcutoff,$aVer) =$stm->fetch(PDO::FETCH_NUM);
+		list($allowlate,$enddate,$startdate,$timelimit,$LPcutoff,$aVer) =$stm->fetch(PDO::FETCH_NUM) ?: [null,null,null,null,null,null];
 		if ($enddate === null || $enddate === false) {
 			echo 'Invalid aid';
 			exit;

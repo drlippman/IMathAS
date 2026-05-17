@@ -118,7 +118,7 @@ if (!(isset($teacherid))) {
 		if (isset($_GET['qsetid'])) { //new - adding
 			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id AND courseid=:cid");
 			$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
-			list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM);
+			list($itemorder,$defpoints) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
 			if ($itemorder === null || $itemorder === false) {
 				echo 'Invalid aid';
 				exit;

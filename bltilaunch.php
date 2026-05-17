@@ -170,7 +170,7 @@ if (isset($_GET['launch'])) {
 		$aid = $_SESSION['ltiitemid'];
 		$stm = $DBH->prepare('SELECT courseid,ver FROM imas_assessments WHERE id=:aid');
 		$stm->execute(array(':aid'=>$aid));
-		list($cid,$aver) = $stm->fetch(PDO::FETCH_NUM);
+		list($cid,$aver) = $stm->fetch(PDO::FETCH_NUM) ?: [false,null];
 		if ($cid===false) {
 			$diaginfo = "(Debug info: 1-$aid)";
 			reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
@@ -899,7 +899,7 @@ if ($stm->rowCount()==0) {
 				}
 				$stm = $DBH->prepare('SELECT jsondata,UIver FROM imas_courses WHERE id=:aidsourcecid');
 				$stm->execute(array(':aidsourcecid'=>$aidsourcecid));
-				list($aidsourcejsondata,$sourceUIver) = $stm->fetch(PDO::FETCH_NUM);
+				list($aidsourcejsondata,$sourceUIver) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
                 if ($aidsourcejsondata!==null) {
 				    $aidsourcejsondata = json_decode($aidsourcejsondata, true);
                 }
@@ -1827,7 +1827,7 @@ if (isset($_GET['launch'])) {
 		$aid = $_SESSION['ltiitemid'];
 		$stm = $DBH->prepare("SELECT courseid,ver FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
-		list($cid, $aver) = $stm->fetch(PDO::FETCH_NUM);
+		list($cid, $aver) = $stm->fetch(PDO::FETCH_NUM) ?: [false,null];
 		if ($cid===false) {
 			$diaginfo = "(Debug info: 4-$aid)";
 			reporterror(_("This assignment does not appear to exist anymore.")." $diaginfo");
