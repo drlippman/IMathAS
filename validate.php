@@ -343,9 +343,14 @@ if ($haslogin && !$hasusername) {
             $stm->execute(array(':jsondata' => json_encode($json_data), ':id' => $line['id']));
             if (isset($CFG['cloudwatch_loginlog'])) {
                 require_once __DIR__.'/includes/CloudWatchLogger.php';
-                addLoginLog('login_failure', $line['id'], [
-                    'reason' => ($_SESSION['challenge']!=$_POST['challenge']) ? 'bad_challenge' : 'bad_pw'
-                ]);
+                if ($badsession) {
+                    $reason = 'bad_session';
+                } else if ($_SESSION['challenge']!=$_POST['challenge']) {
+                    $reason = 'bad_challenge';
+                } else {
+                    $reason = 'bad_pw';
+                }
+                addLoginLog('login_failure', $line['id'], ['reason' => $reason]);
             }
         }
         /*  For login error tracking - requires add'l table

@@ -205,9 +205,9 @@ if (isset($_POST['options'])) {
 
             if ($dobca) {
                 $correctAns = $question_object['jsparams']['ans'];
-                $stuAns = $question_object['jsparams']['stuans'];
+                $stuAns = $question_object['jsparams']['stuans'] ?? '';
             } else if ($doba || $dobaraw) {
-                $stuAns = $stuanswers[$qn+1];
+                $stuAns = $stuanswers[$qn+1] ?? '';
             }
 
             $qscore = array();

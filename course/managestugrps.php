@@ -324,7 +324,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
 				WHERE grp.id=:id");
 			$stm->execute(array(':id'=>$delgrp));
-			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
+			if ($page_grpname === null) {
+				echo 'Invalid group';
+				exit;
+			}
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Delete Group";
 	} else if (isset($_GET['addrandgrps'])) {
@@ -412,7 +416,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
 				WHERE grp.id=:id");
 			$stm->execute(array(':id'=>$renGrp));
-			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
+			if ($page_grpname === null) {
+				echo 'Invalid group';
+				exit;
+			}
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Rename Group";
 	} else if (isset($_GET['removeall'])) {
@@ -430,7 +438,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
 				WHERE grp.id=:id");
 			$stm->execute(array(':id'=>$removeall));
-			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
+			if ($page_grpname === null) {
+				echo 'Invalid group';
+				exit;
+			}
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove all group members";
 
@@ -454,7 +466,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
 				WHERE grp.id=:id");
 			$stm->execute(array(':id'=>$remove));
-			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM);
+			list($page_grpname,$page_grpsetname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null];
+			if ($page_grpname === null) {
+				echo 'Invalid group';
+				exit;
+			}
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Remove group member";
 
