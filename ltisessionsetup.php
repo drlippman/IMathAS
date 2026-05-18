@@ -10,7 +10,7 @@ if ($_SERVER['HTTP_HOST'] != 'localhost') {
 	}
 }
 session_start();
-$redir = Sanitize::url($_GET['redirect_url']);
+$redir = Sanitize::url($_GET['redirect_url'] ?? '#');
 ?>
 <!DOCTYPE html>
 <html>

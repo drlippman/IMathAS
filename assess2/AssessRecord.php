@@ -4051,7 +4051,11 @@ class AssessRecord
       }
       for ($tn = 0; $tn < count($parttrydata); $tn++) {
         if ($qtype == 'choices') {
-          $out[$pn][] = $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']] ?? $parttrydata[$tn]['stuans'];
+          if (isset($parttrydata[$tn]['stuans']) && isset($GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']])) {
+            $out[$pn][] = $GLOBALS['choicesdata'][$partref][$parttrydata[$tn]['stuans']] ?? '';
+          } else {
+            $out[$pn][] = $parttrydata[$tn]['stuans'] ?? '';
+          }
         } else if ($qtype == 'multans') {
           $pts = explode('|',$parttrydata[$tn]['stuans'] ?? '');
           $outstr = '';
