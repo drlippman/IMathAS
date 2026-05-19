@@ -1484,7 +1484,7 @@ function randID() {
 }
 
 function setupToggler(base) {
-	$(base).find("*[data-toggler]:not(.togglerinit)").each(function() {
+	$(base).find("*[data-toggler]:not(.togglerinit)").not("#curqtbl *").each(function() {
 		var id = $(this).attr("id") || randID();
 		if ($(this).prop('tagName') === 'IFRAME') {
 			$(this).css("display", "block");
