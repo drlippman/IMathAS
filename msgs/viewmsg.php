@@ -81,7 +81,7 @@
 
 
 	$msgid = Sanitize::onlyInt($_GET['msgid']);
-	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg,imas_students.section ";
+	$query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg,imas_students.section,imas_students.id as stuid ";
 	if ($type=='sent') {
 		$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_msgs.msgto=imas_users.id ";
 	} else {
@@ -269,6 +269,19 @@
 	if ($type!='sent' && $type!='allstu' && $line['viewed']==0) {
 		$stm = $DBH->prepare("UPDATE imas_msgs SET viewed=1 WHERE id=:id AND msgto=:msgto");
 		$stm->execute(array(':id'=>$msgid, ':msgto'=>$userid));
+	}
+	if ($type!='sent' && $type!='allstu' && 
+		(($cid > 0 && isset($studentid)) || ($cid == 0 && !$isteacher)) &&
+		(($msgmonitor&1) == 1 || $line['stuid'] == null)	
+	) {
+		// regular view and probably a student
+		$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+		$query .= "(:userid, :courseid, :type, :typeid, :viewtime)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$line['courseid'],
+			':type'=>'msgview',
+			':typeid'=>$msgid, ':viewtime'=>time()
+		));
 	}
 	echo '<p>&nbsp;</p>';
 	require_once "../footer.php";
