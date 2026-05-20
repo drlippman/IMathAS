@@ -33,7 +33,7 @@ if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
     $addq = 'addquestions';
     $from = 'addq';
 }
-$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id AND courseid=:cid");
+$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro,displaymethod FROM imas_assessments WHERE id=:id AND courseid=:cid");
 $stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 $line = $stm->fetch(PDO::FETCH_ASSOC);
 if ($line === false) {
@@ -75,11 +75,9 @@ function getQuestions($line) {
 		}
 	}
 
-	$introjson = json_decode($line['intro'], true);
     $pagebreaks = [];
-    if ($introjson !== null && $line['displaymethod'] === 'full') {
-      $iqtext = array_slice($introjson, 1);
-      foreach ($iqtext as $k=>$v) {
+    if (!empty($line['texts']) && $line['displaymethod'] === 'full') {
+      foreach ($line['texts'] as $k=>$v) {
         if (!empty($v['ispage'])) {
             $pagebreaks[] = $v['displayBefore'];
         }
@@ -237,7 +235,7 @@ if ($overwriteBody==1) {
     $texts = [];
 	if (($introjson=json_decode($line['intro'], true))!==null) { //is json intro
         $line['intro'] = $introjson[0];
-        $texts = array_slice($introjson, 1);
+        $line['texts'] = array_slice($introjson, 1);
 	}
 
 	$aname = $line['name'];
@@ -259,9 +257,6 @@ if ($overwriteBody==1) {
 		}
 	}
 
-	$questions = getQuestions($line);
-	$numq = count($questions);
-
 	if ($courseUIver > 1) {
 		require_once '../assess2/AssessStandalone.php';
 		$a2 = new AssessStandalone($DBH);
@@ -271,7 +266,7 @@ if ($overwriteBody==1) {
 			$a2->setQuestionData($qdata['id'], $qdata);
 		}
 	} else {
-	require_once "../assessment/displayq2.php";
+		require_once "../assessment/displayq2.php";
 	}
 
 	if (is_numeric($_REQUEST['versions'])) {
