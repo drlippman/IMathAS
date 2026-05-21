@@ -3415,7 +3415,7 @@ class AssessRecord
     $out = array(
       'scored_version' => $qinfo['scored_version'],
       'score' => $qinfo['score'],
-      'time' => $qinfo['time']
+      'time' => $qinfo['time'] ?? 0
     );
     return $out;
   }

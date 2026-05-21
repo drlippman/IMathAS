@@ -23,10 +23,12 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		//know students.  Do work
 		$todo = array();
-		foreach ($_POST['checked'] as $stu) {
-			$stu = intval($stu);
-			if ($stu>0) {
-				$todo[] = $stu;
+		if (!empty($_POST['checked'])) {
+			foreach ($_POST['checked'] as $stu) {
+				$stu = intval($stu);
+				if ($stu>0) {
+					$todo[] = $stu;
+				}
 			}
 		}
 		if (count($todo)>0) {
