@@ -51,18 +51,20 @@
             :lastq = "lastQ"
             :active = "showTexts"
           />
-          <full-question-header
-            :qn = "curqn"
-            v-if = "showQs"
-          />
-          <question
-            v-show = "showQs"
-            class = "med-left"
-            :qn="curqn"
-            :active = "showQs"
-            :key="'q'+curqn"
-            :disabled = "true"
-          />
+          <div class="nobreak">
+            <full-question-header
+              :qn = "curqn"
+              v-if = "showQs"
+            />
+            <question
+              v-show = "showQs"
+              class = "med-left"
+              :qn="curqn"
+              :active = "showQs"
+              :key="'q'+curqn"
+              :disabled = "true"
+            />
+          </div>
         </div>
 
         <inter-question-text-list
