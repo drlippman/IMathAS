@@ -75,14 +75,24 @@ class NumMatrixScorePart implements ScorePart
               $givenanslist = explode('|', $givenans);
               if ($anstype === 'calcmatrix') {
                 foreach ($givenanslist as $i=>$v) {
+                    if ($v !== '') {
                         $givenanslistvals[$i] = evalMathParser($v);
+                        if (is_nan($givenanslistvals[$i])) { // convert to string
+                            $givenanslistvals[$i] = "NaN";
+                        }
+                    } else {
+                        $givenanslistvals[$i] = '';
+                    }
                 }
               }
             } else {
               for ($i=0; $i<$sizeparts[0]*$sizeparts[1]; $i++) {
                   $givenanslist[$i] = $_POST["qn$qn-$i"];
                   if ($anstype === 'calcmatrix' && !$hasNumVal && $_POST["qn$qn-$i"] !== '') {
-                      $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
+                        $givenanslistvals[$i] = evalMathParser($_POST["qn$qn-$i"]);
+                        if (is_nan($givenanslistvals[$i])) { // convert to string
+                            $givenanslistvals[$i] = "NaN";
+                        }
                   }
               }
             }
