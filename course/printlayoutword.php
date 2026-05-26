@@ -310,7 +310,7 @@ if ($overwriteBody==1) {
 			for ($i=0; $i<$numq; $i++) {
                 if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
                 if (!empty($_REQUEST['showtexts'])) {
-                    foreach ($texts as $k=>$v) {
+                    foreach ($line['texts'] as $k=>$v) {
                         if ($v['displayBefore'] == $i) {
                             if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
                                 $out .= '<p><b>'.printfilter(filter(Sanitize::encodeStringForDisplay(html_entity_decode($v['pagetitle'])))).'</b></p>';
@@ -327,7 +327,7 @@ if ($overwriteBody==1) {
 				$out .= $newout;
 			}
 			if (!empty($_REQUEST['showtexts'])) {
-				foreach ($texts as $k=>$v) {
+				foreach ($line['texts'] as $k=>$v) {
 					if ($v['displayBefore'] >= $numq) {
 						if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
 							$out .= '<p><b>'.printfilter(filter(Sanitize::encodeStringForDisplay(html_entity_decode($v['pagetitle'])))).'</b></p>';
@@ -386,7 +386,7 @@ if ($overwriteBody==1) {
 		for ($i=0; $i<$numq; $i++) {
             if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
             if (!empty($_REQUEST['showtexts'])) {
-                foreach ($texts as $k=>$v) {
+                foreach ($line['texts'] as $k=>$v) {
                     if ($v['displayBefore'] == $i) {
                         if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
                             $out .= '<p><b>'.printfilter(filter(Sanitize::encodeStringForDisplay(html_entity_decode($v['pagetitle'])))).'</b></p>';
