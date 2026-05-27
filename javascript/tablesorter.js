@@ -19,10 +19,10 @@ Alf Magne Kalleland
 	var tableWidget_arraySort = [];
 	var tableWidget_tableCounter = 1;
 	var activeColumn = [];
-	var evenodd = false;
-	var dosortlast = true;
-	var skiplast = 0;
-	var skipfirst = 0;
+	var evenodd = [];
+	var dosortlast = [];
+	var skiplast = [];
+	var skipfirst = [];
 
 	function sortNumeric(a,b){
 		var p;
@@ -169,9 +169,12 @@ Alf Magne Kalleland
 		var tableObj = el.parentNode.parentNode.parentNode;
 		var tBody = tableObj.getElementsByTagName('TBODY')[0];
 		var widgetIndex = tableObj.getAttribute('tableIndex');
-		if(!widgetIndex)widgetIndex = tableObj.tableIndex;
+		if(!widgetIndex) widgetIndex = tableObj.tableIndex;
 
 		var sortMethod = tableWidget_arraySort[widgetIndex][indexThis]; // N = numeric, S = String
+		var tableSkipFirst = skipfirst[widgetIndex] !== undefined ? skipfirst[widgetIndex] : 0;
+		var tableSkipLast = skiplast[widgetIndex] !== undefined ? skiplast[widgetIndex] : 0;
+		var tableEvenOdd = evenodd[widgetIndex] === true;
 		if(activeColumn[widgetIndex] && activeColumn[widgetIndex]!=el){
 			if(activeColumn[widgetIndex])activeColumn[widgetIndex].removeAttribute('aria-sort');
 		}
@@ -182,16 +185,16 @@ Alf Magne Kalleland
 		var cellObjArray = new Array();
 		var cellStartObjArray = new Array();
 		var cellEndObjArray = new Array();
-		for (var no=1; no<1+skipfirst; no++) {
+		for (var no=1; no<1+tableSkipFirst; no++) {
 			cellStartObjArray.push(tableObj.rows[no].cells[indexThis]);
 		}
-		for(var no=1+skipfirst;no<tableObj.rows.length-skiplast;no++){
+		for(var no=1+tableSkipFirst;no<tableObj.rows.length-tableSkipLast;no++){
 			if (indexThis>=tableObj.rows[no].cells.length) {continue;}
 			var content= tableObj.rows[no].cells[indexThis].innerHTML+'';
 			cellArray.push(content);
 			cellObjArray.push(tableObj.rows[no].cells[indexThis]);
 		}
-		for (var no=tableObj.rows.length-skiplast; no<tableObj.rows.length; no++) {
+		for (var no=tableObj.rows.length-tableSkipLast; no<tableObj.rows.length; no++) {
 			cellEndObjArray.push(tableObj.rows[no].cells[indexThis]);
 		}
 
@@ -207,8 +210,8 @@ Alf Magne Kalleland
 			cellArray = cellArray.sort(sortString);
 		}
 
-		if (skipfirst>0) {
-			for (var no=0; no<skipfirst; no++) {
+		if (tableSkipFirst>0) {
+			for (var no=0; no<tableSkipFirst; no++) {
 				tBody.appendChild(cellStartObjArray[no].parentNode);
 			}
 		}
@@ -231,15 +234,15 @@ Alf Magne Kalleland
 				}
 			}
 		}
-		if (skiplast>0) {
-			for (var no=0; no<skiplast; no++) {
+		if (tableSkipLast>0) {
+			for (var no=0; no<tableSkipLast; no++) {
 				tBody.appendChild(cellEndObjArray[no].parentNode);
 			}
 		}
 
 
 
-		if (evenodd) {
+		if (tableEvenOdd) {
 			for(var no=1;no<tableObj.rows.length;no++){
 				if (no%2==0) {
 					tableObj.rows[no].className = 'odd';
@@ -262,9 +265,10 @@ Alf Magne Kalleland
 	function initSortTable(objId,sortArray,switchit,sortlast,sortfirst)
 	{
 		var obj = document.getElementById(objId);
-		obj.setAttribute('tableIndex',tableWidget_tableCounter);
-		obj.tableIndex = tableWidget_tableCounter;
-		tableWidget_arraySort[tableWidget_tableCounter] = sortArray;
+		var widgetIndex = tableWidget_tableCounter;
+		obj.setAttribute('tableIndex', widgetIndex);
+		obj.tableIndex = widgetIndex;
+		tableWidget_arraySort[widgetIndex] = sortArray;
 		var tHead = obj.getElementsByTagName('THEAD')[0];
 		var cells = tHead.getElementsByTagName('TH');
 		for(var no=0;no<cells.length;no++){
@@ -295,26 +299,35 @@ Alf Magne Kalleland
 		//	if(sortArray[no2] && sortArray[no2]=='N')obj.rows[0].cells[no2].style.textAlign='right';
 		//}
 
-		tableWidget_tableCounter++;
-
 		if (switchit==true) {
-			evenodd= true;
+			evenodd[widgetIndex] = true;
+		} else {
+			evenodd[widgetIndex] = false;
 		}
 		if (sortlast==false) {
-			dosortlast = false;
-			skiplast = 1;
+			dosortlast[widgetIndex] = false;
+			skiplast[widgetIndex] = 1;
 		} else if (sortlast==true) {
-			skiplast = 0;
+			dosortlast[widgetIndex] = true;
+			skiplast[widgetIndex] = 0;
 		} else if (sortlast<0) {
-			skiplast = -1*sortlast;
+			dosortlast[widgetIndex] = true;
+			skiplast[widgetIndex] = -1*sortlast;
+		} else {
+			dosortlast[widgetIndex] = true;
+			skiplast[widgetIndex] = 0;
 		}
 		if (sortfirst==false) {
-			skipfirst = 1;
+			skipfirst[widgetIndex] = 1;
 		} else if (sortfirst==true) {
-			skipfirst = 0;
+			skipfirst[widgetIndex] = 0;
 		} else if (sortfirst<0) {
-			skipfirst = -1*sortfirst;
+			skipfirst[widgetIndex] = -1*sortfirst;
+		} else {
+			skipfirst[widgetIndex] = 0;
 		}
+
+		tableWidget_tableCounter++;
 	}
 	window.initSortTable = initSortTable;
 })();
