@@ -389,7 +389,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         var assessver = '$aver';
 		</script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=032926\"></script>";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=111925\"></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=111925\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js?v=021326\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -495,7 +496,6 @@ if ($overwriteBody==1) {
         var curlibs = '<?php echo Sanitize::encodeStringForJavascript(implode(',',$searchin)); ?>';
         var cursearchtype = '<?php echo Sanitize::simpleString($searchtype); ?>';
 	</script>
-	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js"></script>
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 

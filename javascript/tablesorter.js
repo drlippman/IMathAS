@@ -1,23 +1,24 @@
-	/************************************************************************************************************
-	(C) www.dhtmlgoodies.com, November 2005
+/************************************************************************************************************
+(C) www.dhtmlgoodies.com, November 2005
 
-	This is a script from www.dhtmlgoodies.com. You will find this and a lot of other scripts at our website.
+This is a script from www.dhtmlgoodies.com. You will find this and a lot of other scripts at our website.
 
-	Terms of use:
-	You are free to use this script as long as the copyright message is kept intact. However, you may not
-	redistribute, sell or repost it without our permission.
+Terms of use:
+You are free to use this script as long as the copyright message is kept intact. However, you may not
+redistribute, sell or repost it without our permission.
 
-	Thank you!
+Thank you!
 
-	www.dhtmlgoodies.com
-	Alf Magne Kalleland
+www.dhtmlgoodies.com
+Alf Magne Kalleland
 
-	************************************************************************************************************/
+************************************************************************************************************/
 
+(function() {
 	var tableWidget_okToSort = true;
-	var tableWidget_arraySort = new Array();
-	tableWidget_tableCounter = 1;
-	var activeColumn = new Array();
+	var tableWidget_arraySort = [];
+	var tableWidget_tableCounter = 1;
+	var activeColumn = [];
 	var evenodd = false;
 	var dosortlast = true;
 	var skiplast = 0;
@@ -26,33 +27,33 @@
 	function sortNumeric(a,b){
 		var p;
 		try {
-		//reRowText = /(\< *[^\>]*\>|\&nbsp\;|\,|[^\d\.\/])/g;
-		//a = a.replace(reRowText,"");
-		//b = b.replace(reRowText,"");
+			//reRowText = /(\< *[^\>]*\>|\&nbsp\;|\,|[^\d\.\/])/g;
+			//a = a.replace(reRowText,"");
+			//b = b.replace(reRowText,"");
 
-		//a = a.replace(/,/,'.');
-		//b = b.replace(/,/,'.');
-		//a = a.replace(/[^\d\.\/]/g,'');
-		//b = b.replace(/[^\d\.\/]/g,'');
-		//if(a.indexOf('/')>=0) a = eval(a);
-		//if(b.indexOf('/')>=0) b = eval(b);
-		a = a.replace(/\<\s*[^\>]*\>/g,'');
-		b = b.replace(/\<\s*[^\>]*\>/g,'');
-		if (p = a.match(/([\d\.]+)\s*(%|min)/)) {
-			a = parseFloat(p[1]);
-		} else {
-			a = parseFloat(a);
-		}
-		if (p = b.match(/([\d\.]+)\s*(%|min)/)) {
-			b = parseFloat(p[1]);
-		} else {
-			b = parseFloat(b);
-		}
+			//a = a.replace(/,/,'.');
+			//b = b.replace(/,/,'.');
+			//a = a.replace(/[^\d\.\/]/g,'');
+			//b = b.replace(/[^\d\.\/]/g,'');
+			//if(a.indexOf('/')>=0) a = eval(a);
+			//if(b.indexOf('/')>=0) b = eval(b);
+			a = a.replace(/\<\s*[^\>]*\>/g,'');
+			b = b.replace(/\<\s*[^\>]*\>/g,'');
+			if (p = a.match(/([\d\.]+)\s*(%|min)/)) {
+				a = parseFloat(p[1]);
+			} else {
+				a = parseFloat(a);
+			}
+			if (p = b.match(/([\d\.]+)\s*(%|min)/)) {
+				b = parseFloat(p[1]);
+			} else {
+				b = parseFloat(b);
+			}
 
-		if (isNaN(a)) { a=-1; }
-		if (isNaN(b)) { b=-1; }
+			if (isNaN(a)) { a=-1; }
+			if (isNaN(b)) { b=-1; }
 
-		return a/1 - b/1;
+			return a/1 - b/1;
 		} catch(e) {
 			return 0;
 		}
@@ -72,6 +73,7 @@
 	}
 	function sortDate(a,b) {
 		var months = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
+		var ar;
 		if (ar = a.match(/(\d+)\/(\d+)\/(\d+),?\s+(\d+):(\d+)\s*(am|pm)/)) {
 			a = ar[3]*10000 + ar[1]*100 + 1*ar[2] + .01*(ar[4]/1-(ar[4]/1==12?12:0)+(ar[6]=='pm'?12:0))+.0001*ar[5]/1;
 		} else if (ar = a.match(/(\d+)\/(\d+)\/(\d+)/)) {
@@ -98,7 +100,7 @@
 			a+='';
 			b+='';
 
-			reRowText = /(\< *[^\>]*\>|\&nbsp\;)/g;
+			var reRowText = /(\< *[^\>]*\>|\&nbsp\;)/g;
 			a = a.replace(reRowText,"");
 			b = b.replace(reRowText,"");
 
@@ -118,7 +120,7 @@
 			a+='';
 			b+='';
 
-			reRowText = /.*sortby([\d\.]+).*/;
+			var reRowText = /.*sortby([\d\.]+).*/;
 			a = a.replace(reRowText,"$1");
 			b = b.replace(reRowText,"$1");
 			if (!isNaN(a/1) && !isNaN(b/1)) {
@@ -141,15 +143,15 @@
 		/* Getting index of current column */
 		var obj = el;
 		var indexThis = 0;
-		while(obj.previousSibling){
+		while (obj.previousSibling) {
 			obj = obj.previousSibling;
-			if(obj.tagName=='TH')indexThis++;
+			if (obj.tagName=='TH') indexThis++;
 		}
 
-		if(el.getAttribute('aria-sort') || el.direction){
-			direction = el.getAttribute('aria-sort');
-			if(navigator.userAgent.indexOf('Opera')>=0)direction = el.direction;
-			if(direction=='ascending'){
+		var direction;
+		if(el.getAttribute('aria-sort') || el.direction) {
+			direction = el.getAttribute('aria-sort') ?? el.direction;
+			if (direction=='ascending') {
 				direction = 'descending';
 				el.setAttribute('aria-sort','descending');
 				el.direction = 'descending';
@@ -158,7 +160,7 @@
 				el.setAttribute('aria-sort','ascending');
 				el.direction = 'ascending';
 			}
-		}else{
+		} else {
 			direction = 'ascending';
 			el.setAttribute('aria-sort','ascending');
 			el.direction = 'ascending';
@@ -314,3 +316,5 @@
 			skipfirst = -1*sortfirst;
 		}
 	}
+	window.initSortTable = initSortTable;
+})();
