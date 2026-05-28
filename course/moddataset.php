@@ -902,7 +902,7 @@
 	$placeinhead .= 'var canedit = ' . ($canedit ? "true" : "false") . ';';
 
 	$placeinhead .= '</script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=041126"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=052726"></script>';
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
