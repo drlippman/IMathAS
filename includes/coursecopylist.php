@@ -226,7 +226,7 @@ if (isset($_POST['cidlookup'])) {
 	if ($groupTemplateResults->rowCount()>0 && !isset($CFG['coursebrowser'])) {
 		$templates = [];
 		while ($line = $groupTemplateResults->fetch(PDO::FETCH_ASSOC)) {
-			$templates[] = getCourseTreeitem($line);
+			$templates[] = getCourseTreeitem($line, 1);
 		}
 		$treedata[] = ['id'=>'grptemplatecourses','label'=>_('Group Template Courses'),'children'=>$templates];
 	}
