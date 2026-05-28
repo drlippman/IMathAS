@@ -410,11 +410,11 @@ var idCounter = 0;
 
 /**  END AUTOSUGGEST CODE **/
 //Remaining code is (c) 2010 David Lippman, IMathAS project
-var names = [];
 function initsuggest() {
 	var table = document.getElementById("myTable");
 	var tbod = table.getElementsByTagName("tbody")[0];
-	trs = tbod.getElementsByTagName("tr");
+	var trs = tbod.getElementsByTagName("tr");
+	var names = [];
 	for (var i=1;i<trs.length;i++) {
 		names.push(trs[i].getElementsByTagName("td")[0].innerText);
 	}
