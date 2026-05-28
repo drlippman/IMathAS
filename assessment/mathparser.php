@@ -379,6 +379,7 @@ class MathParser
       ob_end_clean(); // ditch buffer contents 
       return $out;
     } catch (Throwable $t) {
+      ob_end_clean(); // ditch buffer contents 
       return sqrt(-1);
     } 
   }
