@@ -12,6 +12,11 @@ $loadmathfilter = 1;
 $loadgraphfilter = 1;
 require_once "../filter/filter.php";
 require_once "../includes/filehandler.php";
+
+if (!empty($CFG['GEN']['mathimgurlexport'])) {
+	$mathimgurl = $CFG['GEN']['mathimgurlexport'];
+}
+
 if (substr($mathimgurl,0,4) !== 'http') {
     // need to make an absolute url
     if (strlen($imasroot) > 0) { 
@@ -176,7 +181,7 @@ function filtercapture($str,&$res) {
 		$str = str_replace($imasroot.'/filter/graph/imgs/','',$str);
 	}
 	if ($addmathabs) {
-		$str = str_replace($mathimgurl,'http://'. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']). $mathimgurl, $str);
+		$str = str_replace($mathimgurl,'https://'. Sanitize::domainNameWithPort($_SERVER['HTTP_HOST']). $mathimgurl, $str);
 	}
 	return $str;
 }
