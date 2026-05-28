@@ -384,7 +384,7 @@ if (isset($_GET['launch'])) {
 
 					$reqdata = array('added'=>$now, 'actions'=>array(array('on'=>$now, 'status'=>11, 'via'=>'LTI')));
 					$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
-					$stm->execute(array($newuserid, $now, json_encode($reqdata)));
+					$stm->execute(array($userid, $now, json_encode($reqdata)));
 				}
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
@@ -802,7 +802,7 @@ if (isset($_GET['launch'])) {
 
 					$reqdata = array('added'=>$now, 'actions'=>array(array('on'=>$now, 'status'=>11, 'via'=>'LTI')));
 					$stm = $DBH->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
-					$stm->execute(array($newuserid, $now, json_encode($reqdata)));
+					$stm->execute(array($userid, $now, json_encode($reqdata)));
 				}
 			}
 			$stm = $DBH->prepare('UPDATE imas_ltiusers SET userid=:userid WHERE id=:localltiuser');
