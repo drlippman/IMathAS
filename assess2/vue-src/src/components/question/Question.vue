@@ -399,7 +399,7 @@ export default {
             let match;
             if ((match = el.name.match(regex))) {
               const pn = match[2] % 1000;
-              if (qData.parts[pn].try === 0) {
+              if (!qData.parts.hasOwnProperty(pn) || qData.parts[pn].try === 0) {
                 hasuntried = true;
               } else if (qData.parts[pn].try < qData.tries_max &&
                 qData.parts[pn].hasOwnProperty('rawscore') &&
