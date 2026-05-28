@@ -459,7 +459,21 @@ class Imathas_LTI_Database implements LTI\Database
             ':LastName' => Sanitize::stripHtmlTags($data['lastname']),
             ':email' => Sanitize::emailAddress($data['email']),
             ':msgnotify' => $data['msgnot'], ':groupid' => $data['groupid']));
-        return $this->dbh->lastInsertId();
+
+        $localuserid = $this->dbh->lastInsertId();
+
+        if ($data['rights'] >= 20) {
+            //instructor account; log new account
+            $now = time();
+            $stm = $this->dbh->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
+            $groupid = $data['groupid'];
+            $stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $localuserid:: Group: $groupid, added via LTI"));
+
+            $reqdata = array('added'=>$now, 'actions'=>array(array('on'=>$now, 'status'=>11, 'via'=>'LTI')));
+            $stm = $this->dbh->prepare("INSERT INTO imas_instr_acct_reqs (userid,status,reqdate,reqdata) VALUES (?,11,?,?)");
+            $stm->execute(array($localuserid, $now, json_encode($reqdata)));
+        }
+        return $localuserid;
     }
 
     /**
