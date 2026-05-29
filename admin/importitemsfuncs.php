@@ -398,6 +398,10 @@ private function importQuestionSet() {
 	$qstoimport = array_unique($qstoimport);
 	$qsuidmap = array();
 	foreach ($qstoimport as $qsid) {
+		if (empty($this->data['questionset'][$qsid]['uniqueid'])) {
+			$mt = microtime();
+			$this->data['questionset'][$qsid]['uniqueid'] = substr($mt,11).substr($mt,2,1).str_pad($qsid,5,"0",STR_PAD_LEFT);
+		}
 		$qsuidmap[$this->data['questionset'][$qsid]['uniqueid']] = $qsid;
 	}
 

@@ -103,10 +103,10 @@ function parseqs($file,$touse,$rights) {
 			return $qsetid;
 		} else {
 			$importuid = '';
-			if ($qd['uqid']=='0') {
+			if (empty($qd['uqid'])) {
 				$importuid = $qd['uqid'];
 				$mt = microtime();
-				$qd['uqid'] = substr($mt,11).substr($mt,2,1).str_pad($qn,5,0,STR_PAD_LEFT);
+				$qd['uqid'] = substr($mt,11).substr($mt,2,1).str_pad($qn,5,"0",STR_PAD_LEFT);
 			}
 			if (!empty($qd['qimgs'])) {
 				$hasimg = 1;
