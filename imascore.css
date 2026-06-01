@@ -73,6 +73,7 @@ div.itemsum {
 	margin-left: 45px;
 	overflow: auto;
 	padding: 5px 0px;
+	max-width: 80ch;
 	/*margin-top: -.5em;
 	margin-bottom: -.5em;*/
 }
