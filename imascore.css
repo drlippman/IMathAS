@@ -70,15 +70,14 @@ div#headerhome, div#homelinkbox {
 	padding-top: 8px;
 }
 div.itemsum {
-	margin-left: 45px;
+	margin-left: 40px;
+	margin-right: 10px;
 	overflow: auto;
 	padding: 5px 0px;
 	/*margin-top: -.5em;
 	margin-bottom: -.5em;*/
 }
-div.itemsum p {
-	max-width: 80ch;
-}
+
 span.iteminfo {
 	margin-left: 30px;
 }
