@@ -70,7 +70,7 @@
 			<option value=2>Include time in questions</option>
 			</select></span><br class="form" />';
         
-		echo '<label class="form" for="lastchanged">Include assessment last changed dates?:</label>';
+		echo '<label class="form" for="lastchanged">Include assessment and discussion last changed dates?:</label>';
 		echo '<span class="formright"><select id=lastchanged name=lastchanged>
 			<option value=0 selected>No</option>
 			<option value=1>Yes</option>
@@ -499,7 +499,7 @@ function gbinstrdisp() {
 				$pointsrow .= '<th></th>';
 				$n++;
 			}
-            if ($includelastchange && $gbt[0][1][$i][6]==0) {
+            if ($includelastchange && ($gbt[0][1][$i][6]==0 || $gbt[0][1][$i][6]==2)) {
                 echo '<th>'. $gbt[0][1][$i][0].': Last Changed'.'</th>';
                 $pointsrow .= '<th></th>';
 				$n++;
@@ -660,7 +660,7 @@ function gbinstrdisp() {
 					}
 					$n++;
 				}
-                if ($includelastchange>0 && $gbt[0][1][$j][6]==0) {
+                if ($includelastchange>0 && ($gbt[0][1][$j][6]==0 || $gbt[0][1][$j][6]==2)) {
                     if (!empty($gbt[$i][1][$j][9])) {
                         echo '<td>'.date('Y-m-d g:i a', $gbt[$i][1][$j][9]).'</td>';
                     } else {

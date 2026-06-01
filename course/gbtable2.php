@@ -1756,6 +1756,26 @@ function gbtable() {
 		}
 	}
 
+	//Get forum last changed dates
+	if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true && count($discuss)>0) {
+		$forumidlist = implode(',', array_map('intval', $discuss)); //values from DB
+		if ($limuser>0) {
+			$stm2 = $DBH->prepare("SELECT forumid, userid, MAX(postdate) as lastpostdate FROM imas_forum_posts WHERE forumid IN ($forumidlist) AND userid=:userid AND posttype>0 GROUP BY forumid, userid");
+			$stm2->execute(array(':userid'=>$limuser));
+		} else {
+			$stm2 = $DBH->query("SELECT forumid, userid, MAX(postdate) as lastpostdate FROM imas_forum_posts WHERE forumid IN ($forumidlist) AND posttype>0 GROUP BY forumid, userid");
+		}
+		while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
+			if (!isset($discussidx[$l['forumid']]) || !isset($sturow[$l['userid']]) || !isset($discusscol[$l['forumid']])) {
+				continue;
+			}
+			$row = $sturow[$l['userid']];
+			$col = $discusscol[$l['forumid']];
+			
+			$gb[$row][1][$col][9] = $l['lastpostdate'];
+		}
+	}
+
 	//pull excusals
 	$excused = array();
     $hasexcused = array();
