@@ -74,7 +74,7 @@ var uselocaljs = <?php echo !empty($CFG['GEN']['uselocaljs']) ? 'true' : 'false'
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 <?php if (isset($CFG['S3']['altendpoint'])) { echo 'var altfilesendpoint = "'.Sanitize::encodeStringForDisplay($CFG['S3']['altendpoint']).'";';} ?>
 </script>
-<script src="<?php echo $staticroot;?>/javascript/general.js?v=051926"></script>
+<script src="<?php echo $staticroot;?>/javascript/general.js?v=060226"></script>
 <?php
 // override allowedImgDomains if set in config
 if (isset($CFG['GEN']['allowedImgDomains'])) {
@@ -148,7 +148,7 @@ if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
 
 
 if (isset($useeditor) && $_SESSION['useed']==1) {
-    echo '<script src="'.$staticroot.'/tinymce8/tinymce.min.js?v=073125" referrerpolicy="origin" crossorigin="anonymous"></script>';
+    echo '<script src="'.$staticroot.'/tinymce8/tinymce.min.js?v=060225" referrerpolicy="origin" crossorigin="anonymous"></script>';
 
 	echo "\n";
 	echo '<script>';
