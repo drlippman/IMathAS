@@ -644,7 +644,7 @@ function printchildren($base,$restricttoowner=false) {
 		}
 		echo '" tabindex=-1>';
 		echo '<div class="block flexgroup">';
-		echo '<span class=nowrap>';
+		//echo '<span class=nowrap>';
 		if (isset($children[$child])) {
 			if ($view==1) {
 				$lbl = '+';
@@ -653,7 +653,7 @@ function printchildren($base,$restricttoowner=false) {
 				$lbl = '-';
 				$img = "collapse";
 			}
-			echo '<button class="plain nopad" aria-controls="childwrap'.$child.'" aria-expanded="'.($view==1?'false':'true').'" onClick="toggleshow(this)">';
+			echo '<button type=button class="plain nopad" aria-controls="childwrap'.$child.'" aria-expanded="'.($view==1?'false':'true').'" onClick="toggleshow(this)">';
 			echo "<img class=\"expcol\" src=\"$staticroot/img/$img.gif\" alt=\"Expand/Collapse\" /></button>";
 		}
 		if ($hasuserimg[$child]==1) {
@@ -665,7 +665,7 @@ function printchildren($base,$restricttoowner=false) {
 			}
 			echo '</button>';
 		}
-		echo '</span>';
+		//echo '</span>';
 		echo '<span style="flex-grow:1">';
 		echo "<b>".$re[$child]. Sanitize::encodeStringForDisplay($subject[$child]) . "</b><br/>"._('Posted by').": ";
 		//if ($isteacher && $ownerid[$child]!=0) {
