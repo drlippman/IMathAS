@@ -1150,7 +1150,7 @@ function gbtable() {
 		} else {
 			$gb[$row][1][$col][8] = round($timeontask/60,1);
 		}
-		if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true) {
+		if (!empty($GLOBALS['includelastchange'])) {
 			$gb[$row][1][$col][9] =	$l['endtime'];
 		}
 
@@ -1371,7 +1371,7 @@ function gbtable() {
 		} else {
 			$gb[$row][1][$col][8] = round($timeontask/60,1);
 		}
-		if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true) {
+		if (!empty($GLOBALS['includelastchange'])) {
 			$gb[$row][1][$col][9] =	$l['lastchange'];
 		}
 
@@ -1757,13 +1757,17 @@ function gbtable() {
 	}
 
 	//Get forum last changed dates
-	if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true && count($discuss)>0) {
+	if (!empty($GLOBALS['includelastchange']) && count($discuss)>0) {
 		$forumidlist = implode(',', array_map('intval', $discuss)); //values from DB
 		if ($limuser>0) {
-			$stm2 = $DBH->prepare("SELECT forumid, userid, MAX(postdate) as lastpostdate FROM imas_forum_posts WHERE forumid IN ($forumidlist) AND userid=:userid GROUP BY forumid, userid");
+			$stm2 = $DBH->prepare("SELECT ifp.forumid, ifp.userid, MAX(ifp.postdate) as lastpostdate FROM imas_forum_posts AS ifp
+				JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=ifp.id AND imas_grades.score IS NOT NULL
+				WHERE ifp.forumid IN ($forumidlist) AND ifp.userid=:userid GROUP BY ifp.forumid, ifp.userid");
 			$stm2->execute(array(':userid'=>$limuser));
 		} else {
-			$stm2 = $DBH->query("SELECT forumid, userid, MAX(postdate) as lastpostdate FROM imas_forum_posts WHERE forumid IN ($forumidlist) GROUP BY forumid, userid");
+			$stm2 = $DBH->query("SELECT ifp.forumid, ifp.userid, MAX(ifp.postdate) as lastpostdate FROM imas_forum_posts AS ifp
+				JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=ifp.id AND imas_grades.score IS NOT NULL
+				WHERE ifp.forumid IN ($forumidlist) GROUP BY ifp.forumid, ifp.userid");
 		}
 		while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
 			if (!isset($discussidx[$l['forumid']]) || !isset($sturow[$l['userid']]) || !isset($discusscol[$l['forumid']])) {

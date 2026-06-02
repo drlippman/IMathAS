@@ -70,7 +70,7 @@
 			<option value=2>Include time in questions</option>
 			</select></span><br class="form" />';
         
-		echo '<label class="form" for="lastchanged">Include assessment last changed dates?:</label>';
+		echo '<label class="form" for="lastchanged">Include assessment and forum last changed dates?:</label>';
 		echo '<span class="formright"><select id=lastchanged name=lastchanged>
 			<option value=0 selected>No</option>
 			<option value=1>Yes</option>
