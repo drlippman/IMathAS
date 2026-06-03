@@ -51,10 +51,12 @@ $query = 'SELECT iu.id
     FROM imas_users AS iu
     LEFT JOIN imas_students AS s ON s.userid = iu.id
     LEFT JOIN imas_tutors AS t ON t.userid = iu.id
+    LEFT JOIN imas_courses AS c ON c.ownerid = iu.id
     WHERE iu.rights < 11 
     AND iu.lastaccess < ?
     AND s.userid IS NULL
-    AND t.userid IS NULL ';
+    AND t.userid IS NULL 
+    AND c.id IS NULL ';
 $query .= "LIMIT $batchsize ";
 $stm = $DBH->prepare($query);
 $stm->execute(array(time()-$olddays*24*60*60));
