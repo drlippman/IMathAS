@@ -169,7 +169,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm->execute($insarr);
 				$stm = $DBH->prepare("SELECT id,ver FROM imas_assessments WHERE groupsetid=:groupsetid AND courseid=:courseid");
 				$stm->execute(array(':groupsetid'=>$grpsetid, ':courseid'=>$cid));
-				while ((list($aid,$aver) = $stm->fetch(PDO::FETCH_NUM)) && $grpsetid>0) {
+				while (($row = $stm->fetch(PDO::FETCH_NUM)) && $grpsetid>0) {
+					list($aid,$aver) = $row;
 					//if asid exists for this grpid, need to update students.
 					//if no asid exists already, but the students we're adding have one, use one (which?) of theirs
 					//otherwise do nothing
@@ -460,7 +461,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("SELECT iu.LastName, iu.FirstName FROM imas_users AS iu
 				JOIN imas_students AS istu ON istu.userid=iu.id WHERE iu.id=:id AND istu.courseid=:cid");
 			$stm->execute(array(':id'=>$remove, ':cid' => $cid));
-			$page_stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
+			$page_stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM) ?: ['','']);
 			$stm = $DBH->prepare("SELECT grp.name AS grpname, gset.name AS grpsetname 
 				FROM imas_stugroups AS grp 
 				JOIN imas_stugroupset AS gset ON grp.groupsetid=gset.id
