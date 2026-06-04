@@ -662,6 +662,10 @@ class ScoreEngine
             if (!is_array($answeights)) {
                 $answeights = explode(",",$answeights);
             }
+            if (count(array_filter($answeights, 'is_array')) > 0) {
+                echo 'Error: All elements of $answeights should be numbers, not arrays';
+                $answeights = array_fill_keys(array_keys($anstypes), 1);
+            }
             $answeights = array_map('trim', $answeights);
             if (count($answeights) != count($anstypes)) {
                 $answeights = array_fill_keys(array_keys($anstypes), 1); 

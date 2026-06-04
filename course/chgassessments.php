@@ -432,6 +432,8 @@ if (!(isset($teacherid))) {
 		$line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
 		$line['calrtag'] = isset($CFG['AMS']['calrtag'])?$CFG['AMS']['calrtag']:'R';
 		$line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:1;
+		$line['posttoforum'] = 0;
+        $line['msgtoinstr'] = isset($CFG['AMS']['msgtoinstr'])?$CFG['AMS']['msgtoinstr']:0;
 		if ($line['defpenalty'][0]==='L') {
 			$line['defpenalty'] = substr($line['defpenalty'],1);
 			$skippenalty=10;

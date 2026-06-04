@@ -36,6 +36,10 @@ if ($role != 'Instructor') {
   echo _('This menu requires instructor access');
   exit;
 }
+if ($link === null) {
+    echo _('Missing resource link info');
+    exit;
+}
 echo '<div id="ltimenu">';
 
 if ($link->get_placementtype() == 'assess') {

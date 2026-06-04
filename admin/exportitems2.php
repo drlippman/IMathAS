@@ -87,7 +87,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$body = "You need to log in as a teacher to access this page";
 } elseif (isset($_POST['export'])) { //STEP 2 DATA PROCESSING, OUTPUT FILE HERE
 
-	$checked = $_POST['checked'];
+	$checked = $_POST['checked'] ?? [];
 	$output = array();
 	$output['sourceinstall'] = $installname;
 
