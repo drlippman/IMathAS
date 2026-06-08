@@ -836,11 +836,11 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
             if (!isset($stu[$qn][$v])) {
                 continue;
             }
-            if ($anstypes !== null && $answerformat !== null && $stu[$qn][$v] !== '') {
+            if ($anstypes !== null && $stu[$qn][$v] !== '') {
                 $thisaf = '';
-                if (is_array($answerformat) && !empty($answerformat[$v])) {
+                if ($answerformat !== null && is_array($answerformat) && !empty($answerformat[$v])) {
                     $thisaf = $answerformat[$v];
-                } else if (!is_array($answerformat)) {
+                } else if ($answerformat !== null && !is_array($answerformat)) {
                     $thisaf = $answerformat;
                 }
                 if (($anstypes[$v] == 'calculated' || $anstypes[$v] == 'number') && strpos($thisaf, 'checknumeric') !== false) {
@@ -866,6 +866,28 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
                             }
                         } else if ($thisaf !== '' && $anstypes[$v] == 'calcntuple') {
                             if (!checkanswerformat($pv, $thisaf)) {
+                                continue 2;
+                            }
+                        }
+                    }
+                } else if ($anstypes[$v] == 'complexntuple' || $anstypes[$v] == 'calccomplexntuple') {
+                    $ntuples = parseNtuple($stu[$qn][$v], false, false, true);
+                    if (!is_array($ntuples) || !isset($ntuples[0])) {
+                        continue;
+                    }
+                    $checknumeric = (strpos($thisaf, 'checknumeric') !== false);
+                    foreach ($ntuples[0]['vals'] as $k=>$pv) {
+                        $cv = $ntuples[0]['cvals'][$k];
+                        if ($pv === '') {
+                            continue 2;
+                        } if (!is_array($cv) && $cv != 'oo' && $cv != '-oo') {
+                            continue 2;  
+                        } else if ($checknumeric) {
+                            if (!is_array($cv) || !is_numeric($cv[0]) || !is_numeric($cv[1])) {
+                                continue 2;
+                            }
+                        } else if ($thisaf !== '' && $anstypes[$v] == 'calccomplexntuple') {
+                            if (is_array($cv) && (!checkanswerformat($cv[0], $thisaf) || !checkanswerformat($cv[1], $thisaf))) {
                                 continue 2;
                             }
                         }
