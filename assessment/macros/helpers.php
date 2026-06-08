@@ -851,7 +851,7 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
                     if (!checkanswerformat($stu[$qn][$v], $thisaf)) {
                         continue;
                     }
-                } else if ($anstypes[$v] == 'ntuple' || $anstypes[$v] == 'calcntuple') {
+                } else if ($anstypes[$v] == 'ntuple' || $anstypes[$v] == 'calcntuple' || $anstypes[$v] == 'algntuple') {
                     $ntuples = parseNtuple($stu[$qn][$v], false, false);
                     if (!is_array($ntuples) || !isset($ntuples[0])) {
                         continue;
@@ -864,7 +864,7 @@ function stuansready($stu, $qn, $parts = null, $anstypes = null, $answerformat =
                             if (!is_numeric($pv)) {
                                 continue 2;
                             }
-                        } else if ($thisaf !== '') {
+                        } else if ($thisaf !== '' && $anstypes[$v] == 'calcntuple') {
                             if (!checkanswerformat($pv, $thisaf)) {
                                 continue 2;
                             }
