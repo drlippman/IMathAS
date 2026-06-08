@@ -69,7 +69,7 @@ function getCaptionDataByVidId($vidid) {
             if (function_exists('http_get_last_response_headers')) {
                 $http_response_header = http_get_last_response_headers(); // PHP 8.4+
             }
-            $code = explode(' ', $http_response_header[0])[1];
+            $code = explode(' ', $http_response_header[0] ?? '')[1] ?? '';
             if ($code == '404') {
                 $query = "INSERT INTO imas_captiondata (vidid, captioned, status, lastchg) VALUES (?,0,3,?) ";
                 $query .= "ON DUPLICATE KEY UPDATE status=IF(status=0 OR status=3,VALUES(status),status),";
