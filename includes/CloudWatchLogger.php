@@ -223,5 +223,9 @@ function addLoginLog($eventtype,$userid,$additionalinfo = []) {
         'geo_country' => $_SERVER['HTTP_CF_IPCOUNTRY'] ?? '',
         'user_agent' => $_SERVER['HTTP_USER_AGENT']
     ];
-    $logger->log($baseinfo + $additionalinfo);
+    try {
+        $logger->log($baseinfo + $additionalinfo);
+    } catch (Throwable $e) {
+        // prevent fail on logging error
+    }
 }
