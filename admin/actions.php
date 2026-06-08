@@ -47,6 +47,14 @@ if ($from=='admin') {
     $breadcrumbbase .= '<a href="'.$backloc.'">'._('Unhide Courses').'</a> &gt; ';
 }
 
+// extra safety check
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+if (strpos($referer, $GLOBALS['basesiteurl'].'/admin/forms.php') !== 0 &&
+	strpos($referer, $GLOBALS['basesiteurl'].'/admin/actions.php') !== 0) {
+	echo _('Invalid request');
+	exit;
+}
+
 switch($_POST['action']) {
 	case "chgrights":
 		if ($myrights < 75 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
