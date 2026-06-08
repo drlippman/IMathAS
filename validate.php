@@ -345,7 +345,7 @@ if ($haslogin && !$hasusername) {
                 require_once __DIR__.'/includes/CloudWatchLogger.php';
                 if ($badsession) {
                     $reason = 'bad_session';
-                } else if ($_SESSION['challenge']!=$_POST['challenge']) {
+                } else if ($_SESSION['challenge'] != ($_POST['challenge'] ?? '')) {
                     $reason = 'bad_challenge';
                 } else {
                     $reason = 'bad_pw';
