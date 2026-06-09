@@ -101,7 +101,11 @@ function showarrays() {
                 $out .= '<td>';
             }
             if (isset($alist[2 * $i + 1][$j])) {
-                $out .= $alist[2 * $i + 1][$j];
+                if (is_float($alist[2 * $i + 1][$j]) && is_nan($alist[2 * $i + 1][$j])) {
+                    $out .= _('Undefined');
+                } else {
+                    $out .= $alist[2 * $i + 1][$j];
+                }
             }
 
             $out .= "</td>";
@@ -159,7 +163,12 @@ function showrecttable($m, $clabel, $rlabel, $opts = '') {
             } else {
                 $out .= '<td>';
             }
-            $out .= $m[$j][$i] . '</td>';
+            if (is_float($m[$j][$i]) && is_nan($m[$j][$i])) {
+                $out .= _('Undefined');
+            } else {
+                $out .= $m[$j][$i];
+            } 
+            $out .= '</td>';
         }
         $out .= "</tr>";
     }

@@ -700,6 +700,9 @@ function formatcomplex($real, $imag) {
 /** internal */
 
 function clean($exp) {
+    if (is_float($exp) && is_nan($exp)) {
+        return 'NAN';
+    }
     $exp = preg_replace('/(\+|\-)\s+(\+|\-)/', "$1$2", $exp);
     //$exp = str_replace(" ", "", $exp);  //caused problems with "x > -3"
     $exp = str_replace("+-", "-", $exp);
