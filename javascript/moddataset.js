@@ -21,7 +21,9 @@ function toggleeditor(el) {
 		});
 		qtextbox.value = qtextbox.value.replace(/\n\n/g, "<br/><br/>");
 
-		initeditor("exact", el);
+		initeditor("exact", el, false, false, null, {
+			extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr],asvg[sscr|src|type|style|alt],a[href|target|class|onclick],button[class|onclick|type],script[src|type|async|defer],style[type]'
+		});
 		if (el == "qtext") {
 			editoron = 1;
 		} else if (el == "solution") {
