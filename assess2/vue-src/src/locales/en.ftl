@@ -292,7 +292,8 @@ scoreresult-submitted = Question submitted.
 scoreresult-see_details = See Details for more.
 scoreresult-manual_grade = This question contains parts that must be graded by your instructor. They will show a score of 0 until they are graded.
 scoreresult-jumptoincorrect = Jump to first changable incorrect part
-scoreresult-jumptolast = Jump to last submitted part
+scoreresult-jumptoincorrectstart = Jump to start of first changable incorrect part
+scoreresult-jumptolast = Jump to after last submitted part
 scoreresult-allpartscorrect = All submitted parts correct.
 scoreresult-onepartincorrect = At least one scored part is incorrect.
 

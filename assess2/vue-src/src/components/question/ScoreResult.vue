@@ -4,6 +4,7 @@
       :class="['scoreresult', status.general]"
       tabindex = "-1"
       v-if="expanded"
+      @keydown.tab = "tabDown"
     >
       <p v-if="showScores">
         {{ $t('scoreresult-scorelast') }}
@@ -22,6 +23,10 @@
       </p>
       <p v-if="showScores && showRetryButtons && status.general !== 'correct' && status.partcount > 1 && (status.firstincorrect > -1 || status.untried > 0)">
         {{ partStatusMessage }}
+        <a v-if="status.firstincorrect > -1" class="sr-only" ref="jumpbefore"
+          href="#" @click.prevent="jumpBeforeIncorrect">
+          {{ $t('scoreresult-jumptoincorrectstart') }}.
+        </a>
         <a v-if="status.firstincorrect > -1"
           href="#" @click.prevent="jumpToIncorrect">
           {{ $t('scoreresult-jumptoincorrect') }}.
@@ -213,11 +218,17 @@ export default {
     submitAssess () {
       actions.submitAssessment();
     },
+    tabDown () {
+      this.$refs.jumpbefore.classList.remove("sr-only");
+    },
     jumpToIncorrect (event) {
-      this.focusOnPart(this.status.firstincorrect, false);
+      this.focusOnPart(this.status.firstincorrect, "onel");
+    },
+    jumpBeforeIncorrect (event) {
+      this.focusOnPart(this.status.firstincorrect, "afterprevel");
     },
     jumpToLastTried (event) {
-      this.focusOnPart(this.status.lasttried, true);
+      this.focusOnPart(this.status.lasttried, "afterel");
     },
     getQuestionEl (pn) {
       /*
@@ -240,10 +251,15 @@ export default {
         return [reg[0], false];
       }
     },
-    focusOnPart (pn, after) {
+    focusOnPart (pn, type) {
+      //type: "onel", "afterel", or "afterprevel"
       const tofocus = this.getQuestionEl(pn);
-      if (after) {
+      if (type === "afterel") {
         window.$(tofocus[0]).nextAll('.afterquestion').first().attr('tabindex', '-1')[0].focus();
+      } else if (type === "afterprevel") {
+        const prev = this.closestPreceding(tofocus, '.afterquestion,div[id^=questionwrap]');
+        prev.attr('tabindex', '-1')[0].focus();
+        prev[0].scrollIntoView();
       } else {
         if (tofocus[1]) { // if MQ
           window.MQ(tofocus[0]).focus();
@@ -251,6 +267,42 @@ export default {
           tofocus[0].focus();
         }
       }
+    },
+    closestPreceding (el, selector) {
+      let $result = window.$();
+      const $target = window.$(el);
+
+      if ($target.is(selector)) {
+        return $target;
+      }
+
+      // 1. Walk backwards through preceding siblings and their descendants
+      $target.prevAll().each(function () {
+        const $sib = window.$(this);
+
+        // Check the sibling itself
+        if ($sib.is(selector)) {
+          $result = $sib;
+          return false; // break
+        }
+
+        // Check its descendants — last in DOM order = closest to $target
+        const $found = $sib.find(selector);
+        if ($found.length) {
+          $result = $found.last();
+          return false; // break
+        }
+      });
+
+      // 2. If nothing found among siblings, climb to the parent and repeat
+      if (!$result.length) {
+        const $parent = $target.parent();
+        if ($parent.length && !$parent.is('body')) {
+          $result = this.closestPreceding($parent, selector);
+        }
+      }
+
+      return $result;
     }
   }
 };

@@ -293,7 +293,8 @@ scoreresult-submitted = Question submitted.\r
 scoreresult-see_details = See Details for more.\r
 scoreresult-manual_grade = This question contains parts that must be graded by your instructor. They will show a score of 0 until they are graded.\r
 scoreresult-jumptoincorrect = Jump to first changable incorrect part\r
-scoreresult-jumptolast = Jump to last submitted part\r
+scoreresult-jumptoincorrectstart = Jump to start of first changable incorrect part\r
+scoreresult-jumptolast = Jump to after last submitted part\r
 scoreresult-allpartscorrect = All submitted parts correct.\r
 scoreresult-onepartincorrect = At least one scored part is incorrect.\r
 \r
