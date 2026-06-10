@@ -992,9 +992,9 @@ function addfractionaxislabels($plot, $step, $axis = "x") {
     }
     // suppress the default axis labels by changing the dx/dy to negative
     if ($axis === 'x') {
-        $plot = preg_replace('/axes\(.*?,/', 'axes(-1,', $plot);
+        $plot = preg_replace('/axes\(.*?,/', 'axes(-100,', $plot);
     } else if ($axis === 'y') {
-        $plot = preg_replace('/axes\((.*?),.*?,/', 'axes($1,-1,', $plot);
+        $plot = preg_replace('/axes\((.*?),.*?,/', 'axes($1,-100,', $plot);
     }
     return str_replace("' />", "$outst' />", $plot);
 }

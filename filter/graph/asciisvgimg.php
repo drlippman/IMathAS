@@ -676,12 +676,12 @@ function ASaxes($arg) {
 			$dosmallticks = true;
 		}
 	}
-	if ($xscl<0) {
+	/*if ($xscl<0) {
 		$xscl *= -1;
 	}
 	if ($yscl<0) {
 		$yscl *= -1;
-	}
+	}*/
 	if ($xgrid<0) {
 		$xgrid *= -1;
 	}
@@ -699,11 +699,11 @@ function ASaxes($arg) {
 		$yscl *= $this->yunitlength;
 	}
 	if (!$doy) {
-		$this->fontsize = min($xscl/2,12);
+		$this->fontsize = min(abs($xscl)/2,12);
 	} else if (!$dox) {
-		$this->fontsize = min($yscl/2,12);
+		$this->fontsize = min(abs($yscl)/2,12);
 	} else {
-		$this->fontsize = min($xscl/2,$yscl/2,12);
+		$this->fontsize = min(abs($xscl)/2,abs($yscl)/2,12);
 	}
 	$this->ticklength = max($this->fontsize/4,4);
 	if ($this->usegd2) {
@@ -791,37 +791,41 @@ function ASaxes($arg) {
 	}
 
 	$ac = $this->axescolor;
-	if ($doy && $yscl>0) {
+	if ($doy) {
 		if ($this->origin[0]>=$this->winxmin && $this->origin[0]<=$this->winxmax) {
 			imageline($this->img, (int) round($this->origin[0]), (int) round($this->winymin), (int) round($this->origin[0]), (int) round(($fqonlyy?$this->height-$this->origin[1]:$this->winymax)), $this->colors[$ac]);
-			//ticks
-			if (!$fqonlyy) {
-				for ($y=$this->height - $this->origin[1]; $y<=$this->winymax; $y += $yscl) {
-					if ($y>=$this->winymin) {
+			if ($yscl>0) {
+				//ticks
+				if (!$fqonlyy) {
+					for ($y=$this->height - $this->origin[1]; $y<=$this->winymax; $y += $yscl) {
+						if ($y>=$this->winymin) {
+							imageline($this->img, (int) round($this->origin[0]-$this->ticklength), (int) round($y), (int) round($this->origin[0]+$this->ticklength), (int) round($y), $this->colors[$ac]);
+						}
+					}
+				}
+				for ($y=$this->height - $this->origin[1]-$yscl; $y>=$this->winymin; $y -= $yscl) {
+					if ($y<=$this->winymax) {
 						imageline($this->img, (int) round($this->origin[0]-$this->ticklength), (int) round($y), (int) round($this->origin[0]+$this->ticklength), (int) round($y), $this->colors[$ac]);
 					}
 				}
 			}
-			for ($y=$this->height - $this->origin[1]-$yscl; $y>=$this->winymin; $y -= $yscl) {
-				if ($y<=$this->winymax) {
-					imageline($this->img, (int) round($this->origin[0]-$this->ticklength), (int) round($y), (int) round($this->origin[0]+$this->ticklength), (int) round($y), $this->colors[$ac]);
-				}
-			}
 		}
 	}
-	if ($dox && $xscl>0) {
+	if ($dox) {
 		if ($this->origin[1]>=$this->winymin && $this->origin[1]<=$this->winymax) {
 			imageline($this->img, (int) round(($fqonlyx?$this->origin[0]:$this->winxmin)), (int) round($this->height-$this->origin[1]), (int) round($this->winxmax), (int) round($this->height-$this->origin[1]), $this->colors[$ac]);
-			//ticks
-			for ($x=$this->origin[0]; $x<=$this->winxmax; $x += $xscl) {
-				if ($x>=$this->winxmin) {
-					imageline($this->img, (int) round($x), (int) round($this->height- $this->origin[1] -$this->ticklength), (int) round($x), (int) round($this->height- $this->origin[1] +$this->ticklength), $this->colors[$ac]);
+			if ($xscl>0) {
+				//ticks
+				for ($x=$this->origin[0]; $x<=$this->winxmax; $x += $xscl) {
+					if ($x>=$this->winxmin) {
+						imageline($this->img, (int) round($x), (int) round($this->height- $this->origin[1] -$this->ticklength), (int) round($x), (int) round($this->height- $this->origin[1] +$this->ticklength), $this->colors[$ac]);
+					}
 				}
-			}
-			if (!$fqonlyx) {
-				for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
-					if ($x<=$this->winxmax) {
-						imageline($this->img, (int) round($x), (int) round($this->height-$this->origin[1]-$this->ticklength), (int) round($x), (int) round($this->height-$this->origin[1]+$this->ticklength), $this->colors[$ac]);
+				if (!$fqonlyx) {
+					for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
+						if ($x<=$this->winxmax) {
+							imageline($this->img, (int) round($x), (int) round($this->height-$this->origin[1]-$this->ticklength), (int) round($x), (int) round($this->height-$this->origin[1]+$this->ticklength), $this->colors[$ac]);
+						}
 					}
 				}
 			}
