@@ -39,13 +39,13 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
 
       $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
       
-      if ($dirx == 'right' && $diry == 'left') {
+      if ($dirx == 'right' && $diry == 'left' && $x !== null && $y !== null) {
          $alt .= sprintf(_('The area from %d to %d is shaded.'), $x, $y);
-      } else if ($dirx == 'left' && $diry == 'right') {
+      } else if ($dirx == 'left' && $diry == 'right' && $x !== null && $y !== null) {
          $alt .= sprintf(_('The area left of %d and right of %d is shaded.'), $x, $y);
-      } else if ($dirx == 'left') {
+      } else if ($dirx == 'left' && $x !== null) {
          $alt .= sprintf(_('The area left of %d is shaded.'), $x);
-      } else if ($dirx == 'right') {
+      } else if ($dirx == 'right' && $x !== null) {
          $alt .= sprintf(_('The area right of %d is shaded.'), $x);
       }
       return $alt;
