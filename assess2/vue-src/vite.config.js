@@ -100,7 +100,7 @@ function updatePhpFiles() {
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
-  const env = loadEnv(mode, process.cwd(), '');
+  const env = loadEnv(mode, process.cwd(), 'VUE_APP_');
 
   return {
     // allow reuse of the existing ENV variables
