@@ -196,7 +196,10 @@ class NumberScorePart implements ScorePart
         if (in_array('parenneg',$ansformats)) {
             foreach ($gaarr as $k=>$v) {
                 if ($v[0]=='(') {
-                    $gaarr[$k] = -1*substr($v,1,-1);
+                    $v = substr($v,1,-1);
+                    if (is_numeric($v)) {
+                        $gaarr[$k] = -1*substr($v,1,-1);
+                    }
                 }
             }
         }
