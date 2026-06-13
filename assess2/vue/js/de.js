@@ -1,4 +1,4 @@
-const e=`# Time units\r
+var e=`# Time units\r
 nth = \r
     { $n ->\r
         [1] erste\r
