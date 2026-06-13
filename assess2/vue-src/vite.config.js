@@ -139,7 +139,7 @@ export default defineConfig(({ mode }) => {
       cssCodeSplit: false,
       // needed for plugin above
       manifest: true,
-      rollupOptions: {
+      rolldownOptions: {
         // our two entry points
         input: {
             index: path.resolve(__dirname, 'index.html'),
