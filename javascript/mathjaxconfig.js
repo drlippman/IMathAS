@@ -30,6 +30,11 @@ window.MathJax = {
         AM.newsymbol({input: "iint", tag:"mo", output:"\u222C", ttype:AM.TOKEN.CONST});
         AM.newsymbol({input: "iiint", tag:"mo", output:"\u222D", ttype:AM.TOKEN.CONST});
         AM.newsymbol({input: "thinspace", tag:"mo", output:"\u202F", ttype:AM.TOKEN.CONST});
+        AM.newsymbol({input:"mlt", tag:"mo", output:"\u226A", ttype:AM.TOKEN.CONST});
+        AM.newsymbol({input:"mgt", tag:"mo", output:"\u226B", ttype:AM.TOKEN.CONST});
+        AM.newsymbol({input:"ll", tag:"mo", output:"\u226A", ttype:AM.TOKEN.CONST});
+        AM.newsymbol({input:"gg", tag:"mo", output:"\u226B", ttype:AM.TOKEN.CONST});
+
         ["arcsec","arccsc","arccot","arcsinh","arccosh","arctanh"].forEach(function(v) {
             AM.newsymbol({input:v, tag:"mi", output:v, ttype:AM.TOKEN.UNARY, func:true});
         });
