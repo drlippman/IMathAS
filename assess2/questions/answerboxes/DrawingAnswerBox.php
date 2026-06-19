@@ -744,7 +744,7 @@ class DrawingAnswerBox implements AnswerBox
                             }
                         }
                         //add asymptotes for rational function graphs
-                        if (strpos($function[0], '/x') !== false || preg_match('|/\([^\)]*x|', $function[0])) {
+                        if (in_array('rational', $answerformat) && (strpos($function[0], '/x') !== false || preg_match('|/\([^\)]*x|', $function[0]))) {
                             $func = makeMathFunction(makepretty($function[0]), 'x');
 
                             $epsilon = ($settings[1] - $settings[0]) / 97;
@@ -765,7 +765,7 @@ class DrawingAnswerBox implements AnswerBox
                             $saarr[$k] = "$ha,#00C800,,,,,2,10";
                             $k++;
                             $saarr[$k] = "[$va,t],#00C800,,,,,2,10";
-                        } else if (preg_match('/\^(\(|x|\-|\+)/',$function[0])) { //exponential
+                        } else if (in_array('genexp', $answerformat) && preg_match('/\^(\(|x|\-|\+)/',$function[0])) { //exponential
                             $x1 = 1 / 4 * $settings[1] + 3 / 4 * $settings[0];
                             $x2 = 1 / 2 * $settings[1] + 1 / 2 * $settings[0];
                             $x3 = 3 / 4 * $settings[1] + 1 / 4 * $settings[0];
@@ -782,8 +782,9 @@ class DrawingAnswerBox implements AnswerBox
                             if ($asy != 0) {
                                 $saarr[$k] = "$asy,#00C800,,,,,2,10";
                             }
-                        } else if (($logloc = strpos($function[0],'log'))!==false ||
-                            ($lnloc = strpos($function[0],'ln'))!==false) { //is log
+                        } else if ((in_array('log', $answerformat) || in_array('genlog', $answerformat)) && 
+                            (($logloc = strpos($function[0],'log'))!==false ||
+                            ($lnloc = strpos($function[0],'ln'))!==false)) { //is log
 
                             $nestd = 0; $vertasy = 0; $openright = true;
                             $startloc = strpos($function[0],'(',$logloc!==false?$logloc:$lnloc);
@@ -834,7 +835,9 @@ class DrawingAnswerBox implements AnswerBox
                             if ($vertasy != 0) {
                                 $saarr[$k] = "[$vertasy,t],#00C800,,,,,2,10";
                             }
-                        } else if (($p = strpos($function[0],'tan('))!==false || ($q = strpos($function[0],'cot('))!==false) { //is tan
+                        } else if (in_array('tan', $answerformat) && 
+                            (($p = strpos($function[0],'tan('))!==false || 
+                             ($q = strpos($function[0],'cot('))!==false)) { //is tan
                             if ($p===false) { $p = $q;}
                             $nested = 1;
                             for ($i=$p+4;$i<strlen($function[0]);$i++) {
