@@ -32,7 +32,8 @@ array_push(
     'today',
     'numtoroman',
     'htmldisp',
-    'formatcomplex'
+    'formatcomplex',
+    'strip_parens'
 );
 
 function makepretty($exp) {
@@ -1370,4 +1371,569 @@ function makeprettydisparray($a) {
     for ($i = 0; $i < count($a); $i++) {
         $a = "`" . makepretty($a) . "`";
     }
+}
+
+/**
+ * strip_parens2.php PHP function version  strip_parens.php is the inline, no function version 
+ *
+ * Provides strip_parens($expr): removes unneeded parentheses/brackets from
+ * an algebraic expression string. Makes NO other simplifications.
+ *
+ * RULE
+ * ----
+ * Repeatedly find a parenthesized/bracketed group (t) — scanning left to
+ * right and applying the first eligible group each pass, then restarting
+ * the scan — that is not a function-call argument list (e.g. not the
+ * "(x)" in "cos(x)"), and rewrite
+ *
+ *     x (t) y   ->   x t y
+ *
+ * whenever it is safe to do so, where x is whatever sits immediately to
+ * the left of '(' (or the start of the string) and y is whatever sits
+ * immediately to the right of ')' (or the end of the string).
+ *
+ * t's top-level (depth-1) content is split into a sequence of tokens:
+ * atoms (numbers, identifiers, function calls, sub-groups) and operators
+ * (+, -, *, /, ^), inserting an implicit '*' token between two adjacent
+ * atoms with nothing between them. A unary +/- prefix (at the start of
+ * t, or right after another top-level operator) is folded into the atom
+ * it precedes rather than emitted as its own operator token.
+ *
+ * Operator priorities (lower number = lower priority = binds looser):
+ *     1 : binary + or -
+ *     2 : * or / or implicit multiplication
+ *     3 : ^
+ *
+ *   minPrio       = the minimum priority among t's top-level operators
+ *                    (+infinity if none).
+ *   firstIsCaret  = true if t's leading top-level term is itself a
+ *                    power expression (e.g. t="2^x" or t="2^x+1").
+ *   lastIsCaret   = true if t's trailing top-level term ends with '^'
+ *                    (e.g. t="2^x" or t="1+2^x").
+ *   lastIsDivision = true if t's trailing top-level operator is '/'.
+ *
+ * General requirements: x and y must not be '^'; '(' must not be a
+ * function call.
+ *
+ * Left side (x):
+ *   - x absent (start of string): always fine.
+ *   - t begins with a unary +/- sign: NEVER strip (would put that sign
+ *     directly next to x, e.g. "3(-x)"->"3-x" reads as subtraction, or
+ *     "1-(-x)"->"1--x" is confusing) — purely a readability rule, even
+ *     though every case here is mathematically unambiguous.
+ *   - x is +,-,*,/: strip only if x's priority < minPrio.
+ *   - x is ')' or ']' (close of a PRECEDING bracket group): strip only
+ *     if 2 <= minPrio (the two groups stay visually separated by that
+ *     bracket either way, so no caret/division edge concern).
+ *   - x is a bare digit/letter (implicit multiplication): strip only if
+ *     2 <= minPrio AND t's leading term isn't a caret-expression AND x
+ *     itself isn't the tail of a caret- or division-ending term in the
+ *     surrounding text (e.g. "x^2(6)" and "x/y(z/w)" both stay) AND,
+ *     if x is a digit, t doesn't also begin with a digit (two bare
+ *     numbers must never visually fuse, e.g. "3(2(x+1))" stays).
+ *
+ * Right side (y): symmetric, using lastIsCaret/lastIsDivision of t and
+ * checking what follows y in the surrounding text on the digit-fusion
+ * case (t's trailing character vs y's leading character).
+ *
+ * Both the left and right conditions must hold to strip a given pair.
+ */
+
+function strip_parens($expr) {
+    $changed = true;
+    while ($changed) {
+        $changed = false;
+        $len = strlen($expr);
+
+        for ($i = 0; $i < $len; $i++) {
+            if ($expr[$i] !== '(' && $expr[$i] !== '[') continue;
+
+            $j = findMatchingClose($expr, $i);
+            if ($j === -1) continue; // unmatched
+
+            $inner = substr($expr, $i + 1, $j - $i - 1);
+            if ($inner === '') continue; // empty (), leave alone
+
+            // '(' must not be a function call.
+            if (precededByFunctionName($expr, $i)) continue;
+            // x must not be '^'.
+            if ($i > 0 && $expr[$i - 1] === '^') continue;
+            // y must not be '^'.
+            if ($j + 1 < $len && $expr[$j + 1] === '^') continue;
+
+            $tokens = tokenizeTopLevel($inner);
+            if ($tokens === null) continue; // shouldn't happen, but be safe
+
+            $info = analyzeTokens($tokens);
+            $minPrio       = $info['minPrio'];
+            $firstIsCaret  = $info['firstIsCaret'];
+            $lastIsCaret   = $info['lastIsCaret'];
+            $lastIsDivision = $info['lastIsDivision'];
+
+            // ---- left side check ----
+            // If t begins with a unary +/- sign, never strip on the
+            // left when there's a preceding character, since the sign
+            // would then sit directly adjacent to x (e.g. "3(-x)" ->
+            // "3-x" looks like subtraction, not multiplication by a
+            // negative; "1-(-x)" -> "1--x" is visually confusing).
+            // Stripping is only safe here if x is the very start of
+            // the string (nothing precedes the sign).
+            $tStartsWithUnarySign = ($inner[0] === '+' || $inner[0] === '-');
+
+            $xOk = true;
+            if ($i > 0) {
+                if ($tStartsWithUnarySign) {
+                    $xOk = false;
+                } else {
+                $xc = $expr[$i - 1];
+                if ($xc === '+' || $xc === '-') {
+                    $xOk = (1 < $minPrio);
+                } elseif ($xc === '*' || $xc === '/') {
+                    $xOk = (2 < $minPrio);
+                } elseif (ctype_alnum($xc)) {
+                    // x is a literal digit/letter -> implicit
+                    // multiplication directly against t's leading
+                    // content. Blocked if:
+                    //   - t contains anything looser than
+                    //     multiplication (a top-level +/-);
+                    //   - t's leading term is itself a caret-expression
+                    //     (e.g. 6(2^x) must not become 62^x);
+                    //   - x ITSELF is the tail end of a caret-expression
+                    //     in the surrounding text (e.g. x^2(6) must not
+                    //     become x^26);
+                    //   - x ITSELF is the tail end of a
+                    //     division-ending term (e.g. x/y(z/w) must not
+                    //     become x/yz/w - the y must stay glued to its
+                    //     own (z/w), not merge with it);
+                    //   - x is a digit AND t's first character is also
+                    //     a digit, since two adjacent bare numbers
+                    //     would visually fuse into one number (e.g.
+                    //     3(2(x+1)) must not become 32(x+1)).
+                    $precInfo = analyzePrecedingTerm($expr, $i);
+                    $xOk = (2 <= $minPrio) && !$firstIsCaret &&
+                           !$precInfo['isCaret'] && !$precInfo['isDivision'];
+                    if ($xOk && ctype_digit($xc) && ctype_digit($inner[0])) {
+                        $xOk = false;
+                    }
+                } elseif ($xc === ')' || $xc === ']') {
+                    // x is the close of a PRECEDING bracketed group
+                    // (e.g. the ')' in "(x^2)(6)"). The two groups
+                    // remain visually separated by that bracket, so no
+                    // caret-edge restriction is needed here - only the
+                    // ordinary minPrio compatibility check applies.
+                    $xOk = (2 <= $minPrio);
+                }
+                // any other x (shouldn't occur) leaves $xOk = true
+                }
+            }
+
+            // ---- right side check ----
+            $yOk = true;
+            if ($j + 1 < $len) {
+                $yc = $expr[$j + 1];
+                if ($yc === '+' || $yc === '-') {
+                    $yOk = (1 < $minPrio);
+                } elseif ($yc === '*' || $yc === '/') {
+                    $yOk = (2 < $minPrio);
+                } elseif (ctype_alnum($yc)) {
+                    // y is a literal digit/letter -> implicit
+                    // multiplication directly against t's trailing
+                    // content. Blocked if t's trailing term is a
+                    // caret-expression (e.g. (x^2)3 must not become
+                    // x^23), or if t ends in a division (e.g. (x/y)3
+                    // must not become x/y3 - purely stylistic, to
+                    // avoid the 3 looking like it joined the
+                    // denominator), or if t contains anything looser
+                    // than multiplication, or if y is a digit AND t's
+                    // last character is also a digit (would visually
+                    // fuse into one number).
+                    $yOk = (2 <= $minPrio) && !$lastIsCaret && !$lastIsDivision;
+                    if ($yOk && ctype_digit($yc) && ctype_digit($inner[strlen($inner) - 1])) {
+                        $yOk = false;
+                    }
+                } elseif ($yc === '(' || $yc === '[') {
+                    // y is the open of a FOLLOWING bracketed group
+                    // (e.g. the '(' in "(x^2)(6)"). The two groups
+                    // remain visually separated by that bracket, so no
+                    // caret/division-edge restriction is needed here -
+                    // only the ordinary minPrio compatibility check
+                    // applies.
+                    $yOk = (2 <= $minPrio);
+                }
+            }
+
+            if ($xOk && $yOk) {
+                $expr = substr($expr, 0, $i) . $inner . substr($expr, $j + 1);
+                $changed = true;
+                break; // restart scan from the beginning (left to right)
+            }
+        }
+    }
+
+    return $expr;
+}
+
+/**
+ * Given a position $pos in $expr (the index of a bare digit/letter
+ * character, or one past the end of a term), determines properties of
+ * the top-level term ending at $pos (i.e. the text immediately to the
+ * left, read backward until a lower-or-equal-priority boundary, an
+ * enclosing bracket, or the start of the string):
+ *
+ *   - 'isCaret': true if that term is itself a caret-expression, e.g.
+ *     for "x^2(6)" at $pos = the index of '(', the term ending there
+ *     is "x^2", which IS a caret-expression.
+ *   - 'isDivision': true if that term's last top-level operator is
+ *     '/', e.g. for "x/y(z/w)" at $pos = the index of the second '(',
+ *     the term ending there is "x/y", which DOES end in a division.
+ *
+ * This mirrors lastIsCaret / lastIsDivision from analyzeTokens(), but
+ * operates directly on raw text (skipping over any balanced bracket
+ * groups encountered) rather than on a pre-tokenized t, so it can look
+ * arbitrarily far back through plain (non-parenthesized) text.
+ */
+function analyzePrecedingTerm($expr, $pos) {
+    $k = $pos - 1;
+    $sawCaret = false;
+
+    while ($k >= 0) {
+        $c = $expr[$k];
+
+        if ($c === ')' || $c === ']') {
+            // skip back over the balanced group (could be a function
+            // call or a bare sub-group; either way it's a single atom
+            // for this purpose).
+            $openIdx = -1;
+            $depth = 0;
+            for ($m = $k; $m >= 0; $m--) {
+                if ($expr[$m] === ')' || $expr[$m] === ']') {
+                    $depth++;
+                } elseif ($expr[$m] === '(' || $expr[$m] === '[') {
+                    $depth--;
+                    if ($depth === 0) { $openIdx = $m; break; }
+                }
+            }
+            if ($openIdx === -1) break; // malformed, bail
+            $k = $openIdx - 1;
+            continue;
+        }
+
+        if ($c === '^') {
+            $sawCaret = true;
+            $k--;
+            continue;
+        }
+
+        if ($c === '+' || $c === '-') {
+            // Could be unary or binary. Look at what's before it; if
+            // nothing, or another operator/open-bracket, it's unary
+            // and part of the same term (does not break the scan, and
+            // does not by itself confer caret-ness). If it's a
+            // genuine binary +/- (preceded by an atom/close-bracket),
+            // it ends the current top-level term here.
+            $beforeSign = $k - 1;
+            $isUnary = ($beforeSign < 0);
+            if (!$isUnary) {
+                $pc = $expr[$beforeSign];
+                if ($pc === '+' || $pc === '-' || $pc === '*' || $pc === '/' ||
+                    $pc === '^' || $pc === '(' || $pc === '[') {
+                    $isUnary = true;
+                }
+            }
+            if ($isUnary) {
+                $k--;
+                continue;
+            }
+            return array('isCaret' => $sawCaret, 'isDivision' => false);
+        }
+
+        if ($c === '/') {
+            return array('isCaret' => $sawCaret, 'isDivision' => true);
+        }
+
+        if ($c === '*') {
+            return array('isCaret' => $sawCaret, 'isDivision' => false);
+        }
+
+        if (ctype_alnum($c)) {
+            $k--;
+            continue;
+        }
+
+        // Some other character (e.g. '=', '<', start of string context
+        // boundary) - treat as a term boundary.
+        return array('isCaret' => $sawCaret, 'isDivision' => false);
+    }
+
+    return array('isCaret' => $sawCaret, 'isDivision' => false);
+}
+
+/**
+ * Given the index $i of an open '(' or '[' in $expr, returns the index
+ * of its matching close, or -1 if unmatched.
+ */
+function findMatchingClose($expr, $i) {
+    $len = strlen($expr);
+    $depth = 0;
+    for ($k = $i; $k < $len; $k++) {
+        $c = $expr[$k];
+        if ($c === '(' || $c === '[') {
+            $depth++;
+        } elseif ($c === ')' || $c === ']') {
+            $depth--;
+            if ($depth === 0) return $k;
+        }
+    }
+    return -1;
+}
+
+/**
+ * Returns true if the character(s) immediately before index $i in
+ * $expr spell out one of the recognized function names as a full
+ * token (not part of a longer identifier run).
+ */
+function precededByFunctionName($expr, $i) {
+    $fNames = array('sqrt', 'ln', 'log', 'cos', 'sin', 'tan', 'cot', 'sec', 'csc');
+    foreach ($fNames as $fn) {
+        $flen = strlen($fn);
+        if ($i >= $flen && substr($expr, $i - $flen, $flen) === $fn) {
+            $before = $i - $flen - 1;
+            if ($before < 0 || !ctype_alpha($expr[$before])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Tokenizes a top-level expression string (the contents of a paren
+ * pair, with the outer parens already removed) into a flat list of
+ * tokens, where each token is one of:
+ *   array('type' => 'op',   'val' => '+'|'-'|'*'|'/'|'^')
+ *   array('type' => 'atom', 'val' => <substring>, 'isCaret' => bool)
+ *
+ * Sub-groups (...)/[...] and function calls name(...) are each
+ * collapsed into a single atom token. Implicit multiplication between
+ * two adjacent atoms (no operator between them) is inserted as an
+ * explicit 'op' token with val '*'. A unary +/- prefix on an atom is
+ * folded into that atom (not emitted as a separate 'op' token); the
+ * resulting atom's 'isCaret' is false (a unary-negated power, e.g.
+ * "-2^x", is NOT itself a caret-atom for edge purposes, since the
+ * outer unary minus is the actual top-level operation... but per this
+ * grammar's precedence, unary minus binds looser than ^, so "-2^x" is
+ * -(2^x); we still mark such an atom isCaret=false conservatively,
+ * since the visible leading symbol is '-', not a digit/letter, so the
+ * "bare neighbor" issue does not arise on that edge anyway).
+ *
+ * Returns the token list, or null on malformed input (mismatched
+ * parens) — callers treat null defensively, though this should not
+ * happen given $inner came from a validated paren pair.
+ */
+function tokenizeTopLevel($s) {
+    $tokens = array();
+    $len = strlen($s);
+    $i = 0;
+    $expectOperand = true; // true at start, and right after a binary operator
+
+    while ($i < $len) {
+        $c = $s[$i];
+
+        if ($expectOperand && ($c === '+' || $c === '-')) {
+            // unary sign: fold into the atom that follows
+            $signStart = $i;
+            $i++;
+            // allow multiple unary signs e.g. --x (not expected in this
+            // grammar, but handle gracefully)
+            while ($i < $len && ($s[$i] === '+' || $s[$i] === '-')) $i++;
+            list($atomEnd, $isCaret) = readAtom($s, $i);
+            if ($atomEnd === $i) {
+                // nothing follows the sign(s); malformed, bail gracefully
+                return null;
+            }
+            $tokens[] = array('type' => 'atom', 'val' => substr($s, $signStart, $atomEnd - $signStart), 'isCaret' => false);
+            $i = $atomEnd;
+            $expectOperand = false;
+            continue;
+        }
+
+        if (!$expectOperand && ($c === '+' || $c === '-' || $c === '*' || $c === '/' || $c === '^')) {
+            $tokens[] = array('type' => 'op', 'val' => $c);
+            $i++;
+            $expectOperand = true;
+            continue;
+        }
+
+        if ($expectOperand) {
+            list($atomEnd, $isCaret) = readAtom($s, $i);
+            if ($atomEnd === $i) {
+                // can't make progress; malformed
+                return null;
+            }
+            $tokens[] = array('type' => 'atom', 'val' => substr($s, $i, $atomEnd - $i), 'isCaret' => $isCaret);
+            $i = $atomEnd;
+            $expectOperand = false;
+            continue;
+        }
+
+        // !$expectOperand and current char is not an operator ->
+        // implicit multiplication: insert synthetic '*' and re-process
+        // this same character as the start of a new atom.
+        if (!$expectOperand) {
+            $tokens[] = array('type' => 'op', 'val' => '*');
+            $expectOperand = true;
+            continue;
+        }
+
+        // Shouldn't reach here.
+        $i++;
+    }
+
+    return $tokens;
+}
+
+/**
+ * Reads a single atom (a maximal run of digits, OR a single letter, OR
+ * a parenthesized sub-group, OR a function call name(...)/name[...])
+ * starting at index $i in $s, possibly followed immediately by a '^'
+ * exponent chain (since ^ binds tightest of all and a "primary^expo"
+ * forms the atom for the purposes of THIS atom's caret-edge status —
+ * but note: a chain like x^2^3 — right associative — is read here as
+ * the base 'x' atom only; the caller's main tokenizer loop will see
+ * the following '^' as a separate top-level operator token, which is
+ * exactly what we want, since ^ is the highest top-level priority and
+ * must be visible to the priority/edge analysis).
+ *
+ * Returns array($endIndex, $isCaretAtom) where $isCaretAtom indicates
+ * this atom is immediately the base of a top-level '^' (i.e. caller
+ * should treat the resulting (atom, ^, exponent) trio as a single
+ * "caret term" for edge-detection purposes). This function itself
+ * only reads the base/function-call/sub-group; the caller's analysis
+ * pass stitches consecutive atom/^/atom token triples together when
+ * computing first/last "caret-ness".
+ */
+function readAtom($s, $i) {
+    $len = strlen($s);
+    if ($i >= $len) return array($i, false);
+
+    $c = $s[$i];
+
+    // Parenthesized or bracketed sub-group (could be a function call's
+    // argument list too; if it's a bare group, gather the whole thing).
+    if ($c === '(' || $c === '[') {
+        $close = findMatchingClose($s, $i);
+        if ($close === -1) return array($i, false); // malformed
+        return array($close + 1, false);
+    }
+
+    // digits: a number
+    if (ctype_digit($c)) {
+        $j = $i;
+        while ($j < $len && ctype_digit($s[$j])) $j++;
+        return array($j, false);
+    }
+
+    // letters: could be a function name (followed by '(' or '['), a
+    // multi-letter constant/variable name (pi, e, alpha, beta, theta),
+    // or a single-letter variable.
+    if (ctype_alpha($c)) {
+        $fNames = array('sqrt', 'ln', 'log', 'cos', 'sin', 'tan', 'cot', 'sec', 'csc');
+        foreach ($fNames as $fn) {
+            $flen = strlen($fn);
+            if (substr($s, $i, $flen) === $fn) {
+                $afterName = $i + $flen;
+                if ($afterName < $len && ($s[$afterName] === '(' || $s[$afterName] === '[')) {
+                    $close = findMatchingClose($s, $afterName);
+                    if ($close !== -1) return array($close + 1, false);
+                }
+                // function name not followed by '(' - fall through and
+                // treat as a plain identifier run instead.
+            }
+        }
+        $multiLetterNames = array('alpha', 'beta', 'theta', 'pi');
+        foreach ($multiLetterNames as $nm) {
+            $nlen = strlen($nm);
+            if (substr($s, $i, $nlen) === $nm) {
+                $after = $i + $nlen;
+                if ($after >= $len || !ctype_alpha($s[$after])) {
+                    return array($after, false);
+                }
+            }
+        }
+        // single-letter variable
+        return array($i + 1, false);
+    }
+
+    // unrecognized character; consume one char defensively
+    return array($i + 1, false);
+}
+
+/**
+ * Given the flat token list from tokenizeTopLevel, computes:
+ *   - minPrio: minimum priority among 'op' tokens (PHP_INT_MAX if none)
+ *   - firstIsCaret: whether the leading top-level term (the run of
+ *     tokens up to, but not including, the first 'op' token whose
+ *     priority is <= the priority of an adjacent '^', i.e. simply: is
+ *     there a top-level '^' appearing before any '+','-','*','/'?)
+ *   - lastIsCaret: whether the trailing top-level term (after the last
+ *     '+','-','*','/' operator, if any) ends with a '^' application,
+ *     i.e. is there a top-level '^' appearing after the last
+ *     '+','-','*','/'?
+ */
+function analyzeTokens($tokens) {
+    $minPrio = PHP_INT_MAX;
+    $n = count($tokens);
+
+    $priorityOf = function ($opVal) {
+        if ($opVal === '+' || $opVal === '-') return 1;
+        if ($opVal === '*' || $opVal === '/') return 2;
+        if ($opVal === '^') return 3;
+        return PHP_INT_MAX;
+    };
+
+    foreach ($tokens as $tok) {
+        if ($tok['type'] === 'op') {
+            $p = $priorityOf($tok['val']);
+            if ($p < $minPrio) $minPrio = $p;
+        }
+    }
+
+    // firstIsCaret: scan tokens from the start; if we hit a top-level
+    // '^' before any '+','-','*','/' op token, the leading term is a
+    // caret-expression.
+    $firstIsCaret = false;
+    for ($k = 0; $k < $n; $k++) {
+        $tok = $tokens[$k];
+        if ($tok['type'] === 'op') {
+            if ($tok['val'] === '^') {
+                $firstIsCaret = true;
+            }
+            break; // first operator encountered settles it either way
+        }
+    }
+
+    // lastIsCaret: scan tokens from the end; if we hit a top-level '^'
+    // before any '+','-','*','/' op token (reading backwards), the
+    // trailing term is a caret-expression.
+    $lastIsCaret = false;
+    $lastIsDivision = false;
+    for ($k = $n - 1; $k >= 0; $k--) {
+        $tok = $tokens[$k];
+        if ($tok['type'] === 'op') {
+            if ($tok['val'] === '^') {
+                $lastIsCaret = true;
+            }
+            if ($tok['val'] === '/') {
+                $lastIsDivision = true;
+            }
+            break;
+        }
+    }
+
+    return array(
+        'minPrio'        => $minPrio,
+        'firstIsCaret'   => $firstIsCaret,
+        'lastIsCaret'    => $lastIsCaret,
+        'lastIsDivision' => $lastIsDivision,
+    );
 }
