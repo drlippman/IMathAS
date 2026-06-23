@@ -51,6 +51,12 @@ A library of Stats functions.  Version 1.30, Nov 20, 2021
 <li><a href="#checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></li>
 <li><a href="#binomialpdf">binomialpdf</a></li>
 <li><a href="#binomialcdf">binomialcdf</a></li>
+<li><a href="#negbinomialpdf">negbinomialpdf</a></li>
+<li><a href="#negbinomialcdf">negbinomialcdf</a></li>
+<li><a href="#geometricpdf">geometricpdf</a></li>
+<li><a href="#geometriccdf">geometriccdf</a></li>
+<li><a href="#hypgeompdf">hypgeompdf</a></li>
+<li><a href="#hypgeomcdf">hypgeomcdf</a></li>
 <li><a href="#chi2teststat">chi2teststat</a></li>
 <li><a href="#chi2cdf">chi2cdf</a></li>
 <li><a href="#invchi2cdf">invchi2cdf</a></li>
@@ -388,7 +394,41 @@ binomialpdf(N,p,x)
 binomialcdf(N,p,x)
 <BR>Computes the probably of &lt;=x successes out of N trials
 <BR>where each trial has probability p of success
-<BR><h3><a name="chi2teststat">chi2teststat</a></h3>
+<BR>
+
+<h3><a name="negbinomialpdf">negbinomialpdf</a></h3>
+<p>negbinomialpdf(k, r, p)<br>
+Probability of exactly k failures before the r'th success, where
+each trial has probability p of success.</p>
+
+<h3><a name="negbinomialcdf">negbinomialcdf</a></h3>
+<p>negbinomialcdf(k, r, p)<br>
+Probability there were at most k failures before the r'th success, where
+each trial has probability p of success.</p>
+
+<h3><a name="geometricpdf">geometricpdf</a></h3>
+<p>geometricpdf(k, p)<br>
+Probability of exactly k failures before the 1st success, where
+each trial has probability p of success.</p>
+
+<h3><a name="geometriccdf">geometriccdf</a></h3>
+<p>geometriccdf(k, p)<br>
+Probability of at most k failures before the 1st success, where
+each trial has probability p of success.</p>
+
+<h3><a name="hypgeompdf">hypgeompdf</a></h3>
+<p>hypgeompdf(x, N, m, n)<br>
+Hypergeometric distribution. The probably of exactly x successes 
+drawn from a population of N, with m successes in the population, 
+and n items drawn from the population.</p>
+
+<h3><a name="hypgeomcdf">hypgeomcdf</a></h3>
+<p>hypgeomcdf(x, N, m, n)<br>
+Hypergeometric distribution. The probably of at most x successes 
+drawn from a population of N, with m successes in the population, 
+and n items drawn from the population.</p>
+
+<h3><a name="chi2teststat">chi2teststat</a></h3>
 chi2teststat(m)
 <BR>Computes the test stat sum((E-O)^2/E) given a matrix of values
 <BR><h3><a name="chi2cdf">chi2cdf</a></h3>
