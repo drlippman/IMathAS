@@ -49,10 +49,12 @@ $allowedmacros[] = "jsxUnsuspendUpdate";
 $allowedmacros[] = "jsxSetChild";
 
 function jsx_getlibrarylink() {
-	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.11.1/distrib/jsxgraphcore.js";
+	return $GLOBALS['staticroot'] . '/assessment/libs/jsxgraphcore.js';
+	//return "https://cdn.jsdelivr.net/npm/jsxgraph@1.12.2/distrib/jsxgraphcore.js";
 }
 function jsx_getcsslink() {
-	return "https://cdn.jsdelivr.net/npm/jsxgraph@1.11.1/distrib/jsxgraph.min.css";
+	return $GLOBALS['staticroot'] . '/assessment/libs/jsxgraph.min.css';
+	//return "https://cdn.jsdelivr.net/npm/jsxgraph@1.12.2/distrib/jsxgraph.min.css";
 }
 
 function jsx_idlen() {
