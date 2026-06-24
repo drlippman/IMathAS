@@ -271,6 +271,13 @@ tr.textsegmentrow td {
   input[type=number] {
     -moz-appearance: textfield;
   }
+.fixedonscroll[data-fixed=true] {
+    z-index: 100;
+    margin-top: -5px;
+    padding: 5px 0px;
+    background-color: #fff;
+    width: 100%;
+}
 @media (max-width: 740px) {
 	.tox-tbtn[data-mce-name="alignright"] {
 		display: none !important;

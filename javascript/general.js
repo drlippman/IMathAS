@@ -1442,17 +1442,27 @@ jQuery.fn.isolatedScroll = function() {
 jQuery(document).ready(function($) {
 	var fixedonscrollel = $('.fixedonscroll');
 	var initialtop = [];
+	var fixedbottom = [];
 	for (var i=0;i<fixedonscrollel.length;i++) {
 		initialtop[i] = $(fixedonscrollel[i]).offset().top;
 		if ($(fixedonscrollel[i]).height()>$(window).height()) { //skip if element is taller than window
 			initialtop[i] = -1;
+		}
+		if (fixedonscrollel[i].hasAttribute('data-fixedend')) {
+			const refel = $('#'+fixedonscrollel[i].getAttribute('data-fixedend'));
+			fixedbottom[i] = refel.offset().top + refel.outerHeight() - 50;
+		} else {
+			fixedbottom[i] = 0;
+		}
+		if ($(fixedonscrollel[i]).next(".fixedonscrollpad").length == 0) {
+			$(fixedonscrollel[i]).after('<div class="fixedonscrollpad"></div>');
 		}
 	}
 	if (fixedonscrollel.length>0) { // && $(fixedonscrollel[0]).css('float')=="left") {
 		$(window).scroll(function() {
 			var winscrolltop = $(window).scrollTop();
 			for (var i=0;i<fixedonscrollel.length;i++) {
-				if (winscrolltop > initialtop[i] && initialtop[i]>0) {
+				if (winscrolltop > initialtop[i] && initialtop[i]>0 && (fixedbottom[i] == 0 || winscrolltop < fixedbottom[i])) {
 					$(fixedonscrollel[i]).next(".fixedonscrollpad").height($(fixedonscrollel[i]).height() + 5);
 					$(fixedonscrollel[i]).css('position','fixed').css('top','5px').attr("data-fixed",true);
 				} else {
