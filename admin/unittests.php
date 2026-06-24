@@ -44,7 +44,12 @@ $xxtests = [
     ['3x^1+x/1+x/12','3x+x+x/12'],
     ['(x+3)/1+x^1','(x+3)+x'],
     ['3+0<1x<0x+5','3 < x <  5'],
-    ['x+1 leq 3', 'x+1 leq 3']
+    ['x+1 leq 3', 'x+1 leq 3'],
+	['2(x)(x+3)', '2(x)(x+3)'],
+	['1-(x)', '1-(x)'],
+	['1-(x+3)', '1-(x+3)'],
+	['2^(x)', '2^(x)'],
+	['(2,3)+(4,5)', '(2 , 3)+(4 , 5)']
 ];
 
 require_once "../assessment/interpret5.php";
@@ -52,6 +57,7 @@ require_once "../assessment/macros.php";
 require_once "../assess2/questions/answerboxhelpers.php";
 
 
+echo '<h2>requiretime tests</h2>';
 foreach ($reqtimestests as $test) {
 	echo "Testing ".Sanitize::encodeStringForDisplay($test[0]);
 	echo " against ".Sanitize::encodeStringForDisplay($test[1]);
@@ -64,6 +70,7 @@ foreach ($reqtimestests as $test) {
 	echo '<br/>';
 }
 
+echo '<h2>answerformat tests</h2>';
 foreach ($ansformattests as $test) {
 	echo "Testing ".Sanitize::encodeStringForDisplay($test[0]);
 	echo " with ".Sanitize::encodeStringForDisplay($test[1]);
@@ -76,7 +83,7 @@ foreach ($ansformattests as $test) {
 	echo '<br/>';
 }
 
-
+echo '<h2>makexxpretty tests</h2>';
 foreach ($xxtests as $test) {
     $res = trim(makexxpretty($test[0]));
 	echo "Testing ".Sanitize::encodeStringForDisplay($test[0]);
