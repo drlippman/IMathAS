@@ -530,14 +530,14 @@ function generateMoveSelect2(num) {
         }
         if (curistxt) {
             sel += ">Text" + tcnt + "</option>";
-        } else if (itemarray[i - 1].length < 5 && itemarray[i - 1][0] > 1) {
+        } else if (itemarray[i - 1].length < 6 && itemarray[i - 1][0] > 1) {
             sel += ">Q" + qcnt + "-" + (qcnt + itemarray[i - 1][0] - 1) + "</option>";
         } else {
             sel += ">Q" + qcnt + "</option>";
         }
 
         if (!curistxt) {
-            if (itemarray[i - 1].length < 5) {
+            if (itemarray[i - 1].length < 6) {
                 //is group
                 qcnt += parseInt(itemarray[i - 1][0]);//itemarray[i-1][2].length;
             } else {
@@ -613,7 +613,7 @@ function generateShowforSelect(num) {
         i++;
     }
     while (i < itemarray.length && itemarray[i][0] != "text") {
-        if (itemarray[i].length < 5) {
+        if (itemarray[i].length < 6) {
             //is group
             n += itemarray[i][0]; //pick n from group
         } else {
@@ -683,9 +683,9 @@ function moveitem2(from) {
             if (from < to) {
                 to--;
             }
-            if (itemarray[to - 1].length < 5) {
+            if (itemarray[to - 1].length < 6) {
                 //to is already group
-                if (tomove[0].length < 5) {
+                if (tomove[0].length < 6) {
                     //if grouping a group
                     for (var j = 0; j < tomove[0][2].length; j++) {
                         itemarray[to - 1][2].push(tomove[0][2][j]);
@@ -696,12 +696,12 @@ function moveitem2(from) {
             } else {
                 //to is not group
                 var existing = itemarray[to - 1];
-                if (tomove[0].length < 5) {
+                if (tomove[0].length < 6) {
                     //if grouping a group
                     tomove[0][2].push(existing);
                     itemarray[to - 1] = tomove[0];
                 } else {
-                    itemarray[to - 1] = [1, 0, [existing, tomove[0]], 1];
+                    itemarray[to - 1] = [1, 0, [existing, tomove[0]], 1, ''];
                 }
             }
         }
@@ -769,7 +769,7 @@ function togglegroupEC(loc) {
 function doremoveitem(loc) {
     if (loc.indexOf("-") > -1) {
         locparts = loc.split("-");
-        if (itemarray[locparts[0]].length < 5) {
+        if (itemarray[locparts[0]].length < 6) {
             //usual
             itemarray[locparts[0]][2].splice(locparts[1], 1);
             if (itemarray[locparts[0]][2].length == 1) {
@@ -851,7 +851,7 @@ function groupSelected() {
     }
     var to = grplist[grplist.length - 1];
     var existingcnt = 0;
-    if (itemarray[to].length < 5) {
+    if (itemarray[to].length < 6) {
         //moving to existing group
         existingcnt = itemarray[to][2].length;
         if (grppoints == 0) {
@@ -864,13 +864,13 @@ function groupSelected() {
             grppoints = existing[4]; //point values from this question
             grpextracredit = existing[9];
         }
-        itemarray[to] = [1, 0, [existing], 1];
+        itemarray[to] = [1, 0, [existing], 1, ''];
         existingcnt = 1;
     }
     for (i = 0; i < grplist.length - 1; i++) {
         //going from last in current to first in current
         tomove = itemarray.splice(grplist[i], 1);
-        if (tomove[0].length < 5) {
+        if (tomove[0].length < 6) {
             //if grouping a group
             for (var j = 0; j < tomove[0][2].length; j++) {
                 //itemarray[to][2].push(tomove[0][2][j]);
@@ -966,6 +966,19 @@ function updateGrpT(num, old_type) {
         document.getElementById("grptype" + num).value != itemarray[num][1]
     ) {
         itemarray[num][1] = document.getElementById("grptype" + num).value;
+        submitChanges();
+    }
+}
+
+function updateGrpLabel(num) {
+    var grplabelval = document.getElementById("grplabel-" + num).value.replace(/[|'"~,]/g,'');
+    if (!confirm_textseg_dirty()) {
+        //if aborted, restore old value
+        $("#grplabel-" + num).val(itemarray[num][4]);
+    } else if (
+        grplabelval != itemarray[num][4]
+    ) {
+        itemarray[num][4] = grplabelval;
         submitChanges();
     }
 }
@@ -1099,13 +1112,13 @@ function generateOutput() {
                 pagetitle: itemarray[i][4],
                 forntype: itemarray[i][5]
             });
-        } else if (itemarray[i].length < 5) {
+        } else if (itemarray[i].length < 6) {
             //is group
             if (itemarray[i][2].length > 0) { // skip if group is empty; shouldn't happen
                 if (out.length > 0) {
                     out += ",";
                 }
-                out += itemarray[i][0] + "|" + itemarray[i][1];
+                out += itemarray[i][0] + "|" + itemarray[i][1] + "|" + (itemarray[i][4] ?? '').replace(/[|'"~,]/g,'');
                 for (var j = 0; j < itemarray[i][2].length; j++) {
                     out += "~" + itemarray[i][2][j][0];
                     pts["qn" + itemarray[i][2][j][0]] = itemarray[i][2][j][4];
@@ -1143,7 +1156,7 @@ function updateqgrpcookie() {
         if (itemarray[i][0] == "text") {
             continue;
         }
-        if (itemarray[i].length < 5) {
+        if (itemarray[i].length < 6) {
             //is group
             if (itemarray[i][3] == 0) {
                 closegrp.push(qcnt);
@@ -1210,7 +1223,7 @@ function generateTable() {
             var curitems = new Array();
             curitems[0] = itemarray[i];
             curistext = 1;
-        } else if (itemarray[i].length < 5) {
+        } else if (itemarray[i].length < 6) {
             //is group
             curitems = itemarray[i][2];
             curisgroup = 1;
@@ -1370,6 +1383,10 @@ function generateTable() {
                             html += "selected=1";
                         }
                         html += ">" + _("With") + "</option></select>" + _(" replacement") + '</label>';
+                        html += '. <label class="nowrap">' + _("Label") + ': ';
+                        html += '<input size=20 type=text id="grplabel-' + i + '" ' + 
+                                'value="' + (itemarray[i][4] ?? '') + '" ' +
+                                'onchange="updateGrpLabel(' + i + ')"/></label>';
                         html += "</td>";
                         html +=
                             '<td class="nowrap c"><input size=2 type=number min=0 step=1 id="grppts-' +
@@ -1974,7 +1991,7 @@ function check_textseg_itemarray() {
             numq = 0;
             j = i + 1;
             while (j < itemarray.length && itemarray[j][0] != "text") {
-                if (itemarray[j].length < 5) {
+                if (itemarray[j].length < 6) {
                     //is group
                     numq += parseInt(itemarray[j][0]);
                 } else {

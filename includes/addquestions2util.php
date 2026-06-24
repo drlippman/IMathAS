@@ -215,7 +215,9 @@ function getQuestionsAsJSON($cid, $aid, $data=null)
                 $jsarr[] = array((int) Sanitize::onlyInt($grpparts[0]),
                     (int) Sanitize::onlyInt($grpparts[1]),
                     $qsdata,
-                    (int) $closegrp);
+                    (int) $closegrp,
+                    Sanitize::encodeStringForDisplay($grpparts[2] ?? '')
+                    );
                 $qncnt += $grpparts[0];
             }
         } else {
