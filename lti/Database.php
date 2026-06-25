@@ -873,7 +873,7 @@ class Imathas_LTI_Database implements LTI\Database
         $stm->execute(array($resource_link_id, $contextid, 'LTI13-' . $platform_id));
         $row = $stm->fetch(PDO::FETCH_ASSOC);
         if ($row !== false) {
-            if ($row['enddate'] === null) {
+            if ($row['placementtype'] == 'assess' && $row['enddate'] === null) {
                 // lti link exists but assessment doesn't exist anymore
                 // so probably deleted since link was established.
                 throw new LTI\LTI_Exception("Linked assessment appears to have been deleted. Ref: " . $row['typeid'] . '-' . $resource_link_id);
@@ -889,9 +889,9 @@ class Imathas_LTI_Database implements LTI\Database
                 ->set_typeid($row['typeid'])
                 ->set_placementtype($row['placementtype'])
                 ->set_typenum($this->types_as_num[$row['placementtype']])
-                ->set_date_by_lti($row['date_by_lti'])
-                ->set_startdate($row['startdate'])
-                ->set_enddate($row['enddate']);
+                ->set_date_by_lti($row['date_by_lti'] ?? null)
+                ->set_startdate($row['startdate'] ?? null)
+                ->set_enddate($row['enddate'] ?? null);
         }
         return null;
     }
