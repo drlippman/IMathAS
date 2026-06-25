@@ -173,6 +173,7 @@ export const actions = {
 
         store.assessInfo.intro = response.intro;
         store.assessInfo.interquestion_text = response.interquestion_text;
+        store.assessInfo.resources = response.resources;
         if (callback) {
           nextTick(() => {
             callback();

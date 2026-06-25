@@ -2,7 +2,7 @@
   <div id="resource-pane" v-if="assessResources.length > 0">
     <div class="pane-header">
       <icons v-if="showicon" name="file" />
-      Resources
+      {{ $t('header-resources_header') }}
     </div>
     <div class="pane-body">
       <div v-for="(curResource,index) in assessResources"

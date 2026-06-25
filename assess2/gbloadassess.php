@@ -170,6 +170,7 @@ $include_from_assess_info = array(
 if ($_REQUEST['loadtexts'] == 1) {
     $include_from_assess_info[] = 'intro';
     $include_from_assess_info[] = 'interquestion_text';
+    $include_from_assess_info[] = 'resources';
 }
 $assessInfoOut = $assess_info->extractSettings($include_from_assess_info);
 

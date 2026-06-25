@@ -322,6 +322,18 @@
             :textobj = "{html: aData.intro}"
             class = "questionpane introtext"
           />
+          <div v-if = "!hidetexts && aData.hasOwnProperty('resources') && aData.resources.length > 0"
+            class = "questionpane introtext"  
+          >
+            <b>{{ $t('header-resources_header') }}</b>
+            <ul class = "nomark">
+              <li v-for="(curResource,index) in aData.resources" :key="index">
+                <a :href="curResource.link" target="_blank">
+                  {{ curResource.label }}
+                </a>
+              </li>
+            </ul>
+          </div>
           <div
             v-for = "(qdata,qn) in curQuestions"
             :key = "qn"

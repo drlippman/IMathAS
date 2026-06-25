@@ -27,7 +27,7 @@ $aid = Sanitize::onlyInt($_GET['aid']);
 //load settings without questions
 $assess_info = new AssessInfo($DBH, $aid, $cid, false);
 
-$assessInfoOut = $assess_info->extractSettings(['intro', 'interquestion_text']);
+$assessInfoOut = $assess_info->extractSettings(['intro', 'interquestion_text', 'resources']);
 
 //output JSON object
 echo json_encode($assessInfoOut, JSON_INVALID_UTF8_IGNORE);
