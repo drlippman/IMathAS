@@ -1636,21 +1636,15 @@ function generateTable() {
                     var altaddWE = _(" disabled");
                 }
                 if ((curitems[j][7] & 4) == 4) {
-                    if ((curitems[j][7] & 16) == 16) {
-                        html += '<div class="ccvid inlinediv"';
-                        var altbase = _("Captioned video");
-                    } else {
-                        html += '<div class="inlinediv"';
-                        var altbase = _("Video");
-                    }
-                    
+                    html += '<div class="inlinediv"';
+                    var altbase = ((curitems[j][7] & 16) == 16) ? _("Captioned video") : _("Video");
                     html += 'title="'+altbase+altadd+'">';
                     html +=
-                        '<img src="' +
+                        '<img width=16 src="' +
                         staticroot +
-                        "/img/video_tiny" +
+                        "/img/video2" + ((curitems[j][7] & 16) == 16 ? 'cc' : '') +
                         showicons +
-                        '.png" alt="' +
+                        '.svg" alt="' +
                         altbase +
                         altadd +
                         '"/>';
@@ -1658,11 +1652,11 @@ function generateTable() {
                 }
                 if ((curitems[j][7] & 2) == 2) {
                     html +=
-                        '<img src="' +
+                        '<img width=16 src="' +
                         staticroot +
-                        "/img/html_tiny" +
+                        "/img/page" +
                         showicons +
-                        '.png" alt="'+_('Help Resource') +
+                        '.svg" alt="'+_('Help Resource') +
                         altadd +
                         '" title="'+_('Help Resource') +
                         altadd +
@@ -1672,9 +1666,9 @@ function generateTable() {
                     html +=
                         '<img src="' +
                         staticroot +
-                        "/img/assess_tiny" +
+                        "/img/written" +
                         showiconsWE +
-                        '.png" alt="'+('Written example') +
+                        '.svg" alt="'+('Written example') +
                         altadd +
                         '" title="'+('Written example') +
                         altaddWE +

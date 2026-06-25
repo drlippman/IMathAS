@@ -318,34 +318,29 @@ function displayQuestionList(results) {
         // build feature icons
         features = '';
         if ((q['extrefval']&1)==1) {
-            if ((q['extrefval']&3)==3) {
-                features += '<div class="ccvid inlinediv"';
-                var altbase = _("Captioned video");
-            } else {
-                features += '<div class="inlinediv"';
-                var altbase = _("Video");
-            } 
+            features += '<div class="inlinediv"';
+            var altbase = (q['extrefval']&3)==3 ? _("Captioned video") : _("Video");
             features += 'title="'+altbase+'">';
             features +=
-                '<img src="' +
+                '<img width="16" src="' +
                 staticroot +
-                '/img/video_tiny.png" alt="' +
+                '/img/video2' + ((q['extrefval']&3)==3 ?'cc':'') + '.svg" alt="' +
                 altbase +
                 '"/>' +
                 '</div>';
         }
         if ((q['extrefval'] & 4) == 4) {
             features +=
-                '<img src="' +
+                '<img width="16" src="' +
                 staticroot +
-                '/img/html_tiny.png" alt="'+_('Help Resource')+'" ' +
+                '/img/page.svg" alt="'+_('Help Resource')+'" ' +
                 'title="'+_('Help Resource')+'" />';
         }
         if ((q['extrefval'] & 8) == 8) {
             features +=
-                '<img src="' +
+                '<img width="16" src="' +
                 staticroot +
-                '/img/assess_tiny.png" alt="'+_('Written example')+'" ' +  
+                '/img/written.svg" alt="'+_('Written example')+'" ' +  
                 'title="'+_('Written example')+'" />';
         }
         if (q['mine'] == 1) {
