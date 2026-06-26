@@ -540,6 +540,7 @@ if (isset($_GET['form'])) {
 	echo '<a href="blocksearch.php">Search Block titles</a><br/>';
 	echo '<a href="itemsearch.php">Search inline/linked items</a><br/>';
     echo '<a href="utils.php?form=setupfcm">Set up FCM for push notifications</a><br/>';
+	echo '<a href="ipeds_admin.php">Edit IPEDS</a><br/>';
 	require_once "../footer.php";
 }
 ?>
