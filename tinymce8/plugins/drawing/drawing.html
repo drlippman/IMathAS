@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drawing</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    background: #f0f0f0;
+    color: #2c2c2c;
+  }
+
+  #app {
+    display: flex;
+    flex-direction: column;
+    width: 100%; height: 100%;
+  }
+
+  /* ── Drawing toolbar ─────────────────────────────────────────────── */
+  #toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 8px;
+    background: #fff;
+    border-bottom: 1px solid #d0d0d0;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    user-select: none;
+  }
+
+  .tb-sep {
+    width: 1px; height: 24px;
+    background: #d0d0d0;
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .tool-btn {
+    width: 32px; height: 32px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #444;
+    transition: background .1s, border-color .1s;
+    flex-shrink: 0;
+  }
+  .tool-btn:hover  { background: #e8e8e8; border-color: #c0c0c0; }
+  .tool-btn.active { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; }
+  .tool-btn:disabled { opacity: 0.35; cursor: default; }
+  .tool-btn:disabled:hover { background: transparent; border-color: transparent; }
+  .tool-btn svg    { pointer-events: none; }
+
+  .tb-label {
+    font-size: 11px; color: #666;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  #size-slider {
+    width: 80px; accent-color: #3b82f6;
+    flex-shrink: 0; cursor: pointer;
+  }
+  #size-val {
+    font-size: 12px; color: #333;
+    width: 24px; text-align: right; flex-shrink: 0;
+  }
+
+  #color-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  #color-swatch {
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    border: 2px solid #aaa;
+    padding: 0;
+    background: #000;
+    flex-shrink: 0;
+    /* pointer-events off so clicks fall through to the input beneath */
+    pointer-events: none;
+  }
+  #color-input {
+    position: absolute;
+    left: 0; top: 0;
+    width: 26px; height: 26px;
+    opacity: 0;
+    cursor: pointer;
+    border: none; padding: 0;
+  }
+
+  /* ── Canvas area ──────────────────────────────────────────────────── */
+  #canvas-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #666;
+    overflow: auto;
+    position: relative;
+    min-height: 0;
+  }
+
+  #canvas-stack {
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,.45);
+  }
+
+  #draw-canvas {
+    display: block;
+    background: #fff;
+    touch-action: none;
+  }
+
+  /* Hide OS cursor for tools that render their own preview circle */
+  #draw-canvas.tool-pen    { cursor: none; }
+  #draw-canvas.tool-eraser { cursor: none; }
+  #draw-canvas.tool-line   { cursor: crosshair; }
+  #draw-canvas.tool-select { cursor: default; }
+
+  /* Overlay sits exactly on top of draw-canvas */
+  #overlay-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+  }
+
+  /* ── Status bar ───────────────────────────────────────────────────── */
+  #status-bar {
+    padding: 3px 10px;
+    font-size: 11px; color: #666;
+    background: #f8f8f8;
+    border-top: 1px solid #d0d0d0;
+    height: 20px; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="toolbar" role="toolbar" aria-label="Drawing tools">
+
+    <button class="tool-btn active" data-tool="pen" title="Pen (freehand)" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+        <path d="M2 2l7.586 7.586"/>
+        <circle cx="11" cy="11" r="2"/>
+      </svg>
+    </button>
+
+    <button class="tool-btn" data-tool="eraser" title="Eraser" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 20H7L3 16l11-11 6 6-1.5 1.5"/>
+        <path d="M6 18l3-3"/>
+      </svg>
+    </button>
+
+    <button class="tool-btn" data-tool="line" title="Line" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="4" y1="20" x2="20" y2="4"/>
+      </svg>
+    </button>
+
+    <button class="tool-btn" data-tool="select" title="Selection — drag to move, Delete to clear" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
+        <path d="M13 13l6 6"/>
+      </svg>
+    </button>
+
+    <div class="tb-sep"></div>
+
+    <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)" type="button" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7v6h6"/><path d="M3 13C5 7 10 4 16 6a9 9 0 0 1 5 8"/>
+      </svg>
+    </button>
+    <button class="tool-btn" id="btn-redo" title="Redo (Ctrl+Shift+Z)" type="button" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 7v6h-6"/><path d="M21 13C19 7 14 4 8 6a9 9 0 0 0-5 8"/>
+      </svg>
+    </button>
+
+    <div class="tb-sep"></div>
+
+    <label class="tb-label" for="size-slider">Size</label>
+    <input id="size-slider" type="range" min="1" max="40" value="2">
+    <span id="size-val">2</span>
+
+    <div class="tb-sep"></div>
+
+    <label class="tb-label" for="color-input">Color</label>
+    <div id="color-wrap">
+      <div id="color-swatch"></div>
+      <input id="color-input" type="color" value="#000000" title="Pick color">
+    </div>
+
+  </div>
+
+  <div id="canvas-area">
+    <div id="canvas-stack">
+      <canvas id="draw-canvas"    class="tool-pen"></canvas>
+      <canvas id="overlay-canvas"></canvas>
+    </div>
+  </div>
+
+  <div id="status-bar"></div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+
+  const drawCanvas    = document.getElementById('draw-canvas');
+  const overlayCanvas = document.getElementById('overlay-canvas');
+  const ctx  = drawCanvas.getContext('2d');
+  const octx = overlayCanvas.getContext('2d');
+
+  // Size the canvas to fill the available space inside the iframe.
+  // Subtract the toolbar and status-bar heights so the canvas fits exactly.
+  const toolbar   = document.getElementById('toolbar');
+  const statusBar = document.getElementById('status-bar');
+  const CW = window.innerWidth;
+  const CH = Math.max(200, window.innerHeight
+                          - toolbar.getBoundingClientRect().height
+                          - statusBar.getBoundingClientRect().height);
+
+  drawCanvas.width    = overlayCanvas.width  = CW;
+  drawCanvas.height   = overlayCanvas.height = CH;
+
+  const sizeSlider  = document.getElementById('size-slider');
+  const sizeVal     = document.getElementById('size-val');
+  const colorSwatch = document.getElementById('color-swatch');
+  const colorInput  = document.getElementById('color-input');
+
+  // ── State ──────────────────────────────────────────────────────────
+  let activeTool  = 'pen';
+  let strokeColor = '#000000';
+  let strokeSize  = 2;
+  let pointerDown  = false;
+  let lastPt       = null;
+
+  // ── Smoothing ────────────────────────────────────────────────────────
+  // Two-stage approach used by real drawing apps:
+  //
+  // 1. POINT THINNING — ignore incoming points that are too close to the
+  //    last accepted point. This removes the high-frequency jitter that
+  //    makes raw strokes look jagged, and means there's real distance
+  //    between the points we actually draw through.
+  //
+  // 2. QUADRATIC BEZIER MIDPOINTS — instead of drawing line segments
+  //    p[i]→p[i+1], draw a quadratic bezier from the midpoint of the
+  //    previous pair to the midpoint of the current pair, using the
+  //    shared point as the control handle. This gives a smooth curve
+  //    that visually passes through all accepted points without any
+  //    matrix math or lookahead buffer.
+  //
+  // Both stages together produce a stroke that feels natural and smooth.
+  const MIN_DIST = 4;   // px — minimum distance between accepted points
+  let penPts = [];      // thinned accepted points for the current stroke
+  let penSnap = null;   // canvas ImageData snapshot at stroke start
+
+  function distSq(a, b) {
+    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
+  }
+
+  function redrawPenStroke() {
+    const pts = penPts;
+    if (pts.length < 2) return;
+
+    ctx.putImageData(penSnap, 0, 0);
+    setupStroke();
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+
+    if (pts.length === 2) {
+      ctx.lineTo(pts[1].x, pts[1].y);
+    } else {
+      // Draw quadratic beziers through midpoints.
+      // Each bezier goes from mid(pts[i-1], pts[i]) to mid(pts[i], pts[i+1])
+      // with pts[i] as the control point — this guarantees C1 continuity
+      // (matching tangents) at every junction.
+      let mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+      for (let i = 1; i < pts.length - 1; i++) {
+        const m = mid(pts[i], pts[i + 1]);
+        ctx.quadraticCurveTo(pts[i].x, pts[i].y, m.x, m.y);
+      }
+      // Final segment to the last point
+      const last = pts[pts.length - 1];
+      ctx.lineTo(last.x, last.y);
+    }
+    ctx.stroke();
+  }
+
+  // ── Undo / redo ──────────────────────────────────────────────────────
+  // Simple ImageData snapshot stack. We push after every completed gesture
+  // (stroke, erase, line, selection move/delete). Max 50 states to cap RAM.
+  const MAX_HISTORY = 50;
+  let undoStack = [];  // ImageData snapshots; top = most recent committed state
+  let redoStack = [];
+
+  const btnUndo = document.getElementById('btn-undo');
+  const btnRedo = document.getElementById('btn-redo');
+
+  function updateUndoRedoButtons() {
+    btnUndo.disabled = undoStack.length === 0;
+    btnRedo.disabled = redoStack.length === 0;
+  }
+
+  function pushHistory() {
+    undoStack.push(ctx.getImageData(0, 0, CW, CH));
+    if (undoStack.length > MAX_HISTORY) undoStack.shift();
+    redoStack = [];   // branching discards the redo future
+    updateUndoRedoButtons();
+  }
+
+  function undo() {
+    if (undoStack.length === 0) return;
+    if (activeTool === 'select' && selRect) finaliseSelection();
+    redoStack.push(ctx.getImageData(0, 0, CW, CH));
+    ctx.putImageData(undoStack.pop(), 0, 0);
+    updateUndoRedoButtons();
+  }
+
+  function redo() {
+    if (redoStack.length === 0) return;
+    if (activeTool === 'select' && selRect) finaliseSelection();
+    undoStack.push(ctx.getImageData(0, 0, CW, CH));
+    ctx.putImageData(redoStack.pop(), 0, 0);
+    updateUndoRedoButtons();
+  }
+
+  btnUndo.addEventListener('click', undo);
+  btnRedo.addEventListener('click', redo);
+
+  // Line tool
+  let lineStart = null, lineSnapshot = null;
+
+  // Selection tool
+  let selStart = null, selRect = null;
+  let selSnapshot = null, selContent = null;
+  let selDragging = false, selDragStart = null, selDragOrigin = null;
+
+  // Overlay render state
+  let _selDrawRect = null, _brushPt = null, _brushVisible = false;
+
+  // ── Helpers ─────────────────────────────────────────────────────────
+  function setStatus(msg) { statusBar.textContent = msg; }
+
+  function canvasPoint(e) {
+    const r  = drawCanvas.getBoundingClientRect();
+    const sx = CW / r.width, sy = CH / r.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * sx, y: (src.clientY - r.top) * sy };
+  }
+
+  function normalizeRect(x1, y1, x2, y2) {
+    return { x: Math.min(x1,x2), y: Math.min(y1,y2),
+             w: Math.abs(x2-x1), h: Math.abs(y2-y1) };
+  }
+
+  function ptInRect(pt, r) {
+    return r && pt.x >= r.x && pt.x <= r.x+r.w && pt.y >= r.y && pt.y <= r.y+r.h;
+  }
+
+  // ── Overlay (selection dashes + brush preview circle) ──────────────
+  function renderOverlay() {
+    octx.clearRect(0, 0, CW, CH);
+
+    if (_selDrawRect) {
+      const r = _selDrawRect;
+      octx.save();
+      octx.strokeStyle = '#3b82f6';
+      octx.lineWidth   = 1.5;
+      octx.setLineDash([5, 3]);
+      octx.strokeRect(r.x + .5, r.y + .5, r.w, r.h);
+      octx.fillStyle = 'rgba(59,130,246,.07)';
+      octx.fillRect(r.x, r.y, r.w, r.h);
+      octx.restore();
+    }
+
+    if (_brushVisible && _brushPt && (activeTool === 'pen' || activeTool === 'eraser')) {
+      const radius = Math.max(1, strokeSize / 2);
+      octx.save();
+      octx.beginPath();
+      octx.arc(_brushPt.x, _brushPt.y, radius, 0, Math.PI * 2);
+      if (activeTool === 'eraser') {
+        octx.fillStyle   = 'rgba(255,255,255,0.55)';
+        octx.strokeStyle = 'rgba(80,80,80,0.8)';
+      } else {
+        const hex = strokeColor.replace('#','');
+        const ri = parseInt(hex.slice(0,2),16);
+        const gi = parseInt(hex.slice(2,4),16);
+        const bi = parseInt(hex.slice(4,6),16);
+        octx.fillStyle   = `rgba(${ri},${gi},${bi},0.15)`;
+        octx.strokeStyle = `rgba(${ri},${gi},${bi},0.75)`;
+      }
+      octx.lineWidth = 1;
+      octx.fill();
+      octx.stroke();
+      octx.restore();
+    }
+  }
+
+  const setSelOverlay  = r  => { _selDrawRect = r;      renderOverlay(); };
+  const clearSelOverlay = () => { _selDrawRect = null;   renderOverlay(); };
+  const showBrush = pt     => { _brushPt = pt; _brushVisible = true;  renderOverlay(); };
+  const hideBrush = ()     => { _brushVisible = false; renderOverlay(); };
+
+  // ── Tool switching ───────────────────────────────────────────────────
+  function setTool(tool) {
+    if (activeTool === 'select' && selRect) finaliseSelection();
+    activeTool = tool;
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(b =>
+      b.classList.toggle('active', b.dataset.tool === tool)
+    );
+    drawCanvas.className = `tool-${tool}`;
+    clearSelOverlay();
+    selRect = null; selContent = null; selSnapshot = null;
+    if (tool !== 'pen' && tool !== 'eraser') hideBrush();
+  }
+
+  document.querySelectorAll('.tool-btn[data-tool]').forEach(btn =>
+    btn.addEventListener('click', () => setTool(btn.dataset.tool))
+  );
+
+  // ── Size & color controls ────────────────────────────────────────────
+  sizeSlider.addEventListener('input', () => {
+    strokeSize = parseInt(sizeSlider.value, 10);
+    sizeVal.textContent = strokeSize;
+    renderOverlay();
+  });
+
+  colorInput.addEventListener('input', () => {
+    strokeColor = colorInput.value;
+    colorSwatch.style.background = strokeColor;
+    renderOverlay();
+  });
+
+  // ── Drawing primitives ───────────────────────────────────────────────
+  function setupStroke() {
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.lineWidth = strokeSize; ctx.strokeStyle = strokeColor;
+  }
+
+  function eraseAt(pt) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, strokeSize / 2, 0, Math.PI * 2);
+    ctx.fill();
+    if (lastPt) {
+      ctx.lineWidth = strokeSize; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(lastPt.x, lastPt.y);
+      ctx.lineTo(pt.x, pt.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ── Selection: cut-and-float ─────────────────────────────────────────
+  // On commit: capture pixels, punch a white hole in the snapshot at that
+  // location, store as the permanent background. During drag, restore the
+  // punched background then paint the floating content at the new position,
+  // so the origin is always blank — true relocation with no ghost.
+
+  function startSelection(pt) {
+    selStart    = pt;
+    selSnapshot = ctx.getImageData(0, 0, CW, CH);
+  }
+
+  function commitSelectionRect(pt) {
+    const r = normalizeRect(selStart.x, selStart.y, pt.x, pt.y);
+    selStart = null;
+    if (r.w < 2 || r.h < 2) { clearSelOverlay(); return; }
+    selRect    = r;
+    selContent = ctx.getImageData(r.x, r.y, r.w, r.h);
+
+    const punched = new ImageData(new Uint8ClampedArray(selSnapshot.data), CW, CH);
+    const x0 = Math.floor(r.x), y0 = Math.floor(r.y);
+    const x1 = Math.ceil(r.x + r.w), y1 = Math.ceil(r.y + r.h);
+    for (let y = y0; y < y1; y++) {
+      if (y < 0 || y >= CH) continue;
+      for (let x = x0; x < x1; x++) {
+        if (x < 0 || x >= CW) continue;
+        const i = (y * CW + x) * 4;
+        punched.data[i] = punched.data[i+1] = punched.data[i+2] = punched.data[i+3] = 255;
+      }
+    }
+    selSnapshot = punched;
+    ctx.putImageData(selSnapshot, 0, 0);
+    ctx.putImageData(selContent, r.x, r.y, 0, 0, r.w, r.h);
+
+    setSelOverlay(selRect);
+    setStatus('Selection active — drag to move  •  Delete to clear  •  Esc to commit');
+  }
+
+  function finaliseSelection() {
+    selSnapshot = ctx.getImageData(0, 0, CW, CH);
+    selRect = null; selContent = null; selStart = null; selDragging = false;
+    clearSelOverlay();
+    setStatus('');
+  }
+
+  // ── Pointer events ───────────────────────────────────────────────────
+  function onPointerDown(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    e.preventDefault();
+    if (drawCanvas.setPointerCapture) drawCanvas.setPointerCapture(e.pointerId);
+    pointerDown = true;
+    const pt = canvasPoint(e);
+
+    if (activeTool === 'pen') {
+      pushHistory();    // snapshot before the stroke begins
+      penPts  = [pt];
+      penSnap = ctx.getImageData(0, 0, CW, CH);
+      setupStroke();
+    }
+    if (activeTool === 'eraser') { pushHistory(); lastPt = pt; eraseAt(pt); }
+    if (activeTool === 'line')   { pushHistory(); lineStart = pt; lineSnapshot = ctx.getImageData(0,0,CW,CH); }
+    if (activeTool === 'select') {
+      if (ptInRect(pt, selRect) && selContent) {
+        pushHistory();  // snapshot before the drag begins
+        selDragging = true; selDragStart = pt; selDragOrigin = { ...selRect };
+      } else {
+        if (selRect) finaliseSelection();
+        startSelection(pt);
+      }
+    }
+  }
+
+  function onPointerMove(e) {
+    const pt = canvasPoint(e);
+    if (activeTool === 'pen' || activeTool === 'eraser') showBrush(pt);
+    if (!pointerDown) return;
+    e.preventDefault();
+
+    if (activeTool === 'pen') {
+      const last = penPts[penPts.length - 1];
+      if (distSq(pt, last) >= MIN_DIST * MIN_DIST) {
+        penPts.push(pt);
+        redrawPenStroke();
+      }
+    }
+    if (activeTool === 'eraser') { eraseAt(pt); lastPt = pt; }
+    if (activeTool === 'line' && lineSnapshot) {
+      ctx.putImageData(lineSnapshot, 0, 0);
+      setupStroke(); ctx.beginPath();
+      ctx.moveTo(lineStart.x, lineStart.y); ctx.lineTo(pt.x, pt.y); ctx.stroke();
+    }
+    if (activeTool === 'select') {
+      if (selDragging) {
+        const nx = selDragOrigin.x + (pt.x - selDragStart.x);
+        const ny = selDragOrigin.y + (pt.y - selDragStart.y);
+        ctx.putImageData(selSnapshot, 0, 0);
+        ctx.putImageData(selContent, nx, ny, 0, 0, selRect.w, selRect.h);
+        selRect = { x: nx, y: ny, w: selRect.w, h: selRect.h };
+        setSelOverlay(selRect);
+      } else if (selStart) {
+        setSelOverlay(normalizeRect(selStart.x, selStart.y, pt.x, pt.y));
+      }
+    }
+  }
+
+  function onPointerUp(e) {
+    if (!pointerDown) return;
+    e.preventDefault();
+    pointerDown = false;
+    const pt = canvasPoint(e);
+
+    if (activeTool === 'pen') {
+      penPts.push(pt);
+      redrawPenStroke();
+      penPts  = [];
+      penSnap = null;
+      lastPt  = null;
+    }
+    if (activeTool === 'eraser') { lastPt = null; }
+    if (activeTool === 'line')   { lineStart = null; lineSnapshot = null; }
+    if (activeTool === 'select') {
+      if (selDragging) { selDragging = false; setSelOverlay(selRect); }
+      else if (selStart) commitSelectionRect(pt);
+    }
+  }
+
+  drawCanvas.addEventListener('pointerdown',  onPointerDown);
+  drawCanvas.addEventListener('pointermove',  onPointerMove);
+  drawCanvas.addEventListener('pointerup',    onPointerUp);
+  drawCanvas.addEventListener('pointerleave', () => hideBrush());
+  drawCanvas.addEventListener('touchstart', onPointerDown, { passive: false });
+  drawCanvas.addEventListener('touchmove',  onPointerMove, { passive: false });
+  drawCanvas.addEventListener('touchend',   onPointerUp,   { passive: false });
+
+  document.addEventListener('keydown', e => {
+    // Undo / redo — handle before the selection-only block below
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault(); undo(); return;
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+      e.preventDefault(); redo(); return;
+    }
+
+    if (activeTool !== 'select' || !selRect) return;
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      pushHistory();       // snapshot before pixels are cleared
+      if (selSnapshot) ctx.putImageData(selSnapshot, 0, 0);
+      finaliseSelection();
+    }
+    if (e.key === 'Escape') finaliseSelection(); // no pixel change, no history push
+  });
+
+  // ── Export ───────────────────────────────────────────────────────────
+
+  // Scan pixel data and return the tightest bounding box containing any
+  // pixel that differs from white (255,255,255). Returns null if the
+  // canvas is completely blank.
+  function getContentBounds(imageData) {
+    const d = imageData.data;
+    const w = imageData.width;
+    const h = imageData.height;
+    let minX = w, minY = h, maxX = -1, maxY = -1;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
+        // Treat fully-transparent or pure-white pixels as background
+        if (a < 255 || (r === 255 && g === 255 && b === 255)) continue;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+
+    if (maxX === -1) return null; // blank canvas
+    const PAD = 4; // a few pixels of breathing room around the content
+    return {
+      x: Math.max(0,   minX - PAD),
+      y: Math.max(0,   minY - PAD),
+      w: Math.min(w,   maxX + PAD + 1) - Math.max(0, minX - PAD),
+      h: Math.min(h,   maxY + PAD + 1) - Math.max(0, minY - PAD),
+    };
+  }
+
+  function exportDrawing() {
+    if (activeTool === 'select' && selRect) finaliseSelection();
+    setStatus('Exporting…');
+
+    // Composite draw-canvas onto a white background canvas
+    const flat = document.createElement('canvas');
+    flat.width = CW; flat.height = CH;
+    const fctx = flat.getContext('2d');
+    fctx.fillStyle = '#ffffff';
+    fctx.fillRect(0, 0, CW, CH);
+    fctx.drawImage(drawCanvas, 0, 0);
+
+    // Find the content bounding box and crop to it
+    const pixels = fctx.getImageData(0, 0, CW, CH);
+    const bounds = getContentBounds(pixels);
+
+    const exp = document.createElement('canvas');
+    if (bounds) {
+      exp.width  = bounds.w;
+      exp.height = bounds.h;
+      exp.getContext('2d').drawImage(flat, bounds.x, bounds.y, bounds.w, bounds.h,
+                                          0, 0, bounds.w, bounds.h);
+    } else {
+      // Blank canvas - close without export
+      window.parent.postMessage({ type: 'tdp-cancel' }, '*');
+      return;
+    }
+
+    exp.toBlob(blob => {
+      if (!blob) { setStatus('⚠ Export failed'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        window.parent.postMessage({ type: 'tdp-done', src: reader.result }, '*');
+      };
+      reader.readAsDataURL(blob);
+    }, 'image/png');
+  }
+
+  // ── postMessage bridge ───────────────────────────────────────────────
+  window.addEventListener('message', evt => {
+    const data = evt.data;
+    if (!data) return;
+    if (data.type === 'tdp-init') {
+      if (data.imageSrc) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          // Never upscale: if the image fits, draw it at natural size.
+          // If it's too large, scale it down to fit while preserving aspect ratio.
+          const scale = Math.min(1, CW / img.naturalWidth, CH / img.naturalHeight);
+          const dw = Math.round(img.naturalWidth  * scale);
+          const dh = Math.round(img.naturalHeight * scale);
+          // Centre it on the canvas
+          const dx = Math.round((CW - dw) / 2);
+          const dy = Math.round((CH - dh) / 2);
+          ctx.drawImage(img, dx, dy, dw, dh);
+        };
+        img.onerror = () => setStatus('⚠ Could not load image (CORS?)');
+        img.src = data.imageSrc;
+      }
+    }
+    if (data.type === 'tdp-export') {
+      exportDrawing();
+    }
+  });
+
+  // Tell the plugin we're ready
+  window.parent.postMessage({ type: 'tdp-ready' }, '*');
+
+})();
+</script>
+</body>
+</html>

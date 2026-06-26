@@ -74,7 +74,7 @@ var uselocaljs = <?php echo !empty($CFG['GEN']['uselocaljs']) ? 'true' : 'false'
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 <?php if (isset($CFG['S3']['altendpoint'])) { echo 'var altfilesendpoint = "'.Sanitize::encodeStringForDisplay($CFG['S3']['altendpoint']).'";';} ?>
 </script>
-<script src="<?php echo $staticroot;?>/javascript/general.js?v=062426"></script>
+<script src="<?php echo $staticroot;?>/javascript/general.js?v=062526"></script>
 <?php
 // override allowedImgDomains if set in config
 if (isset($CFG['GEN']['allowedImgDomains'])) {
