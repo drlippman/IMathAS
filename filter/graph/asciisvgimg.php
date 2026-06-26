@@ -304,6 +304,9 @@ function processScript($script) {
 				case 'text':
 					$this->AStext($argarr);
 					break;
+				case 'textfrac':
+					$this->AStextfrac($argarr);
+					break;
 				case 'textabs':
 					$this->AStextAbs($argarr);
 					break;
@@ -423,6 +426,16 @@ function AStext($arg) {
 	}
 	$this->AStextInternal($p,$st,$pos,$angle);
 }
+
+function AStextfrac($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
+	$d = array_splice($arg,2,1);
+	if ($d[0] != 1) {
+		$arg[1] .= '/' . $d[0];
+	}
+	$this->AStext($arg);
+}
+
 function AStextAbs($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
 	$pos = '';  $angle = 0;

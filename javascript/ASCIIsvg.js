@@ -381,7 +381,9 @@ function initPicture(x_min,x_max,y_min,y_max) {
 					picture.removeAttribute("sscr");
 				}
 				if (picture.hasAttribute("script")) {
-					qnode.setAttribute("data-script", picture.getAttribute("script"));
+          var scr = picture.getAttribute("script");
+          scr = scr.replace(/<img[^>]*?alt="(.*?)".*?>/g,'`$1`');
+					qnode.setAttribute("data-script", scr);
 					picture.removeAttribute("script");
 				}
       } else {
@@ -696,6 +698,9 @@ function textabs(p,st,pos,angle,id,fontsty) {
   } else {
 	  angle = (360 - angle)%360;
   }
+  if (typeof st == 'string' && st.indexOf('`') > -1 && rendermathnode && (mathRenderer ?? 'none') != "none") {
+    return mathtextabs(p, st, pos, angle);
+  }
   var textanchor = "middle";
   var dx=0; var dy=0;
   if (angle==270) {
@@ -807,6 +812,111 @@ function textabs(p,st,pos,angle,id,fontsty) {
   return p;
 }
 
+function rotatePt(x, y, angle_deg) {
+  const r = angle_deg * Math.PI / 180;
+  return { x: x * Math.cos(r) - y * Math.sin(r),
+           y: x * Math.sin(r) + y * Math.cos(r) };
+}
+
+// How far the AABB extends from the element's center in each screen direction
+function aabbHalfExtents(w, h, angle_deg) {
+  const corners = [
+    rotatePt(-w/2, -h/2, angle_deg),
+    rotatePt( w/2, -h/2, angle_deg),
+    rotatePt( w/2,  h/2, angle_deg),
+    rotatePt(-w/2,  h/2, angle_deg),
+  ];
+  const xs = corners.map(c => c.x), ys = corners.map(c => c.y);
+  return {
+    left:   -Math.min(...xs),
+    right:   Math.max(...xs),
+    top:    -Math.min(...ys),
+    bottom:  Math.max(...ys),
+  };
+}
+
+function mathtextabs(p,st,pos,angle) {
+  var fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+  var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+  var span = document.createElementNS('http://www.w3.org/1999/xhtml', 'span');
+  div.style.fontSize = (fontsize * .9) + 'px';
+  if (fontfill!="none") { div.style.color = fontfill; }
+  div.innerHTML = st;
+  p[1] = height - p[1];
+  fo.setAttribute('x', p[0] - fontsize/2);
+  fo.setAttribute('y', p[1] - fontsize/2);
+  fo.setAttribute('width', width);
+  fo.setAttribute('height', height);
+  fo.appendChild(div);
+  var ge = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  ge.appendChild(fo);
+  ge.style.visibility = "hidden";
+  svgpicture.appendChild(ge);
+  var basep = p;
+  rendermathnode(div, function() {
+    var w = div.firstElementChild.getBoundingClientRect().width;
+    var h = div.getBoundingClientRect().height;
+
+    const ext = aabbHalfExtents(w, h, angle);
+    let dx = 0, dy = 0;
+    if (pos!=null) {
+      if (pos.match(/above/))  dy =  ext.bottom;
+      if (pos.match(/below/))  dy = -ext.top;
+      if (pos.match(/left/))   dx =  ext.right;
+      if (pos.match(/right/))  dx = -ext.left;
+    }
+    const cx = basep[0] - dx, cy = basep[1] - dy;
+    ge.setAttribute('transform', `translate(${cx}, ${cy}) rotate(${angle})`);
+    fo.setAttribute('x', -w/2);
+    fo.setAttribute('y', -h/2);
+    ge.style.visibility = "";
+  });
+}
+
+var fraccnt = 0;
+function textfrac(p,n,d,pos) {
+  if (d == 1) {
+    text(p, n, pos);
+    return;
+  }
+  p[0] = p[0]*xunitlength+origin[0];
+	p[1] = p[1]*yunitlength+origin[1];
+  let dy = 0;
+  if (pos!=null) {
+    if (pos.match(/above/)) {
+      dy = -fontsize - 3;
+    } else if (pos.match(/below/)) {
+      dy = fontsize + 3;
+    } 
+  }
+  textabs([p[0],p[1]-dy-.6*fontsize],d,'',0,'asfracd'+fraccnt);
+  textabs([p[0],p[1]-dy+.6*fontsize],n,'',0,'asfracn'+fraccnt);
+  let nnode = document.getElementById('asfracn'+fraccnt);
+  let nnodebox = nnode.getBBox();
+  let dnode = document.getElementById('asfracd'+fraccnt);
+  let dnodebox = dnode.getBBox();
+  let hshift = 0;
+  if (pos!=null && pos.match(/(right|left)/)) {
+    let maxw = Math.max(nnodebox.width,dnodebox.width);
+    if (pos.match(/right/)) {
+      hshift = maxw/2 + 3;
+    } else {
+      hshift = -maxw/2 + -3;
+    }
+    nnode.setAttribute('x', parseFloat(nnode.getAttribute('x')) + hshift);
+    dnode.setAttribute('x', parseFloat(dnode.getAttribute('x')) + hshift);
+  }
+  
+  let fleft = Math.min(nnodebox.x,dnodebox.x) + hshift;
+  let fright = Math.max(nnodebox.x+nnodebox.width, dnodebox.x+dnodebox.width) + hshift;
+  
+  node = myCreateElementSVG("path");
+  node.setAttribute("d","M"+(fleft)+","+(height-p[1]+dy)+" "+(fright)+","+(height-p[1]+dy));
+  node.setAttribute("stroke-width", 1);
+  node.setAttribute("stroke", fontfill);
+  svgpicture.appendChild(node);
+  fraccnt++;
+}
 
 function ASdot(center,radius,s,f) { // coordinates in units, radius in pixel
   if (s==null) s = stroke; if (f==null) f = fill;
@@ -1097,7 +1207,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   if (st !== '') {
     pnode = myCreateElementSVG("path");
     pnode.setAttribute("d",st);
-    pnode.setAttribute("stroke-width", .5);
+    pnode.setAttribute("stroke-width", .8);
     pnode.setAttribute("stroke", axesstroke);
     pnode.setAttribute("fill", fill);
     svgpicture.appendChild(pnode);
@@ -1319,6 +1429,7 @@ function drawPics(base) {
 		  } else {
 			  src = picture.hasAttribute("data-script")?picture.getAttribute("data-script"):picture.getAttribute("script"); //script from showplot
 			  if ((src!=null) && (src != "")) {
+          src = src.replace(/<img[^>]*?alt="(.*?)".*?>/g,'`$1`');
 				  try {
 					  eval(prepWithMath(src));
 					  if (!picture.hasAttribute("data-enlarged") && !picture.hasAttribute("data-nomag")) {

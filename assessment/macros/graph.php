@@ -980,13 +980,22 @@ function addfractionaxislabels($plot, $step, $axis = "x") {
         } else {
             $ld = $n;
         }
-        if ($d != 1) {
-            $ld .= "/$d";
-        }
-        if ($axis === 'x') {
-            $outst .= "line([$av,$tm],[$av,$tx]); text([$av,$tm],\"$ld\",\"below\");";
-        } else if ($axis === 'y') {
-            $outst .= "line([$tm,$av],[$tx,$av]); text([$tm,$av],\"$ld\",\"left\");";
+        
+        if (($_SESSION['graphdisp']??0)==1) {
+            if ($axis === 'x') {
+                $outst .= "line([$av,$tm],[$av,$tx]); textfrac([$av,$tm],\"$ld\",$d,\"below\");";
+            } else if ($axis === 'y') {
+                $outst .= "line([$tm,$av],[$tx,$av]); textfrac([$tm,$av],\"$ld\",$d,\"left\");";
+            }
+        } else {
+            if ($d != 1) {
+                $ld .= "/$d";
+            }
+            if ($axis === 'x') {
+                $outst .= "line([$av,$tm],[$av,$tx]); text([$av,$tm],\"$ld\",\"below\");";
+            } else if ($axis === 'y') {
+                $outst .= "line([$tm,$av],[$tx,$av]); text([$tm,$av],\"$ld\",\"left\");";
+            }
         }
         $step++;
     }
