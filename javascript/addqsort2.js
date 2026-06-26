@@ -757,6 +757,13 @@ function fullungroup(loc) {
     return false;
 }
 
+function selallgroup(loc) {
+    $("#curqtbl input[name^=checked][value^="+loc+"-]").prop("checked", true);
+}
+function unselallgroup(loc) {
+    $("#curqtbl input[name^=checked][value^="+loc+"-]").prop("checked", false);
+}
+
 function togglegroupEC(loc) {
     var newec = 1 - itemarray[loc][2][0][9];
     for (var i=0; i<itemarray[loc][2].length; i++) {
@@ -1418,6 +1425,14 @@ function generateTable() {
                         html +=
                             '<li><a href="#" onclick="return togglegroupEC(' + i + ');">' +
                             _("Toggle Extra Credit") +
+                            "</a></li>";
+                        html +=
+                            '<li><a href="#" onclick="return selallgroup(' + i + ');">' +
+                            _("Select all in group") +
+                            "</a></li>";
+                        html +=
+                            '<li><a href="#" onclick="return unselallgroup(' + i + ');">' +
+                            _("Un-select all in group") +
                             "</a></li>";
                         html += '</ul></div></td></tr>';
 
