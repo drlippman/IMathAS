@@ -109,6 +109,7 @@
 		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
 		if (!isset($_POST['gbmode100000'])) {$defgbmode += 100000;}
 		if (!isset($_POST['gbmode200000'])) {$defgbmode += 200000;}
+		if (isset($_POST['gbmode1000000'])) {$defgbmode += 1000000;}
 		$stugbmode = ($_POST['stugbmode1'] ?? 0) + ($_POST['stugbmode2'] ?? 0) + ($_POST['stugbmode4'] ?? 0) + ($_POST['stugbmode8'] ?? 0);
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,usersort=:usersort,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode,colorize=:colorize WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$useweights, ':orderby'=>$orderby, ':usersort'=>$usersort, ':defaultcat'=>$defaultcat, ':defgbmode'=>$defgbmode, ':stugbmode'=>$stugbmode, ':colorize'=>$_POST['colorize'], ':courseid'=>$cid));
@@ -248,7 +249,8 @@
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = $stm->fetch(PDO::FETCH_NUM);
 
 	/*
-		defgbmode is FEDCBA where
+		defgbmode is GFEDCBA where
+		G & 1 is  Try to shorten header names
 		F & 1 is  Show Section Column	
 		F & 2 is  Show Code Column
 		F & 4 is  Show Points (0), Percents (4)
@@ -264,6 +266,7 @@
 		B & 4 is  Last change column: hide (0), show (4)
 		A     is  Show by availability: Past due (0), Past & Available (1), All (2), Past & Attempted (3), Available only (4)
 	*/
+	$shortenheaders = (((floor($defgbmode/1000000)%10)&1)==1);
 	$hidesection = (((floor($defgbmode/100000)%10)&1)==1);
 	$hidecode = (((floor($defgbmode/100000)%10)&2)==2);
 	$showpercents = (((floor($defgbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
@@ -402,7 +405,9 @@
 		<input type="checkbox" name="gbmode200000" value="2" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow">Code column (if used)</label><br/>
 		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
 		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers, and column in single-student view</label><br/>
-		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label>
+		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label><br/>
+		<input type="checkbox" name="gbmode1000000" value="1" id="shortenhdr" <?php writeHtmlChecked($shortenheaders,true);?>/><label for="shortenhdr">Try to shorten header names</label>
+	
 	</span><br class=form />
 
 	<span class="form" id="totlbl">Totals to show students:</span>

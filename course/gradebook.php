@@ -89,6 +89,24 @@ if ($canviewall) {
 	}
 
 	//Gbmode : Links NC Dates
+	/*gbmode is GFEDCBA where
+		G & 1 is  Try to shorten header names
+		F & 1 is  Show Section Column	
+		F & 2 is  Show Code Column
+		F & 4 is  Show Points (0), Percents (4)
+		E & 3 is  Show pics: none (0), small(1), big (2)
+		E & 4 is  Lock headers: 0 locked, 1 unlocked
+		D & 1 is  Total on right (0), left (1)
+		D & 2 is  Average on bottom (0), top (2)
+		D & 4 is  Last login column: hide (0), show (4)
+		C & 1 is  Links show: full (0), summary (1)
+		C & 2 is  Locked: show (0), hide (2)
+		C & 4 is  Due date column: hide (0), show (4)
+		B % 3 is  NC assignments: show (0), student visible (cntingb not 0) (1), hide all (2)
+		B & 4 is  Last change column: hide (0), show (4)
+		A     is  Show by availability: Past due (0), Past & Available (1), All (2), Past & Attempted (3), Available only (4)
+	*/
+	$shortenheaders = (((floor($gbmode/1000000)%10)&1)==1);
 	$hidesection = (((floor($gbmode/100000)%10)&1)==1);
 	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
 	$showpercents = (((floor($gbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
@@ -1520,14 +1538,14 @@ function gbInstrCatHdrs(&$gbt, &$collapsegbcat) {
 			}
 			echo '><div><span class="cattothdr">';
 			if ($availshow<3) {
-				echo $gbt[0][2][$i][0].'<br/>';
+				echo formatHeaderText($gbt[0][2][$i][0]).'<br/>';
 				if ($gbt[0][4][0]==0) { //using points based
 					echo $gbt[0][2][$i][3+$availshow].'&nbsp;', _('pts');
 				} else {
 					echo $gbt[0][2][$i][11].'%';
 				}
 			} else if ($availshow==3) { //past and attempted
-				echo $gbt[0][2][$i][0];
+				echo formatHeaderText($gbt[0][2][$i][0]);
 				if (isset($gbt[0][2][$i][11])) {
 					echo '<br/>'.$gbt[0][2][$i][11].'%';
 				}
@@ -1658,6 +1676,30 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 	}
 }
 
+function formatHeaderText($text) {
+	global $shortenheaders;
+	$text = trim($text);
+	$base = $text;
+	$sub = '';
+	if ($shortenheaders) {
+		if (($p = strpos($text, ':')) !== false) {
+			$base = trim(substr($text,0,$p));
+			$sub = trim(substr($text,$p+1));
+		} else if (($p = strpos($text, ' - ')) !== false) {
+			$base = trim(substr($text,0,$p));
+			$sub = trim(substr($text,$p+3));
+		} else if ($text[strlen($text)-1]==')' && ($p = strpos($text, '(')) !== false) {
+			$base = trim(substr($text,0,$p));
+			$sub = trim(substr($text,$p+1,-1));
+		}
+	}
+	if ($sub !== '') {
+		return '<span title="'.Sanitize::encodeStringForDisplay($sub).'">'.Sanitize::encodeStringForDisplay($base).'</span>';
+	} else {
+		return Sanitize::encodeStringForDisplay($text);
+	}
+}
+
 function gbinstrdisp() {
 	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection;
 	global $avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin,$hidesection,$hidecode,$showpercents,$headerslocked;
@@ -1773,7 +1815,7 @@ function gbinstrdisp() {
 			}
 			//name and points
 			echo '<th class="cat'.($gbt[0][1][$i][1]%10).'" data-pts="'.$gbt[0][1][$i][2].'">';
-			echo '<div>'.$gbt[0][1][$i][0].'<br/>';
+			echo '<div>'.formatHeaderText($gbt[0][1][$i][0]).'<br/>';
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
 				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
 			} else {
