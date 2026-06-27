@@ -18,7 +18,7 @@ array_push($GLOBALS['allowedmacros'],"loadlibrary","importcodefrom","includecode
 $GLOBALS['disallowedvar'] = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la',
   '$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips',
   '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$allowedConstants',
-  '$wherecount','$forloopcnt','$countcnt','$myrights','$myspecialrights',
+  '$wherecount','$forloopcnt','$_forends','$countcnt','$myrights','$myspecialrights',
   '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts','$teacherInGb',
   '$_SERVER','$_POST','$_GET','$_FILES','$_REQUEST','$_SESSION','$_COOKIE','$_ENV');
 
@@ -187,7 +187,14 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				//if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
                 if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
-					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {\$_forstart_{$countcnt}=intval({$forcond[1]});\$_forend_{$countcnt}=round(floatval({$forcond[2]}),0);if (\$_forstart_{$countcnt}<=\$_forend_{$countcnt}) {for ({$forcond[0]}=\$_forstart_{$countcnt},\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=\$_forend_{$countcnt} && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";}} else {for ({$forcond[0]}=\$_forstart_{$countcnt},\$forloopcnt[{$countcnt}]=0;{$forcond[0]}>=\$_forend_{$countcnt} && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}--, \$forloopcnt[{$countcnt}]++) {".$todo.";}}}; if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
+					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
+						\$_forends[{$countcnt}] = [round(floatval({$forcond[1]}),4), round(floatval({$forcond[2]}),4)];
+						if (\$_forends[{$countcnt}][0] <= \$_forends[{$countcnt}][1]) {
+							for ({$forcond[0]}=ceil(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=floor(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo."};
+						} else {
+							for ({$forcond[0]}=floor(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}>=ceil(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}--, \$forloopcnt[{$countcnt}]++) {".$todo."};
+						} 
+						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}}");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';
