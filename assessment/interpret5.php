@@ -223,11 +223,16 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			} else if ($whileloc === 0) {
 				//convert while(cond) {todo}
 				$j = $whileloc;
-				while ($j<count($bits) && $bits[$j][0]!='{') {
-					$j++;
+				if ($bits[$j+1][0] == '(' && strlen($bits[$j+1])>2) {
+					$cond = $bits[$j+1];
+					$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?3:2));
+				} else {
+					while ($j<count($bits) && $bits[$j][0]!='{') {
+						$j++;
+					}
+					$cond = implode('',array_slice($bits,$whileloc+1,$j-$whileloc-1));
+					$todo = implode('',array_slice($bits,$j));
 				}
-				$cond = implode('',array_slice($bits,$whileloc+1,$j-$whileloc-1));
-				$todo = implode('',array_slice($bits,$j));
                 if ($todo !== '' && $cond !== '') {
 					if ($countcnt==1) {
 						$bits = array('$whilecount[0]=0;$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {$whilecount['.$countcnt.']++;$whilecount[0]++;'.$todo.';}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";}; if ($whilecount[0]>=1000 && $whilecount[0]<2000 ) {echo "nested while not terminated in 1000 iterations";}');
