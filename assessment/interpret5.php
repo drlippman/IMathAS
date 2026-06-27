@@ -187,7 +187,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				//if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
                 if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
-					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=intval({$forcond[1]}),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=round(floatval({$forcond[2]}),0) && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";}}; if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
+					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {\$_forstart_{$countcnt}=intval({$forcond[1]});\$_forend_{$countcnt}=round(floatval({$forcond[2]}),0);if (\$_forstart_{$countcnt}<=\$_forend_{$countcnt}) {for ({$forcond[0]}=\$_forstart_{$countcnt},\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=\$_forend_{$countcnt} && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";}} else {for ({$forcond[0]}=\$_forstart_{$countcnt},\$forloopcnt[{$countcnt}]=0;{$forcond[0]}>=\$_forend_{$countcnt} && \$forloopcnt[{$countcnt}]<1000;{$forcond[0]}--, \$forloopcnt[{$countcnt}]++) {".$todo.";}}}; if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';
