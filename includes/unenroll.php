@@ -2,6 +2,7 @@
 
 require_once __DIR__.'/migratesettings.php';
 require_once __DIR__."/TeacherAuditLog.php";
+require_once __DIR__."/validatesections.php";
 
 //util function for unenrolling students
 //$cid = courseid
@@ -289,6 +290,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			)
 		);
 	}
+
+	// fix any section-limited blocks to account for lost sections
+	validateSections($cid);
 
 	/*
 	$lognote = "Unenroll in $cid run by $userid via script ".basename($_SERVER['PHP_SELF']);

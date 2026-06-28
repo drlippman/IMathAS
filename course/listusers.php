@@ -85,6 +85,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
                 $stm->execute(array(':section'=>$_POST['sec'][$stuid], ':code'=>$_POST['code'][$stuid], ':id'=>$stuid, ':courseid'=>$cid));
                 setSectionGroups($_POST['uid'][$stuid], $cid, $_POST['sec'][$stuid]);
 			}
+			require_once '../includes/validatesections.php';
+			validateSections($cid);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 
@@ -298,6 +300,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$qarr[':rights'] = $myrights;
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
+
 			} else {
 				$msgout = '<p>Username, name, email, and password left unchanged.</p>';
 			}
@@ -338,6 +341,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
             }
             require_once '../includes/setSectionGroups.php';
             setSectionGroups($uidToUpdate, $cid, $section);
+			require_once '../includes/validatesections.php';
+			validateSections($cid);
 
 			require_once '../includes/userpics.php';
 
