@@ -353,6 +353,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 foreach ($stuallsecs as $sec=>$stus) {
                     shuffle($stus);
                     $n = count($stus);
+					if ($n == 0) { continue; } // no one to assign
                     $grpn = intval(Sanitize::onlyInt($_POST['grpsize']));
                     $rem = $n%$grpn;
                     if ($_POST['grpadj']==0 || ($_POST['grpadj']==2 && $rem>=$grpn/2)) {
