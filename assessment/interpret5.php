@@ -170,12 +170,12 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			}
     
 			//check for for, if, where and rearrange bits if needed
-			if ($forloc>-1) {
+			if ($forloc===0) {
 				//convert for($i=a..b) {todo}
 				$j = $forloc;
 				if ($bits[$j+1][0] == '(' && strlen($bits[$j+1])>7) {
 					$cond = $bits[$j+1];
-					$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?3:2));
+					$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?$j+3:$j+2));
 				} else {
 					while ($j<count($bits) && $bits[$j][0]!='{') {
 						$j++;
@@ -190,21 +190,21 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
 						\$_forends[{$countcnt}] = [round(floatval({$forcond[1]}),4), round(floatval({$forcond[2]}),4)];
 						if (\$_forends[{$countcnt}][0] <= \$_forends[{$countcnt}][1]) {
-							for ({$forcond[0]}=(int)ceil(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo."};
+							for ({$forcond[0]}=(int)ceil(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";};
 						} else {
-							for ({$forcond[0]}=(int)floor(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}>=(int)ceil(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}--, \$forloopcnt[{$countcnt}]++) {".$todo."};
+							for ({$forcond[0]}=(int)floor(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}>=(int)ceil(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}--, \$forloopcnt[{$countcnt}]++) {".$todo.";};
 						} 
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}}");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';
 				}
-			} else if ($foreachloc>-1) {
+			} else if ($foreachloc===0) {
 				//convert foreach($arr AS $k=>$v) {todo}
 				$j = $foreachloc;
 				if ($bits[$j+1][0] == '(' && strlen($bits[$j+1])>7) {
 					$cond = $bits[$j+1];
-					$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?3:2));
+					$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?$j+3:$j+2));
 				} else {
 					while ($j<count($bits) && $bits[$j][0]!='{') {
 						$j++;
@@ -232,7 +232,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				$j = $whileloc;
 				if ($bits[$j+1][0] == '(' && strlen($bits[$j+1])>2) {
 					$cond = $bits[$j+1];
-					$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?3:2));
+					$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?$j+3:$j+2));
 				} else {
 					while ($j<count($bits) && $bits[$j][0]!='{') {
 						$j++;
@@ -701,7 +701,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 						$thisn--; //decrease nesting depth
 						if ($thisn==0) {
 							//read inside of brackets, send recursively to interpreter
-                            $toprocess = substr($str,$i+1,$j-$i-1);
+                            $toprocess = trim(substr($str,$i+1,$j-$i-1));
                             $inside = interpretline($toprocess,$anstype,$countcnt+1,$included_qs);
 
 							if ($inside=='error') {
