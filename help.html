@@ -2445,9 +2445,9 @@ The following macros create graphs or tables:
      addlabel, except x and y here are pixel values on the picture rather than values relative to the axes.</li>
 <li><strong>addplotborder(plot,left,[bottom,right,top])</strong>:  Changes the pixel width of border (default 5) around a plot.  Labels
     will show within the border.  Typically used to add room for labels to show.</li>
-<li><strong>adddrawcommand(plot,commands)</strong>:  Inserts arbitrary asciisvg drawing commands into an existing
+<li><strong>adddrawcommand(plot,commands)</strong>:  Inserts arbitrary <a href="docs/asciisvgref.php">asciisvg</a> drawing commands into an existing
     plot created with showplot or other drawing tools.</li>
-<li><strong>showasciisvg(string,[width,height,alttext])</strong>:  If you know the ASCIIsvg language, this will set up an svg with "string" as the script.
+<li><strong>showasciisvg(string,[width,height,alttext])</strong>:  If you know the <a href="docs/asciisvgref.php">ASCIIsvg language</a>, this will set up an svg with "string" as the script.
     optionally you can specify the width and height (in pixels) for the svg.  For accessibility, you should always try to
     include alttext, which is text that displays to people requesting non-visual alternatives.</li>
 <li><strong>replacealttext(image or graph, alttext)</strong>: Replaces the alt text (alt tag) in the image or graph with the specified text. This alt text
@@ -2933,7 +2933,7 @@ available in each library</p>
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="mathentry">Math Entry</h2>
-<p>IMathAS uses ASCIIMath for math entry.  In question text or inside strings that
+<p>IMathAS uses <a href="docs/asciimathref.php">ASCIIMath</a> for math entry.  In question text or inside strings that
 	will be displayed in the question text, wrap expressions to be rendered in the
 	backtick/grave symbol, like <code>`x^2`</code>.  That key is usually located on the same keyboard button as the tilde.
 </p>
@@ -2965,7 +2965,7 @@ available in each library</p>
 
 <p>For display only, the full ASCIIMath language is available (which includes support
 for a limited subset of LaTeX). For more info, see the
-<a href="http://asciimath.org/#syntax">ASCIIMath syntax</a>.</p>
+<a href="docs/asciimathref.php">ASCIIMath syntax</a>.</p>
 
 </div> <!-- h2 -->
 <div class=h2>
@@ -3962,7 +3962,7 @@ drawn line from the correct line.
 	    after 0, while still using -n to adjust spacing. </dd>
 <dt>$background = equation or array of equations, using the showplot macro format </dt>
 	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red". 
-    <br>You can also set $background a string of asciisvg commands prefaced with "draw:", like "draw:line([1,1],[3,3]);".  
+    <br>You can also set $background a string of <a href="docs/asciisvgref.php">asciisvg</a> commands prefaced with "draw:", like "draw:line([1,1],[3,3]);".  
         Note that initPicture and axes will already have been called, so do not include them. 
     <br>You can also set $background to "none" to remove axes and the grid.
 	<br>To specify alt-text for the background, add an element to the background array, like 
