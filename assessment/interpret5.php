@@ -75,6 +75,7 @@ function getquestionqtext($m, $included_qs) {
 }
 //interpreter some code text.  Returns a PHP code string.
 function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
+	$str = trim($str);
 	$str .= ';';
 	$bits = array();
 	$lines = array();
@@ -196,7 +197,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
 						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";};
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}}");
-				} else if (preg_match('/^\s*\(\s*([^;]*?);([^;]*?);([^;]*?)\s*\)\s*$/',$cond,$matches)) {
+				} else if (preg_match('/^\s*\(\s*([^;]*?);\s*([^;]*?);\s*([^;]*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "for ({$forcond[0]},\$forloopcnt[{$countcnt}]=0;({$forcond[1]}) && \$forloopcnt[{$countcnt}]<1000; ({$forcond[2]}), \$forloopcnt[{$countcnt}]++) {".$todo.";};
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
