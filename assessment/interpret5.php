@@ -178,7 +178,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$j++;
 				}
 				if ($j == count($bits)) {
-					if ($bits[1][0] == '(' && strlen($bits[1])>7) {
+					if ($bits[1][0] == '(' && count($bits)>2  && strlen($bits[1])>7) {
 						$cond = $bits[1];
 						$todo = implode('', array_slice($bits, $bits[2]=='*'?3:2));
 					} else {
@@ -212,7 +212,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$j++;
 				}
 				if ($j == count($bits)) {
-					if ($bits[1][0] == '(' && strlen($bits[1])>7) {
+					if ($bits[1][0] == '(' && count($bits)>2 && strlen($bits[1])>7) {
 						$cond = $bits[1];
 						$todo = implode('', array_slice($bits, $bits[2]=='*'?3:2));
 					} else {
@@ -246,7 +246,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$j++;
 				}
 				if ($j == count($bits)) {
-					if ($bits[1][0] == '(' && strlen($bits[1])>2) {
+					if ($bits[1][0] == '(' && count($bits)>2 && strlen($bits[1])>2) {
 						$cond = $bits[1];
 						$todo = implode('', array_slice($bits, $bits[2]=='*'?3:2));
 					} else {
@@ -275,7 +275,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$j++;
 				}
 				if ($j==count($bits)) {
-					if ($bits[1][0]=='(' && strlen($bits[1])>2) {
+					if ($bits[1][0]=='(' && count($bits)>2 && strlen($bits[1])>2 ) {
 						// is if (cond); don't need to worry about braces
 						$cond = $bits[1];
 						if (count($elseloc)==0) {
@@ -299,19 +299,22 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 
 				for ($i=0; $i<count($elseloc); $i++) {
 					$j = $elseloc[$i][0];
-					if ($elseloc[$i][1]=='elseif' && $bits[$j+1][0]=='(' && strlen($bits[$j+1])>2 ) { 
-						$cond = $bits[$j+1];
-						if ($i==count($elseloc)-1) {
-							$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?($j+3):($j+2)));
+					while ($j<count($bits) && $bits[$j][0]!='{') {
+						$j++;
+					}
+					$_elsehandled = false;
+					if ($j==count($bits)) {
+						$j = $elseloc[$i][0];
+						if ($elseloc[$i][1]=='elseif' && count($bits)>$j+1 && $bits[$j+1][0]=='(' && strlen($bits[$j+1])>2) { 
+							$cond = $bits[$j+1];
+							if ($i==count($elseloc)-1) {
+								$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?($j+3):($j+2)));
+							} else {
+								$todo = implode('',array_slice($bits, $bits[$j+2]=='*'?($j+3):($j+2) , $elseloc[$i+1][0]- ($bits[$j+2]=='*'?($j+3):($j+2))));
+							}
+							$out .= " else if ($cond) { $todo ;}";
+							$_elsehandled = true;
 						} else {
-							$todo = implode('',array_slice($bits, $bits[$j+2]=='*'?($j+3):($j+2) , $elseloc[$i+1][0]- ($bits[$j+2]=='*'?($j+3):($j+2))));
-						}
-						$out .= " else if ($cond) { $todo ;}";
-					} else {
-						while ($j<count($bits) && $bits[$j][0]!='{') {
-							$j++;
-						}
-						if ($j==count($bits)) {
 							if ($elseloc[$i][1]=='elseif') {
 								echo _('need curlys for elseif statement');
 								return 'error';
@@ -319,6 +322,8 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 								$j = $elseloc[$i][0] + 1;
 							}
 						}
+					}
+					if (!$_elsehandled) {
 						if ($i==count($elseloc)-1) {
 							$todo = implode('',array_slice($bits,$j));
 						} else {
