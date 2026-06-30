@@ -194,13 +194,12 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
                 if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
-						\$_forends[{$countcnt}] = [round(floatval({$forcond[1]}),4), round(floatval({$forcond[2]}),4)];
-						if (\$_forends[{$countcnt}][0] <= \$_forends[{$countcnt}][1]) {
-							for ({$forcond[0]}=(int)ceil(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";};
-						} else {
-							for ({$forcond[0]}=(int)floor(\$_forends[{$countcnt}][0]),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}>=(int)ceil(\$_forends[{$countcnt}][1]) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}--, \$forloopcnt[{$countcnt}]++) {".$todo.";};
-						} 
+						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";};
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}}");
+				} else if (preg_match('/^\s*\(\s*([^;]*?);([^;]*?);([^;]*?)\s*\)\s*$/',$cond,$matches)) {
+					$forcond = array_slice($matches,1,3);
+					$bits = array( "for ({$forcond[0]},\$forloopcnt[{$countcnt}]=0;({$forcond[1]}) && \$forloopcnt[{$countcnt}]<1000; ({$forcond[2]}), \$forloopcnt[{$countcnt}]++) {".$todo.";};
+						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';
