@@ -294,6 +294,7 @@ function prettysmallnumber($n, $space = false) {
 
 
 function roundsigfig($val, $sigfig) {
+    if ($val == 0) { return 0; }
     $log = (int) floor(log10(abs($val)));
     return round($val, $sigfig - $log - 1);
 }

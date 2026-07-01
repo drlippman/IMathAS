@@ -89,8 +89,8 @@ class DrawingScorePart implements ScorePart
                 if ($grid[$i]!='') {
                     if (strpos($grid[$i],':')!==false) {
                         $pts = explode(':',$grid[$i]);
-                        foreach ($pts as $k=>$v) {
-                            $pts[$k] = evalbasic($v,true);
+                        for ($k=0; $k<min(2,count($pts));$k++) {
+                            $pts[$k] = evalbasic($pts[$k],true);
                         }
                         $settings[$i] = implode(':',$pts);
                     } else {
