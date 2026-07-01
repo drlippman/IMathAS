@@ -370,16 +370,21 @@ function getChildren($parent) {
     return $out;
 }
 
-$treearr = getChildren(0);
+if (empty($_GET['baselib'])) {
+    $treearr = getChildren(0);
+} else {
+    $treearr = getChildren(intval($_GET['baselib']));
+}
 if (!empty($addrootnode)) {
     $root = genItem(['id'=>'0','name'=>_('Root'),'userights'=>8,'federationlevel'=>0]);
     $root['expanded'] = true;
     $root['children'] = $treearr;
     $treearr = [$root];
-} else if (empty($hideunassigned)) {
+} else if (empty($hideunassigned) && empty($_GET['baselib'])) {
     // add unassigned
     array_unshift($treearr, genItem(['id'=>'0','name'=>_('Unassigned'),'userights'=>0,'federationlevel'=>0, 'ownerid'=>$userid, 'groupid'=>$groupid]));
 }
+
 if ($mode == 'multi') {
     echo '<div style="margin-bottom: 5px"><button type="button" onclick="treeWidget.unselectAll();">',_('Uncheck All'),'</button></div>';
 }
