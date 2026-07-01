@@ -10,45 +10,17 @@ if (isset($_POST['aidorder'])) {
 	$aidorder = explode(',',$_POST['aidorder']);
 	$aidorder = array_map('intval', $aidorder);
 	$aidlist = implode(',', $aidorder);
-	$stm = $DBH->query("SELECT id,points FROM imas_questions WHERE assessmentid IN ($aidlist) AND points<9999");
-	$qpoints = array();
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$qpoints[$row[0]] = $row[1];
-	}
-	$stm = $DBH->query("SELECT id,defpoints,itemorder FROM imas_assessments WHERE id IN ($aidlist) AND courseid=$cid"); //presanitized
-	$possible = array();
-	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$pos = 0;
-		$aitems = explode(',',$line['itemorder']);
-		$defpoints = $line['defpoints'];
-		foreach ($aitems as $k=>$v) {
-			if (strpos($v,'~')!==FALSE) {
-				$sub = explode('~',$v);
-				if (strpos($sub[0],'|')===false) { //backwards compat
-					$pos += (isset($qpoints[$sub[0]]))?$qpoints[$sub[0]]:$defpoints;
-				} else {
-					$grpparts = explode('|',$sub[0]);
-					$pos += $grpparts[0]*((isset($qpoints[$sub[1]]))?$qpoints[$sub[1]]:$defpoints);
-				}
-			} else {
-				$pos += (isset($qpoints[$v]))?$qpoints[$v]:$defpoints;
-			}
-		}
-		$possible[$line['id']] = $pos;
-	}
-
 	$aidpos = array_flip($aidorder);
 
-	$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=:reqscoreaid,reqscore=:reqscore WHERE id=:id AND courseid=:courseid");
+	$stm = $DBH->prepare("UPDATE imas_assessments SET reqscorejson=:reqscorejson WHERE id=:id AND courseid=:courseid");
 	foreach ($_POST['checked'] as $tochgaid) {
 		if (!isset($possible[$tochgaid])) { continue;}
 		$reqval = intval($_POST['req'.$tochgaid]);
 		$pos = $aidpos[$tochgaid];
 		if ($pos<1) {continue;}  //can't set prereq on first item
 		$prereq = $aidorder[$pos-1]; //identify prereq assignment
-
-		$score = ceil($reqval/100*$possible[$prereq] - .000000000001);
-		$stm->execute(array(':reqscoreaid'=>$prereq, ':reqscore'=>$score, ':id'=>intval($tochgaid), ':courseid'=>$cid));
+		$json = json_encode([$prereq,$reqval,1]);
+		$stm->execute(array(':reqscorejson'=>$json, ':id'=>intval($tochgaid), ':courseid'=>$cid));
 	}
 
 	header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());

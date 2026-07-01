@@ -198,7 +198,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									'viewingb','scoresingb','ansingb','gbcategory','caltag','shuffle',
 									'istutorial','noprint','showcat','allowlate','LPcutoff',
 									'timelimit','overtime_grace','overtime_penalty','password',
-									'reqscore','reqscoretype','reqscoreaid','showhints',
+									'reqscorejson','showhints',
 									'msgtoinstr','eqnhelper','posttoforum','extrefs','showtips',
 									'cntingb','minscore','deffeedbacktext','tutoredit','exceptionpenalty','earlybonus',
 									'defoutcome','isgroup','groupsetid','groupmax','showwork','workcutoff');
@@ -342,19 +342,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			$toset['password'] = trim(Sanitize::stripHtmlTags($_POST['assmpassword']));
 
-			$toset['reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
-			if ($_POST['reqscoreshowtype']==-1 || $toset['reqscore']==0 || !isset($_POST['reqscoreaid'])) {
-				$toset['reqscore'] = 0;
-				$toset['reqscoretype'] = 0;
-				$toset['reqscoreaid'] = 0;
-			} else {
-				$toset['reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
-				$toset['reqscoretype'] = 0;
-				if ($_POST['reqscoreshowtype']==1) {
-					$toset['reqscoretype'] |= 1;
+			$toset['reqscoretype'] = 0;
+			if ($_POST['reqscoreshowtype']==1) {
+				$toset['reqscoretype'] |= 1;
+			}
+			$toset['reqscorejson'] = '';
+			if ($_POST['reqscoreshowtype']!=-1 && !empty($_POST['reqscoreaid'])) {
+				$reqscorearr = [];
+				foreach ($_POST['reqscoreaid'] as $k=>$v) {
+					if (!empty($_POST['reqscore'][$k])) {
+						$reqscorearr[] = [intval($v), intval($_POST['reqscore'][$k]), intval($_POST['reqscorecalctype'][$k])];
+					}
 				}
-				if ($_POST['reqscorecalctype']==1) {
-					$toset['reqscoretype'] |= 2;
+				if (count($reqscorearr) == 1) {
+					$toset['reqscorejson'] = json_encode($reqscorearr[0]);
+				} else if (count($reqscorearr)>1) {
+					$toset['reqscorejson'] = json_encode(['&', $reqscorearr]);
 				}
 			}
 
@@ -723,9 +726,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$line['isgroup'] = isset($CFG['AMS']['isgroup'])?$CFG['AMS']['isgroup']:0;
 					$line['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']:6;
 					$line['groupsetid'] = 0;
-					$line['reqscore'] = 0;
-          $line['reqscoreaid'] = 0;
                     $line['reqscoretype'] = 0;
+					$line['reqscorejson'] = '';
                     $line['showcat'] = 0;
                     $line['timelimit'] = 0;
 					$taken = false;
@@ -815,13 +817,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
         $defregenpenalty = $line['defregenpenalty'];
 		$defregenpenalty_aftern = 1;
       }
-      if ($line['reqscoreaid']==0) {
+      if ($line['reqscorejson']=='') {
       	$reqscoredisptype=-1;
-      } else if ($line['reqscore']<0 || $line['reqscoretype']&1) {
+      } else if ($line['reqscoretype']&1) {
       	$reqscoredisptype=1;
       } else {
       	$reqscoredisptype=0;
       }
+	  if ($line['reqscorejson']=='') {
+		$line['reqscorejson'] = [];
+	  } else {
+		$line['reqscorejson'] = json_decode($line['reqscorejson'], true);
+		// normalize to an array of [aid,score,type] arrays
+		if (is_array($line['reqscorejson'][1])) { // has bool format ['&', [array of objects]]
+			$line['reqscorejson'] = $line['reqscorejson'][1];
+		} else { // single format; make into an array
+			$line['reqscorejson'] = [$line['reqscorejson']];
+		}
+	  }
       if ($taken) {
           $page_isTakenMsg = "<p>This assessment has already been taken.  Modifying some settings will mess up those assessment attempts, and those inputs ";
           $page_isTakenMsg .=  "have been disabled.  If you want to change these settings, you should clear all existing assessment attempts</p>\n";

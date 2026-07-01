@@ -632,40 +632,16 @@ class AssessInfo
    */
   public function checkPrereq($uid) {
     if ($this->assessData['available'] == 'practice') { return; } // don't block in practice mode
-    if ($this->assessData['reqscore'] > 0 &&
-        $this->assessData['reqscoreaid'] > 0 &&
+    if ($this->assessData['reqscorejson'] != '' &&
         !$this->waiveReqScore()
     ) {
-      $stm = $this->DBH->prepare("SELECT id FROM imas_excused WHERE userid=? AND type='A' AND typeid=?");
-      $stm->execute(array($uid, $this->assessData['reqscoreaid']));
-      if ($stm->rowCount() > 0) {
-          // has excusal for prereq - ignore prereq score
-          return;
-      }
+      require_once '../includes/reqscorefuncs.php';
 
-      $query = "SELECT iar.score,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
-			$query .= "imas_assessment_records AS iar ON iar.assessmentid=ia.id AND iar.userid=? ";
-			$query .= "WHERE ia.id=?";
-      $stm = $this->DBH->prepare($query);
-      $stm->execute(array($uid, $this->assessData['reqscoreaid']));
-      list($prereqscore,$reqscoreptsposs,$prereqname) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
-      if ($prereqscore === null) {
-				$isBlocked = true;
-			} else {
-        $isBlocked = false;
-        if ($this->assessData['reqscoretype']&2) { //using percent-based
-            if ($reqscoreptsposs>0 && round(100*$prereqscore/$reqscoreptsposs,1)+.02<abs($this->assessData['reqscore'])) {
-                $isBlocked = true;
-            }
-        } else if ($prereqscore+.02<abs($this->assessData['reqscore'])) { //points based
-            $isBlocked = true;
-        }
-      }
-      if ($isBlocked) {
+      [$meetsPrereq, $prereqStr] = meetsReqScore(json_decode($this->assessData['reqscorejson'],true), true);
+      
+      if (!$meetsPrereq) {
         $this->assessData['available'] = 'needprereq';
-        $this->assessData['reqscorename'] = $prereqname;
-        $this->assessData['reqscorevalue'] = ($this->assessData['reqscore']) .
-          (($this->assessData['reqscoretype']&2) ? '%' : ' '._('points'));
+        $this->assessData['reqscorevalue'] = $prereqStr;
       }
     }
   }
@@ -1357,10 +1333,10 @@ class AssessInfo
     }
 
     // fix old-format reqscore "grey out"
-    if ($settings['reqscore'] < 0) {
+    /*if ($settings['reqscore'] < 0) {
         $settings['reqscoretype'] |= 1;
         $settings['reqscore'] = abs($settings['reqscore']);
-    }
+    }*/
 
     // parse out earlybonus parts
     if (!isset($settings['earlybonus'])) {

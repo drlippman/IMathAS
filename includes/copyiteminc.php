@@ -2,6 +2,8 @@
 
 require_once __DIR__ . "/updateptsposs.php";
 require_once __DIR__ . "/migratesettings.php";
+require_once __DIR__ . "/reqscorefuncs.php";
+
 //boost operation time
 
 //Look to see if a hook file is defined, and include if it is
@@ -237,7 +239,7 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
 			defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,
 			allowlate,exceptionpenalty,earlybonus,noprint,avail,groupmax,isgroup,groupsetid,endmsg,
 			deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,
-			istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,
+			istutorial,viddata,reqscorejson,reqscoretype,ancestors,defoutcome,
 			posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,
 			ansingb,defregens,defregenpenalty,ver,keepscore,overtime_grace,overtime_penalty,
 			showwork,autoexcuse,workcutoff
@@ -294,9 +296,9 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
             }
         }
 
-        $reqscoreaid = $row['reqscoreaid'];
+        $reqscorejson = $row['reqscorejson'];
         if ($cid != $sourcecid) { // if same course, can keep this
-            unset($row['reqscoreaid']);
+            unset($row['reqscorejson']); // causes us to not copy immediately
         }
         $autoexcuse = $row['autoexcuse'];
         if ($cid != $sourcecid) { // if same course, can keep this
@@ -332,8 +334,8 @@ function copyitem($itemid, $gbcats = false, $sethidden = false)
         }
         $stm->execute($queryarr);
         $newtypeid = $DBH->lastInsertId();
-        if ($reqscoreaid > 0) {
-            $reqscoretrack[$newtypeid] = $reqscoreaid;
+        if ($reqscorejson != '') {
+            $reqscoretrack[$newtypeid] = $reqscorejson;
         }
         if ($sourcecid != $cid && $forumtopostto > 0) {
             $posttoforumtrack[$newtypeid] = $forumtopostto;
@@ -533,17 +535,12 @@ function doaftercopy($sourcecid, &$newitems)
     } else {
         $samecourse = false;
     }
-    //update reqscoreaids if possible.
+    //update reqscorejson if possible.
     if (count($reqscoretrack) > 0) {
-        $stmA = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=:reqscoreaid WHERE id=:id");
-        $stmB = $DBH->prepare("UPDATE imas_assessments SET reqscore=0 WHERE id=:id");
-        foreach ($reqscoretrack as $newid => $oldreqaid) {
-            //is old reqscoreaid in copied list?
-            if (isset($assessnewid[$oldreqaid])) {
-                $stmA->execute(array(':reqscoreaid' => $assessnewid[$oldreqaid], ':id' => $newid));
-            } else if (!$samecourse) {
-                $stmB->execute(array(':id' => $newid));
-            }
+        $stmA = $DBH->prepare("UPDATE imas_assessments SET reqscorejson=:reqscorejson WHERE id=:id");
+        foreach ($reqscoretrack as $newid => $oldreqjson) {
+            $newjson = remapReqScore(json_decode($oldreqjson,true), $assessnewid, $samecourse);
+            $stmA->execute(array(':reqscorejson' => empty($newjson)?'':json_encode($newjson), ':id' => $newid));
         }
     }
     //update any assessment ids in categories

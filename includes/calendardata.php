@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__.'/exceptionfuncs.php';
+require_once __DIR__.'/reqscorefuncs.php';
 
 // light calendar data collection function
 // used in canvascalexport and calendarfeed
@@ -85,11 +86,9 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 
 	$calevents = array();
 
-	$bestscores_stm = null;
-
 	if (isset($itemlist['Assessment'])) {
 		$typeids = implode(',', array_keys($itemlist['Assessment']));
-		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,LPcutoff,reqscore,reqscoreaid,reqscoretype,ptsposs FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
+		$stm = $DBH->query("SELECT id,name,startdate,enddate,reviewdate,LPcutoff,reqscorejson,reqscoretype,ptsposs FROM imas_assessments WHERE avail=1 AND date_by_lti<>1 AND id IN ($typeids) AND enddate<2000000000 ORDER BY name");
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			require_once "../includes/exceptionfuncs.php";
 			if (isset($exceptions[$row['id']])) {
@@ -105,58 +104,19 @@ function getCalendarEventData($cid, $userid, $stuview = false) {
 			}
 
 			$showgrayedout = false;
-			if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || ($exceptions[$row['id']]['waivereqscore']&1)==0)) {
-				if ($bestscores_stm===null) { //only prepare once
-					$query = "SELECT ias.bestscores,ia.ptsposs,ia.ver FROM imas_assessment_sessions AS ias ";
-					$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id ";
-					$query .= "WHERE assessmentid=:assessmentid AND userid=:userid ";
-					$query .= "UNION ALL ";
-					$query = "SELECT iar.score,ia.ptsposs,ia.ver FROM imas_assessment_records AS iar ";
-					$query .= "JOIN imas_assessments AS ia ON iar.assessmentid=ia.id ";
-					$query .= "WHERE assessmentid=:assessmentid2 AND userid=:userid2 ";
-
-					$bestscores_stm = $DBH->prepare($query);
-				}
-				$bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid,
-					':assessmentid2'=>$row['reqscoreaid'], ':userid2'=>$userid));
-				if ($bestscores_stm->rowCount()==0) {
-					if ($row['reqscore']<0 || $row['reqscoretype']&1) {
+			if (!isset($teacherid) && $row['reqscorejson']!='' && 
+				(!isset($exceptions[$row['id']]) || ($exceptions[$row['id']]['waivereqscore']&1)==0)
+			) {
+				$meetsPrereq = meetsReqScore(json_decode($row['reqscorejson'],true));
+				if (!$meetsPrereq) {
+					if ($row['reqscoretype']&1) {
 						$showgrayedout = true;
 					} else {
 						continue;
 					}
-				} else {
-					list($scores,$reqscoreptsposs,$reqaver) = $bestscores_stm->fetch(PDO::FETCH_NUM);
-					if ($reqaver > 1) {
-						$reqascore = $scores;
-					} else {
-						$scores = explode(';', $scores);
-						$reqascore = getpts($scores[0]);
-					}
-					if ($row['reqscoretype']&2) { //using percent-based
-						if ($reqscoreptsposs==-1) {
-							require_once "../includes/updateptsposs.php";
-							$reqscoreptsposs = updatePointsPossible($row['reqscoreaid']);
-						}
-						if (round(100*$reqascore/$reqscoreptsposs,1)+.02<abs($row['reqscore'])) {
-							if ($row['reqscore']<0 || $row['reqscoretype']&1) {
-								$showgrayedout = true;
-							} else {
-								continue;
-							}
-						}
-					} else { //points based
-						if (round($reqascore,1)+.02<abs($row['reqscore'])) {
-							if ($row['reqscore']<0 || $row['reqscoretype']&1) {
-								$showgrayedout = true;
-							} else {
-								continue;
-							}
-						}
-					}
 				}
-			} else if ($stuview && abs($row['reqscore'])>0 && $row['reqscoreaid']>0) {
-				if ($row['reqscore']<0) {
+			} else if ($stuview && $row['reqscorejson']!='') {
+				if ($row['reqscoretype']&1) {
 					$showgrayedout = true;
 				} else {
 					continue;

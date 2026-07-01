@@ -63,7 +63,7 @@
 		//check dates, determine if review
 		$aid = Sanitize::onlyInt($_GET['id']);
 		$isreview = false;
-		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,LPcutoff,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod,id,reqscoreaid,reqscore,reqscoretype FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,LPcutoff,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod,id,reqscorejson FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$adata = $stm->fetch(PDO::FETCH_ASSOC);
 		$now = time();
@@ -181,14 +181,16 @@
 			exit;
 		}
 		//check reqscore
-		if ($isRealStudent && abs($adata['reqscore'])>0 && $adata['reqscoreaid']>0 && !$waivereqscore && !$isreview) {
+		if ($isRealStudent && $adata['reqscorejson']!='' && !$waivereqscore && !$isreview) {
 			$isBlocked = false;
+
+			$reqjson = json_decode($adata['reqscorejson'], true);
 
 			$query = "SELECT ias.bestscores,ia.ptsposs,ia.name FROM imas_assessments AS ia LEFT JOIN ";
 			$query .= "imas_assessment_sessions AS ias ON ias.assessmentid=ia.id AND ias.userid=:userid ";
 			$query .= "WHERE ia.id=:assessmentid";
 			$bestscores_stm = $DBH->prepare($query);
-			$bestscores_stm->execute(array(':assessmentid'=>$adata['reqscoreaid'], ':userid'=>$userid));
+			$bestscores_stm->execute(array(':assessmentid'=>$reqjson[0], ':userid'=>$userid));
 			list($prereqscore,$reqscoreptsposs,$reqscorename) = $bestscores_stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 
 			if ($prereqscore === null) {
@@ -202,15 +204,15 @@
 				}
 				$isBlocked = false;
 
-				if ($adata['reqscoretype']&2) { //using percent-based
+				if ($reqjson[2]>0) { //using percent-based
 					if ($reqscoreptsposs==-1) {
 						require_once "../includes/updateptsposs.php";
-						$reqscoreptsposs = updatePointsPossible($adata['reqscoreaid']);
+						$reqscoreptsposs = updatePointsPossible($reqjson[0]);
 					}
-					if (round(100*$prereqscoretot/$reqscoreptsposs,1)+.02<abs($adata['reqscore'])) {
+					if (round(100*$prereqscoretot/$reqscoreptsposs,1)+.02<abs($reqjson[1])) {
 						$isBlocked = true;
 					}
-				} else if ($prereqscoretot+.02<abs($adata['reqscore'])) { //points based
+				} else if ($prereqscoretot+.02<abs($reqjson[1])) { //points based
 					$isBlocked = true;
 				}
 			}
@@ -219,8 +221,8 @@
 				echo '<h2>'._('You cannot start this assessment yet.').'</h2>';
 				echo '<p>';
 				printf(_('Access to this assessment requires a score of %d%s on %s'),
-					abs($adata['reqscore']),
-					($adata['reqscoretype']&2)?'%':_(' points'),
+					abs($reqjson[1]),
+					($reqjson[2]>0)?'%':_(' points'),
 					Sanitize::encodeStringForDisplay($reqscorename));
 				echo '</p>';
 				require_once "../footer.php";

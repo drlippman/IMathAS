@@ -1,6 +1,7 @@
 <?php
 require_once "../includes/filehandler.php";
 require_once "../includes/TeacherAuditLog.php";
+require_once "../includes/reqscorefuncs.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['delete'])) {
@@ -180,8 +181,14 @@ function delitembyid($itemid) {
 		$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$typeid));
 
-		$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=0 WHERE reqscoreaid=:assessmentid AND courseid=:courseid");
-        $stm->execute(array(':assessmentid'=>$typeid, ':courseid'=>$cid));
+		$stm = $DBH->prepare("SELECT id,reqscorejson FROM imas_assessments WHERE courseid=? AND (reqscorejson LIKE ? OR reqscorejson LIKE ?)");
+		$stm->execute([$cid, '%['.$typeid.',%', '%["'.$typeid.'",%']);
+		$stm2 = $DBH->prepare("UPDATE imas_assessments SET reqscorejson=? WHERE id=?");
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$newarr = removeAidFromReqscore(json_decode($row['reqscorejson'], true), $typeid);
+			$newjson = ($newarr===null ? '' : json_encode($newarr));
+			$stm2->execute([$newjson, $row['id']]);
+		}
         
         $stm = $DBH->prepare("DELETE FROM imas_lti_placements WHERE typeid=:assessmentid AND placementtype='assess'");
 		$stm->execute(array(':assessmentid'=>$typeid));

@@ -55,10 +55,8 @@ $vueData = array(
 	'dochgpassword' => false,
 	'assmpassword' => '',
 	'reqscoretype' => 'DNC',
-	'reqscoreaid' => 'DNC',
-	'reqscore' => 1,
-	'reqscorecalctype' => 0,
-	'chgreqscore' => false,
+	'reqscorechg' => 'DNC',
+	'reqscorearr' => [],
     'dochgshowhints' => false,
     'showhints' => ($defshowhints&1) > 0,
 	'showextrefs' => ($defshowhints&2) > 0,
@@ -76,7 +74,8 @@ $vueData = array(
 	'earlybonus' => '',
 	'earlybonushrs' => 1,
 	'defoutcome' => 'DNC',
-	'revealpw' => false
+	'revealpw' => false,
+	'newAssessId' => ''
 );
 
 // skipmathrender class is needed to prevent katex parser from mangling
@@ -559,23 +558,43 @@ $vueData = array(
 				</span><br class=form />
 			</div>
 
-			<div :class="{highlight:reqscoreaid !== 'DNC'}">
-				<label for="reqscoreaid" class=form><?php echo _('Show based on another assessment'); ?>:</label>
+			<div :class="{highlight:reqscorechg !== 'DNC'}">
+				<label for="reqscorechg" class=form><?php echo _('Show based on another assessment'); ?>:</label>
 				<span class=formright>
-					<select id="reqscoreaid" name="reqscoreaid" v-model="reqscoreaid">
+					<select id="reqscorechg" name="reqscorechg" v-model="reqscorechg">
 						<option value="DNC"><?php echo _('Do not change'); ?></option>
 						<option value="0"><?php echo _('No prerequisite'); ?></option>
-						<option v-for="assess in allassess" :key="assess.val" :value="assess.val">
-							{{ assess.label }}
-						</option>
+						<option value="1"><?php echo _('New prerequisite'); ?></option>
 					</select>
-					<span id="reqscorewrap" v-if="reqscoreaid !== 'DNC' && reqscoreaid > 0">
-						<?php echo _('with a score of'); ?>
-						<input type=text size=4 name="reqscore" v-model="reqscore" />
-						<select name="reqscorecalctype" v-model="reqscorecalctype">
-							<option value="0"><?php echo _('Points'); ?></option>
-							<option value="1"><?php echo _('Percent'); ?></option>
-						</select>
+					<span v-show="reqscorechg == 1">
+						<ul class="nomark">
+							<li v-for="(ritem,index) in reqscorearr" :key="index">
+								<input type="hidden" name="reqscoreaid[]" v-model="ritem[0]"/>
+								<label>
+									{{ assessmentName(ritem[0]) }}:
+									<?php echo _('Score of');?>
+									<input size=3 type="number" name="reqscore[]" v-model="ritem[1]" min="0" max="9999"/>
+								</label>
+								<select name="reqscorecalctype[]" v-model="ritem[2]" aria-label="<?php echo _('prerequisite score format');?>">
+									<option value="0"><?php echo _('points');?></option>
+									<option value="1"><?php echo _('percent');?></option>
+								</select>
+								<button class="slim" type="button" @click="reqscorearr.splice(index, 1)"><?php echo _('Remove');?></button>
+							</li>
+							<li>
+								<select v-model="newAssessId">
+									<option value=""><?php echo _('Add prerequisite');?>…</option>
+									<option v-for="a in availableAssessmentsForPrereqs" :key="a.val" :value="a.val">
+										{{ a.label }}
+									</option>
+								</select>
+								<button type="button" 
+									@click="reqscorearr.push([newAssessId, 1, 0]); newAssessId = ''" 
+									:disabled="!newAssessId">
+									<?php echo _('Add');?>
+								</button>
+							</li>
+						</ul>
 					</span>
 				</span><br class=form />
 			</div>
@@ -1081,7 +1100,11 @@ createApp({
 				}
 				return out;
  			}
-		}
+		},
+		availableAssessmentsForPrereqs() {
+			const used = new Set(this.reqscorearr.map(p => p[0]));
+			return this.allassess.filter(a => !used.has(a.val));
+		},
 	},
 	methods: {
 		initCalTagRadio: function() {
@@ -1109,7 +1132,10 @@ createApp({
 		addExtref: function() {
 			this.extrefs.push({'label':'', 'link':''});
 			this.extrefs = this.extrefs.slice();
-		}
+		},
+		assessmentName(id) {
+			return this.allassess.find(a => a.val == id)?.label ?? id;
+		},
 	},
     mounted: function() {
     	// call init method

@@ -55,8 +55,8 @@ closed-hidden = This assessment is not currently available.
 closed-notyet = This assessment is not yet available. It will be available {$sd} until {$ed}.
 closed-pastdue = This assessment was due {$ed}.
 closed-pasttime = The timelimit has expired on this assessment.
-closed-needprereq = You have not yet met the prerequisite requirements to work on this assessment.
-closed-prereqreq = A score of {$score} on {$name} is required.
+closed-needprereq = You have not yet met the prerequisite requirements to work on this assessment
+closed-prereqreq = Prerequisite: {$str}.
 closed-no_attempts = You have used all your attempts at this assessment.
 closed-latepassn = 
     { $n ->

@@ -72,7 +72,7 @@ function getitemstolookup($items,$inpublic,$viewall,&$tolookup,$onlyopen,$ispubl
 *	$limited:	True to only return ids and names/summaries
 ***/
 function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=false,$limittype=false,$limited=false) {
-	global $DBH,$userid;
+	global $DBH,$userid,$reqScoreData;
 	$itemshowdata = array();
 	if ($onlyopen===true) {$onlyopen = 1;} else if ($onlyopen===false) {$onlyopen = 0;}
 	$itemstolookup = array();
@@ -105,7 +105,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 		if ($limited) {
 			$tosel = 'id,name,summary,ver';
 		} else {
-			$tosel = 'id,name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,ptsposs,date_by_lti,scoresingb,ver';
+			$tosel = 'id,name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscoretype,reqscorejson,avail,allowlate,timelimit,ptsposs,date_by_lti,scoresingb,ver';
 		}
 		$stm = $DBH->prepare("SELECT $tosel FROM imas_assessments WHERE id IN ($placeholders)");
 		$stm->execute(array_keys($typelookups['Assessment']));
@@ -114,11 +114,9 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$line['itemtype'] = 'Assessment';
 			$itemshowdata[$typelookups['Assessment'][$line['id']]] = $line;
-			if (isset($line['reqscoreaid']) && ($line['reqscoreaid']>0 && ($line['reqscore']<0 || $line['reqscoretype']&3 || $viewall))) {
-				if (!isset($assessPreReqsToLookup[$line['reqscoreaid']])) {
-					$assessPreReqsToLookup[$line['reqscoreaid']] = array();
-				}
-				$assessPreReqsToLookup[$line['reqscoreaid']][] = $line['id'];
+			
+			if (!$limited && $line['reqscorejson'] !== '') {
+				array_push($assessPreReqsToLookup, ...extractReqScoreAids(json_decode($line['reqscorejson'], true)));
 			}
 			if ($line['ver'] > 1) {
 				$newAssesses[] = $line['id'];
@@ -157,37 +155,23 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 		}
 	}
 	if (count($assessPreReqsToLookup)>0 && !$limited) {
-		//see which ones we already have data for
-		foreach (array_keys($assessPreReqsToLookup) as $tolookup) {
-            if (isset($typelookups['Assessment'][$tolookup]) &&
-                isset($itemshowdata[$typelookups['Assessment'][$tolookup]]) &&
-				isset($itemshowdata[$typelookups['Assessment'][$tolookup]]['ptsposs'])) {
-				foreach ($assessPreReqsToLookup[$tolookup] as $aidtoupdate) {
-					$itemshowdata[$typelookups['Assessment'][$aidtoupdate]]['reqscorename'] = $itemshowdata[$typelookups['Assessment'][$tolookup]]['name'];
-					$itemshowdata[$typelookups['Assessment'][$aidtoupdate]]['reqscoreptsposs'] = $itemshowdata[$typelookups['Assessment'][$tolookup]]['ptsposs'];
-					if (isset($itemshowdata[$typelookups['Assessment'][$tolookup]]['ptsearned'])) {
-						$itemshowdata[$typelookups['Assessment'][$aidtoupdate]]['reqscoreptsearned'] = $itemshowdata[$typelookups['Assessment'][$tolookup]]['ptsearned'];
-					}
-				}
-				unset($assessPreReqsToLookup[$tolookup]);
+		// see which ones we already have data for
+		foreach ($assessPreReqsToLookup as $lookupaid) {
+			if (!isset($reqScoreData[$lookupaid]) && 
+				isset($typelookups['Assessment'][$lookupaid]) &&
+                isset($itemshowdata[$typelookups['Assessment'][$lookupaid]]) &&
+				isset($itemshowdata[$typelookups['Assessment'][$lookupaid]]['ptsposs'])
+			) {
+				$reqScoreData[$lookupaid] = [
+					'id'=>$lookupaid,
+					'name'=>$itemshowdata[$typelookups['Assessment'][$lookupaid]]['name'],
+					'ptsposs'=>$itemshowdata[$typelookups['Assessment'][$lookupaid]]['ptsposs'],
+					'score'=>$itemshowdata[$typelookups['Assessment'][$lookupaid]]['ptsearned'] ?? null
+				];
 			}
 		}
-		//lookup the rest
-		if (count($assessPreReqsToLookup)>0) {
-			$placeholders = Sanitize::generateQueryPlaceholders($assessPreReqsToLookup);
-			$stm = $DBH->prepare("SELECT id,name,ptsposs FROM imas_assessments WHERE id IN ($placeholders)");
-			$stm->execute(array_keys($assessPreReqsToLookup));
-			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-				foreach ($assessPreReqsToLookup[$line['id']] as $refaid) {
-					$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscorename'] = $line['name'];
-					if ($line['ptsposs']==-1) {
-						require_once __DIR__."/updateptsposs.php";
-						$line['ptsposs'] = updatePointsPossible($line['id']);
-					}
-					$itemshowdata[$typelookups['Assessment'][$refaid]]['reqscoreptsposs'] = $line['ptsposs'];
-				}
-			}
-		}
+		// get any missing rest
+		reqScoreGetData($assessPreReqsToLookup);
 	}
 	if (isset($typelookups['InlineText'])) {
 		$placeholders = Sanitize::generateQueryPlaceholders($typelookups['InlineText']);

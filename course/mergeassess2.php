@@ -26,7 +26,7 @@ if (isset($_POST['mergefrom'])) {
 	$fieldstocopy .= 'defpenalty,itemorder,shuffle,gbcategory,password,cntingb,showcat,showhints,showtips,';
 	$fieldstocopy .= 'allowlate,exceptionpenalty,earlybonus,noprint,avail,groupmax,isgroup,groupsetid,endmsg,';
 	$fieldstocopy .= 'deffeedbacktext,eqnhelper,caltag,calrtag,tutoredit,posttoforum,msgtoinstr,';
-	$fieldstocopy .= 'istutorial,viddata,reqscore,reqscoreaid,reqscoretype,ancestors,defoutcome,';
+	$fieldstocopy .= 'istutorial,viddata,reqscorejson,reqscoretype,ancestors,defoutcome,';
 	$fieldstocopy .= 'posttoforum,ptsposs,extrefs,submitby,showscores,showans,viewingb,scoresingb,';
 	$fieldstocopy .= 'ansingb,defregens,defregenpenalty,ver,keepscore,overtime_grace,overtime_penalty,showwork,autoexcuse';
 	$stm = $DBH->prepare("SELECT $fieldstocopy FROM imas_assessments WHERE id=:id AND courseid=:cid");

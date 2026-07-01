@@ -55,17 +55,16 @@ if (!(isset($teacherid))) {
         $coreOK = true;
 		if ($_POST['copyopts'] != 'DNC') {
             $copyreqscore = !empty($_POST['copyreqscore']);
-			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscore,reqscoreaid,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,earlybonus,defoutcome';
+			$tocopy = 'displaymethod,submitby,defregens,defregenpenalty,keepscore,defattempts,defpenalty,showscores,showans,viewingb,scoresingb,ansingb,gbcategory,caltag,shuffle,showwork,noprint,istutorial,showcat,allowlate,timelimit,password,reqscoretype,reqscorejson,showhints,msgtoinstr,posttoforum,extrefs,showtips,cntingb,minscore,deffeedbacktext,tutoredit,exceptionpenalty,earlybonus,defoutcome';
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id AND courseid=:courseid");
 			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopts']), ':courseid'=>$cid));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
-                if (($item == 'reqscoreaid' || $item == 'reqscore') && !$copyreqscore) {
+                if ($item == 'reqscorejson' && !$copyreqscore) {
                     unset($qarr[$item]);
                 } else if ($item == 'reqscoretype' && !$copyreqscore) {
                     if (($qarr[$item]&1)==0) {
-                        $sets[] = 'reqscore=ABS(reqscore)';
                         $sets[] = 'reqscoretype=(reqscoretype & ~1)';
                     } else {
                         $sets[] = 'reqscoretype=(reqscoretype | 1)';
@@ -302,19 +301,25 @@ if (!(isset($teacherid))) {
 				$qarr[':password'] = Sanitize::stripHtmlTags($_POST['assmpassword']);
 			}
 
-			if ($_POST['reqscoreaid'] !== 'DNC') {
-				$sets[] = "reqscore=:reqscore";
-				if ($_POST['reqscoreaid'] > 0) {
-					$qarr[':reqscore'] = Sanitize::onlyInt($_POST['reqscore']);
-				} else {
-					$qarr[':reqscore'] = 0;
-				}
-				$sets[] = "reqscoreaid=:reqscoreaid";
-				$qarr[':reqscoreaid'] = Sanitize::onlyInt($_POST['reqscoreaid']);
-				if (!empty($_POST['reqscorecalctype'])) {
-					$sets[] = "reqscoretype=(reqscoretype | 2)";
-				} else {
-					$sets[] = "reqscoretype=(reqscoretype & ~2)";
+			if ($_POST['reqscorechg'] !== 'DNC') {
+				if ($_POST['reqscorechg'] == 0) {
+					$sets[] = "reqscorejson=''";
+				} else if (!empty($_POST['reqscoreaid'])) {
+					$reqscorearr = [];
+					foreach ($_POST['reqscoreaid'] as $k=>$v) {
+						if (!empty($_POST['reqscore'][$k])) {
+							$reqscorearr[] = [$v, $_POST['reqscore'][$k], $_POST['reqscorecalctype'][$k]];
+						}
+					}
+					
+					if (count($reqscorearr) > 0) {
+						$sets[] = "reqscorejson=:reqscorejson";
+						if (count($reqscorearr) == 1) {
+							$qarr[':reqscorejson'] = json_encode($reqscorearr[0]);
+						} else {
+							$qarr[':reqscorejson'] = json_encode(['&', $reqscorearr]);
+						}
+					}
 				}
 			}
 			if ($_POST['reqscoreshowtype'] !== 'DNC') {

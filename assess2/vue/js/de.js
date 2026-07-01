@@ -57,8 +57,8 @@ closed-hidden = Dieser Test ist derzeit nicht verfügbar.\r
 closed-notyet = Dieser Test ist noch nicht verfügbar. Er wird von {$sd} bis {$ed} verfügbar sein.\r
 closed-pastdue = Dieser Test war am {$ed} fällig.\r
 closed-pasttime = Die Zeit für diesen test ist abgelaufen.\r
-closed-needprereq = Sie haben noch nicht die Voraussetzungen erfüllt, um an diesem Test zu arbeiten.\r
-closed-prereqreq = Eine Punktzahl von {$score} für {$name} ist erforderlich.\r
+closed-needprereq = Sie haben noch nicht die Voraussetzungen erfüllt, um an diesem Test zu arbeiten\r
+closed-prereqreq = Voraussetzung: {$str}.\r
 closed-no_attempts = Sie haben alle Versuche für diesen Test verbraucht.\r
 closed-latepassn = \r
     { $n ->\r

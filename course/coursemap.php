@@ -4,6 +4,7 @@
 
 require_once "../init.php";
 require_once '../includes/loaditemshowdata.php';
+require_once '../includes/reqscorefuncs.php';
 
 $placeinhead = '<style type="text/css">
 ul.qview ul { border-left: 1px dashed #ccc; padding-left: 10px;}
@@ -102,36 +103,15 @@ function showitemtree($items,$parent,$greyitems=0) {
 					}
 			   	}
 			   	$nothidden = true;  $showgreyedout = false;
-				if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
-				   && (!isset($exceptions[$item]) || ($exceptions[$item]['waivereqscore']&1)==0)) {
-				   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
-					   $showgreyedout = true;
-				   }
-					 if ($line['ver']>1) {
-						 $stm = $DBH->prepare("SELECT score FROM imas_assessment_records WHERE assessmentid=:assessmentid AND userid=:userid");
-					 } else {
-				   	 $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
-					 }
-					 $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
-				   if ($stm->rowCount()==0) {
-					   $nothidden = false;
-				   } else {
-						 if ($line['ver']>1) {
-							 $score = $stm->fetchColumn(0);
-						 } else {
-					   	 $scores = explode(';',$stm->fetchColumn(0));
-							 $score = getpts($scores[0]);
-						 }
-					   if ($line['reqscoretype']&2) { //using percent-based
-					   	   if (round(100*$score/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
-							   $nothidden = false;
-						   }
-					   } else { //points based
-						   if (round($score,1)+.02<abs($line['reqscore'])) {
-							   $nothidden = false;
-						   }
-					   }
-				   }
+				if ($line['reqscorejson'] !== '' && !$viewall && $line['enddate'] > $now
+                	&& (!isset($exceptions[$item]) || ($exceptions[$item]['waivereqscore']&1) == 0)
+				) {
+					if (!meetsReqScore(json_decode($line['reqscorejson'], true))) {
+						if ($line['reqscoretype'] & 1) {
+							$showgreyedout = true;
+						}
+						$nothidden = false;
+					}
 				}
 				if (($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && ($nothidden || $showgreyedout)) ||
 					($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) || $viewall ||

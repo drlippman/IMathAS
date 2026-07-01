@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 
 require_once "../includes/exceptionfuncs.php";
+require_once "../includes/reqscorefuncs.php";
 
 if ($GLOBALS['canviewall'] || !isset($studentinfo)) {
 	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, false);
@@ -307,7 +308,7 @@ function gbtable() {
 	$now = time();
 	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,LPcutoff,itemorder,gbcategory,cntingb,avail,groupsetid,isgroup,allowlate,date_by_lti,ver,viewingb,scoresingb,deffeedbacktext";
 	if ($limuser>0) {
-		$query .= ',reqscoreaid,reqscore,reqscoretype,workcutoff';
+		$query .= ',reqscorejson,workcutoff';
 	}
 	if (isset($includeendmsg) && $includeendmsg) {
 		$query .= ',endmsg';
@@ -412,8 +413,8 @@ function gbtable() {
 		if (isset($line['endmsg']) && $line['endmsg']!='') {
 			$endmsgs[$kcnt] = unserialize($line['endmsg']);
 		}
-		if ($limuser>0) {
-			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']), 'calctype'=>($line['reqscoretype']&2));
+		if ($limuser>0 && $line['reqscorejson'] !== '') {
+			$reqscores[$kcnt] = json_decode($line['reqscorejson'], true);
 		}
 		$defFb[$kcnt] = $line['deffeedbacktext'];
 
@@ -2597,24 +2598,29 @@ function gbtable() {
 
 		$gb[$ln][4][0] = -1;
 	}
-	if ($limuser>0) { //mark reqscoreaid
+	if ($limuser>0) { //mark reqscores
+		// two passes: one to gather scores
 		foreach ($gb[0][1] as $col=>$gbitem) {
-			if ($gbitem[6]==0) {
+			if ($gbitem[6]==0) { 
+				$k = $assessidx[$gbitem[7]];
+				$reqScoreData[$gbitem[7]] = [
+					'id'=>$gbitem[7],
+					'name'=>$gbitem[0],
+					'ptsposs'=>$gbitem[2],
+					'score'=>(!empty($gb[1][1][$col][0]) && is_numeric($gb[1][1][$col][0]))?$gb[1][1][$col][0]:0
+				];
+			}
+		}
+		// second pass to mark
+		foreach ($gb[0][1] as $col=>$gbitem) {
+			if ($gbitem[6]==0) { 
 				$k = $assessidx[$gbitem[7]];
 				$gb[1][1][$col][13] = 1;
-				if (isset($reqscores[$k]) && 
-				    $reqscores[$k]['aid']>0 && 
-				    isset($assesscol[$reqscores[$k]['aid']]) && 
-					(!isset($exceptions[$gbitem[7]][$limuser]) || ($exceptions[$gbitem[7]][$limuser]['waivereqscore']&1) == 0)
-				) {
-                    $colofprereq = $assesscol[$reqscores[$k]['aid']];
-                    if (empty($gb[1][1][$colofprereq][14])) {
-                        if (!isset($gb[1][1][$colofprereq][0]) || is_numeric($gb[1][1][$colofprereq][0]) && (
-                         ($reqscores[$k]['calctype']==0 && $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) ||
-                         ($reqscores[$k]['calctype']==2 && $gb[0][1][$colofprereq][2] > 0 && 100*$gb[1][1][$colofprereq][0]/$gb[0][1][$colofprereq][2]+1e-4 < $reqscores[$k]['score']))) {
-                            $gb[1][1][$col][13] = 0;
-                        }
-                    }
+				if (!empty($reqscores[$k])) {
+					$meets = meetsReqScore($reqscores[$k], false, true, $limuser);
+					if (!$meets) {
+						$gb[1][1][$col][13] = 0;
+					}
 				}
 			}
 		}

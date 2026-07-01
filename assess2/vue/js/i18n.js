@@ -56,8 +56,8 @@ closed-hidden = This assessment is not currently available.\r
 closed-notyet = This assessment is not yet available. It will be available {$sd} until {$ed}.\r
 closed-pastdue = This assessment was due {$ed}.\r
 closed-pasttime = The timelimit has expired on this assessment.\r
-closed-needprereq = You have not yet met the prerequisite requirements to work on this assessment.\r
-closed-prereqreq = A score of {$score} on {$name} is required.\r
+closed-needprereq = You have not yet met the prerequisite requirements to work on this assessment\r
+closed-prereqreq = Prerequisite: {$str}.\r
 closed-no_attempts = You have used all your attempts at this assessment.\r
 closed-latepassn = \r
     { $n ->\r
@@ -662,4 +662,4 @@ latepass-reason5 = LatePasses cannot be used because it is too far past the due 
 latepass-reason6 = LatePasses cannot be used because you do not have enough LatePasses to reopen this assesssment.\r
 latepass-reason7 = LatePasses cannot be used because you have opened this assessment in Practice Mode, and that blocks use of LatePasses.\r
 latepass-reason8 = LatePasses cannot be used because you have reviewed this assessment in the Gradebook, and that blocks use of LatePasses.\r
-latepass-reason9 = LatePasses cannot be used because you are out of attempts.`,fu=new fl(`en`);fu.addResource(new Ll(du));var pu=lu({bundles:[fu]});async function mu(e){let t=await Bc(Object.assign({"./locales/de.ftl":()=>dc(()=>import(`./de.js?v=Di7CPtSM`),[],import.meta.url),"./locales/en.ftl":()=>dc(()=>Promise.resolve().then(()=>uu),void 0,import.meta.url)}),`./locales/${e}.ftl?raw`,3),n=new fl(e);n.addResource(new Ll(t.default)),pu.bundles=[n,fu]}var hu=document.getElementsByTagName(`html`)[0].getAttribute(`lang`).substring(0,2);hu!==`en`&&mu(hu);export{k as $,X as A,Mr as B,go as C,Fa as D,U as E,Ia as F,An as G,Dr as H,Nn as I,Rt as J,Lt as K,vn as L,sa as M,Y as N,J as O,nr as P,me as Q,K as R,Jo as S,is as T,Ln as U,Nr as V,kn as W,Zt as X,Jt as Y,ye as Z,Za as _,pc as a,Zo as b,sc as c,qs as d,Hs as f,ps as g,Ms as h,_c as i,q as j,$i as k,rc as l,Is as m,zc as n,fc as o,Vs as p,qt as q,Mc as r,dc as s,pu as t,$s as u,us as v,os as w,Qo as x,Yo as y,Mn as z};
+latepass-reason9 = LatePasses cannot be used because you are out of attempts.`,fu=new fl(`en`);fu.addResource(new Ll(du));var pu=lu({bundles:[fu]});async function mu(e){let t=await Bc(Object.assign({"./locales/de.ftl":()=>dc(()=>import(`./de.js?v=DKW1O-Hl`),[],import.meta.url),"./locales/en.ftl":()=>dc(()=>Promise.resolve().then(()=>uu),void 0,import.meta.url)}),`./locales/${e}.ftl?raw`,3),n=new fl(e);n.addResource(new Ll(t.default)),pu.bundles=[n,fu]}var hu=document.getElementsByTagName(`html`)[0].getAttribute(`lang`).substring(0,2);hu!==`en`&&mu(hu);export{k as $,X as A,Mr as B,go as C,Fa as D,U as E,Ia as F,An as G,Dr as H,Nn as I,Rt as J,Lt as K,vn as L,sa as M,Y as N,J as O,nr as P,me as Q,K as R,Jo as S,is as T,Ln as U,Nr as V,kn as W,Zt as X,Jt as Y,ye as Z,Za as _,pc as a,Zo as b,sc as c,qs as d,Hs as f,ps as g,Ms as h,_c as i,q as j,$i as k,rc as l,Is as m,zc as n,fc as o,Vs as p,qt as q,Mc as r,dc as s,pu as t,$s as u,us as v,os as w,Qo as x,Yo as y,Mn as z};

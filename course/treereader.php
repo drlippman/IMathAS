@@ -345,7 +345,7 @@ function printlist($items) {
 			if ($line['itemtype']=='Assessment') {
 				//TODO check availability, timelimit, etc.
 				//TODO: reqscoreaid, latepasses
-				 $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscoreaid,reqscoretype,avail,allowlate,timelimit,displaymethod,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
+				 $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,LPcutoff,deffeedback,reqscore,reqscorejson,reqscoretype,avail,allowlate,timelimit,displaymethod,ver FROM imas_assessments WHERE id=:id AND courseid=:cid");
 				 $stm->execute(array(':id'=>$typeid, ':cid'=>$cid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if (isset($exceptions[$item])) {

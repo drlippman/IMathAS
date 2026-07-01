@@ -6,6 +6,7 @@
 require_once "../includes/htmLawed.php";
 require_once "../includes/updateptsposs.php";
 require_once "../includes/migratesettings.php";
+require_once "../includes/reqscorefuncs.php";
 
 //used during confirmation step
 function getsubinfo($items,$parent,$pre) {
@@ -814,7 +815,7 @@ private function insertAssessment() {
 			$thisitemdata['endmsg'] = '';
 		}
 		//we'll resolve these later
-		$thisitemdata['reqscoreaid'] = 0;
+		$thisitemdata['reqscorejson'] = '';
 		$thisitemdata['itemorder'] = '';
 
 		// update settings if needed
@@ -913,15 +914,25 @@ private function insertAssessment() {
 	}
 
 	//resolve itemorder and reqscoreaid
-	$a_upd_stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=?,itemorder=?,ptsposs=? WHERE id=?");
+	$a_upd_stm = $DBH->prepare("UPDATE imas_assessments SET reqscorejson=?,itemorder=?,ptsposs=? WHERE id=?");
 	foreach ($this->toimportbytype['Assessment'] as $toimport) {
 		$thisitemdata = $this->data['items'][$toimport]['data'];
-		//remap reqscoreaid
-		if ($thisitemdata['reqscoreaid']>0) {
-			$rsaid = $this->typemap['Assessment'][$thisitemdata['reqscoreaid']];
-		} else {
-			$rsaid = 0;
-		}
+		//remap reqscore aids
+		$rsjson = '';
+		if (!empty($thisitemdata['reqscoreaid']) && !empty($thisitemdata['reqscore'])) {
+			// old format
+			if (isset($this->typemap['Assessment'][$thisitemdata['reqscoreaid']])) {
+				$rsjson = json_encode([
+					$this->typemap['Assessment'][$thisitemdata['reqscoreaid']],
+					$thisitemdata['reqscore'],
+					($thisitemdata['reqscoretype']&2)>0 ? 1 : 0
+				]);
+			}
+		} else if (!empty($thisitemdata['reqscorejson'])) { 
+			// new format
+			$newjson = remapReqScore(json_decode($thisitemdata['reqscorejson'], true), $this->typemap['Assessment'], false);
+			$rsjson = empty($newjson) ? '' : json_encode($newjson);
+		} 
 		//remap itemorder and collapse
 		$mappedqpoints = array();
         $mappedqec = array();
@@ -970,7 +981,7 @@ private function insertAssessment() {
 		if (!isset($thisitemdata['ptsposs']) || $thisitemdata['ptsposs']==-1) {
 			$thisitemdata['ptsposs'] = calcPointsPossible($aitemorder, $mappedqpoints, $mappedqec, $thisitemdata['defpoints']);
 		}
-		$a_upd_stm->execute(array($rsaid, $aitemorder, $thisitemdata['ptsposs'], $this->typemap['Assessment'][$toimport]));
+		$a_upd_stm->execute(array($rsjson, $aitemorder, $thisitemdata['ptsposs'], $this->typemap['Assessment'][$toimport]));
 	}
 }
 

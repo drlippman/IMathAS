@@ -15,6 +15,7 @@ require_once "../init.php";
 require_once "../includes/filehandler.php";
 require_once "../includes/copyiteminc.php";
 require_once "../includes/loaditemshowdata.php";
+require_once "../includes/reqscorefuncs.php";
 require_once "itemexportfields.php";
 
 mb_substitute_character("none");
@@ -401,15 +402,11 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$line['itemorder'] = $neworder;
 			$output['items'][$output_item_id] = array('type'=>'Assessment', 'data'=>$line);
 		}
-		//remap reqscoreaid
+		//remap reqscore aid's
 		foreach ($assessmap as $sourceid=>$outputid) {
-			if ($output['items'][$outputid]['data']['reqscoreaid']>0) {
-				if (isset($assessmap[$output['items'][$outputid]['data']['reqscoreaid']])) {
-					$output['items'][$outputid]['data']['reqscoreaid'] = $assessmap[$output['items'][$outputid]['data']['reqscoreaid']];
-				} else {
-					//unset
-					$output['items'][$outputid]['data']['reqscoreaid'] = 0;
-				}
+			if ($output['items'][$outputid]['data']['reqscorejson']!='') {
+				$newjson = remapReqScore(json_decode($output['items'][$outputid]['data']['reqscorejson'], true), $assessmap, false);
+				$output['items'][$outputid]['data']['reqscorejson'] = empty($newjson)?'':json_encode($newjson);
 			}
 		}
 	}
