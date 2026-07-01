@@ -667,6 +667,25 @@ $placeinhead .= '<style>
   .qisprivate {
     color: #db0000;
   }
+  #qsl-scrollbox {
+  overflow-y: auto;
+  position: relative;
+  height: calc(100vh - 180px); /* fallback */
+  max-height: none;
+  }
+  #qsl-pdiv {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: #fff;
+    padding-bottom: 6px;
+  }
+  #myTable thead th {
+    position: sticky;
+    top: var(--qsl-frozen-h, 0px);
+    z-index: 2;
+    background: #fff;
+  }
   </style>';
 require_once "../header.php";
 
@@ -930,7 +949,8 @@ if (isset($searchtype)) {
 		echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=082913\"></script>\n";
 		echo "<form id=\"selq\" method=post action=\"manageqset.php?cid=$cid\">\n";
 		//echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
-		echo '<div class=pdiv>Check: <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',false)">None</a> ';
+		echo '<div id="qsl-scrollbox">';
+		echo '<div id="qsl-pdiv" class=pdiv>Check: <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',false)">None</a> ';
 
         echo '<span class="dropdown">';
 		echo ' <a role=button tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
@@ -956,12 +976,37 @@ if (isset($searchtype)) {
                 <a href="#" id="searchprev" style="display:none">' . _('Previous Results'). ' </a>
                 <a href="#" id="searchnext" style="display:none">' . _('More Results'). ' </a>
             </p>';
+		echo '</div>'; // close #qsl-scrollbox
 		echo "</form>\n";
         echo '<script type="text/javascript">
+		function qslSetLayout() {
+		  var scrollbox = document.getElementById("qsl-scrollbox");
+		  var pdiv = document.getElementById("qsl-pdiv");
+		  if (!scrollbox || !pdiv) { return; }
+
+		  scrollbox.style.setProperty("--qsl-frozen-h", pdiv.offsetHeight + "px");
+
+		  var rect = scrollbox.getBoundingClientRect();
+		  var bottomBuffer = 8;
+		  var h = window.innerHeight - rect.top - bottomBuffer;
+
+		  if (h < 250) { h = 250; }
+		  scrollbox.style.height = h + "px";
+		}
             $(function() {
-                displayQuestionList(' . json_encode($search_results, JSON_INVALID_UTF8_IGNORE) . ');
-                setlibhistory();
+                try {
+                    displayQuestionList(' . json_encode($search_results, JSON_INVALID_UTF8_IGNORE) . ');
+                    setlibhistory();
+                } catch (e) {
+                    if (window.console) { console.error("manageqset list init error:", e); }
+                }
+                qslSetLayout();
+                // re-check shortly after in case fonts/images/async content shift the layout
+                setTimeout(qslSetLayout, 100);
+                setTimeout(qslSetLayout, 500);
             });
+            $(window).on("load", qslSetLayout);
+            $(window).on("resize", qslSetLayout);
             </script>';
 		echo "<p></p>\n";
 	}

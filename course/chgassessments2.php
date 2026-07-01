@@ -717,6 +717,15 @@ div.warn {
 	margin-left: -2px;
 	margin-bottom: 2px;
 }
+
+#assesslist-scrollbox {
+    overflow-y: auto;
+    position: relative;
+    height: calc(100vh - 260px);
+    border-top: 1px solid #ccc;
+    margin-top: 6px;
+    padding-top: 6px;
+}
 ul.assessnest {
 	list-style-type: none;
 	padding-left: 0;
@@ -791,6 +800,17 @@ function tabToSettings() {
 		$(document).scrollTop(0);
 	}
 }
+
+function assessListSetLayout() {
+    var box = document.getElementById("assesslist-scrollbox");
+    if (!box) { return; }
+
+    var rect = box.getBoundingClientRect();
+    var h = window.innerHeight - rect.top - 12;
+    if (h < 250) { h = 250; }
+
+    box.style.height = h + "px";
+}
 $(function() {
 	$(".tablist a").on('click', function(ev) {
 		setActiveTab(this)
@@ -812,6 +832,10 @@ $(function() {
 			}
 		} 
 	});
+    assessListSetLayout();
+    setTimeout(assessListSetLayout, 100);
+    setTimeout(assessListSetLayout, 500);
+    $(window).on("resize", assessListSetLayout);
 });
 </script>
 
@@ -852,9 +876,11 @@ $(function() {
 		writeHtmlSelect ("selbygbcat",array_keys($gbcats),array_values($gbcats),null,"Select...",-1,' onchange="chkgbcat(this.value);" id="selbygbcat" ');
 		?>
 
-		<ul id="alistul" class="assessnest">
-		<?php echo $assessNestedList; ?>
-		</ul>
+		<div id="assesslist-scrollbox">
+			<ul id="alistul" class="assessnest">
+			<?php echo $assessNestedList; ?>
+			</ul>
+		</div>
 
 		<p>
 			Continue to <a href="#" role="button" onclick="tabToSettings();return false;">Change Settings</a>.

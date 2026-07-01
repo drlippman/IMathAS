@@ -393,6 +393,24 @@ if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
 
+// Keep the course header/title area and left navigation visible while only the item list scrolls.
+$placeinhead .= '<style type="text/css">
+#leftcontent {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+#centercontent {
+  margin-left: 220px;   /* adjust if your left panel is wider/narrower */
+}
+#courseitem-scrollbox {
+  overflow-y: auto;
+  position: relative;
+  height: calc(100vh - 180px);
+}
+</style>';
+
 /******* begin html output ********/
 require_once "../header.php";
 
@@ -644,6 +662,10 @@ if ($overwriteBody==1) {
    makeTopMenu();
    echo "<div id=\"headercourse\" class=\"pagetitle\"><h1>".Sanitize::encodeStringForDisplay($curname)."</h1></div>\n";
 
+
+   // Everything above this point stays visible; only the course items below scroll.
+   echo '<div id="courseitem-scrollbox">';
+
    if (count($items)>0) {
 
 
@@ -682,6 +704,31 @@ if ($overwriteBody==1) {
    if (isset($backlink)) {
 	   echo $backlink;
    }
+
+   echo "</div>"; //courseitem-scrollbox
+
+   echo '<script type="text/javascript">
+function courseSetLayout() {
+	var box = document.getElementById("courseitem-scrollbox");
+	if (!box) { return; }
+
+	var rect = box.getBoundingClientRect();
+	var h = window.innerHeight - rect.top - 8;
+	if (h < 250) { h = 250; }
+	box.style.height = h + "px";
+}
+if (typeof $ !== "undefined") {
+	$(function() {
+		courseSetLayout();
+		setTimeout(courseSetLayout, 100);
+		setTimeout(courseSetLayout, 500);
+	});
+	$(window).on("load resize", courseSetLayout);
+} else {
+	window.addEventListener("load", courseSetLayout);
+	window.addEventListener("resize", courseSetLayout);
+}
+</script>';
 
    echo "</div>"; //centercontent
 
