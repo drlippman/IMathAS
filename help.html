@@ -2309,40 +2309,47 @@ can be omitted.</p>
   <details class="example"><summary>Example</summary><pre>$a = rand(1,10);        // $a might be 7
 $b = rand(-5,5);        // $b might be -2</pre></details></li>
 <li><strong>rrand(min,max,p)</strong>:  Returns a number between min and max in steps of p
-  <details class="example"><summary>Example</summary><pre>$a = rrand(2,5,.1);     // $a might be 3.4
+  <details class="example"><summary>Example</summary>
+	<pre>$a = rrand(2,5,.1);     // $a might be 3.4
 $b = rrand(2,5,.01);    // $b might be 3.27
-$c = rrand(2,8,2);      // $c might be 6</pre></details></li>
+$c = rrand(2,8,2);      // $c might be 2, 4, 6, or 8</pre></details></li>
 <li><strong>nonzerorand(min,max)</strong>:  Returns a nonzero integer between min and max
-  <details class="example"><summary>Example</summary><pre>$a = nonzerorand(-5,5); // $a might be -3 or 4, but never 0</pre></details></li>
+  <details class="example"><summary>Example</summary>
+	<pre>$a = nonzerorand(-5,5); // $a might be -3 or 4, but never 0</pre></details></li>
 <li><strong>nonzerorrand(min,max,p)</strong>:  Returns a nonzero real number between min and max in steps of p
-  <details class="example"><summary>Example</summary><pre>$a = nonzerorrand(-2,2,.5); // $a might be -1.5 or 0.5, but never 0</pre></details></li>
+  <details class="example"><summary>Example</summary>
+	<pre>$a = nonzerorrand(-2,2,.5); // $a might be -1.5 or 3, but never 0</pre></details></li>
 <li><strong>randfrom(list or array)</strong>: Return an element of the list/array
   <details class="example"><summary>Example</summary><pre>$color = randfrom("red,green,blue");  // might return "green"
 $n = randfrom("2,4,6,8");             // might return 4
 
-$arr = array(10,20,30);
+$arr = [10,20,30];
 $val = randfrom($arr);                // might return 20</pre></details></li>
 <li><strong>randname(),randmalename(),randfemalename()</strong>:  Returns a random first name
   <details class="example"><summary>Example</summary><pre>$name = randname();       // might return "Sofia"
 $name = randmalename();   // might return "Carlos"
 $name = randfemalename(); // might return "Aisha"</pre></details></li>
-<li><strong>randnamewpronouns([option])</strong>:  Returns a random first name with pronouns in the order: subjective, objective, possessive (singular), possessive (plural), reflexive. Can set option to 'neutral' for they/them/their/theirs/themself pronouns.
+<li><strong>randnamewpronouns([option])</strong>:  Returns a random first name with pronouns in the order: subjective, objective, 
+	possessive (singular), possessive (plural), reflexive. Can set option to 'neutral' for they/them/their/theirs/themself pronouns.
+	Use: $name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns()
   <details class="example"><summary>Example</summary><pre>$name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns();
-// might give: $name="Carlos", $heshe="he", $himher="him", ...
+// might give: $name="Carlos", $heshe="he", $himher="him", $hisher="his"...
+$str = "$name went to the store to buy a gift for $hisher friend"
 
 $name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns('neutral');
-// always gives they/them/their/theirs/themself pronouns</pre></details></li>
+// always gives they/them pronouns</pre></details></li>
 <li><strong>uniqid()</strong>: Generates a random unique string, useful for giving a unique id to elements.
-  <details class="example"><summary>Example</summary><pre>$id = uniqid();   // might return "64f3a2b1c"
+  <details class="example"><summary>Example</summary><pre>$id = uniqid();   // might return "a64f3a2b1c"
 // Typical use: creating unique HTML element ids in question markup
-// &lt;div id='graph`$id`'&gt;</pre></details></li>
+// &lt;div id='graph$id'&gt;</pre></details></li>
 </ul>
 
 <p>Array randomizers (return multiple results):</p>
 <ul>
 <li><strong>rands(min,max,n,[order])</strong>:  Returns n integers between min and max. Can set order to 'inc' or 'dec' to sort the values, but be aware there may still be duplicate values.
   <details class="example"><summary>Example</summary><pre>$a,$b,$c = rands(1,10,3);        // might give 3, 7, 1 (duplicates possible)
-$a,$b,$c = rands(1,10,3,'inc');  // sorted ascending, e.g. 1, 3, 7</pre></details></li>
+$a,$b,$c = rands(1,10,3,'inc');  // sorted ascending, e.g. 1, 3, 7
+$arr = rand(1,10,2) // reference using $arr[0] and $arr[1]</pre></details></li>
 <li><strong>rrands(min,max,p,n,[order])</strong>:  Returns n real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
   <details class="example"><summary>Example</summary><pre>$a,$b,$c = rrands(0,1,.25,3);        // might give 0.25, 0.75, 0.5
 $a,$b,$c = rrands(0,1,.25,3,'dec');  // sorted descending, e.g. 0.75, 0.5, 0.25</pre></details></li>
@@ -2350,14 +2357,18 @@ $a,$b,$c = rrands(0,1,.25,3,'dec');  // sorted descending, e.g. 0.75, 0.5, 0.25<
   <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorands(-3,3,2);       // might give -1, 2 (never 0)
 $a,$b = nonzerorands(-3,3,2,'inc'); // sorted: -1, 2</pre></details></li>
 <li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorrands(-1,1,.5,2); // might give -0.5, 0.5 (never 0)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorrands(-3,3,.5,2); // might give -2.5, 1 (never 0)</pre></details></li>
 <li><strong>randsfrom(list/array,n,[order])</strong>: Return n elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.
   <details class="example"><summary>Example</summary><pre>$a,$b = randsfrom("red,green,blue,yellow", 2);  // e.g. "blue", "red"
-$a,$b = randsfrom("2,4,6,8", 2, 'inc');         // sorted ascending, e.g. 2, 6</pre></details></li>
+$arr = [2,4,6,8]
+$a,$b = randsfrom($arr, 2, 'inc');         // sorted ascending, e.g. 2, 6</pre></details></li>
 <li><strong>jointrandfrom(list/array,list/array,[list/array,...])</strong>:  Returns one element from each list, where the location used in each list is the same
   <details class="example"><summary>Example</summary><pre>$first,$last = jointrandfrom("Alice,Bob,Carlos", "Smith,Jones,Rivera");
 // picks the same index from each list, so names stay paired:
-// e.g. $first="Bob", $last="Jones"</pre></details></li>
+// e.g. $first="Bob", $last="Jones"
+
+// can be used to randomly pick a question prompt and answer from corresponding arrays:
+$prompt,$answer = jointrandfrom($questionprompts, $allanswers)</pre></details></li>
 <li><strong>diffrands(min,max,n,[order])</strong>:  Returns n different integers between min and max. Can set order to 'inc' or 'dec' to sort the values.
   <details class="example"><summary>Example</summary><pre>$a,$b,$c = diffrands(1,6,3);        // three distinct values, e.g. 4, 1, 6
 $a,$b,$c = diffrands(1,6,3,'inc');  // sorted ascending, e.g. 1, 4, 6</pre></details></li>
@@ -2378,9 +2389,11 @@ $names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71));
 // e.g. $names=array("Bob","Carlos","Alice"), $scores=array(82,71,95)
 
 // Pick 2 from each:
-$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71), 2);</pre></details></li>
+$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71), 2);
+// e.g. $names=array("Bob","Alice"), $scores=array(82,95)
+</pre></details></li>
 <li><strong>singleshuffle(list/array,[n])</strong>:  returns a shuffled version of a list/array.  If n is provided,
-    it behaves identically to diffrandsfrom
+    it behaves identically to diffrandsfrom, and picks n items from the list/array.
   <details class="example"><summary>Example</summary><pre>$shuffled = singleshuffle("1,2,3,4,5");    // e.g. array(3,1,5,2,4)
 $two = singleshuffle("1,2,3,4,5", 2);      // pick 2: e.g. array(4,2)</pre></details></li>
 <li><strong>randnames(n),randmalenames(n),randfemalenames(n)</strong>:  Returns n random first names
@@ -2419,12 +2432,17 @@ The following macros create graphs or tables:
 $ys = array(1,4,9);
 $table = showarrays("x", $xs, "y", $ys);
 
+// all columns centered
+$table = showarrays("x", $xs, "y", $ys, 'c');
+
 // With alignment and caption:
 $opts["align"] = "rc";
 $opts["caption"] = "Squares";
 $table = showarrays("x", $xs, "y", $ys, $opts);
+// or equivalently
+$table = showarrays("x", $xs, "y", $ys, ['align'=>"rc", 'caption'=>"Squares"]);
 
-// Array-of-arrays form:
+// Array-of-arrays alternate call form:
 $table = showarrays(array("x","y"), array($xs,$ys));</pre></details></li>
 <li><strong>showdataarray(array,[columns,options])</strong>: Creates a tabular display of the data in the array with no headers.
   <details class="example"><summary>Parameters</summary>
@@ -2434,7 +2452,9 @@ $table = showarrays(array("x","y"), array($xs,$ys));</pre></details></li>
   <details class="example"><summary>Example</summary><pre>$data = array(10,20,30,40,50,60);
 $table = showdataarray($data);         // single column
 $table = showdataarray($data, 3);      // spread across 3 columns
-$table = showdataarray($data, 2, "c"); // 2 columns, centered</pre></details></li>
+$table = showdataarray($data, 2, "c"); // 2 columns, centered
+$table = showdataarray($data, 2, ['align'=>'c', 'caption'=>"Scores"]); // 2 columns, centered, with caption
+</pre></details></li>
 <li><strong>horizshowarrays(string,array,[string,array]...,[options])</strong>: Creates a tabular display of the data in the array(s) as row(s), with the strings as row labels. Does not text wrap, so only use for small data sets.
   <details class="example"><summary>Parameters</summary>
   <p>Options can be a string "c", "l", or "r" to align data, or an array with <code>$opts["align"]</code>,
@@ -2452,7 +2472,9 @@ $table = horizshowarrays("x", $xs, "y", $ys);
   <details class="example"><summary>Example</summary><pre>$data = array(array(10,20), array(30,40));
 $cols = array("A","B");
 $rows = array("Row1","Row2");
-$table = showrecttable($data, $cols, $rows);</pre></details></li>
+$table = showrecttable($data, $cols, $rows);
+// table with column headers A and B, row headers Row1 and Row2, first row 10, 20
+</pre></details></li>
 <li><strong>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</strong>: Creates a graph from one or more function strings.
   <details class="example"><summary>Parameters</summary>
 	<ul>
@@ -2505,35 +2527,51 @@ $table = showrecttable($data, $cols, $rows);</pre></details></li>
 	</ul>
   </details>
   <details class="example"><summary>Example</summary><pre>// Single function:
-$graph = showplot("x^2,blue");
+$graph = showplot("x^2");
 
-// With window:
-$graph = showplot("x^2,blue", -3, 3, -1, 9);
+// With window
+$graph = showplot("x^2,blue", -3, 3, -1, 9, 1, 1, 300, 300);
 
-// Multiple functions with dots and labels:
+// Drawn larger, 300x300
+$graph = showplot("x^2", -5, 5, -5, 5, 1, 1, 300, 300);
+
+// With window and scaling, labels spaced at 2 in x and 20 in y, 
+// grid spaced at 1 in x, 10 in y.
+$graph = showplot("2^x", -3, 12, -20, 200, "2:20", "1:10")
+
+// dashed line, with axes labeled x and y, no grid lines
+$graph = showplot("3-x,blue,,,,,,dash", -5, 5, -5, 5, "1:1:x:y", 0)
+
+// Multiple functions with dot and label:
 $funcs = array("x^2,blue", "2*x+1,red", "dot,1,1,closed,blue", "text,1,1,A,blue,above");
 $graph = showplot($funcs, -4, 4, -2, 10);
 
 // Parametric curve:
 $graph = showplot("[cos(t),sin(t)],blue,0,6.28", -1.5, 1.5, -1.5, 1.5);
 
-// Domain with hole, endpoint markers:
-$graph = showplot("1/x,black,-5,5!0", -5, 5, -5, 5);</pre></details></li>
+// Domain with hole:
+$graph = showplot("1/x,black,-5,5!0", -5, 5, -5, 5);
+
+// Piecewise, first line ends at closed dot, second starts at open dot
+$funcs = ["3-x,blue,-6,1,,closed","-2+x,blue,1,6,open"]
+$graph = showplot($funcs)
+</pre></details></li>
 <li><strong>mergeplots($plot1, $plot2, [$plot3, $plot4, ...])</strong>: Merges multiple plots into one. Usually not necessary since showplot accepts an array of funcstrings, but useful when combining graphs generated by different functions. The grid and border from the first graph is used; ensure all plots use the same grid.
   <details class="example"><summary>Example</summary><pre>$g1 = showplot("x^2,blue");
 $g2 = showplot("2*x,red");
 $combined = mergeplots($g1, $g2);</pre></details></li>
 <li><strong>invertplot($plot)</strong>: Inverts a plot by swapping x and y coordinates of every point. Useful for drawing curves where x is a function of y. Note: use replacealttext after inverting, since the auto-generated alt text will not be accurate.
   <details class="example"><summary>Example</summary><pre>// Draw x = y^2 by drawing y = x^2 then inverting:
-$g = showplot("x^2,blue", 0, 10, 0, 3);
+$g = showplot("x^2,blue");
 $g = invertplot($g);
 $g = replacealttext($g, "Graph of x equals y squared");</pre></details></li>
-<li><strong>addfractionaxislabels(plot,step,[axis])</strong>: Adds fraction or pi-multiple labels along an axis of a showplot graph. Set axis to "y" for the y-axis; defaults to x-axis.
+<li><strong>addfractionaxislabels(plot,step,[axis])</strong>: Adds fraction or pi-multiple labels along an axis of a showplot graph. 
   <details class="example"><summary>Parameters</summary>
-  <p>Step can be a fraction like "1/4" or a pi multiple like "pi/4" or "2pi". Set the showplot axis label spacing larger than the domain to suppress the default numeric labels.</p>
+  <p>Set axis to "y" for the y-axis; defaults to x-axis.<br/>
+	Step can be a fraction like "1/4" or a pi multiple like "pi/4" or "2pi".</p>
   </details>
   <details class="example"><summary>Example</summary><pre>// Trig graph with pi/2 labels on x-axis:
-$g = showplot("sin(x),blue", 0, 6.3, -1.2, 1.2, 100, 1);
+$g = showplot("sin(x),blue", 0, 6.3, -1.2, 1.2);
 $g = addfractionaxislabels($g, "pi/2");
 // x-axis now shows 0, pi/2, pi, 3pi/2, 2pi</pre></details></li>
 <li><strong>addlabel(plot,x,y,label,[color,loc,angle,size,alt])</strong>: Adds a text label at graph coordinates (x,y) to a showplot graph.
@@ -2547,27 +2585,27 @@ $g = addfractionaxislabels($g, "pi/2");
   </ul>
   </details>
   <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
-$g = addlabel($g, 1, 1, "A", "red", "above");
-$g = addlabel($g, -2, 4, "(-2,4)", "blue", "left");</pre></details></li>
+$g = addlabel($g, 1, 1, "A", "red", "above")
+$g = addlabel($g, -2, 4, "(-2,4)", "blue", "left")</pre></details></li>
 <li><strong>addlabelabs(plot,x,y,label,[color,loc,angle,alt])</strong>: Like addlabel, but x and y are pixel coordinates on the image rather than graph coordinates.
-  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
-$g = addlabelabs($g, 10, 10, "My Graph", "black", "right");</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue")
+$g = addlabelabs($g, 0, 200, "My Graph", "black", "belowright")</pre></details></li>
 <li><strong>addplotborder(plot,left,[bottom,right,top])</strong>: Changes the pixel border width (default 5) around a plot. Labels show within the border; typically used to add room for axis labels.
-  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
-$g = addplotborder($g, 30);           // 30px border all sides
-$g = addplotborder($g, 40, 5, 5, 5); // wide left border for y-axis labels</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue", 0, 10, 0, 10)
+$g = addplotborder($g, 30)           // 30px border all sides
+$g = addplotborder($g, 30, 30, 5, 5) // wide left and bottom border for axis labels</pre></details></li>
 <li><strong>adddrawcommand(plot,commands)</strong>: Inserts arbitrary <a href="docs/asciisvgref.php">ASCIIsvg</a> drawing commands into an existing plot.
-  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
-$g = adddrawcommand($g, "stroke('green'); line(0,0,1,1)");</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue")
+$g = adddrawcommand($g, "stroke='green'; line([0,0],[1,1]);")</pre></details></li>
 <li><strong>showasciisvg(string,[width,height,alttext])</strong>: Renders an <a href="docs/asciisvgref.php">ASCIIsvg</a> script directly as an SVG. Always include alttext for accessibility.
-  <details class="example"><summary>Example</summary><pre>$g = showasciisvg("stroke('blue'); circle(0,0,1)", 200, 200, "A blue unit circle");</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$g = showasciisvg("initPicture(0,10,0,10);path([[0,0],[0,10],[10,10],[0,0]]);", 100, 100, "A Triangle")</pre></details></li>
 <li><strong>replacealttext(image or graph, alttext)</strong>: Replaces the auto-generated alt text on a graph or image with the specified text.
   <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
 $g = replacealttext($g, "Graph of y equals x squared, a parabola opening upward");</pre></details></li>
-<li><strong>changeimagesize(image or graph, width, [height])</strong>: Changes the display size of an image or graph. Does not resize the underlying file.
-  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
-$g = changeimagesize($g, 300);        // 300px wide
-$g = changeimagesize($g, 300, 400);   // 300x400px</pre></details></li>
+<li><strong>changeimagesize(image, width, [height])</strong>: Changes the display size of an image. Does not resize the underlying file.
+  <details class="example"><summary>Example</summary><pre>// assuming $img is an attached image
+$img = changeimagesize($img, 300)        // 300px wide
+$img = changeimagesize($img, 300, 400)   // 300x400px</pre></details></li>
 <li><strong>textonimage(img,text,left,top[,text,left,top,...])</strong>: Overlays text strings over an image at given pixel offsets from the top-left corner.
   <details class="example"><summary>Parameters</summary>
   <p>Image can be a URL or an uploaded image variable. Not screenreader-friendly — provide alt text on the image.
@@ -2584,23 +2622,29 @@ $result = textonimage($img, "centerelements", "A", 100, 50, "B", 200, 50);</pre>
 $img2 = addimageborder($img, 2, 5);   // 2px border, 5px whitespace margin</pre></details></li>
 <li><strong>arraystodoteqns(xarray,yarray,[color])</strong>: Converts arrays of x and y values into a dot funcstring for use in showplot.
   <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3,4);
-$ys = array(1,4,9,16);
-$dots = arraystodoteqns($xs, $ys, "blue");
-$g = showplot($dots, 0, 5, 0, 20);</pre></details></li>
+$ys = calconarray($xs, "x^2")
+$dots = arraystodoteqns($xs, $ys, "blue")
+$g = showplot($dots, "0:-1", 5, "0:-2", 20, "1:2", "1:2")</pre></details></li>
 <li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts arrays of x and y values into a connected-line funcstring for showplot.
-  <details class="example"><summary>Example</summary><pre>$xs = array(0,1,2,3);
-$ys = array(0,2,1,3);
-$lines = connectthedots($xs, $ys, "red");
-$g = showplot($lines, -1, 4, -1, 4);</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$xs = array(0,1,2,3)
+$ys = array(0,2,1,3)
+$lines = connectthedots($xs, $ys, "red")
+$g = showplot($lines, -1, 4, -1, 4)</pre></details></li>
 <li><strong>arraystodots(xarray,yarray)</strong>: Converts arrays of x and y values into a form suitable for use as the answer to a Drawing question.
-  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3);
-$ys = array(1,4,9);
-$answer = arraystodots($xs, $ys); // use as $answer for a Drawing question</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$answerformat = "twopoint,dot"
+$xs = array(1,2,3)
+$ys = array(1,4,9)
+$answers = arraystodots($xs, $ys) // an $answers for a Drawing question</pre></details></li>
 <li><strong>gettwopointlinedata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointlinedata(stuans, [grid, snaptogrid])</strong>: Extracts two-point line data from a Drawing question student answer. Returns an array of lines, each as array(x1,y1,x2,y2).
-  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $lines = gettwopointlinedata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
-  // $lines[0] = array(x1, y1, x2, y2) for the first line drawn
-  $slope = ($lines[0][3] - $lines[0][1]) / ($lines[0][2] - $lines[0][0]);
+  <details class="example"><summary>Example</summary><pre>$answerformat = "twopoint,line"
+$grid = "-5,5,-5,5"
+$snaptogrid = .5
+if (stuansready($stuanswers, $thisq, null, 'draw')) {
+  $lines = gettwopointlinedata($stuanswers[$thisq], $grid, $snaptogrid)
+  if (count($lines)==1) {
+    // $lines[0] = array(x1, y1, x2, y2) for the first line drawn
+    $slope = ($lines[0][3] - $lines[0][1]) / ($lines[0][2] - $lines[0][0])
+  }
 }</pre></details></li>
 <li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointdata(stuans, type, [grid, snaptogrid])</strong>: Extracts two-point control data from a Drawing question for a specific curve type. Returns an array of curves, each as array(x1,y1,x2,y2).
   <details class="example"><summary>Parameters</summary>
@@ -2610,11 +2654,14 @@ $answer = arraystodots($xs, $ys); // use as $answer for a Drawing question</pre>
   'genexp'/'genlog' return a 5th array entry for the asymptote value.
   Use 'circlerad' to return array(x-center, y-center, radius) or 'ellipserad' for array(x-center, y-center, x-radius, y-radius).</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $curves = gettwopointdata($stuanswers[$thisq], 'parab', -5, 5, -5, 5, 200, 200);
+  <details class="example"><summary>Example</summary><pre>$answerformat="twopoint,parab"
+if (stuansready($stuanswers, $thisq, null, 'draw')) {
+  $curves = gettwopointdata($stuanswers[$thisq], 'parab');
   // For a parabola: $curves[0] = array(x_vertex, y_vertex, x_point, y_point)
-  $vx = $curves[0][0];
-  $vy = $curves[0][1];
+  if (count($curves)>0) {
+	$vx = $curves[0][0];
+	$vy = $curves[0][1];
+  }
 }</pre></details></li>
 <li><strong>gettwopointformulas(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointformulas(stuans, type, [grid, snaptogrid])</strong>: Returns algebraic formulas for curves drawn in a Drawing question. Returns an array of expression strings (functions of x).
   <details class="example"><summary>Parameters</summary>
@@ -2623,24 +2670,28 @@ $answer = arraystodots($xs, $ys); // use as $answer for a Drawing question</pre>
   For 'horizparab', output is in terms of y. For 'circle'/'ellipse', output is an expression in x and y equaling 1.
   Add a final argument 'showequation' (optionally with custom variable names like 'showequation,x,y') to return implicit equations.</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $formulas = gettwopointformulas($stuanswers[$thisq], 'line', -5, 5, -5, 5, 200, 200);
-  // $formulas[0] is a string like "2*x+1"
-  $correct = comparefunctions($formulas[0], $answer);
+  <details class="example"><summary>Example</summary><pre>$answerformat = "twopoint,sqrt"
+$grid = "-5,5,-5,5"
+$snaptogrid = .5
+if (stuansready($stuanswers, $thisq, null, 'draw')) {
+  $formulas = gettwopointformulas($stuanswers[$thisq], 'sqrt', $grid, $snaptogrid)
+  // $formulas[0] is a string like "3*sqrt(x-2)"
+  $eqns = gettwopointformulas($stuanswers[$thisq], 'sqrt', $grid, $snaptogrid, 'showequation,t,y')
+  // $eqns[0] is a string like "y=2*sqrt(t+1)"
 }</pre></details></li>
 <li><strong>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getdotsdata(stuans, [grid, snaptogrid])</strong>: Extracts the closed dots from a Drawing question. Returns an array of dots, each as array(x, y).
-  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $dots = getdotsdata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null, 'draw')) {
+  $dots = getdotsdata($stuanswers[$thisq]);
   // $dots[0] = array(x, y) of the first closed dot
 }</pre></details></li>
 <li><strong>getopendotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getopendotsdata(stuans, [grid, snaptogrid])</strong>: Extracts the open dots from a Drawing question. Returns an array of dots, each as array(x, y).
-  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $dots = getopendotsdata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null, 'draw')) {
+  $dots = getopendotsdata($stuanswers[$thisq]);
   // $dots[0] = array(x, y) of the first open dot
 }</pre></details></li>
 <li><strong>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getlinesdata(stuans, [grid, snaptogrid])</strong>: Extracts freehand line or polygon data from a Drawing question. Returns an array of curves, where each curve is an array of array(x,y) points.
-  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $lines = getlinesdata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null, 'draw')) {
+  $lines = getlinesdata($stuanswers[$thisq]);
   // $lines[0] = array of points for the first curve
   // $lines[0][0] = array(x, y) of the first point on that curve
 }</pre></details></li>
@@ -2648,14 +2699,18 @@ $answer = arraystodots($xs, $ys); // use as $answer for a Drawing question</pre>
   <details class="example"><summary>Parameters</summary>
   <p>Type should be 'linear' or 'quadratic'. style will be 'ne' for strict inequality (dashed border) or 'eq' for inequality with equality (solid border).</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $ineqs = getineqdata($stuanswers[$thisq], 'linear', -5, 5, -5, 5, 200, 200);
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null, 'draw')) {
+  $ineqs = getineqdata($stuanswers[$thisq], 'linear', $grid, $snaptogrid);
   // $ineqs[0][0] = 'ne' or 'eq' (dashed or solid border)
-  // $ineqs[0][1..6] = x1,y1,x2,y2,x3,y3 of the three control points
+  // $ineqs[0][1..6] = x1,y1,x2,y2,x3,y3 of the three control points:
+  //   (x1,y1) and (x2,y2) for the line, (x3,y3) for the shading point
 }</pre></details></li>
 <li><strong>getsnapwidthheight(xmin, xmax, ymin, ymax, drawing width, drawing height, snaptogrid)</strong>: Returns an adjusted drawing width and height that guarantees snap-to-grid values fall on exact pixel boundaries.
-  <details class="example"><summary>Example</summary><pre>$dims = getsnapwidthheight(-5, 5, -5, 5, 200, 200, 0.5);
-// Use $dims[0] as width and $dims[1] as height in your drawing question setup</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$dims = getsnapwidthheight(-5, 5, -5, 5, 200, 200, 0.5)
+// Use $dims[0] as width and $dims[1] as height where you need the actual width and height</pre>
+Note: You generally can avoid needing to use this function by passing $grid and $snaptogrid to any of the get___data functions 
+above, rather than passing the width and height. In some cases you might want to use this function to determine a 
+more exact width and height to use in the $grid to ensure pixel-perfect snapping.</details></li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
@@ -2664,25 +2719,25 @@ $answer = arraystodots($xs, $ys); // use as $answer for a Drawing question</pre>
 The following macros help with formatting values for display:
 <ul>
 <li><strong>makepretty(string or array of strings)</strong>: Changes double add/subtract signs to a single sign (e.g. "3+-2" → "3-2", "5--3" → "5+3").
-  <details class="example"><summary>Example</summary><pre>$a = rand(-5,5);
-$nice = makepretty("x+" . $a);    // "x+3" or "x-2" depending on sign of $a</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a = rand(-5,5)
+$nice = makepretty("x+$a")    // "x+3" or "x-2" depending on sign of $a</pre></details></li>
 <li><strong>makeprettydisp(string or array of strings)</strong>: Does makepretty and wraps the result in backticks for math display.
-  <details class="example"><summary>Example</summary><pre>$a = rand(-5,5);
-$disp = makeprettydisp("x+" . $a); // ready to embed in question text as math</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a = rand(-5,5)
+$disp = makeprettydisp("(x+$a)/7");  // e.g. "`(x-3)/7`"</pre></details></li>
 <li><strong>polymakepretty and polymakeprettydisp</strong>: Like makepretty but for polynomials — also cleans up 0*, 1*, ^1, and ^0. Test carefully; can behave unexpectedly with non-polynomial expressions.
-  <details class="example"><summary>Example</summary><pre>$a = rand(1,5);
-$poly = $a . "*x^2+0*x+1*x^0";
-$nice = polymakepretty($poly);    // e.g. "3x^2+1"
-$disp = polymakeprettydisp($poly); // math display version</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a = rand(1,5)
+$poly = "$a x^2 + 0 x + 1 x^0"
+$nice = polymakepretty($poly);    // e.g. "3x^2+1" or "x^2+1"
+$disp = polymakeprettydisp($poly); // backtick-wrapped math display version</pre></details></li>
 <li><strong>makexpretty and makexprettydisp</strong>: (deprecated — use makexxpretty instead) Like makepretty but also cleans up 1*, 0*, etc. Can cause unexpected results; test carefully.</li>
 <li><strong>makexxpretty and makexxprettydisp</strong>: Like makepretty but also cleans up 1*, 0*, x^1, x^0, etc. Cannot handle |x| notation — use abs(x) instead. Test carefully.
   <details class="example"><summary>Example</summary><pre>$expr = "1*x^2+0*x^1+1*x^0";
 $nice = makexxpretty($expr);     // "x^2+1"
 $disp = makexxprettydisp($expr); // math display version</pre></details></li>
 <li><strong>makepretynegative(string)</strong>: Wraps negative terms in parentheses — e.g. "3+-4" → "3+(-4)" and "3--4" → "3-(-4)". Note: "3-+4" becomes "3-4".
-  <details class="example"><summary>Example</summary><pre>$b = 0 - rand(1,5);  // a negative number
-$expr = "3+" . $b;   // like "3+-4"
-$nice = makepretynegative($expr); // "3+(-4)"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$b = rand(-5,-1)  // a negative number
+$expr = "3+$b"      // like "3+-4"
+$nice = makepretynegative($expr) // "3+(-4)"</pre></details></li>
 <li><strong>numtowords(number,[addth, numwithTh, addcommas])</strong>: Converts a number to its word representation.
   <details class="example"><summary>Example</summary><pre>numtowords(1203)              // "one thousand two hundred three"
 numtowords(1203, true)        // "one thousand two hundred third"  (ordinal)
@@ -2694,10 +2749,13 @@ numtowords(1203, false, false, true) // "one thousand, two hundred three"  (with
   </details>
   <details class="example"><summary>Example</summary><pre>fractowords(5, -2)             // "negative five halves"
 fractowords(6, 3)              // "two"  (reduced to integer)
+fractowords(6, 3, 'literal')  // "six thirds"  (no simplification)
 fractowords(2, 3, 'hyphen')   // "two-thirds"
+fractowords(3, 4, 'by')       // "three by four"
+fractowords(3, 4, 'over')       // "three over four"
 fractowords(-7, 4, 'mixed')   // "negative one and three fourths"
 fractowords(-7, 4, 'mixed over') // "negative one and three over four"
-fractowords(6, 3, 'literal')  // "six thirds"  (no simplification)</pre></details></li>
+</pre></details></li>
 <li><strong>numtoroman(number,[uppercase])</strong>: Converts a number (0.5–3999.5) to a Roman numeral string. Defaults to uppercase; pass false for lowercase.
   <details class="example"><summary>Example</summary><pre>numtoroman(14)        // "XIV"
 numtoroman(14, false) // "xiv"
@@ -2720,43 +2778,50 @@ round_instring("roughly 3.7 people", 0)  // "roughly 4 people"</pre></details></
 prettysmallnumber(0.0000002, true) // "0.000 000 2"</pre></details></li>
 <li><strong>prettysigfig(number,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>: Rounds a number to the specified significant figures for display. For rounding for calculations, use roundsigfig instead.
   <details class="example"><summary>Parameters</summary>
-  <p>By default adds comma thousands separators; set comma to "" to suppress.
-  choptrailingzeros: set true to remove trailing decimal zeros even if significant.
-  scinot: set true to display in scientific notation.
-  sigfigbar: set true to put an overline on the last significant zero (e.g. 420<span style="text-decoration:overline">0</span> for 3 sig figs) — use in math display only.</p>
+  <ul>
+	<li>comma: By default adds comma thousands separators; set comma to "" to suppress.</li>
+	<li>choptrailingzeros: set true to remove trailing decimal zeros even if significant.</li>
+	<li>scinot: set true to display in scientific notation.</li>
+	<li>sigfigbar: set true to put an overline on the last significant zero (e.g. 420<span style="text-decoration:overline">0</span> for 3 sig figs) — use in math display only.</li>
+  </ul>
   </details>
   <details class="example"><summary>Example</summary><pre>prettysigfig(12345.6, 3)              // "12,300"
 prettysigfig(0.00456, 2)             // "0.0046"
-prettysigfig(12345.6, 3, ",", false, true) // "1.23*10^4"  (sci notation)</pre></details></li>
+prettysigfig(123, 4)                 // "123.0"
+prettysigfig(123, 4, ",", true)      // "123"
+prettysigfig(12345.6, 3, "", false, true) // "1.23*10^4"  (sci notation)</pre></details></li>
 <li><strong>prettysigfig_instring(string,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>: Applies prettysigfig rounding to every number found within a string.
   <details class="example"><summary>Example</summary><pre>prettysigfig_instring("The mass is 1234.56 kg", 3) // "The mass is 1,230 kg"</pre></details></li>
 <li><strong>makescinot(number,[decimals,format])</strong>: Converts a number to scientific notation. Optionally rounds the mantissa to the given decimal places. Format can be "*" or "E" as alternatives to the default multiplication cross.
-  <details class="example"><summary>Example</summary><pre>makescinot(1234.5)       // "1.2345*10^3"
-makescinot(1234.5, 2)   // "1.23*10^3"
+  <details class="example"><summary>Example</summary><pre>makescinot(1234.5)       // "1.2345 xx 10^3"
+makescinot(1234.5, 2, '*')   // "1.23*10^3"
 makescinot(1234.5, 2, "E") // "1.23E3"</pre></details></li>
 <li><strong>prettytime(value,informat,outformat)</strong>: Converts a time value to a readable string. informat is 'h', 'm', or 's' (the unit of the input). outformat is any combination of 'h', 'm', 's', or 'clock'/'sclock'.
   <details class="example"><summary>Example</summary><pre>prettytime(90, 'm', 'hm')     // "1 hour and 30 minutes"
 prettytime(3661, 's', 'hms')  // "1 hour, 1 minute, and 1 second"
 prettytime(754, 'm', 'clock') // "12:34pm"
 prettytime(754, 'm', 'sclock') // includes seconds: "12:34:00pm"</pre></details></li>
-<li><strong>dispreducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>: Returns a reduced fraction already formatted for display (suitable for $showanswer). Set doubleslash to true for "3//4" format. Set variable in numerator to include a variable like pi.
-  <details class="example"><summary>Example</summary><pre>dispreducedfraction(6, 9)         // "2/3"
-dispreducedfraction(3, 4, true)   // "3//4"
-dispreducedfraction(2, 3, false, 'pi') // "2pi/3"</pre></details></li>
+<li><strong>dispreducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>: Returns a reduced fraction already formatted for display (wrapped in backticks). Set doubleslash to true for "3//4" format. Set variable in numerator to include a variable like pi.
+  <details class="example"><summary>Example</summary><pre>dispreducedfraction(6, 9)         // "`2/3`"
+dispreducedfraction(3, 4, true)   // "`3//4`"
+dispreducedfraction(2, 3, false, 'pi') // "`(2pi)/3`"</pre></details></li>
 <li><strong>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>: Same as dispreducedfraction but returns a value suitable for use in $answer (not pre-formatted for display). Pass 'parts' as the third argument to get an array of [numerator, denominator] instead.
   <details class="example"><summary>Example</summary><pre>makereducedfraction(6, 9)           // "2/3"
 makereducedfraction(3, 4, true)     // "3//4"
-makereducedfraction(6, 9, false, 'pi') // "2pi/3"
+makereducedfraction(6, 9, false, 'pi') // "(2pi)/3"
 
 // Get reduced parts as separate values:
 $num,$den = makereducedfraction(6, 9, 'parts'); // $num=2, $den=3</pre></details></li>
-<li><strong>decimaltofraction(decimal,[format,maxden])</strong>: Converts a decimal to a fraction string. Only works for denominators up to maxden (default 5000).
+<li><strong>decimaltofraction(decimal,[format,maxden])</strong>: Converts a decimal to a fraction string. 
+	Can use format="mixednumber" to get a mixed number rather than improper fraction. 
+	Only works for denominators up to maxden (default 5000).
   <details class="example"><summary>Example</summary><pre>decimaltofraction(0.75)                  // "3/4"
 decimaltofraction(1.5)                   // "3/2"
 decimaltofraction(1.5, 'mixednumber')    // "1 1/2"</pre></details></li>
 <li><strong>htmldisp(string,[variables])</strong>: Uses HTML superscripts/subscripts and italics for simple math display, without invoking the full math typesetter.
   <details class="example"><summary>Example</summary><pre>htmldisp("x_1^2 + x_2^2")        // renders subscripts and superscripts in HTML
-htmldisp("x^2 + y^2", "x,y")    // also italicizes the variables x and y</pre></details></li>
+htmldisp("x^2 + y^2", "x,y")    // also italicizes the variables x and y</pre>
+Note: It's usually better for accessibility to use the math renderer (wrap the expression in backticks).</details></li>
 <li><strong>formatcomplex(real,imag)</strong>: Creates a display string for a complex number from its real and imaginary parts.
   <details class="example"><summary>Example</summary><pre>formatcomplex(2, 3)   // "2+3i"
 formatcomplex(2, -3)  // "2-3i"
