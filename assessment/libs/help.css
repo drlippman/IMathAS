@@ -49,3 +49,21 @@ pre {
     padding: 10px;
     margin: 0px 20px;
 }
+details.example {
+    margin-top: 0.25em;
+    margin-left: 1em;
+}
+details.example > summary {
+    cursor: pointer;
+    color: #666;
+    font-size: 0.875em;
+    display: inline-block;
+    user-select: none;
+}
+details.example > summary:hover {
+    color: #00c;
+}
+details.example pre {
+    margin: 0.3em 0 0.2em 0;
+    font-size: 0.9em;
+}

@@ -2305,42 +2305,102 @@ can be omitted.</p>
 
 <p>Single result randomizers:</p>
 <ul>
-<li><strong>rand(min,max)</strong>:  Returns an integer between min and max</li>
-<li><strong>rrand(min,max,p)</strong>:  Returns a number between min and max in steps of p.  Example: rrand(2,5,.1) might return 3.4.
-       rrand(2,5,.01) might return 3.27.  rrand(2,8,2) might return 6</li>
-<li><strong>nonzerorand(min,max)</strong>:  Returns a nonzero integer between min and max</li>
-<li><strong>nonzerorrand(min,max,p)</strong>:  Returns a nonzero real number between min and max in steps of p</li>
-<li><strong>randfrom(list or array)</strong>: Return an element of the list/array.  Examples of lists: &quot;2,4,6,8&quot;, or &quot;red,green,blue&quot;</li>
-<li><strong>randname(),randmalename(),randfemalename()</strong>:  Returns a random first name</li>
+<li><strong>rand(min,max)</strong>:  Returns an integer between min and max
+  <details class="example"><summary>Example</summary><pre>$a = rand(1,10);        // $a might be 7
+$b = rand(-5,5);        // $b might be -2</pre></details></li>
+<li><strong>rrand(min,max,p)</strong>:  Returns a number between min and max in steps of p
+  <details class="example"><summary>Example</summary><pre>$a = rrand(2,5,.1);     // $a might be 3.4
+$b = rrand(2,5,.01);    // $b might be 3.27
+$c = rrand(2,8,2);      // $c might be 6</pre></details></li>
+<li><strong>nonzerorand(min,max)</strong>:  Returns a nonzero integer between min and max
+  <details class="example"><summary>Example</summary><pre>$a = nonzerorand(-5,5); // $a might be -3 or 4, but never 0</pre></details></li>
+<li><strong>nonzerorrand(min,max,p)</strong>:  Returns a nonzero real number between min and max in steps of p
+  <details class="example"><summary>Example</summary><pre>$a = nonzerorrand(-2,2,.5); // $a might be -1.5 or 0.5, but never 0</pre></details></li>
+<li><strong>randfrom(list or array)</strong>: Return an element of the list/array
+  <details class="example"><summary>Example</summary><pre>$color = randfrom("red,green,blue");  // might return "green"
+$n = randfrom("2,4,6,8");             // might return 4
+
+$arr = array(10,20,30);
+$val = randfrom($arr);                // might return 20</pre></details></li>
+<li><strong>randname(),randmalename(),randfemalename()</strong>:  Returns a random first name
+  <details class="example"><summary>Example</summary><pre>$name = randname();       // might return "Sofia"
+$name = randmalename();   // might return "Carlos"
+$name = randfemalename(); // might return "Aisha"</pre></details></li>
 <li><strong>randnamewpronouns([option])</strong>:  Returns a random first name with pronouns in the order: subjective, objective, possessive (singular), possessive (plural), reflexive. Can set option to 'neutral' for they/them/their/theirs/themself pronouns.
-	Use: $name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns()</li>
-<li><strong>uniqid()</strong>: Generates a random unique string, useful for giving a unique id to elements.</li>
+  <details class="example"><summary>Example</summary><pre>$name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns();
+// might give: $name="Carlos", $heshe="he", $himher="him", ...
+
+$name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns('neutral');
+// always gives they/them/their/theirs/themself pronouns</pre></details></li>
+<li><strong>uniqid()</strong>: Generates a random unique string, useful for giving a unique id to elements.
+  <details class="example"><summary>Example</summary><pre>$id = uniqid();   // might return "64f3a2b1c"
+// Typical use: creating unique HTML element ids in question markup
+// &lt;div id='graph`$id`'&gt;</pre></details></li>
 </ul>
 
 <p>Array randomizers (return multiple results):</p>
 <ul>
-<li><strong>rands(min,max,n,[order])</strong>:  Returns n integers between min and max. Can set order to 'inc' or 'dec' to sort the values, but be aware there may still be duplicate values.</li>
-<li><strong>rrands(min,max,p,n,[order])</strong>:  Returns n real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>nonzerorands(min,max,n,[order])</strong>:  Returns n nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>randsfrom(list/array,n,[order])</strong>: Return n elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>jointrandfrom(list/array,list/array,[list/array,...])</strong>:  Returns one element from each list, where the location used in each list is the same</li>
-<li><strong>diffrands(min,max,n,[order])</strong>:  Returns n different integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>diffrrands(min,max,p,n,[order])</strong>:  Returns n different real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>diffrandsfrom(list/array,n,[order])</strong>: Return n different elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>nonzerodiffrands(min,max,n,[order])</strong>:  Returns n different nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.</li>
-<li><strong>nonzerodiffrrands(min,max,p,n,[order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.</li>
+<li><strong>rands(min,max,n,[order])</strong>:  Returns n integers between min and max. Can set order to 'inc' or 'dec' to sort the values, but be aware there may still be duplicate values.
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = rands(1,10,3);        // might give 3, 7, 1 (duplicates possible)
+$a,$b,$c = rands(1,10,3,'inc');  // sorted ascending, e.g. 1, 3, 7</pre></details></li>
+<li><strong>rrands(min,max,p,n,[order])</strong>:  Returns n real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = rrands(0,1,.25,3);        // might give 0.25, 0.75, 0.5
+$a,$b,$c = rrands(0,1,.25,3,'dec');  // sorted descending, e.g. 0.75, 0.5, 0.25</pre></details></li>
+<li><strong>nonzerorands(min,max,n,[order])</strong>:  Returns n nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorands(-3,3,2);       // might give -1, 2 (never 0)
+$a,$b = nonzerorands(-3,3,2,'inc'); // sorted: -1, 2</pre></details></li>
+<li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorrands(-1,1,.5,2); // might give -0.5, 0.5 (never 0)</pre></details></li>
+<li><strong>randsfrom(list/array,n,[order])</strong>: Return n elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b = randsfrom("red,green,blue,yellow", 2);  // e.g. "blue", "red"
+$a,$b = randsfrom("2,4,6,8", 2, 'inc');         // sorted ascending, e.g. 2, 6</pre></details></li>
+<li><strong>jointrandfrom(list/array,list/array,[list/array,...])</strong>:  Returns one element from each list, where the location used in each list is the same
+  <details class="example"><summary>Example</summary><pre>$first,$last = jointrandfrom("Alice,Bob,Carlos", "Smith,Jones,Rivera");
+// picks the same index from each list, so names stay paired:
+// e.g. $first="Bob", $last="Jones"</pre></details></li>
+<li><strong>diffrands(min,max,n,[order])</strong>:  Returns n different integers between min and max. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = diffrands(1,6,3);        // three distinct values, e.g. 4, 1, 6
+$a,$b,$c = diffrands(1,6,3,'inc');  // sorted ascending, e.g. 1, 4, 6</pre></details></li>
+<li><strong>diffrrands(min,max,p,n,[order])</strong>:  Returns n different real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b = diffrrands(0,1,.1,2); // two distinct values, e.g. 0.3, 0.7</pre></details></li>
+<li><strong>diffrandsfrom(list/array,n,[order])</strong>: Return n different elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b = diffrandsfrom("red,green,blue,yellow", 2); // two distinct colors, e.g. "green", "red"</pre></details></li>
+<li><strong>nonzerodiffrands(min,max,n,[order])</strong>:  Returns n different nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerodiffrands(-3,3,2); // two distinct nonzero values, e.g. -2, 3</pre></details></li>
+<li><strong>nonzerodiffrrands(min,max,p,n,[order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerodiffrrands(-1,1,.5,2); // e.g. -0.5, 1.0 (distinct and nonzero)</pre></details></li>
 <li><strong>jointshuffle(list/array1,list/array2,[n1,n2])</strong>:  Shuffles two lists/arrays in a way that retains
     respective order.  In n1 is provided, n1 elements from each shuffled array will be returned (like
     a joint version of diffrandsfrom).  If n2 is also provided, n1 elements of list/array1 and n2
-    elements of list/array2 will be returned.</li>
+    elements of list/array2 will be returned.
+  <details class="example"><summary>Example</summary><pre>// Shuffle names and scores together so they stay paired:
+$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71));
+// e.g. $names=array("Bob","Carlos","Alice"), $scores=array(82,71,95)
+
+// Pick 2 from each:
+$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71), 2);</pre></details></li>
 <li><strong>singleshuffle(list/array,[n])</strong>:  returns a shuffled version of a list/array.  If n is provided,
-    it behaves identically to diffrandsfrom</li>
-<li><strong>randnames(n),randmalenames(n),randfemalenames(n)</strong>:  Returns n random first names</li>
-<li><strong>randcity([country]),randcities(n, [country])</strong>:  Returns one or n random US or Canadian city names. Argument country can be set to "USA" or "Canada". The default is "USA".</li>
-<li><strong>randstate([country]),randstates(n, [country])</strong>:  Returns one or n random US state or Canadian province names. Argument country can be set to "USA" or "Canada". The default is "USA".</li>
-<li><strong>randcountry(),randcountries(n)</strong>:  Returns one or n random country names</li>
-<li><strong>randpythag([min,max])</strong>:  Return a Pythagorean triple.  min/max default to 1 to 100</li>
+    it behaves identically to diffrandsfrom
+  <details class="example"><summary>Example</summary><pre>$shuffled = singleshuffle("1,2,3,4,5");    // e.g. array(3,1,5,2,4)
+$two = singleshuffle("1,2,3,4,5", 2);      // pick 2: e.g. array(4,2)</pre></details></li>
+<li><strong>randnames(n),randmalenames(n),randfemalenames(n)</strong>:  Returns n random first names
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = randnames(3);      // e.g. "Sofia", "Carlos", "Aisha"
+$a,$b = randmalenames(2);     // e.g. "Marcus", "Eli"
+$a,$b = randfemalenames(2);   // e.g. "Priya", "Helena"</pre></details></li>
+<li><strong>randcity([country]),randcities(n, [country])</strong>:  Returns one or n random US or Canadian city names. Argument country can be set to "USA" or "Canada". The default is "USA".
+  <details class="example"><summary>Example</summary><pre>$city = randcity();             // e.g. "Portland"
+$city = randcity("Canada");    // e.g. "Calgary"
+$c1,$c2 = randcities(2);      // e.g. "Austin", "Denver"</pre></details></li>
+<li><strong>randstate([country]),randstates(n, [country])</strong>:  Returns one or n random US state or Canadian province names. Argument country can be set to "USA" or "Canada". The default is "USA".
+  <details class="example"><summary>Example</summary><pre>$state = randstate();           // e.g. "Oregon"
+$prov = randstate("Canada");   // e.g. "Alberta"
+$s1,$s2 = randstates(2);      // e.g. "Texas", "Ohio"</pre></details></li>
+<li><strong>randcountry(),randcountries(n)</strong>:  Returns one or n random country names
+  <details class="example"><summary>Example</summary><pre>$c = randcountry();            // e.g. "Brazil"
+$c1,$c2 = randcountries(2);   // e.g. "Japan", "Mexico"</pre></details></li>
+<li><strong>randpythag([min,max])</strong>:  Return a Pythagorean triple.  min/max default to 1 to 100
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = randpythag();        // e.g. 3, 4, 5  (satisfies a^2+b^2=c^2)
+$a,$b,$c = randpythag(5,20);   // triple with values between 5 and 20</pre></details></li>
 </ul>
 
 </div> <!-- h2 -->
@@ -2348,26 +2408,53 @@ can be omitted.</p>
 <h2 id="graphtablemacros">Graph/Table Macros</h2>
 The following macros create graphs or tables:
 <ul>
-<li><strong>showarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
-    as column headers.  Alternatively you can call this function with arguments
-    showarrays(array of column headers, array of data arrays, [options]).  Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
-	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
-      and $opts["caption"] to add a caption to the table.  To align each column differently, provide a
-	  a string with a character for each column, like "rcc"</li>
-<li><strong>showdataarray(array,[columns,options])</strong>:  Creates a tabular display of the data in the array with no headers.  Data is presented
-    in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.
-    Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
-    or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
-    and $opts["caption"] to add a caption to the table.</li>
-<li><strong>horizshowarrays(string,array,[string,array]...,[options])</strong>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
-    as row labels.  Does not text wrap, so only use for small data sets. Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
-	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
-      and $opts["caption"] to add a caption to the table</li>
-<li><strong>showrecttable(data array of arrays,columnlabels,rowlabels,[options])</strong>:  Creates a tabular display of a 2x2 data table, where $data[0] is the first row of the table.
-    The rowlabels and columnlabels are arrays of labels. Options can be a string = "c", "l", or "r" to center, left-align, or right align data,
-	  or can be an array with $opts["align"] for alignment, $opts["tablealign"]="center" to center the whole table,
-      and $opts["caption"] to add a caption to the table.</li>
-<li><strong>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</strong>
+<li><strong>showarrays(string,array,[string,array]...,[options])</strong>: Creates a tabular display of the data in the array(s) as column(s), with the strings as column headers.
+  <details class="example"><summary>Parameters</summary>
+  <p>Alternate call form: <code>showarrays(array of column headers, array of data arrays, [options])</code>.<br>
+  Options can be a string "c", "l", or "r" to center, left-align, or right-align data, or an array with
+  <code>$opts["align"]</code> for alignment, <code>$opts["tablealign"]="center"</code> to center the whole table,
+  and <code>$opts["caption"]</code> to add a caption. To align each column differently use a character-per-column string like "rcc".</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3);
+$ys = array(1,4,9);
+$table = showarrays("x", $xs, "y", $ys);
+
+// With alignment and caption:
+$opts["align"] = "rc";
+$opts["caption"] = "Squares";
+$table = showarrays("x", $xs, "y", $ys, $opts);
+
+// Array-of-arrays form:
+$table = showarrays(array("x","y"), array($xs,$ys));</pre></details></li>
+<li><strong>showdataarray(array,[columns,options])</strong>: Creates a tabular display of the data in the array with no headers.
+  <details class="example"><summary>Parameters</summary>
+  <p>Data is presented in one column unless a column count is provided. Options can be a string "c", "l", or "r" to align data,
+  or an array with <code>$opts["align"]</code>, <code>$opts["tablealign"]="center"</code>, and <code>$opts["caption"]</code>.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$data = array(10,20,30,40,50,60);
+$table = showdataarray($data);         // single column
+$table = showdataarray($data, 3);      // spread across 3 columns
+$table = showdataarray($data, 2, "c"); // 2 columns, centered</pre></details></li>
+<li><strong>horizshowarrays(string,array,[string,array]...,[options])</strong>: Creates a tabular display of the data in the array(s) as row(s), with the strings as row labels. Does not text wrap, so only use for small data sets.
+  <details class="example"><summary>Parameters</summary>
+  <p>Options can be a string "c", "l", or "r" to align data, or an array with <code>$opts["align"]</code>,
+  <code>$opts["tablealign"]="center"</code>, and <code>$opts["caption"]</code>.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3,4);
+$ys = array(1,4,9,16);
+$table = horizshowarrays("x", $xs, "y", $ys);
+// Creates a two-row table: "x" row and "y" row, values in columns</pre></details></li>
+<li><strong>showrecttable(data array of arrays,columnlabels,rowlabels,[options])</strong>: Creates a tabular display of a rectangular data table, where <code>$data[0]</code> is the first row.
+  <details class="example"><summary>Parameters</summary>
+  <p>rowlabels and columnlabels are arrays of label strings. Options can be a string "c", "l", or "r" to align data,
+  or an array with <code>$opts["align"]</code>, <code>$opts["tablealign"]="center"</code>, and <code>$opts["caption"]</code>.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$data = array(array(10,20), array(30,40));
+$cols = array("A","B");
+$rows = array("Row1","Row2");
+$table = showrecttable($data, $cols, $rows);</pre></details></li>
+<li><strong>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</strong>: Creates a graph from one or more function strings.
+  <details class="example"><summary>Parameters</summary>
 	<ul>
 	<li><strong>funcstrings</strong> is a single string or an array of strings each having at least the first of the following list:<BR>
 	"function,color,min,max,startmarker,endmarker,width,dash"
@@ -2402,7 +2489,7 @@ The following macros create graphs or tables:
 					<li>color: a color designator: black,red,orange,yellow,green,blue,purple</li>
 					<li>location: label location: above, left, right, below, aboveleft, etc.</li>
 					<li>angle: a rotation angle in degrees for the label (0,90,180,270)</li>
-					<li>graphassoc: If this text is a label for a graph, the index in funcstrings 
+					<li>graphassoc: If this text is a label for a graph, the index in funcstrings
 						for the graph it labels. This is used by the accessible alt text.</li>
 					<li><strong>Examples:</strong>: "text,2,4,Cars", "text,4,0,Hours,below"</li>
 				</ul>
@@ -2415,91 +2502,160 @@ The following macros create graphs or tables:
 	<li><strong>labels</strong>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis. Use "xlbl:ylbl:xname:yname" to put a named label on the axes.</li>
 	<li><strong>grid</strong>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
 	<li><strong>width,height</strong>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
-	</ul></li>
-<li><strong>mergeplots($plot1, $plot2, [$plot3, $plot4, ...])</strong>: Merges multiple plots into one.  Usually
-  	not necessary, since showplot can accept an array of funcstrings, but occasionally useful
-  	when adding to a graph generated by another function.  The grid and border from the first
-  	graph is used. To avoid weird behavior, try to ensure all plots were drawn using the same
-  	grid.</li>
-<li><strong>invertplot($plot)</strong>: Inverts any drawing on the plot, swapping x and y coordinates of 
-	every point. Useful in a case where a function can't handle x= function well, this way you can draw it
-	using y= function then invert it. Note you should use replacealttext with this, since any auto-generated 
-	alt text won't be accurate anymore.</li>
-<li><strong>addfractionaxislabels(plot,step,[axis])</strong>:  Adds labels along the horizontal axis in steps of step to a plot created with showplot.
-      Step is a fraction like "1/4", or a pi multiple, like "pi/4" or "2pi".  When using this, make sure to set the showplot x-axis label
-      spacing larger than the domain to prevent the default labels from showing.  Set axis to "y" to add fraction axis labels on the y-axis.</li>
-<li><strong>addlabel(plot,x,y,label,[color,loc,angle,size,alt])</strong>: Adds a label to a plot created with showplot.
-	<ul>
-	<li><strong>plot</strong>: The plot created with showplot</li>
-	<li><strong>x,y</strong>: The coordinates for the label</li>
-	<li><strong>label</strong>:  The string label itself.  MathML cannot currently be displayed in labels</li>
-	<li><strong>color</strong>: Label color.  Defaults to black.</li>
-	<li><strong>loc</strong>:  By default, the label is centered at the x,y coordinates.  Use "left" to display the string to the left of the
-	point, "right" to the right, "below" for below the point, "above" for above the point.</li>
-	<li><strong>angle</strong>: Angle to rotate text.</li>
-	<li><strong>size</strong>: font size for label.</li>
-	<li><strong>alt</strong>: alt text for the label, to replace the default.</li>
 	</ul>
-	</li>
-<li><strong>addlabelabs(plot,x,y,label,[color,loc,angle,alt])</strong>: Adds a label to a plot created with showplot. Parameters are the same as with
-     addlabel, except x and y here are pixel values on the picture rather than values relative to the axes.</li>
-<li><strong>addplotborder(plot,left,[bottom,right,top])</strong>:  Changes the pixel width of border (default 5) around a plot.  Labels
-    will show within the border.  Typically used to add room for labels to show.</li>
-<li><strong>adddrawcommand(plot,commands)</strong>:  Inserts arbitrary <a href="docs/asciisvgref.php">asciisvg</a> drawing commands into an existing
-    plot created with showplot or other drawing tools.</li>
-<li><strong>showasciisvg(string,[width,height,alttext])</strong>:  If you know the <a href="docs/asciisvgref.php">ASCIIsvg language</a>, this will set up an svg with "string" as the script.
-    optionally you can specify the width and height (in pixels) for the svg.  For accessibility, you should always try to
-    include alttext, which is text that displays to people requesting non-visual alternatives.</li>
-<li><strong>replacealttext(image or graph, alttext)</strong>: Replaces the alt text (alt tag) in the image or graph with the specified text. This alt text
-    will replace the autogenerated textual description for graphs produced by showplot.</li>
-<li><strong>changeimagesize(image or graph, width, [height])</strong>: Changes the display width for an image.
-    Note this doesn't resize the file itself, just changes the display size - it's always better to resize the original
-    image file.</li>
-<li><strong>textonimage(img,text,left,top[,text,left,top,left,...])</strong>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
-    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.
-    textonimage is not screenreader-friendly, so it's recommended you provide an alt text on the image, 
-    which will be read to the screenreader instead of the image and any layered text. <br/>
-	You can put "centerelements" anywhere after the image to have all elements after that be centered at the given coordinates rather than 
-	have the upper-left corner at those coordinates.<br/>
-	There is an alternate input format: <code>textonimage(img,array)</code>, where the array is an array [text,left,top,text,left,top,...]</li>
-<li><strong>addimageborder(image, [border width, margin])</strong>: Adds a border to an image uploaded in 
-    the question editor. Border width (default 1) and whitespace margin (default 0) can be specified.</li>
-<li><strong>arraystodoteqns(xarray,yarray,[color])</strong>:  Converts an array of x-values and y-values into a form that can be used in
-  showplot.</li>
-<li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts an array of x-values and y-values into a form that
-  can be used in showplot to create a series of lines connecting the (x,y) pairs</li>
-<li><strong>arraystodots(xarray,yarray)</strong>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
-<li><strong>gettwopointlinedata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointlinedata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing
-  question and pulls out the two-point line data.  Returns an array of lines, each of form array(x1,y1,x2,y2) giving the coordinates
-  of the two points used.</li>
-<li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointdata(stuans, type, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing question
-  and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'lineseg', 'ray', 'parab', 'halfparab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
-  'rational', 'exp', 'genexp', 'log', 'genlog', 'sin', 'cos', 'abs', 'vector', 'circle','ellipse'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of
-  the two points used.  They are returned in the order clicked.  For example, with 'parab' type, the first point is the vertex and the
-  second point is an arbitrary point. Using 'genexp' or 'genlog' will return a 5th entry which is the value of the asymptote. Can use type 'circlerad' to return array(x-center,y-center,radius) or 'ellipserad' 
-	to return array(x-center,y-center,x-radius,y-radius).</li>
-<li><strong>gettwopointformulas(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointformulas(stuans, type, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing question
-  and returns formulas for curves drawn by the student.  Type should be one of 'line', 'lineseg', 'ray', 'parab', 'halfparab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
-  'rational', 'exp', 'genexp', 'log', 'genlog', 'sin', 'cos', 'abs', 'circle','ellipse'.  Returns an array of expressions, each a function of x, for the curves drawn. They are returned in the order clicked.  For 
-	'horizparab', output will be in terms of y. For 'circle' and 'ellipse', output will be expression in x and y equaling 1. Can give a final optional argument 'showequation,[xvar,yvar]' to output implicit equations with optional custom x 
-	and y variables.</li>
-<li><strong>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getdotsdata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing
-  question and pulls out the closed dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
-  of the dot.</li>
-<li><strong>getopendotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getopendotsdata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing
-  question and pulls out the open dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
-  of the dot.</li>
-<li><strong>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getlinesdata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing
-  question using the older non-twopoint line tool or the polygon tool, and pulls out the lines data.  Returns an array, with an element for each line/curve draw.  Each of those
-  elements will be an array of points on that line/curve.  Each of those points is array (x,y).</li>
-<li><strong>getineqdata(stuans, [type, xmin, xmax, ymin, ymax, drawing width, drawing height]) or getineqdata(stuans, [grid, snaptogrid])</strong>:  Takes a $stuanswers from a drawing question
-  and pulls out the inequalities data for the given curve type.  Type should be one of 'linear' or 'quadratic'.
-	Returns an array of curve data, each of form array(style,x1,y1,x2,y2,x3,y3) giving the coordinates of
-  the three points used.  They are returned in the order clicked.  style will be either 'ne' for strict inequality (dashed line),
-	or 'eq' for inequality with equality (solid line).</li>
-<li><strong>getsnapwidthheight(xmin, xmax, ymin, ymax, drawing width, drawing height, snaptogrid)</strong>:  Takes drawing grid info and a snaptogrid
-  value or string, and returns an array(width,height) giving a closeby drawing width and height that will guarantee that the snaptogrid values
-  fall on exact drawing pixel locations.</li>
+  </details>
+  <details class="example"><summary>Example</summary><pre>// Single function:
+$graph = showplot("x^2,blue");
+
+// With window:
+$graph = showplot("x^2,blue", -3, 3, -1, 9);
+
+// Multiple functions with dots and labels:
+$funcs = array("x^2,blue", "2*x+1,red", "dot,1,1,closed,blue", "text,1,1,A,blue,above");
+$graph = showplot($funcs, -4, 4, -2, 10);
+
+// Parametric curve:
+$graph = showplot("[cos(t),sin(t)],blue,0,6.28", -1.5, 1.5, -1.5, 1.5);
+
+// Domain with hole, endpoint markers:
+$graph = showplot("1/x,black,-5,5!0", -5, 5, -5, 5);</pre></details></li>
+<li><strong>mergeplots($plot1, $plot2, [$plot3, $plot4, ...])</strong>: Merges multiple plots into one. Usually not necessary since showplot accepts an array of funcstrings, but useful when combining graphs generated by different functions. The grid and border from the first graph is used; ensure all plots use the same grid.
+  <details class="example"><summary>Example</summary><pre>$g1 = showplot("x^2,blue");
+$g2 = showplot("2*x,red");
+$combined = mergeplots($g1, $g2);</pre></details></li>
+<li><strong>invertplot($plot)</strong>: Inverts a plot by swapping x and y coordinates of every point. Useful for drawing curves where x is a function of y. Note: use replacealttext after inverting, since the auto-generated alt text will not be accurate.
+  <details class="example"><summary>Example</summary><pre>// Draw x = y^2 by drawing y = x^2 then inverting:
+$g = showplot("x^2,blue", 0, 10, 0, 3);
+$g = invertplot($g);
+$g = replacealttext($g, "Graph of x equals y squared");</pre></details></li>
+<li><strong>addfractionaxislabels(plot,step,[axis])</strong>: Adds fraction or pi-multiple labels along an axis of a showplot graph. Set axis to "y" for the y-axis; defaults to x-axis.
+  <details class="example"><summary>Parameters</summary>
+  <p>Step can be a fraction like "1/4" or a pi multiple like "pi/4" or "2pi". Set the showplot axis label spacing larger than the domain to suppress the default numeric labels.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>// Trig graph with pi/2 labels on x-axis:
+$g = showplot("sin(x),blue", 0, 6.3, -1.2, 1.2, 100, 1);
+$g = addfractionaxislabels($g, "pi/2");
+// x-axis now shows 0, pi/2, pi, 3pi/2, 2pi</pre></details></li>
+<li><strong>addlabel(plot,x,y,label,[color,loc,angle,size,alt])</strong>: Adds a text label at graph coordinates (x,y) to a showplot graph.
+  <details class="example"><summary>Parameters</summary>
+  <ul>
+  <li><strong>color</strong>: Label color. Defaults to black.</li>
+  <li><strong>loc</strong>: Position relative to the point — "above", "below", "left", "right", "aboveleft", etc. Defaults to centered.</li>
+  <li><strong>angle</strong>: Rotation angle in degrees.</li>
+  <li><strong>size</strong>: Font size for the label.</li>
+  <li><strong>alt</strong>: Alt text for the label, replacing the default.</li>
+  </ul>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
+$g = addlabel($g, 1, 1, "A", "red", "above");
+$g = addlabel($g, -2, 4, "(-2,4)", "blue", "left");</pre></details></li>
+<li><strong>addlabelabs(plot,x,y,label,[color,loc,angle,alt])</strong>: Like addlabel, but x and y are pixel coordinates on the image rather than graph coordinates.
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
+$g = addlabelabs($g, 10, 10, "My Graph", "black", "right");</pre></details></li>
+<li><strong>addplotborder(plot,left,[bottom,right,top])</strong>: Changes the pixel border width (default 5) around a plot. Labels show within the border; typically used to add room for axis labels.
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
+$g = addplotborder($g, 30);           // 30px border all sides
+$g = addplotborder($g, 40, 5, 5, 5); // wide left border for y-axis labels</pre></details></li>
+<li><strong>adddrawcommand(plot,commands)</strong>: Inserts arbitrary <a href="docs/asciisvgref.php">ASCIIsvg</a> drawing commands into an existing plot.
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
+$g = adddrawcommand($g, "stroke('green'); line(0,0,1,1)");</pre></details></li>
+<li><strong>showasciisvg(string,[width,height,alttext])</strong>: Renders an <a href="docs/asciisvgref.php">ASCIIsvg</a> script directly as an SVG. Always include alttext for accessibility.
+  <details class="example"><summary>Example</summary><pre>$g = showasciisvg("stroke('blue'); circle(0,0,1)", 200, 200, "A blue unit circle");</pre></details></li>
+<li><strong>replacealttext(image or graph, alttext)</strong>: Replaces the auto-generated alt text on a graph or image with the specified text.
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
+$g = replacealttext($g, "Graph of y equals x squared, a parabola opening upward");</pre></details></li>
+<li><strong>changeimagesize(image or graph, width, [height])</strong>: Changes the display size of an image or graph. Does not resize the underlying file.
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
+$g = changeimagesize($g, 300);        // 300px wide
+$g = changeimagesize($g, 300, 400);   // 300x400px</pre></details></li>
+<li><strong>textonimage(img,text,left,top[,text,left,top,...])</strong>: Overlays text strings over an image at given pixel offsets from the top-left corner.
+  <details class="example"><summary>Parameters</summary>
+  <p>Image can be a URL or an uploaded image variable. Not screenreader-friendly — provide alt text on the image.
+  Put "centerelements" anywhere after the image to center subsequent labels at their coordinates instead of using top-left anchoring.
+  Alternate form: <code>textonimage(img, array("Label A", 50, 30, "Label B", 150, 30))</code>.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>// $img is an uploaded image variable
+$result = textonimage($img, "Label A", 50, 30, "Label B", 150, 80);
+
+// Centered labels:
+$result = textonimage($img, "centerelements", "A", 100, 50, "B", 200, 50);</pre></details></li>
+<li><strong>addimageborder(image, [border width, margin])</strong>: Adds a border to an uploaded image. Border width defaults to 1px, margin defaults to 0.
+  <details class="example"><summary>Example</summary><pre>$img2 = addimageborder($img);         // default 1px border
+$img2 = addimageborder($img, 2, 5);   // 2px border, 5px whitespace margin</pre></details></li>
+<li><strong>arraystodoteqns(xarray,yarray,[color])</strong>: Converts arrays of x and y values into a dot funcstring for use in showplot.
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3,4);
+$ys = array(1,4,9,16);
+$dots = arraystodoteqns($xs, $ys, "blue");
+$g = showplot($dots, 0, 5, 0, 20);</pre></details></li>
+<li><strong>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</strong>: Converts arrays of x and y values into a connected-line funcstring for showplot.
+  <details class="example"><summary>Example</summary><pre>$xs = array(0,1,2,3);
+$ys = array(0,2,1,3);
+$lines = connectthedots($xs, $ys, "red");
+$g = showplot($lines, -1, 4, -1, 4);</pre></details></li>
+<li><strong>arraystodots(xarray,yarray)</strong>: Converts arrays of x and y values into a form suitable for use as the answer to a Drawing question.
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3);
+$ys = array(1,4,9);
+$answer = arraystodots($xs, $ys); // use as $answer for a Drawing question</pre></details></li>
+<li><strong>gettwopointlinedata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointlinedata(stuans, [grid, snaptogrid])</strong>: Extracts two-point line data from a Drawing question student answer. Returns an array of lines, each as array(x1,y1,x2,y2).
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $lines = gettwopointlinedata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
+  // $lines[0] = array(x1, y1, x2, y2) for the first line drawn
+  $slope = ($lines[0][3] - $lines[0][1]) / ($lines[0][2] - $lines[0][0]);
+}</pre></details></li>
+<li><strong>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointdata(stuans, type, [grid, snaptogrid])</strong>: Extracts two-point control data from a Drawing question for a specific curve type. Returns an array of curves, each as array(x1,y1,x2,y2).
+  <details class="example"><summary>Parameters</summary>
+  <p>Type should be one of: 'line', 'lineseg', 'ray', 'parab', 'halfparab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
+  'rational', 'exp', 'genexp', 'log', 'genlog', 'sin', 'cos', 'abs', 'vector', 'circle', 'ellipse'.
+  Points are returned in click order — for 'parab', the first point is the vertex.
+  'genexp'/'genlog' return a 5th array entry for the asymptote value.
+  Use 'circlerad' to return array(x-center, y-center, radius) or 'ellipserad' for array(x-center, y-center, x-radius, y-radius).</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $curves = gettwopointdata($stuanswers[$thisq], 'parab', -5, 5, -5, 5, 200, 200);
+  // For a parabola: $curves[0] = array(x_vertex, y_vertex, x_point, y_point)
+  $vx = $curves[0][0];
+  $vy = $curves[0][1];
+}</pre></details></li>
+<li><strong>gettwopointformulas(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or gettwopointformulas(stuans, type, [grid, snaptogrid])</strong>: Returns algebraic formulas for curves drawn in a Drawing question. Returns an array of expression strings (functions of x).
+  <details class="example"><summary>Parameters</summary>
+  <p>Type should be one of: 'line', 'lineseg', 'ray', 'parab', 'halfparab', 'horizparab', 'sqrt', 'cubic', 'cuberoot',
+  'rational', 'exp', 'genexp', 'log', 'genlog', 'sin', 'cos', 'abs', 'circle', 'ellipse'.
+  For 'horizparab', output is in terms of y. For 'circle'/'ellipse', output is an expression in x and y equaling 1.
+  Add a final argument 'showequation' (optionally with custom variable names like 'showequation,x,y') to return implicit equations.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $formulas = gettwopointformulas($stuanswers[$thisq], 'line', -5, 5, -5, 5, 200, 200);
+  // $formulas[0] is a string like "2*x+1"
+  $correct = comparefunctions($formulas[0], $answer);
+}</pre></details></li>
+<li><strong>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getdotsdata(stuans, [grid, snaptogrid])</strong>: Extracts the closed dots from a Drawing question. Returns an array of dots, each as array(x, y).
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $dots = getdotsdata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
+  // $dots[0] = array(x, y) of the first closed dot
+}</pre></details></li>
+<li><strong>getopendotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getopendotsdata(stuans, [grid, snaptogrid])</strong>: Extracts the open dots from a Drawing question. Returns an array of dots, each as array(x, y).
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $dots = getopendotsdata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
+  // $dots[0] = array(x, y) of the first open dot
+}</pre></details></li>
+<li><strong>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height]) or getlinesdata(stuans, [grid, snaptogrid])</strong>: Extracts freehand line or polygon data from a Drawing question. Returns an array of curves, where each curve is an array of array(x,y) points.
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $lines = getlinesdata($stuanswers[$thisq], -5, 5, -5, 5, 200, 200);
+  // $lines[0] = array of points for the first curve
+  // $lines[0][0] = array(x, y) of the first point on that curve
+}</pre></details></li>
+<li><strong>getineqdata(stuans, [type, xmin, xmax, ymin, ymax, drawing width, drawing height]) or getineqdata(stuans, [grid, snaptogrid])</strong>: Extracts inequality data from a Drawing question. Returns an array of curves, each as array(style, x1, y1, x2, y2, x3, y3).
+  <details class="example"><summary>Parameters</summary>
+  <p>Type should be 'linear' or 'quadratic'. style will be 'ne' for strict inequality (dashed border) or 'eq' for inequality with equality (solid border).</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $ineqs = getineqdata($stuanswers[$thisq], 'linear', -5, 5, -5, 5, 200, 200);
+  // $ineqs[0][0] = 'ne' or 'eq' (dashed or solid border)
+  // $ineqs[0][1..6] = x1,y1,x2,y2,x3,y3 of the three control points
+}</pre></details></li>
+<li><strong>getsnapwidthheight(xmin, xmax, ymin, ymax, drawing width, drawing height, snaptogrid)</strong>: Returns an adjusted drawing width and height that guarantees snap-to-grid values fall on exact pixel boundaries.
+  <details class="example"><summary>Example</summary><pre>$dims = getsnapwidthheight(-5, 5, -5, 5, 200, 200, 0.5);
+// Use $dims[0] as width and $dims[1] as height in your drawing question setup</pre></details></li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
@@ -2507,74 +2663,107 @@ The following macros create graphs or tables:
 
 The following macros help with formatting values for display:
 <ul>
-<li><strong>makepretty(string or array of strings)</strong>: Changes double add/subtract signs to a single sign.</li>
-<li><strong>makeprettydisp(string or array of strings)</strong>:  Does makepretty (see above) and backquotes the string for math display</li>
-<li><strong>polymakepretty and polymakeprettydisp</strong>:  Like makepretty, but for polynomials.  Cleans up 0*, 1*, ^1, and ^0 to make the polynomial look nicer.
-   This function can do weird things for equations that are not simple polynomials, so test well</li>
-<li><strong>makexpretty and makexprettydisp</strong>:  (deprecated - use makexxpretty instead) Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
-   will often cause weird things to happen, so test well</li>
-<li><strong>makexxpretty and makexxprettydisp</strong>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, x^1, x^0, etc.  Can occasionally cause strange output, so
-   be sure to test.  Handles things better than the older makexpretty, but does not always produce 100% identical output.
-   This function cannot handle |x| notation; use abs(x) instead.</li>
-<li><strong>makepretynegative(string)</strong>: Puts parens around negatives is certain cases.
-	Changes 3--4 to 3-(-4) and  3+-4 to 3+(-4), but note it will change 3-+4 to 3-4.</li>
-<li><strong>numtowords(number,[addth, numwithTh, addcommas)</strong>:  Creates a string containing number written out in words.<br/>
-   numtowords(1203) returns "one thousand two hundred three"<br/>
-   numtowords(1203,true) returns "one thousand two hundred third"<br/>
-   numtowords(1203,false,true) returns "1023rd"<br/>
-   numtowords(1203,false,false,true) returns "one thousand, two hundred three"
-  </li>
-<li><strong>fractowords(numerator,denominator,[options])</strong>: Creates a string containing 
-    fraction numerator/denominator written out in words. By default, fractions will be reduced 
-    to integers if possible, and pos/neg signs will be reduced. 
-    Options is a string that can include combinations of 'mixed' or 'literal', 
-    and 'over' or 'by', and 'hyphen'. Using 'over' or 'by' will connect numerator and 
-    denominator with that word. Using 'mixed' will output a mixed number, and 'literal' 
-    overrides the default simplifications. Does not allow division by zero. 
-    If 'over' and 'by' both used, defaults to 'over'. If 'mixed' and 'literal' both used,
-	defaults to 'mixed'. 'hyphen' will hyphenate the fraction.<br/>
-	fractowords(5,-2) returns "negative five halves"<br/>
-	fractowords(6,3) returns "two"<br/>
-    fractowrods(2,3,'hyphen') return 'two-thirds'<br/>
-	fractowords(-7,4,'mixed') returns "negative one and three fourths"<br/>
-	fractowords(-7,4,'mixed over') returns "negative one and three over four"<br/>
-	fractowords(6,3,'literal') returns "six thirds"<br/>
-	fractowords(6,3,'literal over') returns "six over three"<br/>
-</li>
-<li><strong>numtoroman(number,[uppercase])</strong>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
-    produce lowercase</li>
-<li><strong>prettyint(number)</strong>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
-   can only be used for display, not in calculations</li>
-<li><strong>prettyreal(number,decimals,[comma])</strong>:  Adds commas in thousands spaces of number, and displays the value to a fixed number of decimals places (rounding if needed).
-   Example: prettyreal(1234.567,2) will return "1,234.57", and prettyreal(1.8,3) will return "1.800".  The result is a string, which
-   can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li>
-<li><strong>prettyreal_instring(string,decimals,[comma])</strong>:  Formats any number in the string
-   using the same process as prettyreal.</li>
-<li><strong>round_instring(string,[decimals])</strong>: Rounds any number in the string 
-   to the specified number of decimal places (nearest whole number if decimal is left out)</li>
-<li><strong>prettysmallnumber(number, [space])</strong>:  Prevents very small numbers from being displayed as scientific notation.
-   Set space to true to add space in groups of 3, like 0.000 000 02</li>
-<li><strong>prettysigfig(number,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" to override.
-   Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant. Set scinot to true to display in scientific notation. Set sigfigbar to true to put line over last significant, non-terminating zero, such as 42<span style="text-decoration: overline">0</span>0 having three sig figs (use only in math display).
-   This is for display; to round a number for calculations, use roundsigfig.</li>
-<li><strong>prettysigfig_instring(string,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>:  
-    Rounds any number in the string to sigfigs significant figures. The rest of the options are the same 
-    as for prettysigfig.</li>
-<li><strong>makescinot(number,[decimals,format])</strong>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
-<li><strong>prettytime(value,informat,outformat)</strong>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
-    value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
-    can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
-<li><strong>dispreducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
-    reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".  Set variable in numerator to put a variable
-    in the numerator, such as pi.</li>
-<li><strong>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>:  Same as dispreducefraction, but not already in display form.<br>
-    An alternate input form of makereducedfraction(numerator,denominator,'parts') will return an array of the 
-    reduced numerator and denominator.</li>
-<li><strong>decimaltofraction(decimal,[format,maxden])</strong>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.
-    Only works for denominators up to maxden (default 5000)</li>
-<li><strong>htmldisp(string,[variables])</strong>:  Uses HTML instead of the math typesetter to display simple exponents and subscripts, and to italicize variables</li>
-<li><strong>formatcomplex(real,imag)</strong>: Creates a string like "2+i" from the real and imaginary parts.</li>
-<li><strong>rawurlencode(string)</strong>: Encodes a string for use in a URL query string parameter.</li>
+<li><strong>makepretty(string or array of strings)</strong>: Changes double add/subtract signs to a single sign (e.g. "3+-2" → "3-2", "5--3" → "5+3").
+  <details class="example"><summary>Example</summary><pre>$a = rand(-5,5);
+$nice = makepretty("x+" . $a);    // "x+3" or "x-2" depending on sign of $a</pre></details></li>
+<li><strong>makeprettydisp(string or array of strings)</strong>: Does makepretty and wraps the result in backticks for math display.
+  <details class="example"><summary>Example</summary><pre>$a = rand(-5,5);
+$disp = makeprettydisp("x+" . $a); // ready to embed in question text as math</pre></details></li>
+<li><strong>polymakepretty and polymakeprettydisp</strong>: Like makepretty but for polynomials — also cleans up 0*, 1*, ^1, and ^0. Test carefully; can behave unexpectedly with non-polynomial expressions.
+  <details class="example"><summary>Example</summary><pre>$a = rand(1,5);
+$poly = $a . "*x^2+0*x+1*x^0";
+$nice = polymakepretty($poly);    // e.g. "3x^2+1"
+$disp = polymakeprettydisp($poly); // math display version</pre></details></li>
+<li><strong>makexpretty and makexprettydisp</strong>: (deprecated — use makexxpretty instead) Like makepretty but also cleans up 1*, 0*, etc. Can cause unexpected results; test carefully.</li>
+<li><strong>makexxpretty and makexxprettydisp</strong>: Like makepretty but also cleans up 1*, 0*, x^1, x^0, etc. Cannot handle |x| notation — use abs(x) instead. Test carefully.
+  <details class="example"><summary>Example</summary><pre>$expr = "1*x^2+0*x^1+1*x^0";
+$nice = makexxpretty($expr);     // "x^2+1"
+$disp = makexxprettydisp($expr); // math display version</pre></details></li>
+<li><strong>makepretynegative(string)</strong>: Wraps negative terms in parentheses — e.g. "3+-4" → "3+(-4)" and "3--4" → "3-(-4)". Note: "3-+4" becomes "3-4".
+  <details class="example"><summary>Example</summary><pre>$b = 0 - rand(1,5);  // a negative number
+$expr = "3+" . $b;   // like "3+-4"
+$nice = makepretynegative($expr); // "3+(-4)"</pre></details></li>
+<li><strong>numtowords(number,[addth, numwithTh, addcommas])</strong>: Converts a number to its word representation.
+  <details class="example"><summary>Example</summary><pre>numtowords(1203)              // "one thousand two hundred three"
+numtowords(1203, true)        // "one thousand two hundred third"  (ordinal)
+numtowords(1203, false, true) // "1203rd"  (numeric with ordinal suffix)
+numtowords(1203, false, false, true) // "one thousand, two hundred three"  (with comma)</pre></details></li>
+<li><strong>fractowords(numerator,denominator,[options])</strong>: Converts a fraction to its word representation. By default reduces to integers if possible.
+  <details class="example"><summary>Parameters</summary>
+  <p>Options is a string combining any of: 'mixed' (mixed number output), 'literal' (suppress simplifications), 'over' or 'by' (connect with that word), 'hyphen' (hyphenate the fraction). If both 'over' and 'by' are given, 'over' wins. If both 'mixed' and 'literal' are given, 'mixed' wins.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>fractowords(5, -2)             // "negative five halves"
+fractowords(6, 3)              // "two"  (reduced to integer)
+fractowords(2, 3, 'hyphen')   // "two-thirds"
+fractowords(-7, 4, 'mixed')   // "negative one and three fourths"
+fractowords(-7, 4, 'mixed over') // "negative one and three over four"
+fractowords(6, 3, 'literal')  // "six thirds"  (no simplification)</pre></details></li>
+<li><strong>numtoroman(number,[uppercase])</strong>: Converts a number (0.5–3999.5) to a Roman numeral string. Defaults to uppercase; pass false for lowercase.
+  <details class="example"><summary>Example</summary><pre>numtoroman(14)        // "XIV"
+numtoroman(14, false) // "xiv"
+numtoroman(1999)      // "MCMXCIX"</pre></details></li>
+<li><strong>prettyint(number)</strong>: Formats an integer with comma thousands separators. Returns a string for display only, not for calculations.
+  <details class="example"><summary>Example</summary><pre>prettyint(1234567)  // "1,234,567"
+prettyint(1000)     // "1,000"</pre></details></li>
+<li><strong>prettyreal(number,decimals,[comma])</strong>: Formats a number with comma thousands separators and a fixed number of decimal places. Returns a string for display only. Set comma to "" to suppress the thousands separator.
+  <details class="example"><summary>Example</summary><pre>prettyreal(1234.567, 2)     // "1,234.57"
+prettyreal(1.8, 3)          // "1.800"
+prettyreal(1234.5, 2, "")   // "1234.50"  (no comma)</pre></details></li>
+<li><strong>prettyreal_instring(string,decimals,[comma])</strong>: Applies prettyreal formatting to every number found within a string.
+  <details class="example"><summary>Example</summary><pre>prettyreal_instring("The value is 1234.567 dollars", 2)
+// "The value is 1,234.57 dollars"</pre></details></li>
+<li><strong>round_instring(string,[decimals])</strong>: Rounds every number within a string to the specified decimal places (nearest whole number if omitted).
+  <details class="example"><summary>Example</summary><pre>round_instring("Pi is about 3.14159", 3) // "Pi is about 3.142"
+round_instring("roughly 3.7 people", 0)  // "roughly 4 people"</pre></details></li>
+<li><strong>prettysmallnumber(number, [space])</strong>: Displays very small numbers in decimal form instead of scientific notation. Set space to true to add spaces every 3 decimal places.
+  <details class="example"><summary>Example</summary><pre>prettysmallnumber(0.0000002)       // "0.0000002"  (not "2E-7")
+prettysmallnumber(0.0000002, true) // "0.000 000 2"</pre></details></li>
+<li><strong>prettysigfig(number,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>: Rounds a number to the specified significant figures for display. For rounding for calculations, use roundsigfig instead.
+  <details class="example"><summary>Parameters</summary>
+  <p>By default adds comma thousands separators; set comma to "" to suppress.
+  choptrailingzeros: set true to remove trailing decimal zeros even if significant.
+  scinot: set true to display in scientific notation.
+  sigfigbar: set true to put an overline on the last significant zero (e.g. 420<span style="text-decoration:overline">0</span> for 3 sig figs) — use in math display only.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>prettysigfig(12345.6, 3)              // "12,300"
+prettysigfig(0.00456, 2)             // "0.0046"
+prettysigfig(12345.6, 3, ",", false, true) // "1.23*10^4"  (sci notation)</pre></details></li>
+<li><strong>prettysigfig_instring(string,sigfigs,[comma,choptrailingzeros,scinot,sigfigbar])</strong>: Applies prettysigfig rounding to every number found within a string.
+  <details class="example"><summary>Example</summary><pre>prettysigfig_instring("The mass is 1234.56 kg", 3) // "The mass is 1,230 kg"</pre></details></li>
+<li><strong>makescinot(number,[decimals,format])</strong>: Converts a number to scientific notation. Optionally rounds the mantissa to the given decimal places. Format can be "*" or "E" as alternatives to the default multiplication cross.
+  <details class="example"><summary>Example</summary><pre>makescinot(1234.5)       // "1.2345*10^3"
+makescinot(1234.5, 2)   // "1.23*10^3"
+makescinot(1234.5, 2, "E") // "1.23E3"</pre></details></li>
+<li><strong>prettytime(value,informat,outformat)</strong>: Converts a time value to a readable string. informat is 'h', 'm', or 's' (the unit of the input). outformat is any combination of 'h', 'm', 's', or 'clock'/'sclock'.
+  <details class="example"><summary>Example</summary><pre>prettytime(90, 'm', 'hm')     // "1 hour and 30 minutes"
+prettytime(3661, 's', 'hms')  // "1 hour, 1 minute, and 1 second"
+prettytime(754, 'm', 'clock') // "12:34pm"
+prettytime(754, 'm', 'sclock') // includes seconds: "12:34:00pm"</pre></details></li>
+<li><strong>dispreducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>: Returns a reduced fraction already formatted for display (suitable for $showanswer). Set doubleslash to true for "3//4" format. Set variable in numerator to include a variable like pi.
+  <details class="example"><summary>Example</summary><pre>dispreducedfraction(6, 9)         // "2/3"
+dispreducedfraction(3, 4, true)   // "3//4"
+dispreducedfraction(2, 3, false, 'pi') // "2pi/3"</pre></details></li>
+<li><strong>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</strong>: Same as dispreducedfraction but returns a value suitable for use in $answer (not pre-formatted for display). Pass 'parts' as the third argument to get an array of [numerator, denominator] instead.
+  <details class="example"><summary>Example</summary><pre>makereducedfraction(6, 9)           // "2/3"
+makereducedfraction(3, 4, true)     // "3//4"
+makereducedfraction(6, 9, false, 'pi') // "2pi/3"
+
+// Get reduced parts as separate values:
+$num,$den = makereducedfraction(6, 9, 'parts'); // $num=2, $den=3</pre></details></li>
+<li><strong>decimaltofraction(decimal,[format,maxden])</strong>: Converts a decimal to a fraction string. Only works for denominators up to maxden (default 5000).
+  <details class="example"><summary>Example</summary><pre>decimaltofraction(0.75)                  // "3/4"
+decimaltofraction(1.5)                   // "3/2"
+decimaltofraction(1.5, 'mixednumber')    // "1 1/2"</pre></details></li>
+<li><strong>htmldisp(string,[variables])</strong>: Uses HTML superscripts/subscripts and italics for simple math display, without invoking the full math typesetter.
+  <details class="example"><summary>Example</summary><pre>htmldisp("x_1^2 + x_2^2")        // renders subscripts and superscripts in HTML
+htmldisp("x^2 + y^2", "x,y")    // also italicizes the variables x and y</pre></details></li>
+<li><strong>formatcomplex(real,imag)</strong>: Creates a display string for a complex number from its real and imaginary parts.
+  <details class="example"><summary>Example</summary><pre>formatcomplex(2, 3)   // "2+3i"
+formatcomplex(2, -3)  // "2-3i"
+formatcomplex(0, 1)   // "i"
+formatcomplex(3, 0)   // "3"</pre></details></li>
+<li><strong>rawurlencode(string)</strong>: Encodes a string for safe use in a URL query string.
+  <details class="example"><summary>Example</summary><pre>rawurlencode("hello world!") // "hello%20world%21"</pre></details></li>
 </ul>
 
 </div> <!-- h2 -->
@@ -2583,26 +2772,60 @@ The following macros help with formatting values for display:
 <h2 id="stringmacros">String Macros</h2>
 These macros help with working with strings:
 <ul>
-<li><strong>stringappend(value,string)</strong>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
-<li><strong>stringprepend(value,string)</strong>:  Same as stringappend, but prepends string to value</li>
-<li><strong>today([string])</strong>: Returns today's date, like "July 3, 2008".  Can change format using string (see https://www.php.net/manual/en/datetime.format.php for formats)</li>
-<li><strong>stringpos(needle,haystack)</strong>: Finds the position of the string needle in the string haystack.  Returns -1 if needle is not found</li>
-<li><strong>stringlen(string)</strong>: returns the character count in the provided string</li>
-<li><strong>stringclean(string,[mode])</strong>: mode 0 (default): trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric characters.</li>
-<li><strong>substr(string,start,[length])</strong>: grabs the part of the string from the start index with given length. 
-	If start is negative, the returned string will start at the start'th character from the end of string.
-	If length is not specified, it cuts from the start index to the end of the string.
-	If length is given and is negative, then that many characters will be omitted from the end of string.
-	</li>
-<li><strong>strtoupper(string)</strong>: make all characters in the string upper case</li>
-<li><strong>ucfirst(string)</strong>: makes the first character in the string upper case</li>
-<li><strong>strtolower(string)</strong>: make all characters in the string lower case</li>
-<li><strong>lcfirst(string)</strong>: makes the first character in the string lower case</li>
-<li><strong>substr_count(haystack,needle)</strong>: Find the number of occurrences of needle in the string haystack</li>
-<li><strong>str_replace(search,replace,string)</strong>:  Replace all occurrences of search in the string with replace.  Search and replace can be arrays.</li>
-<li><strong>preg_match(pattern,subject,[matches])</strong>: Searches subject for a match using the regular expression in pattern. Returns true/false, and stores the match in matches.</li>
-<li><strong>preg_match_all(pattern,subject,[matches, flags, offset])</strong>: Searches subject for multiple matches using the regular expression in pattern. Returns number of matches, and stores the matches in matches. See <a href="https://www.php.net/manual/en/function.preg-match-all.php">PHP help</a> for optional flags.</li>
-<li><strong>preg_replace(pattern,replacement,subject,[limit])</strong>: Searches subject for a match using the regular expression in pattern, and replaces any matches with the replacement.</li>
+<li><strong>stringappend(value,string)</strong>: Appends string to value. If value is an array, string is appended to each element.
+  <details class="example"><summary>Example</summary><pre>stringappend("hello", " world")    // "hello world"
+stringappend(array("cat","dog"), "s") // array("cats","dogs")</pre></details></li>
+<li><strong>stringprepend(value,string)</strong>: Prepends string to value. If value is an array, string is prepended to each element.
+  <details class="example"><summary>Example</summary><pre>stringprepend("world", "hello ")    // "hello world"
+stringprepend(array("A","B"), "$")  // array("$A","$B")</pre></details></li>
+<li><strong>today([string])</strong>: Returns today's date. Defaults to "Month D, YYYY" format. See <a href="https://www.php.net/manual/en/datetime.format.php">PHP date format codes</a> for custom formats.
+  <details class="example"><summary>Example</summary><pre>today()          // "July 3, 2026"
+today("Y-m-d")  // "2026-07-03"
+today("D, M j") // "Tue, Jul 3"</pre></details></li>
+<li><strong>stringpos(needle,haystack)</strong>: Returns the position (0-indexed) of needle in haystack. Returns -1 if not found.
+  <details class="example"><summary>Example</summary><pre>stringpos("lo", "hello")   // 3
+stringpos("xyz", "hello")  // -1  (not found)</pre></details></li>
+<li><strong>stringlen(string)</strong>: Returns the number of characters in the string.
+  <details class="example"><summary>Example</summary><pre>stringlen("hello")  // 5
+stringlen("")       // 0</pre></details></li>
+<li><strong>stringclean(string,[mode])</strong>: Cleans up a string. Mode 0 (default): trim whitespace. Mode 1: remove all whitespace. Mode 2: remove all non-alphanumeric characters.
+  <details class="example"><summary>Example</summary><pre>stringclean("  hello  ")     // "hello"
+stringclean("h e l l o", 1) // "hello"
+stringclean("hi there! 2", 2) // "hithere2"</pre></details></li>
+<li><strong>substr(string,start,[length])</strong>: Extracts a portion of the string. Negative start counts from the end. Negative length omits that many characters from the end.
+  <details class="example"><summary>Example</summary><pre>substr("hello world", 6)      // "world"
+substr("hello world", 0, 5)   // "hello"
+substr("hello world", -5)     // "world"
+substr("hello world", 0, -6)  // "hello"</pre></details></li>
+<li><strong>strtoupper(string)</strong>: Converts all characters to uppercase.
+  <details class="example"><summary>Example</summary><pre>strtoupper("hello")  // "HELLO"</pre></details></li>
+<li><strong>ucfirst(string)</strong>: Capitalizes the first character of the string.
+  <details class="example"><summary>Example</summary><pre>ucfirst("hello world")  // "Hello world"</pre></details></li>
+<li><strong>strtolower(string)</strong>: Converts all characters to lowercase.
+  <details class="example"><summary>Example</summary><pre>strtolower("HELLO")  // "hello"</pre></details></li>
+<li><strong>lcfirst(string)</strong>: Lowercases the first character of the string.
+  <details class="example"><summary>Example</summary><pre>lcfirst("Hello World")  // "hello World"</pre></details></li>
+<li><strong>substr_count(haystack,needle)</strong>: Counts how many times needle appears in haystack.
+  <details class="example"><summary>Example</summary><pre>substr_count("hello world", "l")  // 3
+substr_count("aababc", "ab")      // 2</pre></details></li>
+<li><strong>str_replace(search,replace,string)</strong>: Replaces all occurrences of search in string with replace. Search and replace can be arrays for bulk replacement.
+  <details class="example"><summary>Example</summary><pre>str_replace("cat", "dog", "I have a cat")  // "I have a dog"
+
+// Array replacement:
+str_replace(array("cat","dog"), array("feline","canine"), "I have a cat and a dog")
+// "I have a feline and a canine"</pre></details></li>
+<li><strong>preg_match(pattern,subject,[matches])</strong>: Tests subject against a regular expression. Returns true/false, and stores the full match and capture groups in matches.
+  <details class="example"><summary>Example</summary><pre>$found = preg_match("/\d+/", "abc123", $m);
+// $found = true, $m[0] = "123"
+
+$found = preg_match("/^[a-z]+$/", "hello", $m);
+// $found = true (all lowercase letters)</pre></details></li>
+<li><strong>preg_match_all(pattern,subject,[matches, flags, offset])</strong>: Finds all matches of a regular expression in subject. Returns the count of matches. See <a href="https://www.php.net/manual/en/function.preg-match-all.php">PHP help</a> for optional flags.
+  <details class="example"><summary>Example</summary><pre>$count = preg_match_all("/\d+/", "abc 12 def 34", $m);
+// $count = 2, $m[0] = array("12","34")</pre></details></li>
+<li><strong>preg_replace(pattern,replacement,subject,[limit])</strong>: Replaces all regex matches in subject with replacement.
+  <details class="example"><summary>Example</summary><pre>preg_replace("/\s+/", "_", "hello world foo")  // "hello_world_foo"
+preg_replace("/\d+/", "NUM", "abc 12 def 34")  // "abc NUM def NUM"</pre></details></li>
 </ul>
 
 </div> <!-- h2 -->
@@ -2611,197 +2834,272 @@ These macros help with working with strings:
 <h2 id="arraymacros">Array Macros</h2>
 These macros are for working with arrays:
 <ul>
-<li><strong>listtoarray(list, [tonum])</strong>:  Converts a list, like "1,2,3,4" or "cat,dog,rabbit" to an array. 
-	If the list is decimal or integer numbers, set tonum to true to ensure they're treated like numbers.</li>
-<li><strong>calclisttoarray(list)</strong>:  Converts a list of calculations, like "2^2,3^5,7/2" to an array, evaluating the calculations
-    along the way.</li>
-<li><strong>explode(symbol, string)</strong>:  Converts a string to an array, breaking it apart on the given symbol.</li>
-<li><strong>arraytolist(array, [space])</strong>:  Converts an array to a list. Set the second argument to <code>true</code> to add spaces after the commas.</li>
-<li><strong>joinarray(array,[symbol,ksort])</strong>:  Convert an array to a string, joining elements with the given symbol (default comma). Set ksort to true to sort the array by key before joining, useful if elements were defined out of order.</li>
-<li><strong>stringtoarray(string, [tonum])</strong>: Converts a text string to an array of characters. 
-	If the characters are all numbers, set tonum to true to ensure they're treated as numbers.</li>
-<li><strong>fillarray(value,num,[start])</strong>:  Creates an array with num entries, all of which are the same given value.  Array indexing
-    starts at 0 unless specified. Alternatively, num can be an array of indices, in which case the array will
-	only be defined to the value at those indices.</li>
-<li><strong>consecutive(min,max,[step])</strong>:  Creates an array of consecutive numbers, starting at min and ending at max, in increments of
-    step.  Step is optional; it defaults to 1.</li>
-<li><strong>arraysetvalues(array,keyarray,value/valuearray)</strong>:
-	Sets values on an existing array, at the keys specified in the keyarray. If value is a single value,
-	that value is set at all the keys. This is similar to fillarray with an array for num, but this function 
-	modifies an existing array rather than creating a new one. If an array of values is provided, the corresponding value is set 
-	for each key in the keyarray.  Returns the array with new values.  
-	</li>
-<li><strong>sortarray(list/array,[type, maxkey])</strong>:  Sorts an array from lowest to highest value.  
-    To sort in reverse order, give the option second parameter as "rev". 
-    To sort by key, give the optional second parameter as "key". 
-    To sort by key (numeric only) and fill in any missing numeric keys with empty string values, 
-    give the optional second parameter as "keyfill". In this case you can optionally provide a third 
-    argument for the max key to fill the array with.</li>
-<li><strong>jointsort(array,array,[array,...])</strong>:  Jointly reorders two or more arrays based on a lowest-to-highest sort of values in the first array</li>
-<li><strong>calconarray(array,calculation)</strong>:  Returns an array, performing the given calculation on each element of the given array.  Use
-    "x" as the variable to represent each element of the array.  Example: $b = calconarray($a,"x^2") will create an array that is the
-    square each element of the array $a.</li>
-<li><strong>multicalconarray(calculation,varslist,var1array,var2array,etc.)</strong>  Returns an array, performing the given calculation on each set
-    of elements from the given arrays.  Allows multivariable calculations.  Example:  $z= multicalconarray("x*y^2","x,y",$xs,$ys)</li>
-<li><strong>calconarrayif(array,calculation,ifcondition)</strong>:  Like calconarray, but allows you to specify a condition for each element for whether to
-    do the calculation.  Example:  $b = calconarrayif($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the
-    other elements unchanged.</li>
-<li><strong>keepif(array,condition)</strong>  Filters an array, only keeping values that meet the 
-    supplied condition. Example: keepif($a,"x%3==0").</li>
-<li><strong>subarray(array,params)</strong>:  Creates a new array as a subset of the specified array.  The params can take several forms:
-	<ul>
-	<li>subarray($a,2,4,6):  creates an array from $a[2], $a[4], and $a[6]</li>
-	<li>subarray($a,"1:3","6:8"):  create an array from $a[1] through $a[3], and $a[6] through $a[8]</li>
-	<li>subarray($a,$b):  creates an array from entries in $a with indexes specified in $b.  So if $b = array(2,4,6), this
-	    would return $a[2], $a[4], and $a[6]</li>
-	 </ul>
-	 </li>
-<li><strong>splicearray(array,offset,length,[replacement])</strong>: Removes the elements designated by offset and length from the given array, and replaces them with the elements of the replacement array, if supplied.</li>
-<li><strong>mergearrays(array,array,[array,...])</strong>:  Combines two or more arrays into one long array</li>
-<li><strong>unionarrays(array,array)</strong>:  Unions two arrays, preventing duplicates, into a new array</li>
-<li><strong>intersectarrays(array,array)</strong>:  Finds the intersection of two arrays</li>
-<li><strong>diffarrays(array1,array2)</strong>: Returns all elements in array1 that are not also in array2</li>
-<li><strong>array_unique(array)</strong>: Returns the array, stripping duplicate values. Beware this doesn't re-index the array, so you may want to then use array_values if you need consecutive array keys.</li>
-<li><strong>array_values(array)</strong>: Returns the values of an array, reindexing with consecutive numeric indices.</li>
-<li><strong>array_keys(array)</strong>: Returns the keys of an associative array.</li>
-<li><strong>count(array)</strong>:  Counts the number of entries in the array</li>
-<li><strong>is_array(variable)</strong>:  Determines if the variable is an array</li>
-<li><strong>sumarray(array)</strong>: Adds the entries in an array</li>
-<li><strong>in_array(needle,haystack)</strong>:  Checks if value needle is in array haystack.  Returns true or false</li>
-<li><strong>arrayfindindex(needle,haystack)</strong>: Returns the index in the array haystack of the value needle.  If there are multiple matches, it only returns the first.</li>
-<li><strong>arrayfindindices(needle,haystack)</strong>: Returns an array of indices in the array haystack of the value needle.</li>
-<li><strong>array_flip(array)</strong>:  Reverses a one-to-one array, so indexes become values and values become indexes</li>
-<li><strong>print_r(array, [return])</strong>: Outputs an array for debugging purposes. Add second argument true to return the output as a string you
-	can store to a variable and include in your question text for nicer debugging.</li>
+<li><strong>listtoarray(list, [tonum])</strong>: Converts a comma-separated list string to an array. Set tonum to true to ensure numeric values are treated as numbers.
+  <details class="example"><summary>Example</summary><pre>listtoarray("1,2,3,4")         // array("1","2","3","4")
+listtoarray("1,2,3,4", true)   // array(1,2,3,4)  (as numbers)
+listtoarray("red,green,blue")  // array("red","green","blue")</pre></details></li>
+<li><strong>calclisttoarray(list)</strong>: Converts a list of calculation expressions to an array, evaluating each one.
+  <details class="example"><summary>Example</summary><pre>calclisttoarray("2^2,3^2,4^2")  // array(4,9,16)
+calclisttoarray("pi,pi/2")      // array(3.14159..., 1.5708...)</pre></details></li>
+<li><strong>explode(symbol, string)</strong>: Splits a string into an array using the given delimiter.
+  <details class="example"><summary>Example</summary><pre>explode(",", "a,b,c")   // array("a","b","c")
+explode(":", "x:y:z")   // array("x","y","z")</pre></details></li>
+<li><strong>arraytolist(array, [space])</strong>: Converts an array to a comma-separated string. Set space to true to add a space after each comma.
+  <details class="example"><summary>Example</summary><pre>arraytolist(array(1,2,3))        // "1,2,3"
+arraytolist(array(1,2,3), true)  // "1, 2, 3"</pre></details></li>
+<li><strong>joinarray(array,[symbol,ksort])</strong>: Joins array elements into a string using the given symbol (default: comma). Set ksort to true to sort by key first, useful if elements were defined out of order.
+  <details class="example"><summary>Example</summary><pre>joinarray(array("a","b","c"))          // "a,b,c"
+joinarray(array("a","b","c"), " + ")   // "a + b + c"
+joinarray(array("x","y"), " and ")     // "x and y"</pre></details></li>
+<li><strong>stringtoarray(string, [tonum])</strong>: Converts a string to an array of individual characters. Set tonum to true if all characters are digits.
+  <details class="example"><summary>Example</summary><pre>stringtoarray("abc")         // array("a","b","c")
+stringtoarray("123", true)   // array(1,2,3)</pre></details></li>
+<li><strong>fillarray(value,num,[start])</strong>: Creates an array filled with the same value. Indexing starts at 0 unless start is specified. num can also be an array of indices to set.
+  <details class="example"><summary>Example</summary><pre>fillarray(0, 5)              // array(0,0,0,0,0)
+fillarray("x", 3, 1)        // array(1=>"x", 2=>"x", 3=>"x")
+fillarray(1, array(0,2,4))  // array(0=>1, 2=>1, 4=>1)</pre></details></li>
+<li><strong>consecutive(min,max,[step])</strong>: Creates an array of evenly spaced numbers from min to max.
+  <details class="example"><summary>Example</summary><pre>consecutive(1, 5)        // array(1,2,3,4,5)
+consecutive(0, 1, .25)  // array(0, 0.25, 0.5, 0.75, 1)
+consecutive(2, 10, 2)   // array(2,4,6,8,10)</pre></details></li>
+<li><strong>arraysetvalues(array,keyarray,value/valuearray)</strong>: Sets values in an existing array at the specified keys. Returns the modified array.
+  <details class="example"><summary>Example</summary><pre>$arr = fillarray(0, 5);  // array(0,0,0,0,0)
+// Set a single value at multiple keys:
+$arr = arraysetvalues($arr, array(1,3), 99);    // array(0,99,0,99,0)
+// Set different values at each key:
+$arr = arraysetvalues($arr, array(0,2), array(10,20)); // index 0→10, index 2→20</pre></details></li>
+<li><strong>sortarray(list/array,[type, maxkey])</strong>: Sorts an array from lowest to highest. Use "rev" for descending, "key" to sort by key, or "keyfill" to sort by key and fill missing keys with empty string.
+  <details class="example"><summary>Example</summary><pre>sortarray(array(3,1,4,1,5))          // array(1,1,3,4,5)
+sortarray(array(3,1,4,1,5), "rev")  // array(5,4,3,1,1)</pre></details></li>
+<li><strong>jointsort(array,array,[array,...])</strong>: Reorders two or more arrays together based on a lowest-to-highest sort of the first array's values.
+  <details class="example"><summary>Example</summary><pre>$xs = array(3,1,2);
+$ys = array(9,1,4);
+$xs,$ys = jointsort($xs,$ys);  // $xs=array(1,2,3), $ys=array(1,4,9)</pre></details></li>
+<li><strong>calconarray(array,calculation)</strong>: Applies a calculation to each element of an array. Use "x" to represent each element.
+  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4);
+$b = calconarray($a, "x^2");    // array(1,4,9,16)
+$c = calconarray($a, "2*x+1"); // array(3,5,7,9)</pre></details></li>
+<li><strong>multicalconarray(calculation,varslist,var1array,var2array,...)</strong>: Like calconarray but supports multiple variables, one per array.
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3);
+$ys = array(4,5,6);
+$zs = multicalconarray("x*y", "x,y", $xs, $ys);  // array(4,10,18)</pre></details></li>
+<li><strong>calconarrayif(array,calculation,ifcondition)</strong>: Like calconarray but only applies the calculation to elements that satisfy the condition; others are left unchanged.
+  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4,5);
+$b = calconarrayif($a, "x^2", "x>3");  // array(1,2,3,16,25)
+// Only squares elements greater than 3</pre></details></li>
+<li><strong>keepif(array,condition)</strong>: Filters an array, returning only elements that satisfy the condition. Use "x" for each element.
+  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4,5,6);
+keepif($a, "x%2==0")  // array(2,4,6)  — keep only even numbers
+keepif($a, "x>3")     // array(4,5,6)</pre></details></li>
+<li><strong>subarray(array,params)</strong>: Creates a new array as a subset of the original.
+  <details class="example"><summary>Parameters</summary>
+  <ul>
+  <li><code>subarray($a,2,4,6)</code>: picks $a[2], $a[4], $a[6]</li>
+  <li><code>subarray($a,"1:3","6:8")</code>: picks $a[1] through $a[3] and $a[6] through $a[8]</li>
+  <li><code>subarray($a,$b)</code>: picks entries from $a at the indices listed in array $b</li>
+  </ul>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$a = array(10,20,30,40,50);
+subarray($a, 1, 3)       // array(20,40)
+subarray($a, "1:3")      // array(20,30,40)
+subarray($a, array(0,2,4)) // array(10,30,50)</pre></details></li>
+<li><strong>splicearray(array,offset,length,[replacement])</strong>: Removes elements at offset for length positions, optionally replacing them with new values.
+  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4,5);
+splicearray($a, 1, 2)                      // array(1,4,5)  (removed 2 at index 1)
+splicearray($a, 1, 2, array(20,30))        // array(1,20,30,4,5)</pre></details></li>
+<li><strong>mergearrays(array,array,[array,...])</strong>: Concatenates two or more arrays into one.
+  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3);
+$b = array(4,5,6);
+mergearrays($a, $b)  // array(1,2,3,4,5,6)</pre></details></li>
+<li><strong>unionarrays(array,array)</strong>: Combines two arrays, removing duplicate values.
+  <details class="example"><summary>Example</summary><pre>unionarrays(array(1,2,3), array(2,3,4))  // array(1,2,3,4)</pre></details></li>
+<li><strong>intersectarrays(array,array)</strong>: Returns elements that appear in both arrays.
+  <details class="example"><summary>Example</summary><pre>intersectarrays(array(1,2,3,4), array(2,4,6))  // array(2,4)</pre></details></li>
+<li><strong>diffarrays(array1,array2)</strong>: Returns elements from array1 that do not appear in array2.
+  <details class="example"><summary>Example</summary><pre>diffarrays(array(1,2,3,4), array(2,4))  // array(1,3)</pre></details></li>
+<li><strong>array_unique(array)</strong>: Removes duplicate values from an array. Note: does not re-index — follow with array_values if you need consecutive keys.
+  <details class="example"><summary>Example</summary><pre>array_unique(array(1,2,2,3,3,3))  // array(1,2,3)  (non-consecutive keys)
+array_values(array_unique(array(1,2,2,3,3,3)))  // re-indexed: 0,1,2</pre></details></li>
+<li><strong>array_values(array)</strong>: Returns array values re-indexed with consecutive numeric keys starting at 0.
+  <details class="example"><summary>Example</summary><pre>array_values(array(2=>"a", 5=>"b", 8=>"c"))  // array(0=>"a", 1=>"b", 2=>"c")</pre></details></li>
+<li><strong>array_keys(array)</strong>: Returns the keys of an array as a new array.
+  <details class="example"><summary>Example</summary><pre>array_keys(array("x"=>1, "y"=>2, "z"=>3))  // array("x","y","z")</pre></details></li>
+<li><strong>count(array)</strong>: Returns the number of elements in the array.
+  <details class="example"><summary>Example</summary><pre>count(array(10,20,30,40))  // 4</pre></details></li>
+<li><strong>is_array(variable)</strong>: Returns true if the variable is an array, false otherwise.
+  <details class="example"><summary>Example</summary><pre>is_array(array(1,2,3))  // true
+is_array(5)             // false</pre></details></li>
+<li><strong>sumarray(array)</strong>: Returns the sum of all elements in the array.
+  <details class="example"><summary>Example</summary><pre>sumarray(array(1,2,3,4,5))  // 15</pre></details></li>
+<li><strong>in_array(needle,haystack)</strong>: Returns true if needle is found anywhere in the haystack array.
+  <details class="example"><summary>Example</summary><pre>in_array(3, array(1,2,3,4,5))          // true
+in_array("red", array("blue","green"))  // false</pre></details></li>
+<li><strong>arrayfindindex(needle,haystack)</strong>: Returns the index of the first occurrence of needle in haystack.
+  <details class="example"><summary>Example</summary><pre>arrayfindindex("green", array("red","green","blue"))  // 1</pre></details></li>
+<li><strong>arrayfindindices(needle,haystack)</strong>: Returns an array of all indices where needle appears in haystack.
+  <details class="example"><summary>Example</summary><pre>arrayfindindices("x", array("x","y","x","z","x"))  // array(0,2,4)</pre></details></li>
+<li><strong>array_flip(array)</strong>: Swaps keys and values in a one-to-one array.
+  <details class="example"><summary>Example</summary><pre>array_flip(array("a"=>1, "b"=>2, "c"=>3))  // array(1=>"a", 2=>"b", 3=>"c")</pre></details></li>
+<li><strong>print_r(array, [return])</strong>: Outputs an array in readable form for debugging. Pass true as second argument to return the output as a string instead of printing it.
+  <details class="example"><summary>Example</summary><pre>print_r($a);              // prints array structure in question output
+$s = print_r($a, true);  // store as string, then include $s in question text</pre></details></li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="generalmacros">General Macros</h2>
 These macros are fairly general purpose:
 <ul>
-<li><strong>ifthen(condition,trueval,falseval)</strong>:  Takes a comparison condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
-<li><strong>cases(testvalue,comparearray,outputarray,[defaultoutput, tolerance])</strong>:  Compares the 
-  testvalue to each of the comparearray entries, and if a match is found, returns the corresponding 
-  entry of outputarray. If there is no match, the defaultoutput is returned. Note that if both values 
-  are numeric, the comparison is made with tolerance, otherwise the values are compared using string 
-  matching (meaning 0.5 will not be considered equivalent to "1/2").  Tolerance defaults to 0.0015 
-  relative error. Prefix with |, like "|0.1" for absolute tolerance.  Example: 
-  <code>cases(3,[1,2,3,4],["a","b","c","d"])</code> would return "c".</code></li>
-<li><strong>formhoverover(label,tip)</strong>:  Creates a hover-over definition or other tip</li>
-<li><strong>formpopup(label,content,[width,height,style,scrollbars])</strong>:  Creates a link or button leading to a popup window.  Content can
-  be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>
-<li><strong>forminlinebutton(lable,content,[style,outputstyle])</strong>:  Creates a link or button that when clicked will reveal hidden content.
-  Content can be any valid HTML.  Style can be "link" or "button".  Outputstyle can be "inline" or "block".  Block will allow any HTML, but will
-  be displayed on a new line.  Use "inline" to have text stay on the same line.</li>
-<li><strong>makenumberrequiretimes(array/list)</strong>:  Takes an array or list of numbers and generates a string suitable for use as a $requiretimes.  Writes
-  the string so that every number in the array must show up in the student answer.  Automatically detects and adjusts for number overlaps
-  (like 2 appearing in 32).</li>
-<li><strong>ABarray(start, num)</strong>: Produces an array of strings of the form [AB#] which will get replaced with answerboxes if placed in the question text.
-  start is the first value used, and num indicates the number of entries to create.
-  ABarray(5,2) will output array("[AB5]","[AB6]").
-  This macro is often used in conjunction with the showarrays macro.</li>
-<li><strong>getntupleparts(string, [expected number of components, checknumeric])</strong>: 
-  If fed a string from $stuanswers or $stuanswersval of an N-tuple or Calculted N-tuple question,
-  this will extract the components of the n-tuple, returning them as an array.  It is recommended to
-  provide a second argument of the number of components expected, and if the values are expected to
-  be numeric, put true as the third argument.  This function will return false if the input is 
-  not a valid ntuple.  This function only works for a single n-tuple, not a list of them.</li>
-<li><strong>scoremultiorder(stua, answer, swap, type, [weights, options])</strong>: In a multipart question, allows questions or groups 
-  of questions to be scored in any order.  Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 
-  'ntuple', and 'calcntuple'.  <em>Note:</em> Use of the "list" option for individual question types is <b>strongly</b> recommended over 
-  using this function if you're just asking for multiple answers.
+<li><strong>ifthen(condition,trueval,falseval)</strong>: Returns trueval if condition is true, falseval otherwise. Useful for inline conditionals without a full if/else block.
+  <details class="example"><summary>Example</summary><pre>$a = rand(1,10);
+$desc = ifthen($a > 5, "large", "small");  // "large" or "small"
+$sign = ifthen($a >= 0, "positive", "negative");</pre></details></li>
+<li><strong>cases(testvalue,comparearray,outputarray,[defaultoutput, tolerance])</strong>: Looks up testvalue in comparearray and returns the corresponding entry from outputarray. Returns defaultoutput if no match is found. Numeric comparisons use tolerance; string comparisons are exact.
+  <details class="example"><summary>Parameters</summary>
+  <p>Tolerance defaults to 0.0015 relative error. Prefix with | for absolute tolerance, like "|0.1". String comparison is exact — "0.5" will not match 1/2.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$n = rand(1,4);
+$word = cases($n, array(1,2,3,4), array("one","two","three","four"));
+// if $n=3, returns "three"
+
+// With default fallback:
+$result = cases($n, array(1,2), array("yes","no"), "other");
+// returns "other" if $n is neither 1 nor 2</pre></details></li>
+<li><strong>formhoverover(label,tip)</strong>: Creates a word or phrase with a tooltip that appears on hover.
+  <details class="example"><summary>Example</summary><pre>$def = formhoverover("compound interest", "Interest calculated on principal and accumulated interest");
+// Place $def in question text to show a tooltip on hover</pre></details></li>
+<li><strong>formpopup(label,content,[width,height,style,scrollbars])</strong>: Creates a link or button that opens a popup window. Content can be a URL or HTML string. Style can be "link" or "button"; scrollbars defaults to false.
+  <details class="example"><summary>Example</summary><pre>$popup = formpopup("See formula", "A = P(1 + r/n)^(nt)");
+$popup = formpopup("Help", "https://example.com/help", 400, 300, "button");</pre></details></li>
+<li><strong>forminlinebutton(label,content,[style,outputstyle])</strong>: Creates a link or button that reveals hidden content inline. Style can be "link" or "button". Outputstyle can be "inline" (stays on same line) or "block" (new line, allows any HTML).
+  <details class="example"><summary>Example</summary><pre>$hint = forminlinebutton("Show hint", "Try factoring the numerator.", "button");
+$note = forminlinebutton("Note", "Remember to simplify.", "link", "inline");</pre></details></li>
+<li><strong>makenumberrequiretimes(array/list)</strong>: Generates a $requiretimes string ensuring every number in the array must appear in the student answer. Automatically handles cases where one number is a substring of another (e.g. 2 inside 32).
+  <details class="example"><summary>Example</summary><pre>$requiretimes = makenumberrequiretimes(array(2, 3, 12));
+// $requiretimes ensures 2, 3, and 12 all appear in the student's answer</pre></details></li>
+<li><strong>ABarray(start, num)</strong>: Produces an array of [AB#] placeholders that get replaced with answer boxes in question text. Often used with showarrays to embed answer boxes in a table.
+  <details class="example"><summary>Example</summary><pre>$boxes = ABarray(1, 3);  // array("[AB1]","[AB2]","[AB3]")
+
+// Embed answer boxes in a table:
+$xs = array(1,2,3);
+$table = showarrays("x", $xs, "y", ABarray(1,3));</pre></details></li>
+<li><strong>getntupleparts(string, [expected number of components, checknumeric])</strong>: Extracts the components from an N-tuple student answer string, returning them as an array. Returns false if the input is not a valid n-tuple. Does not work on lists of n-tuples.
+  <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
+  $parts = getntupleparts($stuanswers[$thisq], 2, true);
+  // For student answer "(3,4)": $parts = array(3,4)
+  // Returns false if input is not a valid ntuple
+  if ($parts !== false) {
+    $x = $parts[0];
+    $y = $parts[1];
+  }
+}</pre></details></li>
+<li><strong>scoremultiorder(stua, answer, swap, type, [weights, options])</strong>: In a multipart question, allows specified parts to be answered in any order. Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 'ntuple', and 'calcntuple'. <em>Note:</em> The "list" option on individual question types is strongly preferred for most multi-answer situations.
+  <details class="example"><summary>Parameters</summary>
   <ul>
-    <li>Use like <code>$answer=scoremultiorder($stuanswers[$thisq],$answer,'0;1','number')</code></li>
-    <li>stua: For numeric types, <code>$stuanswers[$thisq]</code> should be the first argument.  For calculated types, 
-        <code>$stuanswersval[$thisq]</code> should be the first argument.</li>
-    <li>answer: The second argument is always <code>$answer</code>. This function must be used after $answer is already defined.</li>
-    <li>swap: The third argument shows what entries should be swappable. It can be a string or array of strings. Examples:
+    <li><strong>stua</strong>: For numeric types, use <code>$stuanswers[$thisq]</code>. For calculated types, use <code>$stuanswersval[$thisq]</code>.</li>
+    <li><strong>answer</strong>: Always <code>$answer</code>. Must be called after $answer is defined.</li>
+    <li><strong>swap</strong>: Which answer indices are interchangeable. Examples:
         <ul>
-            <li><code>'0;1'</code> would say answers index 0 and 1 should be swappable</li>
-            <li><code>'0;1;2'</code> would say answers index 0,1,and 2 should be swappable</li>
-            <li><code>['0;1','2;3']</code> would say answers index 0 and 1 should be swappable, and 2 and 3 should be swappable</li>
-            <li><code>'0,1,2;3,4,5'</code> would say answers with indices 0,1,2 should be swappable as a group with 
-              the answers with indices 3,4,5.  Comparison is only made on the first entry to decide whether to swap the groups.</li>
+            <li><code>'0;1'</code> — parts 0 and 1 are swappable</li>
+            <li><code>'0;1;2'</code> — parts 0, 1, and 2 are all swappable</li>
+            <li><code>['0;1','2;3']</code> — 0↔1 and 2↔3 independently</li>
+            <li><code>'0,1,2;3,4,5'</code> — the group [0,1,2] is swappable with the group [3,4,5]</li>
         </ul>
     </li>
-    <li>type: should be the question part short name, like 'number' or 'calccomplex', for the entries that can be swapped.</li>
-    <li>weights: optionally, you can include your answeights to have them swapped to.  In that case, use the form 
-        <code>$answer,$answeights=scoremultiorder($stuanswers[$thisq],$answer,'0;1','number',$answeights)</code>
-    </li>
-	<li>options: an array of other options.  To use without enabling the weights, set weights to null.
-		<ul>
-			<li>variables: to change the variables when type is numfunc. Example:
-				<code>$answer = scoremultiorder($stuanswers[$thisq],$answer,'0;1','numfunc',null,['variables'=>$variables])</code>
-			</li>
-		</ul>
-	</li>
+    <li><strong>type</strong>: The part type short name, like 'number' or 'calccomplex'.</li>
+    <li><strong>weights</strong>: Optionally pass $answeights to have weights swapped along with answers.</li>
+    <li><strong>options</strong>: Array of extra options (set weights to null to skip). Use <code>['variables'=&gt;$variables]</code> when type is 'numfunc'.</li>
   </ul>
-  </li>
-<li><strong>scoreperiodic(answer, stuanswer, variable, [tolerance])</strong>: This helps scoring of "all solutions"
-	periodic answers, like "pi/6+2pik" by redefining the $answer if the student's answer is equivalent but 
-	with a different base value, like "-11pi/6+2pik". It works for a single expression or list of solutions.
-	The function returns a value that should replace $answer, so make sure you separately define $showanswer so 
-	a "nice" answer gets displayed in the key. Here's a couple examples of use:
-	<ul>
-		<li>Single part: (algebraic expression type)<br/>
-			<code>$answerformat = "list"</code><br/>
-			<code>$variables = "k"</code><br/>
-			<code>$answer = "pi/6 + 2pik, pi/3+2pik"</code><br/>
-			<code>$showanswer = "`$answer`"</code><br/>
-			<code>$answer = scoreperiodic($answer, $stuanswers[$thisq], "k")</code>
-		</li>
-		<li>Multipart part (suppose part index 3 is "numfunc"):<br/>
-			<code>$answer[3] = "pi/12 + pi/3n</code><br/>
-			<code>$variables[3] = "n"</code><br/>
-			<code>$showanswer[3] = "`$answer[3]`"</code><br/>
-			<code>$answer[3] = scoreperiodic($answer[3], getstuans($stuanswers,$thisq,3), "n")</code>
-		</li>
-	</ul>
-	</li>
-<li><strong>setupmathquillfillin(asciimath format,alt format)</strong>: For use in a multipart question, 
-  this allows you to create fill-in areas inside an otherwise static math expression. Setup a multipart 
-  question like usual, then use this function to generate an entry string you place into the question text 
-  instead of $answerboxes for the parts involved. The asciimath string should be the expression to render, with 
-  [AB#] where the fill-ins will go, corresponding to the part indexes of the multipart question. The alt format 
-  string should be a plain text string using the same [AB#] inputs, which will be used for students who have 
-  disabled the equation editor for accessibility.  Example of use:<br>
-  <code>$entry = setupmathquillfillin("int_([AB0])^([AB1]) [AB2] dx", "The integral from [AB0] to [AB1] of [AB2] dx")</code><br><br>
-  If you want to define a single answer key for the whole fillin, define <code>$showanswer[2]</code> as 
-  the answer key you want to show (using the last part index from the range used in the fillin), and place 
-  <code>[SAB0-2]</code> after the $entry in the question text (using the range of part indexes from the fillin).  You may 
-  want to set <code>$showanswerstyle = "inline"</code> so the key shows on the same line as the fillin entry.<br><br>
-  To adjust the size of fillins, use <code>$answerboxsize[part number]</code> as usual, but be aware large sizes may be
-  reduced, since the editor will expand the input based on what's typed.
-</li>
+  </details>
+  <details class="example"><summary>Example</summary><pre>// Allow parts 0 and 1 to be answered in either order:
+$answer = scoremultiorder($stuanswers[$thisq], $answer, '0;1', 'number');
+
+// With weights also swapped:
+$answer,$answeights = scoremultiorder($stuanswers[$thisq], $answer, '0;1', 'number', $answeights);</pre></details></li>
+<li><strong>scoreperiodic(answer, stuanswer, variable, [tolerance])</strong>: Helps score "all solutions" periodic answers (e.g. "pi/6+2pik") by accepting equivalent forms with a shifted base value. Returns a value to replace $answer — always define $showanswer separately first so a clean answer shows in the key.
+  <details class="example"><summary>Example</summary><pre>// Single-part algebraic expression question:
+$answerformat = "list";
+$variables = "k";
+$answer = "pi/6 + 2pik, pi/3+2pik";
+$showanswer = "`$answer`";
+$answer = scoreperiodic($answer, $stuanswers[$thisq], "k");
+// "-11pi/6+2pik" will now be accepted as equivalent
+
+// Multipart (part index 3, numfunc type):
+$answer[3] = "pi/12 + pi/3*n";
+$variables[3] = "n";
+$showanswer[3] = "`$answer[3]`";
+$answer[3] = scoreperiodic($answer[3], getstuans($stuanswers,$thisq,3), "n");</pre></details></li>
+<li><strong>setupmathquillfillin(asciimath format, alt format)</strong>: Creates fill-in answer boxes embedded inside a rendered math expression. Use in multipart questions: write the expression in ASCIIMath with [AB#] at each fill-in point, and provide a plain-text fallback for accessibility.
+  <details class="example"><summary>Parameters</summary>
+  <p>Place the returned string in question text instead of $answerboxes. To show a single combined answer key, define <code>$showanswer[lastpart]</code> and place <code>[SAB0-N]</code> after the entry in the question text. Use <code>$answerboxsize[part]</code> to adjust box size. Set <code>$showanswerstyle = "inline"</code> to keep the key on the same line.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>// Integral with three fill-in areas (lower limit, upper limit, integrand):
+$entry = setupmathquillfillin(
+  "int_([AB0])^([AB1]) [AB2] dx",
+  "The integral from [AB0] to [AB1] of [AB2] dx"
+);
+// Place $entry in question text where the expression goes</pre></details></li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="mathmacros">Math Macros</h2>
 These macros are used for mathematical calculations:
 <ul>
-<li><strong>sin(t), cos(t), tan(t), sec(t), csc(t), cot(t)</strong>: The usual trig functions</li>
-<li><strong>arcsin(v), arccos(v), arctan(v), atan2(y,x)</strong>: The inverse trig functions</li>
-<li><strong>abs(v)</strong>: Absolute value</li>
-<li><strong>sqrt(t), root(n)(t)</strong>: Square root and nth root</li>
-<li><strong>gcd(a,b,[c,d,...])</strong>: Greatest common divisor of the inputs</li>
-<li><strong>lcm(a,b,[c,d,...])</strong>: Least common multiple of the inputs</li>
-<li><strong>sign(a,[option])</strong>:  Returns the sign of a, as 1 or -1.  If option is set to true, returns a string "+" or "-" instead. If option
-  is set to "onlyneg", it returns the string "-" if a is negative, or "" otherwise.</li>
-<li><strong>sgn(a)</strong>: Returns the sign of a, as -1, 0, or 1.</li>
-<li><strong>hexdec(a)</strong>: converts a hexidecimal string to a decimal number</li>
-<li><strong>dechex(a)</strong>: converts a decimal number to a hexidecimal string</li>
-<li><strong>v!</strong>: Factorial, like $a = $b!</li>
-<li><strong>evalfunc(func,vars,val1,val2,...,[falseonerror])</strong>: Evaluates a function given the variables and values for each variable.
-  for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3.<br/>
-  This function by default will return <code>false</code> on invalid parameters. 
-  With numerical inputs, it will return an empty string if the function is unable 
-  to be evaluated due to a syntax error. Set the optional falseonerror parameter to 
-  true to return <code>false</code> instead of an empty string in this case. 
-  For non-numerical inputs, setting the optional parameter to true will skip 
-  some additional cleanup steps that sometimes cause problems.</li>
-<li><strong>evalnumstr(expr, [complex])</strong>: Evaluates a string representation of a numerical expression, like "(2pi)/3", to a decimal.  
-  Avoid using this in place of direct calculation in most cases, but it can be handy if you already have generated the string 
-  for display but then need to do a calculation with it.  Set complex to true if the calculation involves complex number expressions.</li>
+<li><strong>sin(t), cos(t), tan(t), sec(t), csc(t), cot(t)</strong>: The standard trig functions (input in radians).
+  <details class="example"><summary>Example</summary><pre>$a = sin(pi/6);  // 0.5
+$b = cos(0);     // 1
+$c = tan(pi/4);  // 1</pre></details></li>
+<li><strong>arcsin(v), arccos(v), arctan(v), atan2(y,x)</strong>: The inverse trig functions (output in radians). atan2 handles the full circle using the signs of both arguments.
+  <details class="example"><summary>Example</summary><pre>arcsin(0.5)   // pi/6 ≈ 0.5236
+arccos(1)     // 0
+arctan(1)     // pi/4 ≈ 0.7854
+atan2(1, 1)   // pi/4  (first quadrant)
+atan2(-1, 0)  // -pi/2</pre></details></li>
+<li><strong>abs(v)</strong>: Absolute value.
+  <details class="example"><summary>Example</summary><pre>abs(-5)  // 5
+abs(3)   // 3</pre></details></li>
+<li><strong>sqrt(t), root(n)(t)</strong>: Square root and nth root.
+  <details class="example"><summary>Example</summary><pre>sqrt(16)    // 4
+root(3)(8)  // 2  (cube root of 8)
+root(4)(81) // 3</pre></details></li>
+<li><strong>gcd(a,b,[c,d,...])</strong>: Greatest common divisor of two or more integers.
+  <details class="example"><summary>Example</summary><pre>gcd(12, 8)     // 4
+gcd(12, 8, 6)  // 2</pre></details></li>
+<li><strong>lcm(a,b,[c,d,...])</strong>: Least common multiple of two or more integers.
+  <details class="example"><summary>Example</summary><pre>lcm(4, 6)      // 12
+lcm(3, 4, 6)   // 12</pre></details></li>
+<li><strong>sign(a,[option])</strong>: Returns the sign of a. Without option: returns 1 or -1. With option true: returns "+" or "-". With option "onlyneg": returns "-" if negative, "" otherwise.
+  <details class="example"><summary>Example</summary><pre>sign(-7)           // -1
+sign(3)            // 1
+sign(-7, true)     // "-"
+sign(3, true)      // "+"
+sign(-7, "onlyneg") // "-"
+sign(3, "onlyneg")  // ""</pre></details></li>
+<li><strong>sgn(a)</strong>: Returns -1, 0, or 1 depending on the sign of a (unlike sign, returns 0 for zero).
+  <details class="example"><summary>Example</summary><pre>sgn(-7)  // -1
+sgn(0)   //  0
+sgn(3)   //  1</pre></details></li>
+<li><strong>hexdec(a)</strong>: Converts a hexadecimal string to a decimal number.
+  <details class="example"><summary>Example</summary><pre>hexdec("1F")   // 31
+hexdec("FF")   // 255</pre></details></li>
+<li><strong>dechex(a)</strong>: Converts a decimal integer to a hexadecimal string.
+  <details class="example"><summary>Example</summary><pre>dechex(31)   // "1f"
+dechex(255)  // "ff"</pre></details></li>
+<li><strong>v!</strong>: Factorial operator. Write as a postfix operator on a variable.
+  <details class="example"><summary>Example</summary><pre>$n = 5;
+$result = $n!;  // 120
+$result = 0!;   // 1</pre></details></li>
+<li><strong>evalfunc(func,vars,val1,val2,...,[falseonerror])</strong>: Evaluates a function string at given variable values. Returns false on invalid parameters; returns empty string (or false if falseonerror=true) on syntax errors.
+  <details class="example"><summary>Example</summary><pre>evalfunc("x^2", "x", 3)          // 9
+evalfunc("x^2*y", "x,y", 2, 3)  // 12
+
+// Evaluate a student-entered function at a point:
+$f = $stuanswers[$thisq];
+$val = evalfunc($f, "x", 2);</pre></details></li>
+<li><strong>evalnumstr(expr, [complex])</strong>: Evaluates a numerical expression string to a decimal. Useful when you already have a string for display and need its value. Set complex to true for complex number expressions.
+  <details class="example"><summary>Example</summary><pre>evalnumstr("(2*pi)/3")  // ≈ 2.0944
+evalnumstr("sqrt(2)+1") // ≈ 2.4142
+evalnumstr("2+3i", true) // evaluates complex expression</pre></details></li>
 <li>See also: calconarray and multicalconarray in the <a href="#arraymacros">Array Macros</a> section</li>
 </ul>
 </div> <!-- h2 -->
@@ -2809,116 +3107,149 @@ These macros are used for mathematical calculations:
 <h2 id="conditionalmacros">Conditional Test Macros</h2>
 These macros are used to test various conditions.  They typically return true or false, depending on whether the desired condition is met.
 <ul>
-<li><strong>getstuans($stuanswers, $thisq, [part number])</strong>: Pass this function the 
-  $stuanswers or $sutanswersval arrays, $thisq for the question number, and a part number (omit 
-  if it's a single part question) and this will return the corresponding value.  Use of this 
-  function is recommended over directly accessing the array, as this function accounts for 
-  undefined values in a way that won't trigger errors.</li>
-<li><strong>stuansready($stuanswers, $thisq, array of part numbers, [anstypes, answerformat])</strong>: Before using 
-    student answers, you need to check to make sure the student has actually answered them.
-    Pass this function the $stuanswers or $sutanswersval arrays, $thisq for the question number,
-    and an array of part numbers, and it will check to make sure a non-blank answer has been 
-    provided for all of the part numbers.  A part number can also be given as "1 or 2" if answering
-    either part is sufficient.  If it is a single part question, use null for the part number.
-    To allow a blank answer, prefix a part number with a tilde. 
-    It is good to wrap any multipart or conditional code using student answers in an "if" block 
-    using stuansready as the condition.  It is advisable to pass $anstypes as a 4th input, which 
-    allows the function to handle special cases like matrices better. $answerformat can be added 
-    as an optional 5th input, which will check the student answer meets the answerformat (currently 
-    only checks Calculated and Calculated N-tuple questions, and no lists). Or you can put 'checknumeric' for the answerformat 
-    and it will check that "number", "calculated", "ntuple", and "calcntuple" answers are numeric 
-	(must use $stuanswersval for calculated and calcntuplein this case).
-    Note this won't work for list answers, only single numbers, and that it won't recognize answers 
-    with commas like "2,345" as numeric. For calcmatrix, it's best to pass $stuanswersval, as that will 
-	allow stuansready to confirm all elements evaluate to a value.</li>
-<li><strong>comparenumbers(a,b,[tol])</strong>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
-  tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
-<li><strong>comparenumberswithunits(a,b,[tol])</strong>:  Compares numbers-with-units a and b to see if they are equivalent to the specified tolerance. Set tol to 
-	specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance. Each of a and b must be of the form: 
-	<code>[decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...</code>, though 'per' may be used for division of units, and 'unit squared', 'square unit',
-	'unit cubed' and 'cubic unit' may be used. Examples: <code>4 cm</code>, and <code>3.5E4 feet per second squared</code>
-<li><strong>comparecomplex(a,b,[tol])</strong>:  Compares complex number expressions a and b to see if there are equivalent to the specified
-  tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
-  Note this accomodates any format, so 'sqrt(-4)' and '2i' will be considered equivalent, as would 'e^(pi*i)' and '-1'.</li>
-<li><strong>comparentuples(a,b,[tol],[option])</strong>:  Compares ntuples or calcntuples a and b to see if they are equivalent to the specified
-	  tolerance.  Set a single tol to specify the relative tolerance for all entries in ntuple (defaults to .001), or prefix with | for an absolute tolerance,
-		such as "|0.5". Can make tol an array (or list) to apply by element to the ntuple. By default, function compares the parentheses/brackets containing the
-		ntuple. Can give option "ignoreparens" to only compare the entries in the ntuple, so (a,b) would be considered equivalent to [a,b].</li>
-<li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Compares functions a and b to see if they are algebraically equivalent.  Set
-  vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
-  Set domain to "xmin,xmax" to specify a domain for comparison, or "xmin,xmax,integers" to restrict domain to integer values.</li>
-<li><strong>comparesameform(a,b,[vars])</strong>: Compares expressions a and b to see if they are 
-    in the "same form". This means exactly the same, except for commutation of addition and 
-    multiplication, multiplication by 1, implicit multiplication, and extra parentheses. This is picky,
-    so use with caution. Set vars to a list of variables (defaults to 'x').</li>
-<li><strong>comparelogic(a,b,vars)</strong>: Compares two logical statements, written using 
- ^^ for and, vv for or, ~ for not, -&gt; or =&gt; for conditional, and &lt;-&gt; or &lt;=&gt; for biconditional.
- vars should be a list or array of variables in the statements. </li>
-<li><strong>isset($var)</strong>: Checks to see if $var is defined</li>
-<li><strong>is_numeric(str)</strong>:  Checks if the string represents an integer or decimal number.</li>
-<li><strong>are_numeric(v1,v2,v3,...)</strong>:  Checks if all the arguments are or represent an integer or decimal number. You can also input a single array instead of individual values.</li>
-<li><strong>is_nan(val)</strong>:  Checks if the value is NAN (not a number), which results from things like sqrt(-1). Only works on calculated values, not string expressions.</li>
-<li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: This function checks
-  to see if the words in the list/array "words" appear in the student's answer. If they all appear, it redefines
-  $answer so the student's answer is marked correct.  $showanswer is also redefined to show the original $answer 
-  with all the required words highlighted. You can turn off the highlighting by setting the optional highlight 
-  parameters to false.<br>
-  For multipart questions, include the part number as an
-  additional parameter.  Usage for single part questions (where $words is predefined earlier in the code):<br/>
-  $answer,$showanswer = scorestring($answer,"",$words,$stuanswers,$thisq)<Br/>
-  Usage for multipart questions (again where $words is predefined). This is example is for part 2: <br/>
-  $answer,$showanswer = scorestring($answer,$showanswer,$words,$stuanswers,$thisq,2)</li>
-<li><strong>checkanswerformat(string, answerformat)</strong>: Checks a single numerical expression 
-    string, like "3/2" for whether it meets the answerformat listed.</li>
-<li><strong>getsigfigs(value, [expected sigfigs])</strong>: returns the number of sigfigs in 
-    value.  Include the expected sigfigs to resolve ambiguity on numbers like 1200.</li>
+<li><strong>getstuans($stuanswers, $thisq, [part number])</strong>: Safely retrieves a student answer. Preferred over direct array access because it handles undefined values without triggering errors. Omit the part number for single-part questions.
+  <details class="example"><summary>Example</summary><pre>$ans = getstuans($stuanswers, $thisq);       // single-part question
+$ans = getstuans($stuanswersval, $thisq, 2); // part 2 of a calculated multipart</pre></details></li>
+<li><strong>stuansready($stuanswers, $thisq, array of part numbers, [anstypes, answerformat])</strong>: Checks that the student has submitted non-blank answers for all specified parts. Wrap any code that uses student answers in an if block with this as the condition.
+  <details class="example"><summary>Parameters</summary>
+  <p>Use null for part numbers on a single-part question. Prefix a part number with ~ to allow a blank for that part. Use "1 or 2" as a part number if either is sufficient. Pass $anstypes as 4th argument to handle special cases like matrices. Pass 'checknumeric' as 5th argument to also verify the answer is numeric (use $stuanswersval for calculated/calcntuple types).</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>// Single-part question:
+if (stuansready($stuanswers, $thisq, null)) {
+  // safe to use $stuanswers[$thisq]
+}
+
+// Multipart — require parts 0 and 1, allow part 2 to be blank:
+if (stuansready($stuanswers, $thisq, array(0,1,"~2"), $anstypes)) {
+  // process answers
+}</pre></details></li>
+<li><strong>comparenumbers(a,b,[tol])</strong>: Compares two numbers or numerical expressions. Returns true if they are equivalent within the given tolerance. Set tol for relative tolerance (default 0.001) or prefix with | for absolute.
+  <details class="example"><summary>Example</summary><pre>comparenumbers(0.333, 1/3)         // true  (within default 0.1% tolerance)
+comparenumbers(1.001, 1, .01)      // true  (within 1% relative tolerance)
+comparenumbers(1.5, 1.49, "|0.02") // true  (within 0.02 absolute)
+comparenumbers("sqrt(4)", 2)       // true  (evaluates expressions)</pre></details></li>
+<li><strong>comparenumberswithunits(a,b,[tol])</strong>: Compares two quantities that include units. Units must match exactly; "100 cm" and "1 m" are not considered equivalent.
+  <details class="example"><summary>Parameters</summary>
+  <p>Each value must be of the form: <code>[number]*[unit]^[power]*[unit]^[power].../[unit]^[power]...</code>. 'per' may be used for division. 'unit squared', 'square unit', 'unit cubed', 'cubic unit' are accepted. Tolerance defaults to 0.001 relative; prefix with | for absolute.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>comparenumberswithunits("3.5 feet", "3.5 feet")           // true
+comparenumberswithunits("9.8 meters per second squared", "9.8 m/s^2") // true
+comparenumberswithunits("100 cm", "1 m")                  // false (units must match)</pre></details></li>
+<li><strong>comparecomplex(a,b,[tol])</strong>: Compares complex number expressions for equivalence. Handles any representation — 'sqrt(-4)' equals '2i', 'e^(pi*i)' equals '-1'.
+  <details class="example"><summary>Example</summary><pre>comparecomplex("2+3i", "2+3i")     // true
+comparecomplex("sqrt(-4)", "2i")   // true
+comparecomplex("e^(pi*i)", "-1")   // true</pre></details></li>
+<li><strong>comparentuples(a,b,[tol],[option])</strong>: Compares two n-tuples for equivalence. By default also checks that the bracket type matches; pass "ignoreparens" to treat (a,b) and [a,b] as equivalent.
+  <details class="example"><summary>Example</summary><pre>comparentuples("(1,2,3)", "(1,2,3)")                     // true
+comparentuples("(1,2)", "[1,2]")                         // false  (brackets differ)
+comparentuples("(1,2)", "[1,2]", .001, "ignoreparens")  // true
+comparentuples("(1,2)", "(1,2)", array(.01,.1))          // different tol per element</pre></details></li>
+<li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Tests whether two algebraic expressions are equivalent by evaluating them at random points.
+  <details class="example"><summary>Example</summary><pre>comparefunctions("x^2+2*x+1", "(x+1)^2")         // true
+comparefunctions("sin(x)^2+cos(x)^2", "1")       // true
+comparefunctions("x*y", "y*x", "x,y")            // true  (multivariable)
+comparefunctions("x^2", "x", "x", .001, "0,5")   // false  (different functions)</pre></details></li>
+<li><strong>comparesameform(a,b,[vars])</strong>: Checks whether two expressions are in the same structural form — identical except for commutativity of +/*, multiplying by 1, implicit multiplication, and extra parentheses. More strict than comparefunctions; use with caution.
+  <details class="example"><summary>Example</summary><pre>comparesameform("x+2", "2+x")        // true  (commutation ok)
+comparesameform("2*(x+1)", "2*x+2")  // false  (expanded vs factored)
+comparesameform("x*1", "x")          // true  (mult by 1 ok)</pre></details></li>
+<li><strong>comparelogic(a,b,vars)</strong>: Compares two propositional logic statements for equivalence. Uses ^^ (and), vv (or), ~ (not), -&gt; or =&gt; (conditional), &lt;-&gt; or &lt;=&gt; (biconditional).
+  <details class="example"><summary>Example</summary><pre>comparelogic("p^^q", "q^^p", "p,q")           // true  (and is commutative)
+comparelogic("~(p^^q)", "~p vv ~q", "p,q")   // true  (De Morgan's law)
+comparelogic("p->q", "~p vv q", "p,q")        // true  (material conditional)</pre></details></li>
+<li><strong>isset($var)</strong>: Returns true if the variable has been defined, false otherwise.
+  <details class="example"><summary>Example</summary><pre>$a = 5;
+isset($a)  // true
+isset($b)  // false  ($b not yet defined)</pre></details></li>
+<li><strong>is_numeric(str)</strong>: Returns true if the string represents an integer or decimal number (not fractions or expressions).
+  <details class="example"><summary>Example</summary><pre>is_numeric("3.14")  // true
+is_numeric("3/4")   // false
+is_numeric("abc")   // false</pre></details></li>
+<li><strong>are_numeric(v1,v2,v3,...)</strong>: Returns true only if all arguments are numeric values or strings. Can also pass a single array.
+  <details class="example"><summary>Example</summary><pre>are_numeric(1, 2.5, 3)   // true
+are_numeric(1, "x", 3)  // false</pre></details></li>
+<li><strong>is_nan(val)</strong>: Returns true if the value is NaN (not a number), such as the result of sqrt(-1). Only works on calculated values, not expression strings.
+  <details class="example"><summary>Example</summary><pre>$a = sqrt(-1);
+is_nan($a)  // true
+is_nan(5)   // false</pre></details></li>
+<li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: Checks whether all required words appear in a student's text answer. If they do, redefines $answer to mark the student correct and highlights the matched words in $showanswer. Set highlight to false to disable highlighting.
+  <details class="example"><summary>Example</summary><pre>$words = array("slope", "negative");
+
+// Single-part question:
+$answer,$showanswer = scorestring($answer, "", $words, $stuanswers, $thisq);
+
+// Multipart question (part 2):
+$answer,$showanswer = scorestring($answer, $showanswer, $words, $stuanswers, $thisq, 2);</pre></details></li>
+<li><strong>checkanswerformat(string, answerformat)</strong>: Checks whether a numerical expression string meets the specified answer format (e.g. "fraction", "decimal", "integer").
+  <details class="example"><summary>Example</summary><pre>checkanswerformat("3/4", "fraction")  // true
+checkanswerformat("0.75", "fraction") // false
+checkanswerformat("3/4", "decimal")   // false</pre></details></li>
+<li><strong>getsigfigs(value, [expected sigfigs])</strong>: Returns the number of significant figures in value. Provide the expected count to resolve ambiguity on values like 1200.
+  <details class="example"><summary>Example</summary><pre>getsigfigs(0.0450)     // 3
+getsigfigs(1.230)      // 4
+getsigfigs(1200)       // ambiguous without hint
+getsigfigs(1200, 3)    // 3  (resolves ambiguity)</pre></details></li>
   </ul>
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="feedbackmacros">Feedback Macros</h2>
 These macros are used to select and format feedback messages to students.  They return a string which can be placed in the question text.
 <ul>
-<li><strong>getfeedbackbasic(correct msg, incorrect msg, $thisq, [partnum])</strong>:  Generates a feedback string based solely on whether the
-  question was scored correct or not.  Provide the correct and incorrect messages to display, and provide $thisq.  Give a part number for
-  multipart questions to get part-based feedback. Can give an array of part-numbers, in which case the 
-  correct message only shows if all parts are correct.</li>
-<li><strong>getfeedbacktxt(stuans, feedbacktxt, ans)</strong>:  Gives feedback on multiple choice questions.  <br/>
-  stuans should be the student answer, obtained from
-   $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart. <br/>
-   feedbacktxt is an array of feedback responses, corresponding     in array order to the $questions, so feedbacktxt[1] is the feedback
-   if the student selections $questions[1] as their answer.  <br/>
-   ans is the correct    answer; you can usually pass $answer if it's been defined already.</li>
-<li><strong>getfeedbacktxtessay(stuans, feedbacktxt)</strong>:  Gives feedback on essay questions.  stuans should be the student answer, obtained from
-   $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  It is not actually evaluated or compared - it is only
-   needed to see if the student has entered a response or not.  Once the student has entered any response, feedbacktxt will be returned.</li>
-<li><strong>getfeedbacktxtnumber(stuans, partialcredit, feedbacktxt, defaultfeedback, [tol])</strong>:  Gives feedback on number questions.  <br/>
-  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  For Calculated
-  type questions, be sure to use $stuanswersval.  <br/>
-  partialcredit is an array or list of form array(number, score, number, score, ... ) where the scores are in the range [0,1].  <br/>
-  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
-  defaultfeedback is the default incorrect response feedback <br/>
-  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
-<li><strong>getfeedbacktxtcalculated(stuans, stuansval, partialcredit, feedbacktxt, defaultfeedback, [answerformat, requiretimes, tol])</strong>:  Gives feedback on calculated number questions.  <br/>
-  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  <br>
-  stuansval should be the numerical value of the student answer, obtained from $stuanswersval[$thisq]. <br/>
-  partialcredit is an array or list of form array(number, score, number, score, ... ) where the scores are in the range [0,1].  <br/>
-  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
-  defaultfeedback is the default incorrect response feedback <br/>
-  answerformat can be a single answerformat to apply to all expressions, or an array with each element applied to the corresponding expression<br/>
-  requiretimes can be a single requiretimes to apply to all expressions, or an array with each element applied to the corresponding expression<br/>
-  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.<br/>
-  Example: <code>getfeedbacktxtcalculated($stuanswers[$thisq], $stuanswersval[$thisq], array("1/2",1,"1/2",.5), array("Correct", "Right value, but give your answer as a fraction"), "Incorrect", array("fraction",""))</code>
-    will check the students answer against the answer "1/2" twice, the first time applying the "fraction" answerformat, and the second time not.</li>
-<li><strong>getfeedbacktxtnumfunc(stuans, partialcredit, feedbacktxt, defaultfeedback, [vars, requiretimes, tol, domain])</strong>:  Gives feedback on numfunc (algebraic expression/equation) questions.  <br/>
-  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.<br/>
-  partialcredit is an array or list of form array(expression, score, expression, score, ... ) where the scores are in the range [0,1].  <br/>
-  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
-  defaultfeedback is the default incorrect response feedback <br/>
-  vars should be a list of variables used in the expression. Defaults to "x"<br/>
-  requiretimes can be a single requiretimes to apply to all expressions, or an array with each element applied to the corresponding expression<br/>
-  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.<br/>
-  Set domain to limit the test domain.  Defaults to "-10,10"
-  </li>
+<li><strong>getfeedbackbasic(correct msg, incorrect msg, $thisq, [partnum])</strong>: Returns a feedback string based on whether the question was scored correct or not. For multipart questions pass a part number (or an array of part numbers — the correct message only shows if all parts are correct).
+  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbackbasic("Great job!", "Not quite — try again.", $thisq);
+
+// Part 2 of a multipart:
+$feedback = getfeedbackbasic("Correct!", "Check your work.", $thisq, 2);
+
+// Correct message only shows when all three parts are right:
+$feedback = getfeedbackbasic("All correct!", "Review your answers.", $thisq, array(0,1,2));</pre></details></li>
+<li><strong>getfeedbacktxt(stuans, feedbacktxt, ans)</strong>: Returns per-choice feedback for multiple choice questions. feedbacktxt is an array whose indices correspond to the $questions array — feedbacktxt[1] shows when the student picks $questions[1].
+  <details class="example"><summary>Example</summary><pre>$feedbacktxt = array(
+  "That's too small.",
+  "Correct!",
+  "That's too large.",
+  "Way off."
+);
+$feedback = getfeedbacktxt($stuanswers[$thisq], $feedbacktxt, $answer);</pre></details></li>
+<li><strong>getfeedbacktxtessay(stuans, feedbacktxt)</strong>: Returns feedbacktxt once the student has entered any response to an essay question. The answer is not evaluated — it only checks for a non-blank response.
+  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbacktxtessay(
+  $stuanswers[$thisq],
+  "Thank you for your response. The key concepts to include are..."
+);</pre></details></li>
+<li><strong>getfeedbacktxtnumber(stuans, partialcredit, feedbacktxt, defaultfeedback, [tol])</strong>: Returns targeted feedback for numeric questions, with support for partial credit scoring.
+  <details class="example"><summary>Parameters</summary>
+  <p>partialcredit is array(value, score, value, score, ...) where scores are in [0,1]. feedbacktxt is an array of messages corresponding to each value/score pair. defaultfeedback shows when no value matches. For Calculated questions use $stuanswersval. Tolerance defaults to 0.001 relative; prefix with | for absolute.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbacktxtnumber(
+  $stuanswers[$thisq],
+  array(10, 1, 5, 0.5),          // answer 10 = full credit, 5 = half credit
+  array("Correct!", "Close, but check your rounding."),
+  "Incorrect — the answer is 10."
+);</pre></details></li>
+<li><strong>getfeedbacktxtcalculated(stuans, stuansval, partialcredit, feedbacktxt, defaultfeedback, [answerformat, requiretimes, tol])</strong>: Like getfeedbacktxtnumber but for Calculated question types, supporting answerformat and requiretimes checks.
+  <details class="example"><summary>Parameters</summary>
+  <p>stuans from $stuanswers[$thisq], stuansval from $stuanswersval[$thisq]. partialcredit/feedbacktxt/defaultfeedback same as getfeedbacktxtnumber. answerformat and requiretimes can each be a single value applied to all checks, or an array applied per check.</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>// Check the answer "1/2" twice: once requiring fraction format, once without:
+$feedback = getfeedbacktxtcalculated(
+  $stuanswers[$thisq],
+  $stuanswersval[$thisq],
+  array("1/2", 1, "1/2", 0.5),
+  array("Correct!", "Right value, but give your answer as a fraction"),
+  "Incorrect",
+  array("fraction", "")  // answerformat per check
+);</pre></details></li>
+<li><strong>getfeedbacktxtnumfunc(stuans, partialcredit, feedbacktxt, defaultfeedback, [vars, requiretimes, tol, domain])</strong>: Targeted feedback for algebraic expression (numfunc) questions, with partial credit support.
+  <details class="example"><summary>Parameters</summary>
+  <p>partialcredit is array(expression, score, expression, score, ...) where scores are in [0,1]. feedbacktxt messages correspond to each expression. vars defaults to "x". requiretimes can be a single value or an array per expression. tol defaults to 0.001 relative. domain defaults to "-10,10".</p>
+  </details>
+  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbacktxtnumfunc(
+  $stuanswers[$thisq],
+  array("x+1", 1, "x^2+1", 0.5),
+  array("Correct!", "Close — check whether that's linear or quadratic."),
+  "Incorrect — the answer is x+1.",
+  "x"
+);</pre></details></li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
