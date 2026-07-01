@@ -683,7 +683,7 @@
                                           0, 0, bounds.w, bounds.h);
     } else {
       // Blank canvas - close without export
-      window.parent.postMessage({ type: 'tdp-cancel' }, '*');
+      window.parent.postMessage({ type: 'tdp-cancel' }, window.location.origin);
       return;
     }
 
@@ -691,7 +691,7 @@
       if (!blob) { setStatus('⚠ Export failed'); return; }
       const reader = new FileReader();
       reader.onload = () => {
-        window.parent.postMessage({ type: 'tdp-done', src: reader.result }, '*');
+        window.parent.postMessage({ type: 'tdp-done', src: reader.result }, window.location.origin);
       };
       reader.readAsDataURL(blob);
     }, 'image/png');
@@ -699,6 +699,9 @@
 
   // ── postMessage bridge ───────────────────────────────────────────────
   window.addEventListener('message', evt => {
+    if (evt.origin !== window.location.origin) {
+      return; // reject anything not from the expected origin
+    }
     const data = evt.data;
     if (!data) return;
     if (data.type === 'tdp-init') {
@@ -726,7 +729,7 @@
   });
 
   // Tell the plugin we're ready
-  window.parent.postMessage({ type: 'tdp-ready' }, '*');
+  window.parent.postMessage({ type: 'tdp-ready' }, window.location.origin);
 
 })();
 </script>
