@@ -115,8 +115,7 @@ export default defineConfig(({ mode }) => {
       }),
       legacy({
         // builds the legacy version
-        targets: ["defaults", "not IE 11"],
-        modernTargets: ["defaults", "not safari < 14.1"]
+        targets: ["defaults", "not IE 11"]
       }),
       updatePhpFiles(),
       // strip the ?v=hash from the stored filenames; we only want the hash encoded
