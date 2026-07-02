@@ -3221,20 +3221,22 @@ hexdec("FF")   // 255</pre></details></li>
   <details class="example"><summary>Example</summary><pre>dechex(31)   // "1f"
 dechex(255)  // "ff"</pre></details></li>
 <li><strong>v!</strong>: Factorial operator. Write as a postfix operator on a variable.
-  <details class="example"><summary>Example</summary><pre>$n = 5;
-$result = $n!;  // 120
-$result = 0!;   // 1</pre></details></li>
-<li><strong>evalfunc(func,vars,val1,val2,...,[falseonerror])</strong>: Evaluates a function string at given variable values. Returns false on invalid parameters; returns empty string (or false if falseonerror=true) on syntax errors.
+  <details class="example"><summary>Example</summary><pre>$n = 5
+$result = $n!  // 120
+$result = 0!   // 1</pre></details></li>
+<li><strong>evalfunc(func,vars,val1,val2,...,[falseonerror])</strong>: Evaluates a function string at given variable values. 
+Returns false on invalid parameters; returns empty string (or false if falseonerror=true) on syntax errors.
   <details class="example"><summary>Example</summary><pre>evalfunc("x^2", "x", 3)          // 9
 evalfunc("x^2*y", "x,y", 2, 3)  // 12
-
-// Evaluate a student-entered function at a point:
-$f = $stuanswers[$thisq];
-$val = evalfunc($f, "x", 2);</pre></details></li>
-<li><strong>evalnumstr(expr, [complex])</strong>: Evaluates a numerical expression string to a decimal. Useful when you already have a string for display and need its value. Set complex to true for complex number expressions.
+evalfunc("x^2+x", "x", "sin(x)")  // (sin(x))^2+(sin(x))
+</pre></details></li>
+<li><strong>evalnumstr(expr, [complex])</strong>: Evaluates a numerical expression string to a decimal. 
+	Useful when you already have a string for display and need its value, but avoid using this in place 
+	of direct calculation in most cases. Set complex to true for complex number expressions.
   <details class="example"><summary>Example</summary><pre>evalnumstr("(2*pi)/3")  // ≈ 2.0944
 evalnumstr("sqrt(2)+1") // ≈ 2.4142
-evalnumstr("2+3i", true) // evaluates complex expression</pre></details></li>
+evalnumstr("3/2+3i", true) // array(1.5,3)
+</pre></details></li>
 <li>See also: calconarray and multicalconarray in the <a href="#arraymacros">Array Macros</a> section</li>
 </ul>
 </div> <!-- h2 -->
@@ -3242,12 +3244,26 @@ evalnumstr("2+3i", true) // evaluates complex expression</pre></details></li>
 <h2 id="conditionalmacros">Conditional Test Macros</h2>
 These macros are used to test various conditions.  They typically return true or false, depending on whether the desired condition is met.
 <ul>
-<li><strong>getstuans($stuanswers, $thisq, [part number])</strong>: Safely retrieves a student answer. Preferred over direct array access because it handles undefined values without triggering errors. Omit the part number for single-part questions.
-  <details class="example"><summary>Example</summary><pre>$ans = getstuans($stuanswers, $thisq);       // single-part question
-$ans = getstuans($stuanswersval, $thisq, 2); // part 2 of a calculated multipart</pre></details></li>
+<li><strong>getstuans($stuanswers or $stuanswersval, $thisq, [part number])</strong>: Safely retrieves a student answer. 
+	Preferred over direct array access because it handles undefined values without triggering errors. 
+	Omit the part number for single-part questions.
+  <details class="example"><summary>Example</summary><pre>$ans = getstuans($stuanswers, $thisq)       // single-part question
+$ans = getstuans($stuanswersval, $thisq, 2)  // numerical part index 2 of a calculated multipart</pre></details></li>
 <li><strong>stuansready($stuanswers, $thisq, array of part numbers, [anstypes, answerformat])</strong>: Checks that the student has submitted non-blank answers for all specified parts. Wrap any code that uses student answers in an if block with this as the condition.
   <details class="example"><summary>Parameters</summary>
-  <p>Use null for part numbers on a single-part question. Prefix a part number with ~ to allow a blank for that part. Use "1 or 2" as a part number if either is sufficient. Pass $anstypes as 4th argument to handle special cases like matrices. Pass 'checknumeric' as 5th argument to also verify the answer is numeric (use $stuanswersval for calculated/calcntuple types).</p>
+  <ul>
+	<li>part numbers array<ul>
+		<li>Use null for part numbers on a single-part question</li>
+		<li>Prefix a part number with ~ to allow a blank for that part.</li>
+		<li>Use "1 or 2" as a part number if either is sufficient.</li>
+	</ul></li>
+	<li>anstypes: Pass $anstypes as 4th argument to handle special cases like matrices, and to enable answerformat checks. 
+		For a single part question you can pass a string like <code>'number'</code></li>
+	<li>answerformat: Pass $answerformat to check the student answer meets the answerformat 
+		(currently only checks Calculated and Calculated N-tuple questions, and no lists). 
+		Pass 'checknumeric' to also verify the answer is numeric 
+		(use $stuanswersval for the first argument for calculated/calcntuple types).</li>
+  </ul>
   </details>
   <details class="example"><summary>Example</summary><pre>// Single-part question:
 if (stuansready($stuanswers, $thisq, null)) {
@@ -3257,43 +3273,72 @@ if (stuansready($stuanswers, $thisq, null)) {
 // Multipart — require parts 0 and 1, allow part 2 to be blank:
 if (stuansready($stuanswers, $thisq, array(0,1,"~2"), $anstypes)) {
   // process answers
-}</pre></details></li>
+}
+
+// verify $stuanswers[$thisq] is a matrix with numeric entries
+if (stuansready($stuanswers, $thisq, null, 'matrix', 'checknumeric')) {
+  // verified
+}
+
+// verify a calculated answer represented a valid number 
+if (stuansready($stuanswersval, $thisq, null, 'calculated', 'checknumeric')) {
+  // $stuanswerval[$thisq] is a number
+}
+</pre></details></li>
 <li><strong>comparenumbers(a,b,[tol])</strong>: Compares two numbers or numerical expressions. Returns true if they are equivalent within the given tolerance. Set tol for relative tolerance (default 0.001) or prefix with | for absolute.
-  <details class="example"><summary>Example</summary><pre>comparenumbers(0.333, 1/3)         // true  (within default 0.1% tolerance)
+  <details class="example"><summary>Example</summary><pre>comparenumbers(0.3333, 1/3)         // true  (within default 0.1% tolerance)
 comparenumbers(1.001, 1, .01)      // true  (within 1% relative tolerance)
 comparenumbers(1.5, 1.49, "|0.02") // true  (within 0.02 absolute)
 comparenumbers("sqrt(4)", 2)       // true  (evaluates expressions)</pre></details></li>
-<li><strong>comparenumberswithunits(a,b,[tol])</strong>: Compares two quantities that include units. Units must match exactly; "100 cm" and "1 m" are not considered equivalent.
+<li><strong>comparenumberswithunits(a,b,[tol])</strong>: Compares two quantities that include units. 
+	Units do not have to match; "100 cm" and "1 m" are considered equivalent.
   <details class="example"><summary>Parameters</summary>
-  <p>Each value must be of the form: <code>[number]*[unit]^[power]*[unit]^[power].../[unit]^[power]...</code>. 'per' may be used for division. 'unit squared', 'square unit', 'unit cubed', 'cubic unit' are accepted. Tolerance defaults to 0.001 relative; prefix with | for absolute.</p>
+  <p>Each value must be of the form: <code>[number]*[unit]^[power]*[unit]^[power].../[unit]^[power]...</code>. 
+	'per' may be used for division. 'unit squared', 'square unit', 'unit cubed', 'cubic unit' are accepted. 
+	Tolerance defaults to 0.1% (0.001) relative; prefix with | for absolute.</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>comparenumberswithunits("3.5 feet", "3.5 feet")           // true
+  <details class="example"><summary>Example</summary><pre>comparenumberswithunits("3.45 feet", "3.5 feet", "|.1")      // true to .1 absolute tolerance
 comparenumberswithunits("9.8 meters per second squared", "9.8 m/s^2") // true
-comparenumberswithunits("100 cm", "1 m")                  // false (units must match)</pre></details></li>
-<li><strong>comparecomplex(a,b,[tol])</strong>: Compares complex number expressions for equivalence. Handles any representation — 'sqrt(-4)' equals '2i', 'e^(pi*i)' equals '-1'.
+comparenumberswithunits("100 cm", "1 m")      // true
+comparenumberswithunits("100 cm", "100")      // false</pre></details></li>
+<li><strong>comparecomplex(a,b,[tol])</strong>: Compares complex number expressions for equivalence. 
+	Handles any representation, so 'sqrt(-4)' equals '2i', 'e^(pi*i)' equals '-1'.
+	Tolerance defaults to 0.001 relative; prefix with | for absolute. 
   <details class="example"><summary>Example</summary><pre>comparecomplex("2+3i", "2+3i")     // true
 comparecomplex("sqrt(-4)", "2i")   // true
 comparecomplex("e^(pi*i)", "-1")   // true</pre></details></li>
-<li><strong>comparentuples(a,b,[tol],[option])</strong>: Compares two n-tuples for equivalence. By default also checks that the bracket type matches; pass "ignoreparens" to treat (a,b) and [a,b] as equivalent.
+<li><strong>comparentuples(a,b,[tol],[option])</strong>: Compares two n-tuples for equivalence. 
+	By default also checks that the bracket type matches; pass option "ignoreparens" to treat (a,b) and [a,b] as equivalent.
+	Tolerance defaults to 0.001 relative; prefix with | for absolute.
+	Can make tol an array (or list) to apply by element to the ntuple.
   <details class="example"><summary>Example</summary><pre>comparentuples("(1,2,3)", "(1,2,3)")                     // true
 comparentuples("(1,2)", "[1,2]")                         // false  (brackets differ)
 comparentuples("(1,2)", "[1,2]", .001, "ignoreparens")  // true
-comparentuples("(1,2)", "(1,2)", array(.01,.1))          // different tol per element</pre></details></li>
-<li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Tests whether two algebraic expressions are equivalent by evaluating them at random points.
+comparentuples("(1.005,2.02)", "(1,2)", array(.01,.1))          // true. different tol per element</pre></details></li>
+<li><strong>comparefunctions(a,b,[vars,tol,domain])</strong>: Tests whether two algebraic expressions are equivalent.
+ <details class="example"><summary>Parameters</summary>
+	<ul><li>a, b: the functions</li>
+	<li>vars: a list of variables in the function (default "x")</li>
+	<li>tol: defaults to 0.001 relative; prefix with | for absolute.</li>
+	<li>domain: Set <code>"xmin,xmax"</code> to specify a domain for comparison, or 
+		<code>"xmin,xmax,integers" to restrict to integer values.</code></li></ul>
+ </details>
   <details class="example"><summary>Example</summary><pre>comparefunctions("x^2+2*x+1", "(x+1)^2")         // true
-comparefunctions("sin(x)^2+cos(x)^2", "1")       // true
+comparefunctions("sin(t)^2+cos(t)^2", "1", "t")       // true
 comparefunctions("x*y", "y*x", "x,y")            // true  (multivariable)
-comparefunctions("x^2", "x", "x", .001, "0,5")   // false  (different functions)</pre></details></li>
-<li><strong>comparesameform(a,b,[vars])</strong>: Checks whether two expressions are in the same structural form — identical except for commutativity of +/*, multiplying by 1, implicit multiplication, and extra parentheses. More strict than comparefunctions; use with caution.
+comparefunctions("sqrt(x)", "x^(1/2)", "x", .001, "0,5")   // true, test domain adjusted</pre></details></li>
+<li><strong>comparesameform(a,b,[vars])</strong>: Checks whether two expressions are in the same structural form, 
+	identical except for commutativity of +/*, multiplying by 1, implicit multiplication, and extra parentheses. 
+	This is picky, so use with caution.
   <details class="example"><summary>Example</summary><pre>comparesameform("x+2", "2+x")        // true  (commutation ok)
 comparesameform("2*(x+1)", "2*x+2")  // false  (expanded vs factored)
-comparesameform("x*1", "x")          // true  (mult by 1 ok)</pre></details></li>
+comparesameform("(t+2)(t+3)", "(t+3)(t+2)", "t")        // true </pre></details></li>
 <li><strong>comparelogic(a,b,vars)</strong>: Compares two propositional logic statements for equivalence. Uses ^^ (and), vv (or), ~ (not), -&gt; or =&gt; (conditional), &lt;-&gt; or &lt;=&gt; (biconditional).
   <details class="example"><summary>Example</summary><pre>comparelogic("p^^q", "q^^p", "p,q")           // true  (and is commutative)
 comparelogic("~(p^^q)", "~p vv ~q", "p,q")   // true  (De Morgan's law)
 comparelogic("p->q", "~p vv q", "p,q")        // true  (material conditional)</pre></details></li>
 <li><strong>isset($var)</strong>: Returns true if the variable has been defined, false otherwise.
-  <details class="example"><summary>Example</summary><pre>$a = 5;
+  <details class="example"><summary>Example</summary><pre>$a = 5
 isset($a)  // true
 isset($b)  // false  ($b not yet defined)</pre></details></li>
 <li><strong>is_numeric(str)</strong>: Returns true if the string represents an integer or decimal number (not fractions or expressions).
@@ -3302,43 +3347,55 @@ is_numeric("3/4")   // false
 is_numeric("abc")   // false</pre></details></li>
 <li><strong>are_numeric(v1,v2,v3,...)</strong>: Returns true only if all arguments are numeric values or strings. Can also pass a single array.
   <details class="example"><summary>Example</summary><pre>are_numeric(1, 2.5, 3)   // true
-are_numeric(1, "x", 3)  // false</pre></details></li>
+are_numeric(1, "x", 3)  // false
+are_numeric([3,"3/2"])  // false</pre></details></li>
 <li><strong>is_nan(val)</strong>: Returns true if the value is NaN (not a number), such as the result of sqrt(-1). Only works on calculated values, not expression strings.
-  <details class="example"><summary>Example</summary><pre>$a = sqrt(-1);
+  <details class="example"><summary>Example</summary><pre>$a = sqrt(-1)
 is_nan($a)  // true
-is_nan(5)   // false</pre></details></li>
-<li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: Checks whether all required words appear in a student's text answer. If they do, redefines $answer to mark the student correct and highlights the matched words in $showanswer. Set highlight to false to disable highlighting.
-  <details class="example"><summary>Example</summary><pre>$words = array("slope", "negative");
+is_nan(5)   // false
+is_nan("sqrt(-1)")   // triggers an error; cannot use on strings</pre></details></li>
+<li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: Checks whether 
+	all required words appear in a student's text answer. 
+	If they do, redefines $answer to mark the student correct and highlights the matched words in $showanswer. 
+	Set highlight to false to disable highlighting.
+  <details class="example"><summary>Example</summary><pre>$words = array("slope", "negative")
 
 // Single-part question:
 $answer,$showanswer = scorestring($answer, "", $words, $stuanswers, $thisq);
 
 // Multipart question (part 2):
 $answer,$showanswer = scorestring($answer, $showanswer, $words, $stuanswers, $thisq, 2);</pre></details></li>
-<li><strong>checkanswerformat(string, answerformat)</strong>: Checks whether a numerical expression string meets the specified answer format (e.g. "fraction", "decimal", "integer").
+<li><strong>checkanswerformat(string, answerformat)</strong>: Checks whether a numerical expression string meets 
+	the specified answer format (e.g. "fraction", "reducedfraction", "decimal").
   <details class="example"><summary>Example</summary><pre>checkanswerformat("3/4", "fraction")  // true
 checkanswerformat("0.75", "fraction") // false
-checkanswerformat("3/4", "decimal")   // false</pre></details></li>
+checkanswerformat("6/8", "reducedfraction")   // false</pre></details></li>
 <li><strong>getsigfigs(value, [expected sigfigs])</strong>: Returns the number of significant figures in value. Provide the expected count to resolve ambiguity on values like 1200.
-  <details class="example"><summary>Example</summary><pre>getsigfigs(0.0450)     // 3
-getsigfigs(1.230)      // 4
-getsigfigs(1200)       // ambiguous without hint
-getsigfigs(1200, 3)    // 3  (resolves ambiguity)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>getsigfigs("0.0450")     // 3
+getsigfigs(0.0450)     // 2 because it's not a string so the 0 gets lost
+getsigfigs("1.234")      // 4
+getsigfigs("1200")       // 2, but is ambiguous without hint
+getsigfigs("1200", 3)    // 3  (resolves ambiguity)</pre></details></li>
   </ul>
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="feedbackmacros">Feedback Macros</h2>
 These macros are used to select and format feedback messages to students.  They return a string which can be placed in the question text.
 <ul>
+
 <li><strong>getfeedbackbasic(correct msg, incorrect msg, $thisq, [partnum])</strong>: Returns a feedback string based on whether the question was scored correct or not. For multipart questions pass a part number (or an array of part numbers — the correct message only shows if all parts are correct).
-  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbackbasic("Great job!", "Not quite — try again.", $thisq);
+  <details class="example"><summary>Example</summary><pre>//single part
+$feedback = getfeedbackbasic("Great job!", "Not quite — try again.", $thisq);
 
 // Part 2 of a multipart:
 $feedback = getfeedbackbasic("Correct!", "Check your work.", $thisq, 2);
 
 // Correct message only shows when all three parts are right:
-$feedback = getfeedbackbasic("All correct!", "Review your answers.", $thisq, array(0,1,2));</pre></details></li>
-<li><strong>getfeedbacktxt(stuans, feedbacktxt, ans)</strong>: Returns per-choice feedback for multiple choice questions. feedbacktxt is an array whose indices correspond to the $questions array — feedbacktxt[1] shows when the student picks $questions[1].
+$feedback = getfeedbackbasic("All correct!", "Review your answers.", $thisq, [0,1,2]);</pre></details></li>
+
+<li><strong>getfeedbacktxt(stuans, feedbacktxt, ans)</strong>: Returns per-choice feedback for multiple choice questions. 
+	feedbacktxt is an array whose indices correspond to the $questions array, so feedbacktxt[1] shows when 
+	the student picks $questions[1].
   <details class="example"><summary>Example</summary><pre>$feedbacktxt = array(
   "That's too small.",
   "Correct!",
@@ -3346,47 +3403,80 @@ $feedback = getfeedbackbasic("All correct!", "Review your answers.", $thisq, arr
   "Way off."
 );
 $feedback = getfeedbacktxt($stuanswers[$thisq], $feedbacktxt, $answer);</pre></details></li>
+
 <li><strong>getfeedbacktxtessay(stuans, feedbacktxt)</strong>: Returns feedbacktxt once the student has entered any response to an essay question. The answer is not evaluated — it only checks for a non-blank response.
-  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbacktxtessay(
-  $stuanswers[$thisq],
+  <details class="example"><summary>Example</summary>
+<pre>// for part 2 of a multipart 
+$feedback = getfeedbacktxtessay(
+  getstuans($stuanswers, $thisq, 2)
   "Thank you for your response. The key concepts to include are..."
 );</pre></details></li>
-<li><strong>getfeedbacktxtnumber(stuans, partialcredit, feedbacktxt, defaultfeedback, [tol])</strong>: Returns targeted feedback for numeric questions, with support for partial credit scoring.
+
+<li><strong>getfeedbacktxtnumber(stuans, partialcredit, feedbacktxt, defaultfeedback, [tol])</strong>: 
+	Returns targeted feedback for numeric questions, with correct/incorrect marks based on the 
+	partialcredit.
   <details class="example"><summary>Parameters</summary>
-  <p>partialcredit is array(value, score, value, score, ...) where scores are in [0,1]. feedbacktxt is an array of messages corresponding to each value/score pair. defaultfeedback shows when no value matches. For Calculated questions use $stuanswersval. Tolerance defaults to 0.001 relative; prefix with | for absolute.</p>
+  <ul><li>For Calculated questions use $stuanswersval instead of $stuanswers.</li>
+	<li>partialcredit is array(value, score, value, score, ...) where scores are in [0,1].</li>
+	<li>feedbacktxt is an array of messages corresponding to each value/score pair.</li>
+	<li>defaultfeedback shows when no value matches. </li>
+	<li>Tolerance defaults to 0.001 relative; prefix with | for absolute.</li>
+  </ul>
   </details>
-  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbacktxtnumber(
+  <details class="example"><summary>Example</summary><pre>$partialcredit = array(10, 1, 10.3, 0.5) // answer 10 = full credit, 10.3 = half credit
+$feedback = getfeedbacktxtnumber(
   $stuanswers[$thisq],
-  array(10, 1, 5, 0.5),          // answer 10 = full credit, 5 = half credit
+  $partialcredit,          
   array("Correct!", "Close, but check your rounding."),
-  "Incorrect — the answer is 10."
-);</pre></details></li>
+  "Incorrect, the answer is 10."
+)</pre></details></li>
+
 <li><strong>getfeedbacktxtcalculated(stuans, stuansval, partialcredit, feedbacktxt, defaultfeedback, [answerformat, requiretimes, tol])</strong>: Like getfeedbacktxtnumber but for Calculated question types, supporting answerformat and requiretimes checks.
   <details class="example"><summary>Parameters</summary>
-  <p>stuans from $stuanswers[$thisq], stuansval from $stuanswersval[$thisq]. partialcredit/feedbacktxt/defaultfeedback same as getfeedbacktxtnumber. answerformat and requiretimes can each be a single value applied to all checks, or an array applied per check.</p>
+  <ul><li>stuans from $stuanswers[$thisq], stuansval from $stuanswersval[$thisq]</li>
+	<li>partialcredit is array(value, score, value, score, ...) where scores are in [0,1].</li>
+	<li>feedbacktxt is an array of messages corresponding to each value/score pair.</li>
+	<li>defaultfeedback shows when no value matches. </li>
+	<li>answerformat can be a single answerformat to apply to all expressions, or an array with each element applied to the corresponding expression</li>
+	<li>requiretimes can be a single requiretimes to apply to all expressions, or an array with each element applied to the corresponding expression</li>
+	<li>Tolerance defaults to 0.001 relative; prefix with | for absolute.</li>
+  </ul>
   </details>
   <details class="example"><summary>Example</summary><pre>// Check the answer "1/2" twice: once requiring fraction format, once without:
+$partialcredit = array("1/2", 1, "1/2", 0.5)
+$answerformat = ["fraction", ""] // different answerformat per check in $partialcredit
 $feedback = getfeedbacktxtcalculated(
   $stuanswers[$thisq],
   $stuanswersval[$thisq],
-  array("1/2", 1, "1/2", 0.5),
+  $partialcredit,
   array("Correct!", "Right value, but give your answer as a fraction"),
   "Incorrect",
-  array("fraction", "")  // answerformat per check
-);</pre></details></li>
-<li><strong>getfeedbacktxtnumfunc(stuans, partialcredit, feedbacktxt, defaultfeedback, [vars, requiretimes, tol, domain])</strong>: Targeted feedback for algebraic expression (numfunc) questions, with partial credit support.
+  $answerformat 
+)</pre></details></li>
+
+<li><strong>getfeedbacktxtnumfunc(stuans, partialcredit, feedbacktxt, defaultfeedback, [vars, requiretimes, tol, domain])</strong>: 
+	Targeted feedback for algebraic expression (numfunc) questions.
   <details class="example"><summary>Parameters</summary>
-  <p>partialcredit is array(expression, score, expression, score, ...) where scores are in [0,1]. feedbacktxt messages correspond to each expression. vars defaults to "x". requiretimes can be a single value or an array per expression. tol defaults to 0.001 relative. domain defaults to "-10,10".</p>
+   <ul><li>stuans from $stuanswers[$thisq]</li>
+	<li>partialcredit is array(expr, score, expr, score, ...) where scores are in [0,1].</li>
+	<li>feedbacktxt is an array of messages corresponding to each value/score pair.</li>
+	<li>defaultfeedback shows when no value matches. </li>
+	<li>vars is a list of variables in the expressions, like "x,y" (default "x")</li>
+	<li>requiretimes can be a single requiretimes to apply to all expressions, or an array with each element applied to the corresponding expression</li>
+	<li>Tolerance defaults to 0.001 relative; prefix with | for absolute.</li>
+	<li>Set domain to limit the test domain. Defaults to "-10,10"</li>
+  </ul>
   </details>
-  <details class="example"><summary>Example</summary><pre>$feedback = getfeedbacktxtnumfunc(
+  <details class="example"><summary>Example</summary><pre>$partialcredit = array("x+1", 1, "x^2+1", 0.5)
+$feedback = getfeedbacktxtnumfunc(
   $stuanswers[$thisq],
-  array("x+1", 1, "x^2+1", 0.5),
-  array("Correct!", "Close — check whether that's linear or quadratic."),
-  "Incorrect — the answer is x+1.",
-  "x"
-);</pre></details></li>
+  $partialcredit,
+  array("Correct!", "Close, check whether that's linear or quadratic."),
+  "Incorrect, the answer is x+1."
+)</pre></details></li>
 </ul>
 </div> <!-- h2 -->
+
 <div class=h2>
 <h2 id="usingothermacros">Using Other Macros</h2>
 <p>If an IMathAS administrator has installed other Macro Libraries, you can load a macro library by entering the line
@@ -3607,24 +3697,23 @@ Notes (important!):
 <p>
 1) If the student has not answered the question, then $stuanswers[N] === null, with the exception of drop-down select
 questions, where $stuanswers[N] == "NA" if no selection is made.
-If used in an equation, it will take on the value 0.
-To prevent divide-by-zero errors and to prevent students from exploiting this, it is highly recommended that you do something like:
+To prevent divide-by-zero errors and other issues and to prevent students from exploiting this, 
+it is highly recommended that you do something like:
 </p>
 <pre>
-$a = $stuanswers[$thisq][0]
-$a = rand(1,100) if ($a===null)
+if (stuansready($stuanswers, $thisq, [0])) {
+	// stuff using $stuanswers[$thisq][0]
+}
 </pre>
+
 <p>
-Perhaps also include:
-$warning = "You MUST answer question 1 before this question" if ($a===null), then put $warning in the question text.
-</p>
-<p>
-2) If you use $stuanswers in your $answer, $showanswer will generally not be defined.  If you follow the advice in #1 above, then your
+2) If you use $stuanswers in your $answer, $showanswer will not be defined until the student answers.  If you follow the advice in #1 above, then your
 $showanswer will reflect the random number assigned to $a.  For this reason, it is highly recommended that you custom define the $showanswer.
 </p>
 <p>
 3) If using the $stuanswers array in a string or in the Question Text, you must enclose it with curly brackets:
-Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enclose it in parentheses just to be safe.
+<code>Your answer was {$stuanswers[$thisq][0]}</code>.  If using it directly in a calculation, 
+enclose it in parentheses just to be safe.
 </p>
 <p>
 4) $stuanswers[$thisq] is defined for question scoring, but may not be for question display.
@@ -3635,7 +3724,8 @@ when there is a multipart question with only one part, so is recommended.
 </p>
 <p>
 6) You can use the function stuansready($stuanswers,$thisq,[p1,p2,...]) to determine if the parts 
-have been answered, instead of checking for null.
+have been answered, instead of checking for null.  It also provides options for checking format or 
+if the entry is numeric, so is highly recommended.
 </p>
 
 <h3>Other Reference Variables</h3>
@@ -3714,6 +3804,27 @@ The student is asked to enter a number (integer, decimal, or scientific notation
 The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity), and
 -oo (Negative Infinity) as answers.
 </p>
+<details class="example"><summary>Examples</summary>
+<pre>
+// a question asking for the mean of 3 numbers
+$a,$b,$c = diffrands(1,20,3)
+$answer = ($a+$b+$c)/3
+
+// a rounding question 
+$a = rand(1,9) + rand(2,9)/10 + rand(5,9)/100
+$answer = round($a,1)
+$abstolerance = 0  // require an exact answer, no tolerance
+
+// a money question
+$answer = $initial*(1+$rate/100)^$years
+$reqdecimals = 2   // require accurate to cents; allows more than 2
+// $reqdecimals = "=2"  // would require exactly 2 decimals 
+
+// a list of answers 
+$answerformat = "list"
+$answer = "$root1,$root2"
+</pre>
+</details>
 <p><strong>Required Variables</strong></p>
 <dl>
 <dt>$answer = a number or calculation resulting in a number, like $answer = 5 </dt>
