@@ -85,7 +85,7 @@ function jointsort() {
 }
 
 function listtoarray($l, $tonum=false) {
-    if (func_num_args() > 1) {
+    if (func_num_args() > 2) {
         echo "Warning:  listtoarray expects one argument, more than one provided";
     }
     if ($l === '') {

@@ -2306,40 +2306,40 @@ can be omitted.</p>
 <p>Single result randomizers:</p>
 <ul>
 <li><strong>rand(min,max)</strong>:  Returns an integer between min and max
-  <details class="example"><summary>Example</summary><pre>$a = rand(1,10);        // $a might be 7
-$b = rand(-5,5);        // $b might be -2</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a = rand(1,10)        // $a might be 7
+$b = rand(-5,5)        // $b might be -2</pre></details></li>
 <li><strong>rrand(min,max,p)</strong>:  Returns a number between min and max in steps of p
   <details class="example"><summary>Example</summary>
-	<pre>$a = rrand(2,5,.1);     // $a might be 3.4
-$b = rrand(2,5,.01);    // $b might be 3.27
-$c = rrand(2,8,2);      // $c might be 2, 4, 6, or 8</pre></details></li>
+	<pre>$a = rrand(2,5,.1)     // $a might be 3.4
+$b = rrand(2,5,.01)    // $b might be 3.27
+$c = rrand(2,8,2)      // $c might be 2, 4, 6, or 8</pre></details></li>
 <li><strong>nonzerorand(min,max)</strong>:  Returns a nonzero integer between min and max
   <details class="example"><summary>Example</summary>
-	<pre>$a = nonzerorand(-5,5); // $a might be -3 or 4, but never 0</pre></details></li>
+	<pre>$a = nonzerorand(-5,5) // $a might be -3 or 4, but never 0</pre></details></li>
 <li><strong>nonzerorrand(min,max,p)</strong>:  Returns a nonzero real number between min and max in steps of p
   <details class="example"><summary>Example</summary>
-	<pre>$a = nonzerorrand(-2,2,.5); // $a might be -1.5 or 3, but never 0</pre></details></li>
+	<pre>$a = nonzerorrand(-2,2,.5) // $a might be -1.5 or 3, but never 0</pre></details></li>
 <li><strong>randfrom(list or array)</strong>: Return an element of the list/array
   <details class="example"><summary>Example</summary><pre>$color = randfrom("red,green,blue");  // might return "green"
-$n = randfrom("2,4,6,8");             // might return 4
+$n = randfrom("2,4,6,8")             // might return 4
 
-$arr = [10,20,30];
-$val = randfrom($arr);                // might return 20</pre></details></li>
+$arr = [10,20,30]
+$val = randfrom($arr)                // might return 20</pre></details></li>
 <li><strong>randname(),randmalename(),randfemalename()</strong>:  Returns a random first name
-  <details class="example"><summary>Example</summary><pre>$name = randname();       // might return "Sofia"
-$name = randmalename();   // might return "Carlos"
-$name = randfemalename(); // might return "Aisha"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$name = randname()       // might return "Sofia"
+$name = randmalename()   // might return "Carlos"
+$name = randfemalename() // might return "Aisha"</pre></details></li>
 <li><strong>randnamewpronouns([option])</strong>:  Returns a random first name with pronouns in the order: subjective, objective, 
 	possessive (singular), possessive (plural), reflexive. Can set option to 'neutral' for they/them/their/theirs/themself pronouns.
 	Use: $name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns()
-  <details class="example"><summary>Example</summary><pre>$name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns();
+  <details class="example"><summary>Example</summary><pre>$name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns()
 // might give: $name="Carlos", $heshe="he", $himher="him", $hisher="his"...
 $str = "$name went to the store to buy a gift for $hisher friend"
 
-$name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns('neutral');
+$name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns('neutral')
 // always gives they/them pronouns</pre></details></li>
 <li><strong>uniqid()</strong>: Generates a random unique string, useful for giving a unique id to elements.
-  <details class="example"><summary>Example</summary><pre>$id = uniqid();   // might return "a64f3a2b1c"
+  <details class="example"><summary>Example</summary><pre>$id = uniqid()   // might return "a64f3a2b1c"
 // Typical use: creating unique HTML element ids in question markup
 // &lt;div id='graph$id'&gt;</pre></details></li>
 </ul>
@@ -2347,73 +2347,73 @@ $name,$heshe,$himher,$hisher,$hishers,$himherself = randnamewpronouns('neutral')
 <p>Array randomizers (return multiple results):</p>
 <ul>
 <li><strong>rands(min,max,n,[order])</strong>:  Returns n integers between min and max. Can set order to 'inc' or 'dec' to sort the values, but be aware there may still be duplicate values.
-  <details class="example"><summary>Example</summary><pre>$a,$b,$c = rands(1,10,3);        // might give 3, 7, 1 (duplicates possible)
-$a,$b,$c = rands(1,10,3,'inc');  // sorted ascending, e.g. 1, 3, 7
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = rands(1,10,3)        // might give 3, 7, 1 (duplicates possible)
+$a,$b,$c = rands(1,10,3,'inc')  // sorted ascending, e.g. 1, 3, 7
 $arr = rand(1,10,2) // reference using $arr[0] and $arr[1]</pre></details></li>
 <li><strong>rrands(min,max,p,n,[order])</strong>:  Returns n real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b,$c = rrands(0,1,.25,3);        // might give 0.25, 0.75, 0.5
-$a,$b,$c = rrands(0,1,.25,3,'dec');  // sorted descending, e.g. 0.75, 0.5, 0.25</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = rrands(0,1,.25,3)        // might give 0.25, 0.75, 0.5
+$a,$b,$c = rrands(0,1,.25,3,'dec')  // sorted descending, e.g. 0.75, 0.5, 0.25</pre></details></li>
 <li><strong>nonzerorands(min,max,n,[order])</strong>:  Returns n nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorands(-3,3,2);       // might give -1, 2 (never 0)
-$a,$b = nonzerorands(-3,3,2,'inc'); // sorted: -1, 2</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorands(-3,3,2)       // might give -1, 2 (never 0)
+$a,$b = nonzerorands(-3,3,2,'inc')  // sorted: -1, 2</pre></details></li>
 <li><strong>nonzerorrands(min,max,p,n,[order])</strong>:  Returns n nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorrands(-3,3,.5,2); // might give -2.5, 1 (never 0)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerorrands(-3,3,.5,2) // might give -2.5, 1 (never 0)</pre></details></li>
 <li><strong>randsfrom(list/array,n,[order])</strong>: Return n elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = randsfrom("red,green,blue,yellow", 2);  // e.g. "blue", "red"
+  <details class="example"><summary>Example</summary><pre>$a,$b = randsfrom("red,green,blue,yellow", 2)  // e.g. "blue", "red"
 $arr = [2,4,6,8]
 $a,$b = randsfrom($arr, 2, 'inc');         // sorted ascending, e.g. 2, 6</pre></details></li>
 <li><strong>jointrandfrom(list/array,list/array,[list/array,...])</strong>:  Returns one element from each list, where the location used in each list is the same
-  <details class="example"><summary>Example</summary><pre>$first,$last = jointrandfrom("Alice,Bob,Carlos", "Smith,Jones,Rivera");
+  <details class="example"><summary>Example</summary><pre>$first,$last = jointrandfrom("Alice,Bob,Carlos", "Smith,Jones,Rivera")
 // picks the same index from each list, so names stay paired:
 // e.g. $first="Bob", $last="Jones"
 
 // can be used to randomly pick a question prompt and answer from corresponding arrays:
 $prompt,$answer = jointrandfrom($questionprompts, $allanswers)</pre></details></li>
 <li><strong>diffrands(min,max,n,[order])</strong>:  Returns n different integers between min and max. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b,$c = diffrands(1,6,3);        // three distinct values, e.g. 4, 1, 6
-$a,$b,$c = diffrands(1,6,3,'inc');  // sorted ascending, e.g. 1, 4, 6</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = diffrands(1,6,3)        // three distinct values, e.g. 4, 1, 6
+$a,$b,$c = diffrands(1,6,3,'inc')  // sorted ascending, e.g. 1, 4, 6</pre></details></li>
 <li><strong>diffrrands(min,max,p,n,[order])</strong>:  Returns n different real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = diffrrands(0,1,.1,2); // two distinct values, e.g. 0.3, 0.7</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b = diffrrands(0,1,.1,2) // two distinct values, e.g. 0.3, 0.7</pre></details></li>
 <li><strong>diffrandsfrom(list/array,n,[order])</strong>: Return n different elements of the list/array. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = diffrandsfrom("red,green,blue,yellow", 2); // two distinct colors, e.g. "green", "red"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b = diffrandsfrom("red,green,blue,yellow", 2) // two distinct colors, e.g. "green", "red"</pre></details></li>
 <li><strong>nonzerodiffrands(min,max,n,[order])</strong>:  Returns n different nonzero integers between min and max. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerodiffrands(-3,3,2); // two distinct nonzero values, e.g. -2, 3</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerodiffrands(-3,3,2) // two distinct nonzero values, e.g. -2, 3</pre></details></li>
 <li><strong>nonzerodiffrrands(min,max,p,n,[order])</strong>:  Returns n different nonzero real numbers between min and max in steps of p. Can set order to 'inc' or 'dec' to sort the values.
-  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerodiffrrands(-1,1,.5,2); // e.g. -0.5, 1.0 (distinct and nonzero)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b = nonzerodiffrrands(-1,1,.5,2) // e.g. -0.5, 1.0 (distinct and nonzero)</pre></details></li>
 <li><strong>jointshuffle(list/array1,list/array2,[n1,n2])</strong>:  Shuffles two lists/arrays in a way that retains
     respective order.  In n1 is provided, n1 elements from each shuffled array will be returned (like
     a joint version of diffrandsfrom).  If n2 is also provided, n1 elements of list/array1 and n2
     elements of list/array2 will be returned.
   <details class="example"><summary>Example</summary><pre>// Shuffle names and scores together so they stay paired:
-$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71));
+$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71))
 // e.g. $names=array("Bob","Carlos","Alice"), $scores=array(82,71,95)
 
 // Pick 2 from each:
-$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71), 2);
+$names,$scores = jointshuffle("Alice,Bob,Carlos", array(95,82,71), 2)
 // e.g. $names=array("Bob","Alice"), $scores=array(82,95)
 </pre></details></li>
 <li><strong>singleshuffle(list/array,[n])</strong>:  returns a shuffled version of a list/array.  If n is provided,
     it behaves identically to diffrandsfrom, and picks n items from the list/array.
-  <details class="example"><summary>Example</summary><pre>$shuffled = singleshuffle("1,2,3,4,5");    // e.g. array(3,1,5,2,4)
-$two = singleshuffle("1,2,3,4,5", 2);      // pick 2: e.g. array(4,2)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$shuffled = singleshuffle("1,2,3,4,5")    // e.g. array(3,1,5,2,4)
+$two = singleshuffle("1,2,3,4,5", 2)      // pick 2: e.g. array(4,2)</pre></details></li>
 <li><strong>randnames(n),randmalenames(n),randfemalenames(n)</strong>:  Returns n random first names
-  <details class="example"><summary>Example</summary><pre>$a,$b,$c = randnames(3);      // e.g. "Sofia", "Carlos", "Aisha"
-$a,$b = randmalenames(2);     // e.g. "Marcus", "Eli"
-$a,$b = randfemalenames(2);   // e.g. "Priya", "Helena"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = randnames(3)      // e.g. "Sofia", "Carlos", "Aisha"
+$a,$b = randmalenames(2)     // e.g. "Marcus", "Eli"
+$a,$b = randfemalenames(2)   // e.g. "Priya", "Helena"</pre></details></li>
 <li><strong>randcity([country]),randcities(n, [country])</strong>:  Returns one or n random US or Canadian city names. Argument country can be set to "USA" or "Canada". The default is "USA".
-  <details class="example"><summary>Example</summary><pre>$city = randcity();             // e.g. "Portland"
-$city = randcity("Canada");    // e.g. "Calgary"
-$c1,$c2 = randcities(2);      // e.g. "Austin", "Denver"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$city = randcity()             // e.g. "Portland"
+$city = randcity("Canada")    // e.g. "Calgary"
+$c1,$c2 = randcities(2)      // e.g. "Austin", "Denver"</pre></details></li>
 <li><strong>randstate([country]),randstates(n, [country])</strong>:  Returns one or n random US state or Canadian province names. Argument country can be set to "USA" or "Canada". The default is "USA".
-  <details class="example"><summary>Example</summary><pre>$state = randstate();           // e.g. "Oregon"
-$prov = randstate("Canada");   // e.g. "Alberta"
-$s1,$s2 = randstates(2);      // e.g. "Texas", "Ohio"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$state = randstate()           // e.g. "Oregon"
+$prov = randstate("Canada")   // e.g. "Alberta"
+$s1,$s2 = randstates(2)      // e.g. "Texas", "Ohio"</pre></details></li>
 <li><strong>randcountry(),randcountries(n)</strong>:  Returns one or n random country names
-  <details class="example"><summary>Example</summary><pre>$c = randcountry();            // e.g. "Brazil"
-$c1,$c2 = randcountries(2);   // e.g. "Japan", "Mexico"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$c = randcountry()            // e.g. "Brazil"
+$c1,$c2 = randcountries(2)   // e.g. "Japan", "Mexico"</pre></details></li>
 <li><strong>randpythag([min,max])</strong>:  Return a Pythagorean triple.  min/max default to 1 to 100
-  <details class="example"><summary>Example</summary><pre>$a,$b,$c = randpythag();        // e.g. 3, 4, 5  (satisfies a^2+b^2=c^2)
-$a,$b,$c = randpythag(5,20);   // triple with values between 5 and 20</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a,$b,$c = randpythag()        // e.g. 3, 4, 5  (satisfies a^2+b^2=c^2)
+$a,$b,$c = randpythag(5,20)   // triple with values between 5 and 20</pre></details></li>
 </ul>
 
 </div> <!-- h2 -->
@@ -2428,51 +2428,51 @@ The following macros create graphs or tables:
   <code>$opts["align"]</code> for alignment, <code>$opts["tablealign"]="center"</code> to center the whole table,
   and <code>$opts["caption"]</code> to add a caption. To align each column differently use a character-per-column string like "rcc".</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3);
-$ys = array(1,4,9);
-$table = showarrays("x", $xs, "y", $ys);
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3)
+$ys = array(1,4,9)
+$table = showarrays("x", $xs, "y", $ys)
 
 // all columns centered
-$table = showarrays("x", $xs, "y", $ys, 'c');
+$table = showarrays("x", $xs, "y", $ys, 'c')
 
 // With alignment and caption:
-$opts["align"] = "rc";
-$opts["caption"] = "Squares";
-$table = showarrays("x", $xs, "y", $ys, $opts);
+$opts["align"] = "rc"
+$opts["caption"] = "Squares"
+$table = showarrays("x", $xs, "y", $ys, $opts)
 // or equivalently
-$table = showarrays("x", $xs, "y", $ys, ['align'=>"rc", 'caption'=>"Squares"]);
+$table = showarrays("x", $xs, "y", $ys, ['align'=>"rc", 'caption'=>"Squares"])
 
 // Array-of-arrays alternate call form:
-$table = showarrays(array("x","y"), array($xs,$ys));</pre></details></li>
+$table = showarrays(array("x","y"), array($xs,$ys))</pre></details></li>
 <li><strong>showdataarray(array,[columns,options])</strong>: Creates a tabular display of the data in the array with no headers.
   <details class="example"><summary>Parameters</summary>
   <p>Data is presented in one column unless a column count is provided. Options can be a string "c", "l", or "r" to align data,
   or an array with <code>$opts["align"]</code>, <code>$opts["tablealign"]="center"</code>, and <code>$opts["caption"]</code>.</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>$data = array(10,20,30,40,50,60);
-$table = showdataarray($data);         // single column
-$table = showdataarray($data, 3);      // spread across 3 columns
-$table = showdataarray($data, 2, "c"); // 2 columns, centered
-$table = showdataarray($data, 2, ['align'=>'c', 'caption'=>"Scores"]); // 2 columns, centered, with caption
+  <details class="example"><summary>Example</summary><pre>$data = array(10,20,30,40,50,60)
+$table = showdataarray($data)         // single column
+$table = showdataarray($data, 3)      // spread across 3 columns
+$table = showdataarray($data, 2, "c") // 2 columns, centered
+$table = showdataarray($data, 2, ['align'=>'c', 'caption'=>"Scores"]) // 2 columns, centered, with caption
 </pre></details></li>
 <li><strong>horizshowarrays(string,array,[string,array]...,[options])</strong>: Creates a tabular display of the data in the array(s) as row(s), with the strings as row labels. Does not text wrap, so only use for small data sets.
   <details class="example"><summary>Parameters</summary>
   <p>Options can be a string "c", "l", or "r" to align data, or an array with <code>$opts["align"]</code>,
   <code>$opts["tablealign"]="center"</code>, and <code>$opts["caption"]</code>.</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3,4);
-$ys = array(1,4,9,16);
-$table = horizshowarrays("x", $xs, "y", $ys);
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3,4)
+$ys = array(1,4,9,16)
+$table = horizshowarrays("x", $xs, "y", $ys)
 // Creates a two-row table: "x" row and "y" row, values in columns</pre></details></li>
 <li><strong>showrecttable(data array of arrays,columnlabels,rowlabels,[options])</strong>: Creates a tabular display of a rectangular data table, where <code>$data[0]</code> is the first row.
   <details class="example"><summary>Parameters</summary>
   <p>rowlabels and columnlabels are arrays of label strings. Options can be a string "c", "l", or "r" to align data,
   or an array with <code>$opts["align"]</code>, <code>$opts["tablealign"]="center"</code>, and <code>$opts["caption"]</code>.</p>
   </details>
-  <details class="example"><summary>Example</summary><pre>$data = array(array(10,20), array(30,40));
-$cols = array("A","B");
-$rows = array("Row1","Row2");
-$table = showrecttable($data, $cols, $rows);
+  <details class="example"><summary>Example</summary><pre>$data = array(array(10,20), array(30,40))
+$cols = array("A","B")
+$rows = array("Row1","Row2")
+$table = showrecttable($data, $cols, $rows)
 // table with column headers A and B, row headers Row1 and Row2, first row 10, 20
 </pre></details></li>
 <li><strong>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</strong>: Creates a graph from one or more function strings.
@@ -2527,13 +2527,13 @@ $table = showrecttable($data, $cols, $rows);
 	</ul>
   </details>
   <details class="example"><summary>Example</summary><pre>// Single function:
-$graph = showplot("x^2");
+$graph = showplot("x^2")
 
 // With window
-$graph = showplot("x^2,blue", -3, 3, -1, 9, 1, 1, 300, 300);
+$graph = showplot("x^2,blue", -3, 3, -1, 9, 1, 1, 300, 300)
 
 // Drawn larger, 300x300
-$graph = showplot("x^2", -5, 5, -5, 5, 1, 1, 300, 300);
+$graph = showplot("x^2", -5, 5, -5, 5, 1, 1, 300, 300)
 
 // With window and scaling, labels spaced at 2 in x and 20 in y, 
 // grid spaced at 1 in x, 10 in y.
@@ -2543,36 +2543,36 @@ $graph = showplot("2^x", -3, 12, -20, 200, "2:20", "1:10")
 $graph = showplot("3-x,blue,,,,,,dash", -5, 5, -5, 5, "1:1:x:y", 0)
 
 // Multiple functions with dot and label:
-$funcs = array("x^2,blue", "2*x+1,red", "dot,1,1,closed,blue", "text,1,1,A,blue,above");
-$graph = showplot($funcs, -4, 4, -2, 10);
+$funcs = array("x^2,blue", "2*x+1,red", "dot,1,1,closed,blue", "text,1,1,A,blue,above")
+$graph = showplot($funcs, -4, 4, -2, 10)
 
 // Parametric curve:
-$graph = showplot("[cos(t),sin(t)],blue,0,6.28", -1.5, 1.5, -1.5, 1.5);
+$graph = showplot("[cos(t),sin(t)],blue,0,6.28", -1.5, 1.5, -1.5, 1.5)
 
 // Domain with hole:
-$graph = showplot("1/x,black,-5,5!0", -5, 5, -5, 5);
+$graph = showplot("1/x,black,-5,5!0", -5, 5, -5, 5)
 
 // Piecewise, first line ends at closed dot, second starts at open dot
 $funcs = ["3-x,blue,-6,1,,closed","-2+x,blue,1,6,open"]
 $graph = showplot($funcs)
 </pre></details></li>
 <li><strong>mergeplots($plot1, $plot2, [$plot3, $plot4, ...])</strong>: Merges multiple plots into one. Usually not necessary since showplot accepts an array of funcstrings, but useful when combining graphs generated by different functions. The grid and border from the first graph is used; ensure all plots use the same grid.
-  <details class="example"><summary>Example</summary><pre>$g1 = showplot("x^2,blue");
-$g2 = showplot("2*x,red");
-$combined = mergeplots($g1, $g2);</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$g1 = showplot("x^2,blue")
+$g2 = showplot("2*x,red")
+$combined = mergeplots($g1, $g2)</pre></details></li>
 <li><strong>invertplot($plot)</strong>: Inverts a plot by swapping x and y coordinates of every point. Useful for drawing curves where x is a function of y. Note: use replacealttext after inverting, since the auto-generated alt text will not be accurate.
   <details class="example"><summary>Example</summary><pre>// Draw x = y^2 by drawing y = x^2 then inverting:
-$g = showplot("x^2,blue");
-$g = invertplot($g);
-$g = replacealttext($g, "Graph of x equals y squared");</pre></details></li>
+$g = showplot("x^2,blue")
+$g = invertplot($g)
+$g = replacealttext($g, "Graph of x equals y squared")</pre></details></li>
 <li><strong>addfractionaxislabels(plot,step,[axis])</strong>: Adds fraction or pi-multiple labels along an axis of a showplot graph. 
   <details class="example"><summary>Parameters</summary>
   <p>Set axis to "y" for the y-axis; defaults to x-axis.<br/>
 	Step can be a fraction like "1/4" or a pi multiple like "pi/4" or "2pi".</p>
   </details>
   <details class="example"><summary>Example</summary><pre>// Trig graph with pi/2 labels on x-axis:
-$g = showplot("sin(x),blue", 0, 6.3, -1.2, 1.2);
-$g = addfractionaxislabels($g, "pi/2");
+$g = showplot("sin(x),blue", 0, 6.3, -1.2, 1.2)
+$g = addfractionaxislabels($g, "pi/2")
 // x-axis now shows 0, pi/2, pi, 3pi/2, 2pi</pre></details></li>
 <li><strong>addlabel(plot,x,y,label,[color,loc,angle,size,alt])</strong>: Adds a text label at graph coordinates (x,y) to a showplot graph.
   <details class="example"><summary>Parameters</summary>
@@ -2584,7 +2584,7 @@ $g = addfractionaxislabels($g, "pi/2");
   <li><strong>alt</strong>: Alt text for the label, replacing the default.</li>
   </ul>
   </details>
-  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue")
 $g = addlabel($g, 1, 1, "A", "red", "above")
 $g = addlabel($g, -2, 4, "(-2,4)", "blue", "left")</pre></details></li>
 <li><strong>addlabelabs(plot,x,y,label,[color,loc,angle,alt])</strong>: Like addlabel, but x and y are pixel coordinates on the image rather than graph coordinates.
@@ -2600,8 +2600,8 @@ $g = adddrawcommand($g, "stroke='green'; line([0,0],[1,1]);")</pre></details></l
 <li><strong>showasciisvg(string,[width,height,alttext])</strong>: Renders an <a href="docs/asciisvgref.php">ASCIIsvg</a> script directly as an SVG. Always include alttext for accessibility.
   <details class="example"><summary>Example</summary><pre>$g = showasciisvg("initPicture(0,10,0,10);path([[0,0],[0,10],[10,10],[0,0]]);", 100, 100, "A Triangle")</pre></details></li>
 <li><strong>replacealttext(image or graph, alttext)</strong>: Replaces the auto-generated alt text on a graph or image with the specified text.
-  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue");
-$g = replacealttext($g, "Graph of y equals x squared, a parabola opening upward");</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$g = showplot("x^2,blue")
+$g = replacealttext($g, "Graph of y equals x squared, a parabola opening upward")</pre></details></li>
 <li><strong>changeimagesize(image, width, [height])</strong>: Changes the display size of an image. Does not resize the underlying file.
   <details class="example"><summary>Example</summary><pre>// assuming $img is an attached image
 $img = changeimagesize($img, 300)        // 300px wide
@@ -2618,10 +2618,10 @@ $result = textonimage($img, "Label A", 50, 30, "Label B", 150, 80);
 // Centered labels:
 $result = textonimage($img, "centerelements", "A", 100, 50, "B", 200, 50);</pre></details></li>
 <li><strong>addimageborder(image, [border width, margin])</strong>: Adds a border to an uploaded image. Border width defaults to 1px, margin defaults to 0.
-  <details class="example"><summary>Example</summary><pre>$img2 = addimageborder($img);         // default 1px border
-$img2 = addimageborder($img, 2, 5);   // 2px border, 5px whitespace margin</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$img2 = addimageborder($img)         // default 1px border
+$img2 = addimageborder($img, 2, 5)   // 2px border, 5px whitespace margin</pre></details></li>
 <li><strong>arraystodoteqns(xarray,yarray,[color])</strong>: Converts arrays of x and y values into a dot funcstring for use in showplot.
-  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3,4);
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3,4)
 $ys = calconarray($xs, "x^2")
 $dots = arraystodoteqns($xs, $ys, "blue")
 $g = showplot($dots, "0:-1", 5, "0:-2", 20, "1:2", "1:2")</pre></details></li>
@@ -2731,9 +2731,9 @@ $nice = polymakepretty($poly);    // e.g. "3x^2+1" or "x^2+1"
 $disp = polymakeprettydisp($poly); // backtick-wrapped math display version</pre></details></li>
 <li><strong>makexpretty and makexprettydisp</strong>: (deprecated — use makexxpretty instead) Like makepretty but also cleans up 1*, 0*, etc. Can cause unexpected results; test carefully.</li>
 <li><strong>makexxpretty and makexxprettydisp</strong>: Like makepretty but also cleans up 1*, 0*, x^1, x^0, etc. Cannot handle |x| notation — use abs(x) instead. Test carefully.
-  <details class="example"><summary>Example</summary><pre>$expr = "1*x^2+0*x^1+1*x^0";
-$nice = makexxpretty($expr);     // "x^2+1"
-$disp = makexxprettydisp($expr); // math display version</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$expr = "1*x^2+0*x^1+1*x^0"
+$nice = makexxpretty($expr)     // "x^2+1"
+$disp = makexxprettydisp($expr) // math display version</pre></details></li>
 <li><strong>makepretynegative(string)</strong>: Wraps negative terms in parentheses — e.g. "3+-4" → "3+(-4)" and "3--4" → "3-(-4)". Note: "3-+4" becomes "3-4".
   <details class="example"><summary>Example</summary><pre>$b = rand(-5,-1)  // a negative number
 $expr = "3+$b"      // like "3+-4"
@@ -2842,7 +2842,7 @@ These macros help with working with strings:
 stringappend(array("cat","dog"), "s") // array("cats","dogs")</pre></details></li>
 <li><strong>stringprepend(value,string)</strong>: Prepends string to value. If value is an array, string is prepended to each element.
   <details class="example"><summary>Example</summary><pre>stringprepend("world", "hello ")    // "hello world"
-stringprepend(array("A","B"), "$")  // array("$A","$B")</pre></details></li>
+stringprepend(["A","B"], "$")  // array("$A","$B")</pre></details></li>
 <li><strong>today([string])</strong>: Returns today's date. Defaults to "Month D, YYYY" format. See <a href="https://www.php.net/manual/en/datetime.format.php">PHP date format codes</a> for custom formats.
   <details class="example"><summary>Example</summary><pre>today()          // "July 3, 2026"
 today("Y-m-d")  // "2026-07-03"
@@ -2855,13 +2855,13 @@ stringpos("xyz", "hello")  // -1  (not found)</pre></details></li>
 stringlen("")       // 0</pre></details></li>
 <li><strong>stringclean(string,[mode])</strong>: Cleans up a string. Mode 0 (default): trim whitespace. Mode 1: remove all whitespace. Mode 2: remove all non-alphanumeric characters.
   <details class="example"><summary>Example</summary><pre>stringclean("  hello  ")     // "hello"
-stringclean("h e l l o", 1) // "hello"
+stringclean("h e l l o ", 1) // "hello"
 stringclean("hi there! 2", 2) // "hithere2"</pre></details></li>
 <li><strong>substr(string,start,[length])</strong>: Extracts a portion of the string. Negative start counts from the end. Negative length omits that many characters from the end.
-  <details class="example"><summary>Example</summary><pre>substr("hello world", 6)      // "world"
-substr("hello world", 0, 5)   // "hello"
-substr("hello world", -5)     // "world"
-substr("hello world", 0, -6)  // "hello"</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>substr("hello abc", 6)      // "abc"
+substr("hello abc", 0, 5)   // "hello"
+substr("hello abc", -3)     // "abc"
+substr("hello abc", 6, -1)  // "ab"</pre></details></li>
 <li><strong>strtoupper(string)</strong>: Converts all characters to uppercase.
   <details class="example"><summary>Example</summary><pre>strtoupper("hello")  // "HELLO"</pre></details></li>
 <li><strong>ucfirst(string)</strong>: Capitalizes the first character of the string.
@@ -2879,13 +2879,15 @@ substr_count("aababc", "ab")      // 2</pre></details></li>
 // Array replacement:
 str_replace(array("cat","dog"), array("feline","canine"), "I have a cat and a dog")
 // "I have a feline and a canine"</pre></details></li>
-<li><strong>preg_match(pattern,subject,[matches])</strong>: Tests subject against a regular expression. Returns true/false, and stores the full match and capture groups in matches.
+<li><strong>preg_match(pattern,subject,[matches])</strong>: Tests subject against a <a href="https://www.php.net/manual/en/regexp.introduction.php">regular expression</a>. 
+	Returns true/false, and stores the full match and capture groups in matches.
   <details class="example"><summary>Example</summary><pre>$found = preg_match("/\d+/", "abc123", $m);
 // $found = true, $m[0] = "123"
 
 $found = preg_match("/^[a-z]+$/", "hello", $m);
 // $found = true (all lowercase letters)</pre></details></li>
-<li><strong>preg_match_all(pattern,subject,[matches, flags, offset])</strong>: Finds all matches of a regular expression in subject. Returns the count of matches. See <a href="https://www.php.net/manual/en/function.preg-match-all.php">PHP help</a> for optional flags.
+<li><strong>preg_match_all(pattern,subject,[matches, flags, offset])</strong>: Finds all matches of a 
+	<a href="https://www.php.net/manual/en/regexp.introduction.php">regular expression</a> in subject. Returns the count of matches. See <a href="https://www.php.net/manual/en/function.preg-match-all.php">PHP help</a> for optional flags.
   <details class="example"><summary>Example</summary><pre>$count = preg_match_all("/\d+/", "abc 12 def 34", $m);
 // $count = 2, $m[0] = array("12","34")</pre></details></li>
 <li><strong>preg_replace(pattern,replacement,subject,[limit])</strong>: Replaces all regex matches in subject with replacement.
@@ -2901,11 +2903,11 @@ These macros are for working with arrays:
 <ul>
 <li><strong>listtoarray(list, [tonum])</strong>: Converts a comma-separated list string to an array. Set tonum to true to ensure numeric values are treated as numbers.
   <details class="example"><summary>Example</summary><pre>listtoarray("1,2,3,4")         // array("1","2","3","4")
-listtoarray("1,2,3,4", true)   // array(1,2,3,4)  (as numbers)
-listtoarray("red,green,blue")  // array("red","green","blue")</pre></details></li>
+listtoarray("red,green,blue")  // array("red","green","blue")
+listtoarray("1,2,3,4", true)   // array(1,2,3,4)  (as numbers)</pre></details></li>
 <li><strong>calclisttoarray(list)</strong>: Converts a list of calculation expressions to an array, evaluating each one.
   <details class="example"><summary>Example</summary><pre>calclisttoarray("2^2,3^2,4^2")  // array(4,9,16)
-calclisttoarray("pi,pi/2")      // array(3.14159..., 1.5708...)</pre></details></li>
+calclisttoarray("pi,3/2")      // array(3.14159..., 1.5)</pre></details></li>
 <li><strong>explode(symbol, string)</strong>: Splits a string into an array using the given delimiter.
   <details class="example"><summary>Example</summary><pre>explode(",", "a,b,c")   // array("a","b","c")
 explode(":", "x:y:z")   // array("x","y","z")</pre></details></li>
@@ -2915,49 +2917,81 @@ arraytolist(array(1,2,3), true)  // "1, 2, 3"</pre></details></li>
 <li><strong>joinarray(array,[symbol,ksort])</strong>: Joins array elements into a string using the given symbol (default: comma). Set ksort to true to sort by key first, useful if elements were defined out of order.
   <details class="example"><summary>Example</summary><pre>joinarray(array("a","b","c"))          // "a,b,c"
 joinarray(array("a","b","c"), " + ")   // "a + b + c"
-joinarray(array("x","y"), " and ")     // "x and y"</pre></details></li>
+joinarray(array("x","y"), " and ")     // "x and y"
+
+$a[2]="c";$a[0]="a";$a[1]="b";
+$g = joinarray($a)    // "c,a,b" in order defined
+$g = joinarray($a,",",true)  // "a,b,c" ordered by key/index
+</pre></details></li>
 <li><strong>stringtoarray(string, [tonum])</strong>: Converts a string to an array of individual characters. Set tonum to true if all characters are digits.
   <details class="example"><summary>Example</summary><pre>stringtoarray("abc")         // array("a","b","c")
 stringtoarray("123", true)   // array(1,2,3)</pre></details></li>
 <li><strong>fillarray(value,num,[start])</strong>: Creates an array filled with the same value. Indexing starts at 0 unless start is specified. num can also be an array of indices to set.
   <details class="example"><summary>Example</summary><pre>fillarray(0, 5)              // array(0,0,0,0,0)
-fillarray("x", 3, 1)        // array(1=>"x", 2=>"x", 3=>"x")
-fillarray(1, array(0,2,4))  // array(0=>1, 2=>1, 4=>1)</pre></details></li>
+fillarray("x", 3, 2)        // array(2=>"x", 3=>"x", 4=>"x")
+fillarray(1, array(0,2,4))  // array(0=>1, 2=>1, 4=>1)
+
+// for a multipart question with 5 number parts:
+$anstypes = fillarray("number",5)
+</pre></details></li>
 <li><strong>consecutive(min,max,[step])</strong>: Creates an array of evenly spaced numbers from min to max.
   <details class="example"><summary>Example</summary><pre>consecutive(1, 5)        // array(1,2,3,4,5)
 consecutive(0, 1, .25)  // array(0, 0.25, 0.5, 0.75, 1)
 consecutive(2, 10, 2)   // array(2,4,6,8,10)</pre></details></li>
 <li><strong>arraysetvalues(array,keyarray,value/valuearray)</strong>: Sets values in an existing array at the specified keys. Returns the modified array.
-  <details class="example"><summary>Example</summary><pre>$arr = fillarray(0, 5);  // array(0,0,0,0,0)
-// Set a single value at multiple keys:
+  <details class="example"><summary>Example</summary><pre>// Set a single value at multiple keys:
+$arr = fillarray(0, 5);  // array(0,0,0,0,0)
 $arr = arraysetvalues($arr, array(1,3), 99);    // array(0,99,0,99,0)
+
 // Set different values at each key:
-$arr = arraysetvalues($arr, array(0,2), array(10,20)); // index 0→10, index 2→20</pre></details></li>
-<li><strong>sortarray(list/array,[type, maxkey])</strong>: Sorts an array from lowest to highest. Use "rev" for descending, "key" to sort by key, or "keyfill" to sort by key and fill missing keys with empty string.
+$arr = fillarray(0, 5);  // array(0,0,0,0,0)
+$arr = arraysetvalues($arr, array(0,2), array(10,20)); // array(10,0,20,0,0)
+
+// If you had 10 large inputs and two small ones at parts 3 and 7:
+$answerboxsize = fillarray(20, 10)  // 10 inputs, size 20
+$answerboxsize = arraysetvalues($answerboxsize, [3,7], 5)  // set index 3 and 7 to size 5.
+</pre></details></li>
+<li><strong>sortarray(list/array,[type, maxkey])</strong>: Sorts an array from lowest to highest. 
+	Use second argument "rev" for descending by value, "key" to sort by key, or "keyfill" to sort by 
+	key and fill missing keys with empty string.  When using "keyfill" you can optionally provide a 
+	maxkey to fill past the existing range.
   <details class="example"><summary>Example</summary><pre>sortarray(array(3,1,4,1,5))          // array(1,1,3,4,5)
-sortarray(array(3,1,4,1,5), "rev")  // array(5,4,3,1,1)</pre></details></li>
+sortarray(array(3,1,4,1,5), "rev")  // array(5,4,3,1,1)
+
+$a = ['c'=>1, 'a'=>4, 'b'=>5]
+sortarray($a, 'key')  // array("a" => 4, "b" => 5, "c" => 1)
+
+$b[0]=3; $b[5]=2; $b[2]=5; 
+sortarray($b, 'keyfill', 7) // array(3,"",5,"","",2,"","")
+</pre></details></li>
 <li><strong>jointsort(array,array,[array,...])</strong>: Reorders two or more arrays together based on a lowest-to-highest sort of the first array's values.
-  <details class="example"><summary>Example</summary><pre>$xs = array(3,1,2);
-$ys = array(9,1,4);
-$xs,$ys = jointsort($xs,$ys);  // $xs=array(1,2,3), $ys=array(1,4,9)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$xs = array(3,1,2)
+$ys = array(9,1,4)
+$xs,$ys = jointsort($xs,$ys)  // $xs=array(1,2,3), $ys=array(1,4,9)
+</pre></details></li>
 <li><strong>calconarray(array,calculation)</strong>: Applies a calculation to each element of an array. Use "x" to represent each element.
-  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4);
-$b = calconarray($a, "x^2");    // array(1,4,9,16)
-$c = calconarray($a, "2*x+1"); // array(3,5,7,9)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a = consecutive(1,4)
+$b = calconarray($a, "x^2")    // array(1,4,9,16)
+$c = calconarray($a, "2*x+1")  // array(3,5,7,9)</pre></details></li>
 <li><strong>multicalconarray(calculation,varslist,var1array,var2array,...)</strong>: Like calconarray but supports multiple variables, one per array.
-  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3);
-$ys = array(4,5,6);
-$zs = multicalconarray("x*y", "x,y", $xs, $ys);  // array(4,10,18)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$xs = array(1,2,3)
+$ys = array(4,5,6)
+$zs = multicalconarray("x*y", "x,y", $xs, $ys)  // array(4,10,18)</pre></details></li>
 <li><strong>calconarrayif(array,calculation,ifcondition)</strong>: Like calconarray but only applies the calculation to elements that satisfy the condition; others are left unchanged.
-  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4,5);
-$b = calconarrayif($a, "x^2", "x>3");  // array(1,2,3,16,25)
-// Only squares elements greater than 3</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4,5)
+$b = calconarrayif($a, "x^2", "x>3")  // array(1,2,3,16,25)
+// Only squares elements greater than 3
+
+$b = calconarrayif($a,"x+.1","floor(x)==x")
+// will add .1 to add whole numbers in the array, and leave the other elements unchanged.
+</pre></details></li>
 <li><strong>keepif(array,condition)</strong>: Filters an array, returning only elements that satisfy the condition. Use "x" for each element.
   <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4,5,6);
 keepif($a, "x%2==0")  // array(2,4,6)  — keep only even numbers
 keepif($a, "x>3")     // array(4,5,6)</pre></details></li>
 <li><strong>subarray(array,params)</strong>: Creates a new array as a subset of the original.
   <details class="example"><summary>Parameters</summary>
+	The params can take several forms:
   <ul>
   <li><code>subarray($a,2,4,6)</code>: picks $a[2], $a[4], $a[6]</li>
   <li><code>subarray($a,"1:3","6:8")</code>: picks $a[1] through $a[3] and $a[6] through $a[8]</li>
@@ -2969,22 +3003,22 @@ subarray($a, 1, 3)       // array(20,40)
 subarray($a, "1:3")      // array(20,30,40)
 subarray($a, array(0,2,4)) // array(10,30,50)</pre></details></li>
 <li><strong>splicearray(array,offset,length,[replacement])</strong>: Removes elements at offset for length positions, optionally replacing them with new values.
-  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3,4,5);
-splicearray($a, 1, 2)                      // array(1,4,5)  (removed 2 at index 1)
-splicearray($a, 1, 2, array(20,30))        // array(1,20,30,4,5)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>$a = array(5,6,7,8,9);
+splicearray($a, 1, 2)                      // array(5,8,9)  (removed 2 elements at index 1)
+splicearray($a, 1, 2, array(20,30))        // array(5,20,30,8,9)</pre></details></li>
 <li><strong>mergearrays(array,array,[array,...])</strong>: Concatenates two or more arrays into one.
-  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3);
-$b = array(4,5,6);
+  <details class="example"><summary>Example</summary><pre>$a = array(1,2,3)
+$b = array(4,5,6)
 mergearrays($a, $b)  // array(1,2,3,4,5,6)</pre></details></li>
 <li><strong>unionarrays(array,array)</strong>: Combines two arrays, removing duplicate values.
-  <details class="example"><summary>Example</summary><pre>unionarrays(array(1,2,3), array(2,3,4))  // array(1,2,3,4)</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>unionarrays([1,2,3], [2,3,4])  // array(1,2,3,4)</pre></details></li>
 <li><strong>intersectarrays(array,array)</strong>: Returns elements that appear in both arrays.
   <details class="example"><summary>Example</summary><pre>intersectarrays(array(1,2,3,4), array(2,4,6))  // array(2,4)</pre></details></li>
 <li><strong>diffarrays(array1,array2)</strong>: Returns elements from array1 that do not appear in array2.
   <details class="example"><summary>Example</summary><pre>diffarrays(array(1,2,3,4), array(2,4))  // array(1,3)</pre></details></li>
 <li><strong>array_unique(array)</strong>: Removes duplicate values from an array. Note: does not re-index — follow with array_values if you need consecutive keys.
-  <details class="example"><summary>Example</summary><pre>array_unique(array(1,2,2,3,3,3))  // array(1,2,3)  (non-consecutive keys)
-array_values(array_unique(array(1,2,2,3,3,3)))  // re-indexed: 0,1,2</pre></details></li>
+  <details class="example"><summary>Example</summary><pre>array_unique([1,2,2,3,3,3])  // array(1,2,3)  (possibly non-consecutive keys)
+array_values(array_unique(array(1,2,2,3,3,3)))  // re-indexed: [0,1,2]</pre></details></li>
 <li><strong>array_values(array)</strong>: Returns array values re-indexed with consecutive numeric keys starting at 0.
   <details class="example"><summary>Example</summary><pre>array_values(array(2=>"a", 5=>"b", 8=>"c"))  // array(0=>"a", 1=>"b", 2=>"c")</pre></details></li>
 <li><strong>array_keys(array)</strong>: Returns the keys of an array as a new array.
@@ -3006,7 +3040,7 @@ in_array("red", array("blue","green"))  // false</pre></details></li>
 <li><strong>array_flip(array)</strong>: Swaps keys and values in a one-to-one array.
   <details class="example"><summary>Example</summary><pre>array_flip(array("a"=>1, "b"=>2, "c"=>3))  // array(1=>"a", 2=>"b", 3=>"c")</pre></details></li>
 <li><strong>print_r(array, [return])</strong>: Outputs an array in readable form for debugging. Pass true as second argument to return the output as a string instead of printing it.
-  <details class="example"><summary>Example</summary><pre>print_r($a);              // prints array structure in question output
+  <details class="example"><summary>Example</summary><pre>print_r($a)              // prints array structure in question warning output
 $s = print_r($a, true);  // store as string, then include $s in question text</pre></details></li>
 </ul>
 </div> <!-- h2 -->
@@ -3038,49 +3072,75 @@ $popup = formpopup("Help", "https://example.com/help", 400, 300, "button");</pre
 <li><strong>forminlinebutton(label,content,[style,outputstyle])</strong>: Creates a link or button that reveals hidden content inline. Style can be "link" or "button". Outputstyle can be "inline" (stays on same line) or "block" (new line, allows any HTML).
   <details class="example"><summary>Example</summary><pre>$hint = forminlinebutton("Show hint", "Try factoring the numerator.", "button");
 $note = forminlinebutton("Note", "Remember to simplify.", "link", "inline");</pre></details></li>
-<li><strong>makenumberrequiretimes(array/list)</strong>: Generates a $requiretimes string ensuring every number in the array must appear in the student answer. Automatically handles cases where one number is a substring of another (e.g. 2 inside 32).
-  <details class="example"><summary>Example</summary><pre>$requiretimes = makenumberrequiretimes(array(2, 3, 12));
+<li><strong>makenumberrequiretimes(array/list)</strong>: Generates a $requiretimes string ensuring every number in the array must appear in the student answer.
+  <details class="example"><summary>Example</summary><pre>$requiretimes = makenumberrequiretimes(array(2, 3, 3, 12)) // "#2,=1,#3,=2,#12,=1"
 // $requiretimes ensures 2, 3, and 12 all appear in the student's answer</pre></details></li>
 <li><strong>ABarray(start, num)</strong>: Produces an array of [AB#] placeholders that get replaced with answer boxes in question text. Often used with showarrays to embed answer boxes in a table.
-  <details class="example"><summary>Example</summary><pre>$boxes = ABarray(1, 3);  // array("[AB1]","[AB2]","[AB3]")
+  <details class="example"><summary>Example</summary><pre>$boxes = ABarray(5, 3);  // array("[AB5]","[AB6]","[AB7]")
 
 // Embed answer boxes in a table:
+$anstypes = fillarray("number", 3)
 $xs = array(1,2,3);
-$table = showarrays("x", $xs, "y", ABarray(1,3));</pre></details></li>
-<li><strong>getntupleparts(string, [expected number of components, checknumeric])</strong>: Extracts the components from an N-tuple student answer string, returning them as an array. Returns false if the input is not a valid n-tuple. Does not work on lists of n-tuples.
+$table = showarrays("x", $xs, "y", ABarray(0,3));</pre></details></li>
+<li><strong>getntupleparts(string, [expected number of components, checknumeric])</strong>: Extracts the components 
+from an N-tuple student answer string, returning them as an array. Returns false if the input is not a valid n-tuple. 
+Does not work on lists of n-tuples.
+It is recommended to provide a second argument of the number of components expected, 
+and if the values are expected to be numeric, put true as the third argument.
   <details class="example"><summary>Example</summary><pre>if (stuansready($stuanswers, $thisq, null)) {
-  $parts = getntupleparts($stuanswers[$thisq], 2, true);
+  $parts = getntupleparts($stuanswers[$thisq], 2, true)
   // For student answer "(3,4)": $parts = array(3,4)
   // Returns false if input is not a valid ntuple
   if ($parts !== false) {
-    $x = $parts[0];
-    $y = $parts[1];
+    $x = $parts[0]
+    $y = $parts[1]
   }
-}</pre></details></li>
-<li><strong>scoremultiorder(stua, answer, swap, type, [weights, options])</strong>: In a multipart question, allows specified parts to be answered in any order. Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 'ntuple', and 'calcntuple'. <em>Note:</em> The "list" option on individual question types is strongly preferred for most multi-answer situations.
+}
+
+// for calculated n-tuple question, use $stuanswervals to get decimal values
+// if student entered "(3/4, 5)" 
+getntupleparts($stuanswers[$thisq],2)          // array("3/4", "5")
+getntupleparts($stuanswersval[$thisq],2,true)  // array(0.75, 5)
+</pre></details></li>
+<li><strong>scoremultiorder(stua, answer, swap, type, [weights, options])</strong>: In a multipart question, 
+allows specified parts to be answered in any order. 
+Works for types 'number', 'string', 'calculated', 'numfunc', 'complex', 'calccomplex', 'ntuple', and 'calcntuple'. 
+<em>Note:</em> The "list" option on individual question types is strongly preferred for most multi-answer situations.
   <details class="example"><summary>Parameters</summary>
   <ul>
-    <li><strong>stua</strong>: For numeric types, use <code>$stuanswers[$thisq]</code>. For calculated types, use <code>$stuanswersval[$thisq]</code>.</li>
+    <li><strong>stua</strong>: For numeric types, use <code>$stuanswers[$thisq]</code>. 
+		For calculated types, use <code>$stuanswersval[$thisq]</code>.</li>
     <li><strong>answer</strong>: Always <code>$answer</code>. Must be called after $answer is defined.</li>
     <li><strong>swap</strong>: Which answer indices are interchangeable. Examples:
         <ul>
             <li><code>'0;1'</code> — parts 0 and 1 are swappable</li>
             <li><code>'0;1;2'</code> — parts 0, 1, and 2 are all swappable</li>
             <li><code>['0;1','2;3']</code> — 0↔1 and 2↔3 independently</li>
-            <li><code>'0,1,2;3,4,5'</code> — the group [0,1,2] is swappable with the group [3,4,5]</li>
+            <li><code>'0,1,2;3,4,5'</code> — the group [0,1,2] is swappable with the group [3,4,5]. 
+			Comparison is only made on the first entry to decide whether to swap the groups.</li>
         </ul>
     </li>
-    <li><strong>type</strong>: The part type short name, like 'number' or 'calccomplex'.</li>
-    <li><strong>weights</strong>: Optionally pass $answeights to have weights swapped along with answers.</li>
-    <li><strong>options</strong>: Array of extra options (set weights to null to skip). Use <code>['variables'=&gt;$variables]</code> when type is 'numfunc'.</li>
+    <li><strong>type</strong>: The part type short name, like 'number' or 'calccomplex'. When swapping groups, 
+	use the part type for the first entry in the group.</li>
+    <li><strong>weights</strong>: Optionally pass $answeights to have weights swapped along with answers (set weights to null to skip).</li>
+    <li><strong>options</strong>: Array of extra options. Use <code>['variables'=&gt;$variables]</code> when type is 'numfunc'.</li>
   </ul>
   </details>
   <details class="example"><summary>Example</summary><pre>// Allow parts 0 and 1 to be answered in either order:
 $answer = scoremultiorder($stuanswers[$thisq], $answer, '0;1', 'number');
 
 // With weights also swapped:
-$answer,$answeights = scoremultiorder($stuanswers[$thisq], $answer, '0;1', 'number', $answeights);</pre></details></li>
-<li><strong>scoreperiodic(answer, stuanswer, variable, [tolerance])</strong>: Helps score "all solutions" periodic answers (e.g. "pi/6+2pik") by accepting equivalent forms with a shifted base value. Returns a value to replace $answer — always define $showanswer separately first so a clean answer shows in the key.
+$answer,$answeights = scoremultiorder($stuanswers[$thisq], $answer, '0;1', 'number', $answeights)
+
+// numfunc with variables:
+$answer = scoremultiorder($stuanswers[$thisq],$answer,'0;1','numfunc',null,['variables'=>$variables])
+
+// based on choice in calculated part at index 0 and 3, swap groups 
+$answer = scoremultiorder($stuanswersval[$thisq], $answer, '0,1,2;3,4,5', 'calculated');
+</pre></details></li>
+<li><strong>scoreperiodic(answer, stuanswer, variable, [tolerance])</strong>: Helps score "all solutions" periodic 
+	answers (e.g. "pi/6+2pik") by accepting equivalent forms with a shifted base value (like "-11pi/6+2pik"). 
+	Returns a value to replace $answer. Always define $showanswer separately first so a clean answer shows in the key.
   <details class="example"><summary>Example</summary><pre>// Single-part algebraic expression question:
 $answerformat = "list";
 $variables = "k";
@@ -3094,16 +3154,26 @@ $answer[3] = "pi/12 + pi/3*n";
 $variables[3] = "n";
 $showanswer[3] = "`$answer[3]`";
 $answer[3] = scoreperiodic($answer[3], getstuans($stuanswers,$thisq,3), "n");</pre></details></li>
-<li><strong>setupmathquillfillin(asciimath format, alt format)</strong>: Creates fill-in answer boxes embedded inside a rendered math expression. Use in multipart questions: write the expression in ASCIIMath with [AB#] at each fill-in point, and provide a plain-text fallback for accessibility.
+<li><strong>setupmathquillfillin(asciimath format, alt format)</strong>: Creates fill-in answer boxes embedded inside a 
+	rendered math expression. Use in multipart questions: write the expression in ASCIIMath with [AB#] at each fill-in 
+	point, and provide a plain-text fallback for accessibility.
   <details class="example"><summary>Parameters</summary>
-  <p>Place the returned string in question text instead of $answerboxes. To show a single combined answer key, define <code>$showanswer[lastpart]</code> and place <code>[SAB0-N]</code> after the entry in the question text. Use <code>$answerboxsize[part]</code> to adjust box size. Set <code>$showanswerstyle = "inline"</code> to keep the key on the same line.</p>
+  <p>Place the returned string in question text instead of $answerboxes. 
+	To show a single combined answer key, define <code>$showanswer[lastpart]</code> and place <code>[SAB0-N]</code> 
+	after the entry in the question text. Use <code>$answerboxsize[part]</code> to adjust box size. 
+	Set <code>$showanswerstyle = "inline"</code> to keep the key on the same line.
+	The alt format string should be a plain text string using the same [AB#] inputs, which will be used for 
+	students who have disabled the equation editor for accessibility
+	</p>
   </details>
   <details class="example"><summary>Example</summary><pre>// Integral with three fill-in areas (lower limit, upper limit, integrand):
+$anstypes = "number,number,numfunc"
 $entry = setupmathquillfillin(
   "int_([AB0])^([AB1]) [AB2] dx",
   "The integral from [AB0] to [AB1] of [AB2] dx"
 );
-// Place $entry in question text where the expression goes</pre></details></li>
+$showanswer[2] = "`int_$a^$b $func dx`"
+// Place $entry in question text where the expression goes, [SAB0-2] after it</pre></details></li>
 </ul>
 </div> <!-- h2 -->
 <div class=h2>
