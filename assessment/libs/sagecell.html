@@ -3,10 +3,12 @@
     <title>sagecell help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library sagecell</h1>
 <p>Sagecell integration documentation, Version 1.0, Jan 2018</p>
 
-<p>There is not need to actually load this macro library. This documentation
+<p>There is no need to actually load this macro library. This documentation
 describes how to set up your HTML to enable SageCell integration.</p>
 
 <p>For a basic SageCell that students can use for calculations, but for which
@@ -14,79 +16,64 @@ their work is NOT retained when they submit the question, you can put in your HT
 a <code>pre</code> tag with class <code>converttosagecell</code>, and put your
 starting/default Sage code inside of it. Like this:</p>
 
-<pre>
-&lt;pre class="converttosagecell"&gt;
+<details class="example"><summary>Examples</summary><pre>&lt;pre class="converttosagecell"&gt
   x = var('x')
   integral(sin(x), x)
-&lt;/pre&gt;
-</pre>
+&lt;/pre&gt</pre></details>
 
-<p>You can limit the sagecell to a single language by adding <code>data-lang="language"</code> to the <code>pre</code> tag.  Like this:</p>
+<p>You can limit the sagecell to a single language by adding <code>data-lang="language"</code> to the <code>pre</code> tag. Like this:</p>
 
-<pre>
-&lt;pre class="converttosagecell" data-lang="python"&gt;
+<details class="example"><summary>Examples</summary><pre>&lt;pre class="converttosagecell" data-lang="python"&gt
   print("Hello, World!")
-&lt;/pre&gt;
-</pre>
+&lt;/pre&gt</pre></details>
 
 <p>If you want to store the student's code so they can modify it and you can
 view it, then you'll need to add an <code>essay</code> part to your question.
-See the example below for an example of how you could set it up, 
-including providing default Sage code</p>
+See the example below for how you could set it up,
+including providing default Sage code.</p>
 
-<p>Question Type: Multipart.  Question Code:</p>
-<pre>
-$anstypes = "essay,numfunc"
+<p>Question Type: Multipart. Question Code:</p>
+<details class="example"><summary>Examples</summary><pre>$anstypes = "essay,numfunc"
 $answeights = "0,1"
 $scoremethod = "singlescore"
 $a = rand(2,8)
 
-$answer[1]= "-$a cos(x)"
-</pre>
+$answer[1]= "-$a cos(x)"</pre></details>
 
 <p>Question text:</p>
-<pre>
-&lt;p&gt;Modify the Sagecell below to find the integral of `$a sin(x)`&lt;/p&gt;
-&lt;div class="converttosagecell"&gt;
+<details class="example"><summary>Examples</summary><pre>&lt;p&gt;Modify the Sagecell below to find the integral of `$a sin(x)`&lt;/p&gt
+&lt;div class="converttosagecell"&gt
   $answerbox[0]
-  &lt;pre class="hidden"&gt;
+  &lt;pre class="hidden"&gt
     x = var('x')
     integral(sin(x), x)
-  &lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Answer: $answerbox[1]&lt;/p&gt;
-</pre>
-
+  &lt;/pre&gt
+&lt;/div&gt
+&lt;p&gt;Answer: $answerbox[1]&lt;/p&gt</pre></details>
 
 <p>If you want to store the student's code so they can modify it and you can
   view it, and you want to store the output of the Sagecell after it's evaluated,
-  then you'll need to add an <code>essay</code> part to your question and a 
-  <code>string</code> part. 
-  See the example below for an example of how you could set it up, 
-  including providing default Sage code</p>
-  
-  <p>Question Type: Multipart.  Question Code:</p>
-  <pre>
-  $anstypes = "essay,string"
-  $answeights = "0,1"
-  $scoremethod = "singlescore"
-  $a = rand(2,8)
-  
-  $answer[1]= "-$a cos(x)"
-  </pre>
-  
+  then you'll need to add an <code>essay</code> part to your question and a
+  <code>string</code> part.
+  See the example below for how you could set it up,
+  including providing default Sage code.</p>
+
+  <p>Question Type: Multipart. Question Code:</p>
+  <details class="example"><summary>Examples</summary><pre>$anstypes = "essay,string"
+$answeights = "0,1"
+$scoremethod = "singlescore"
+$a = rand(2,8)
+
+$answer[1]= "-$a cos(x)"</pre></details>
+
   <p>Question text:</p>
-  <pre>
-  &lt;p&gt;Modify the Sagecell below to find the integral of `$a sin(x)`&lt;/p&gt;
-  &lt;div class="converttosagecell"&gt;
-    $answerbox[0]
-    $answerbox[1]
-    &lt;pre class="hidden"&gt;
-      x = var('x')
-      integral(sin(x), x)
-    &lt;/pre&gt;
-  &lt;/div&gt;
-  </pre>
-</body>
+  <details class="example"><summary>Examples</summary><pre>&lt;p&gt;Modify the Sagecell below to find the integral of `$a sin(x)`&lt;/p&gt
+&lt;div class="converttosagecell"&gt
+  $answerbox[0]
+  $answerbox[1]
+  &lt;pre class="hidden"&gt
+    x = var('x')
+    integral(sin(x), x)
+  &lt;/pre&gt
+&lt;/div&gt</pre></details></body>
 </html>
-   

@@ -3,15 +3,23 @@
     <title>lineutil help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library lineutil</h1>
-various line utility functions
-<BR><ul>
+<p>Various line utility functions</p>
+<ul>
 <li><a href="#lineboundarycoord">lineboundarycoord</a></li>
 </ul>
-<h3><a name="lineboundarycoord">lineboundarycoord</a></h3>
-function lineboundarycoord(xmin,xmax,ymin,ymax,m,b,[order])
-<BR>looks for where the line crosses the graph boundary.  
-<BR>supply graph boundaries, and m and b of the line.
-<BR>order can be an array of "right", "top", "left", "bottom" indicating order of search
-<BR>returns array(x,y,loc), where loc is a best guess for where it would be good to put the label
-<BR>
+
+<h3 id="lineboundarycoord"><a name="lineboundarycoord">lineboundarycoord</a></h3>
+<p><strong>lineboundarycoord(xmin, xmax, ymin, ymax, m, b, [order])</strong></p>
+<p>Looks for where the line crosses the graph boundary. Supply the graph boundaries, and <code>m</code> and <code>b</code> of the line.</p>
+<ul>
+<li><strong>xmin, xmax, ymin, ymax</strong>: the graph boundaries.</li>
+<li><strong>m, b</strong>: the slope and y-intercept of the line.</li>
+<li><strong>order</strong>: Optional - an array of "right", "top", "left", "bottom" indicating the order of search.</li>
+</ul>
+<p>Returns <code>array(x, y, loc)</code>, where <code>loc</code> is a best guess for where it would be good to put the label.</p>
+<details class="example"><summary>Examples</summary><pre>list($x, $y, $loc) = lineboundarycoord(-10, 10, -10, 10, 2, 1)
+list($x, $y, $loc) = lineboundarycoord(-10, 10, -10, 10, 2, 1, array("right","top","left","bottom"))</pre></details>
+</body></html>

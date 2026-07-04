@@ -5,14 +5,14 @@
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head>
 <body style="margin:30px;padding:0;font-size: 14px;font-family:Calibri, sans-serif">
-    <a name="top"></a>
+    <a name="top" id="top"></a>
+    <p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
     <h1>Basic "Shapes" Library complex</h1>
 
 <p>Library name: shapes</p>
-<p>Functions to create and label basic shapes by using preexisting ASCIIsvg macro.&nbsp; Version January 2022</p>
-<br />
+<p>Functions to create and label basic shapes by using preexisting ASCIIsvg macro. Version January 2022</p>
 <p>By default, an image description is generated for each shape.</p>
-<span>To import the library, include <em>loadlibrary("shapes")</em> in the question's common control.</span>
+<p>To import the library, include <em>loadlibrary("shapes")</em> in the question's common control.</p>
 
 <p>The functions in this library can be used to draw and label basic shapes:</p>
 
@@ -33,19 +33,13 @@
     <li><a href='#pyramid'>draw_pyramid</a></li>
     <li><a href='#polyomino'>draw_polyomino</a></li>
     </ul>
-<p>&nbsp;</p>
 <p>&nbsp;<strong>Function output:</strong></p>
-<p style="text-align: justify;">These functions output images that are defined in code by $gr = function("arguments") and then placed into a problem's text with $gr.
-  <br />
-  </p>
-<p>&nbsp;</p>
+<p style="text-align: justify;">These functions output images that are defined in code by $gr = function("arguments") and then placed into a problem's text with $gr.</p>
 <p>&nbsp;<strong>Functions:</strong></p>
 
-<p><a name="angle"></a></p>
-<h2><strong>draw_angle</strong></h2>
-<p>Draws and labels an angle.</p>
-<p>Syntax: draw_angle("measurement,[label],[noarc]",["rotate,[ang]"],["axes"])</p>
-<p>The first option must include the angle measurement.
+<h3 id="angle"><a name="angle">draw_angle</a></h3>
+<p><strong>draw_angle("measurement,[label],[noarc]", ["rotate,[ang]"], ["axes"])</strong></p>
+<p>Draws and labels an angle. The first option must include the angle measurement.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"measurement,[label],[noarc]"</strong> -- The label will include the degree symbol by default. To not use degree symbol, use "rad", e.g. "57,1rad". Leave label blank to not include a label. Angle arc will be drawn to show direction of angle. To not show the arc, put <em>noarc</em> as the last entry.</li>
@@ -56,18 +50,20 @@
   <li>Note: Angles must be strictly between -2000 and 2000 degrees.</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_angle("340,theta","axes")</strong> -- Draws a 340 degree angle, labeled &theta;, in standard position on coordinate axes, and an angle arc with arrow is shown.
-<p><strong>$gr = draw_angle("120,2pi/3,noarc")</strong> -- This draws a 120 degree angle in standard position, labeled 2&pi;/3. Angle arc is not drawn.</p>
-<p><strong>$gr = draw_angle("-150,-150","axes","rotate")</strong> -- This draws a 150 degree angle clockwise, labeled -150&deg;. Coordinate axes are drawn, and starting ray of the angle is rotated by a random angle. Angle arc is shown with arrow.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_angle("340,theta","axes")
+// Draws a 340 degree angle, labeled theta, in standard position on coordinate
+// axes, and an angle arc with arrow is shown.
 
+$gr = draw_angle("120,2pi/3,noarc")
+// This draws a 120 degree angle in standard position, labeled 2pi/3. Angle arc is not drawn.
 
-<p><a name="circle"></a></p>
-<h2><strong>draw_circle</strong></h2>
-<p>Draws and labels a circle.</p>
-<p>Syntax: draw_circle(["option 1", "option 2", ...])</p>
-<p>draw_circle() -- this draws a circle with no labels.</p>
+$gr = draw_angle("-150,-150","axes","rotate")
+// This draws a 150 degree angle clockwise, labeled -150deg. Coordinate axes are drawn,
+// and starting ray of the angle is rotated by a random angle. Angle arc is shown with arrow.</pre></details>
+
+<h3 id="circle"><a name="circle">draw_circle</a></h3>
+<p><strong>draw_circle(["option 1", "option 2", ...])</strong></p>
+<p>Draws and labels a circle. <code>draw_circle()</code> draws a circle with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"center,[label]"</strong> -- Draws the center point with an optional label.</li>
@@ -83,20 +79,20 @@
   <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_circle("diameter,7 feet")</strong> -- This is a circle with a diameter labeled with "7 feet".</p>
-<p><strong>$gr = draw_circle("center,P", "angle,45,pi/4")</strong> -- This circle has a center labeled P and a 45 degree angle drawn with the label &pi;/4.</p>
-<p><strong>$gr = draw_circle("radius", "point,0,M", "point,90", "colorfill,transpink")</strong> -- This is a circle with a horizontal radius (unlabeled) drawn from the center to labeled point M. Also, point at 90 degrees is drawn but not labeled. Shape is shaded transpink.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_circle("diameter,7 feet")
+// A circle with a diameter labeled with "7 feet".
 
+$gr = draw_circle("center,P", "angle,45,pi/4")
+// This circle has a center labeled P and a 45 degree angle drawn with the label pi/4.
 
-<p><a name="circlesector"></a></p>
-<h2><strong>draw_circlesector</strong></h2>
-<p>Draws and labels a scaled sector of a circle.</p>
-<p>Syntax: draw_circlesector("angle,measurement,[label]", ["option 1", "option 2", ...])</p>
-<p>draw_circlesector("angle,measurement,[label]") -- this draws a circle sector with angle measurement (given in degrees), and optional label.</p>
-<p>Note: Up to two "angle" arguments may be used. Test to make sure labels do not overlap (for close angles).</p>
-<p>Using "angle,measurement" is required for draw_circlesector.
+$gr = draw_circle("radius", "point,0,M", "point,90", "colorfill,transpink")
+// A circle with a horizontal radius (unlabeled) drawn from the center to labeled
+// point M. Also, point at 90 degrees is drawn but not labeled. Shape is shaded transpink.</pre></details>
+
+<h3 id="circlesector"><a name="circlesector">draw_circlesector</a></h3>
+<p><strong>draw_circlesector("angle,measurement,[label]", ["option 1", "option 2", ...])</strong></p>
+<p>Draws and labels a scaled sector of a circle. <code>draw_circlesector("angle,measurement,[label]")</code> draws a circle sector with angle measurement (given in degrees), and optional label.</p>
+<p>Note: Up to two "angle" arguments may be used. Test to make sure labels do not overlap (for close angles). Using "angle,measurement" is required for draw_circlesector.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"center,[label]"</strong> Plots the center of the circle with optional label. If label is a point (x,y), type it as (x;y).</li>
@@ -109,60 +105,54 @@
   <li>Note: Angle must be given in degrees, and degree symbol will be displayed by default. To not display degree symbol, use "rad" in the label. E.g. "angle,57.3,1 rad".</li>
   <li>Note: Greek letters (including pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using Greek letters will suppress the degree symbol.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_circlesector("angle,45,pi/4")</strong> -- This is a 45 degree sector with angle labeled &pi;/4.</p>
-<p><strong>$gr = draw_circlesector("angle,45", "point,45,(3;3)", "axes", "colorfill,lightyellow")</strong> -- This is a 45 degree sector with point on circle at 45 degrees labeled (3,3). The x and y axes are shown. Shape is shaded lightyellow.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_circlesector("angle,45,pi/4")
+// A 45 degree sector with angle labeled pi/4.
 
+$gr = draw_circlesector("angle,45", "point,45,(3;3)", "axes", "colorfill,lightyellow")
+// A 45 degree sector with point on circle at 45 degrees labeled (3,3). The x and y
+// axes are shown. Shape is shaded lightyellow.</pre></details>
 
-<p><a name="cone"></a></p>
-<h2><strong>draw_cone</strong></h2>
-<p>Draws and labels a right, circular cone.</p>
-<p>Syntax: draw_cone([diameter,height],[option 1],[option 2],[option 3]</p>
-<p>draw_cone() -- draws a random cone with no labels. The point of the cone is at the top.</p>
-<p>draw_cone(a,b) -- makes a scaled drawing of a cone with diameter 'a' and height 'b'.
+<h3 id="cone"><a name="cone">draw_cone</a></h3>
+<p><strong>draw_cone([diameter,height], [option 1], [option 2], [option 3])</strong></p>
+<p>Draws and labels a right, circular cone. <code>draw_cone()</code> draws a random cone with no labels; the point of the cone is at the top. <code>draw_cone(a,b)</code> makes a scaled drawing of a cone with diameter 'a' and height 'b'.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"radius,[label]"</strong> Draws a radius on the circular base with optional label.</li>
   <li><strong>"diameter,[label]"</strong> Draws a diameter on the circular base with optional label.</li>
   <li><strong>"height,[label]"</strong> Draws the height of the cone with optional label.</li>
   <li><strong>"slant,[label]"</strong> Labels the slant height of the cone.</li>
-  <li><strong>"fill,[percent],[color]"</strong> Fills the cone up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omiited, fill is lightblue.</li>
+  <li><strong>"fill,[percent],[color]"</strong> Fills the cone up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omitted, fill is lightblue.</li>
   <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_cone(1,1,"radius,r=12")</strong> -- A cone with equal diameter and height, with radius drawn and labeled 'r=12'.</p>
-<p><strong>$gr = draw_cone("height,x","fill,30,lightcyan","invert")</strong> -- A random cone, inverted, with its height labeled 'x' and filled (with lightcyan color) up to 30 percent of its height.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_cone(1,1,"radius,r=12")
+// A cone with equal diameter and height, with radius drawn and labeled 'r=12'.
 
+$gr = draw_cone("height,x","fill,30,lightcyan","invert")
+// A random cone, inverted, with its height labeled 'x' and filled (with lightcyan
+// color) up to 30 percent of its height.</pre></details>
 
-<p><a name="cylinder"></a></p>
-<h2><strong>draw_cylinder</strong></h2>
-<p>Draws and labels a circular cylinder.</p>
-<p>Syntax: draw_cylinder([diameter,height],[option 1],[option 2],[option 3]</p>
-<p>draw_cylinder() -- draws a random cylinder with no labels.</p>
-<p>draw_cylinder(a,b) -- makes a scaled drawing of a cylinder with diameter 'a' and height 'b'.
+<h3 id="cylinder"><a name="cylinder">draw_cylinder</a></h3>
+<p><strong>draw_cylinder([diameter,height], [option 1], [option 2], [option 3])</strong></p>
+<p>Draws and labels a circular cylinder. <code>draw_cylinder()</code> draws a random cylinder with no labels. <code>draw_cylinder(a,b)</code> makes a scaled drawing of a cylinder with diameter 'a' and height 'b'.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"radius,[label]"</strong> Draws a radius on the top of the cylinder with optional label.</li>
   <li><strong>"diameter,[label]"</strong> Draws a diameter on the top of the cylinder with optional label.</li>
   <li><strong>"height,[label]"</strong> Labels the height of the cylinder.</li>
-  <li><strong>"fill,[percent],[color]"</strong> Fills a specified percent of the cylinder. If 'percent' omitted, fills a random percent. Third argument is the color name. If color name omiited, fill is lightblue.</li>
+  <li><strong>"fill,[percent],[color]"</strong> Fills a specified percent of the cylinder. If 'percent' omitted, fills a random percent. Third argument is the color name. If color name omitted, fill is lightblue.</li>
   <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_cylinder(1,1,"radius,r=12")</strong> -- A cylinder with equal diameter and height, with radius drawn and labeled 'r=12'.</p>
-<p><strong>$gr = draw_cylinder("height,x","fill,30,gold")</strong> -- A random cylinder with height labeled 'x' and filled 30 percent in gold color.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_cylinder(1,1,"radius,r=12")
+// A cylinder with equal diameter and height, with radius drawn and labeled 'r=12'.
 
+$gr = draw_cylinder("height,x","fill,30,gold")
+// A random cylinder with height labeled 'x' and filled 30 percent in gold color.</pre></details>
 
-<p><a name="rectangle"></a></p>
-<h2><strong>draw_rectangle</strong></h2>
-<p>Draws a scaled rectangle with labels.</p>
-<p>Syntax: draw_rectangle(["option 1", "option 2", ...])</p>
-<p>draw_rectangle() -- this draws a random rectangle with no labels</p>
+<h3 id="rectangle"><a name="rectangle">draw_rectangle</a></h3>
+<p><strong>draw_rectangle(["option 1", "option 2", ...])</strong></p>
+<p>Draws a scaled rectangle with labels. <code>draw_rectangle()</code> draws a random rectangle with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"base,b,[label]"</strong> Must be used with "height". Draws scaled rectangle with base "b" and height "h" with optional label on bottom horizontal side.</li>
@@ -172,57 +162,45 @@
   <li><strong>"colorfill,color"</strong> fills the interior of the shape with a color</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<p>Notes:</p>
-<ol>
-  <li>"base" and "height" must be used together as they define the size of the rectangle.</li>
-</ol>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_rectangle("base,1,x","height,2,y","points,(0;0),(5;0)", "colorfill,mediumpurple")</strong> -- A rectangle with 1:2 ratio of base-to-height, bottom horizontal side labeled "x", right-hand vertical side labeled "y", and bottom two vertices labeled (0,0) and (5,0). Shape is shaded mediumpurple.</p>
+<p>Note: "base" and "height" must be used together as they define the size of the rectangle.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_rectangle("base,1,x","height,2,y","points,(0;0),(5;0)", "colorfill,mediumpurple")
+// A rectangle with 1:2 ratio of base-to-height, bottom horizontal side labeled "x",
+// right-hand vertical side labeled "y", and bottom two vertices labeled (0,0) and (5,0).
+// Shape is shaded mediumpurple.</pre></details>
 
-
-<p><a name="rectprism"></a></p>
-<h2><strong>draw_rectprism</strong></h2>
-<p>Draws and labels a rectangular prism.</p>
-<p>Syntax: draw_rectprism([length,depth,height],[option 1],[option 2],[option 3]</p>
-<p>draw_rectprism() -- draws a random rectangular prism with no labels.</p>
-<p>draw_rectprism(length,depth,height) -- draws a scaled rectangular prism with no labels.</p>
+<h3 id="rectprism"><a name="rectprism">draw_rectprism</a></h3>
+<p><strong>draw_rectprism([length,depth,height], [option 1], [option 2], [option 3])</strong></p>
+<p>Draws and labels a rectangular prism. <code>draw_rectprism()</code> draws a random rectangular prism with no labels. <code>draw_rectprism(length,depth,height)</code> draws a scaled rectangular prism with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
-
 <ul>
   <li><strong>"labels,lengthlab,depthlab,heightlab"</strong> labels the length, depth and height of the prism. You can omit one or more labels, such as "labels,,,heightlab".</li>
-  <li><strong>"fill,[percent],[color]"</strong> fills the prism up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omiited, fill is lightblue.</li>
+  <li><strong>"fill,[percent],[color]"</strong> fills the prism up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omitted, fill is lightblue.</li>
   <li><strong>"size,length"</strong> sets the image size to be length x length. [Default is 300x300]</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_rectprism(4,5,6,"labels,a,,c","fill,30")</strong> -- A rectangular prism that is 4 units long, 5 units deep and 6 units tall, with front length edge labeled 'a' and height edge labeled 'c'. Prism is filled up to 40 percent of its height with lightblue color.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_rectprism(4,5,6,"labels,a,,c","fill,30")
+// A rectangular prism that is 4 units long, 5 units deep and 6 units tall, with front
+// length edge labeled 'a' and height edge labeled 'c'. Prism is filled up to 30 percent
+// of its height with lightblue color.</pre></details>
 
-
-<p><a name="sphere"></a></p>
-<h2><strong>draw_sphere</strong></h2>
-<p>Draws and labels a sphere.</p>
-<p>Syntax: draw_sphere([option 1],[option 2],[option 3]</p>
-<p>draw_sphere() -- draws a sphere with no labels.</p>
+<h3 id="sphere"><a name="sphere">draw_sphere</a></h3>
+<p><strong>draw_sphere([option 1], [option 2], [option 3])</strong></p>
+<p>Draws and labels a sphere. <code>draw_sphere()</code> draws a sphere with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"radius,[label]"</strong> Draws a radius with optional label.</li>
   <li><strong>"diameter,[label]"</strong> Draws a diameter with optional label.</li>
-  <li><strong>"fill,[percent],[color]"</strong> Fills the sphere up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omiited, fill is lightblue.</li>
+  <li><strong>"fill,[percent],[color]"</strong> Fills the sphere up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omitted, fill is lightblue.</li>
   <li><strong>"size,[length]"</strong> Sets the image size to be length x length. [Default is 300x300]</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_sphere("radius,r=12","fill,50,springgreen")</strong> -- A sphere with radius drawn and labeled 'r=12', filled half way up from the bottom in springgreen color.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_sphere("radius,r=12","fill,50,springgreen")
+// A sphere with radius drawn and labeled 'r=12', filled half way up from the
+// bottom in springgreen color.</pre></details>
 
-
-<p><a name="square"></a></p>
-<h2><strong>draw_square</strong></h2>
-<p>Draws and labels a square.</p>
-<p>Syntax: draw_square(["option 1", "option 2", ...])</p>
-<p>draw_square() -- this draws an unlabeled square</p>
+<h3 id="square"><a name="square">draw_square</a></h3>
+<p><strong>draw_square(["option 1", "option 2", ...])</strong></p>
+<p>Draws and labels a square. <code>draw_square()</code> draws an unlabeled square.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"base,[label]"</strong> Labels the bottom horizontal side.</li>
@@ -232,16 +210,13 @@
   <li><strong>"colorfill,color"</strong> shades interior of the shape with a color</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_square("base,x","points,(0;0),(5;0)")</strong> -- A square with bottom horizontal side labeled "x", and bottom two vertices labeled (0,0) and (5,0).</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_square("base,x","points,(0;0),(5;0)")
+// A square with bottom horizontal side labeled "x", and bottom two vertices
+// labeled (0,0) and (5,0).</pre></details>
 
-
-<p><a name="triangle"></a></p>
-<h2><strong>draw_triangle</strong></h2>
-<p>Draws a scaled triangle, where size can be defined by its "angles", "sides" or "random".
-<p>Syntax: draw_triangle(["option 1", "option 2", ...])</p>
-<p>draw_triangle() -- this draws a random triangle with no labels.</p>
+<h3 id="triangle"><a name="triangle">draw_triangle</a></h3>
+<p><strong>draw_triangle(["option 1", "option 2", ...])</strong></p>
+<p>Draws a scaled triangle, where size can be defined by its "angles", "sides" or "random". <code>draw_triangle()</code> draws a random triangle with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"angles,A,B,C,[lab1,lab2,lab3,arc1,arc2,arc3]"</strong> Here, A,B,C are angles (in degrees) that define the triangle; lab1,lab2,lab3 are the angle labels; and arc1,arc2,arc3 can be (,(( or ((( to make arc symbols.</li>
@@ -256,35 +231,45 @@
   <li><strong>"colorfill,color"</strong> shades interior of the shape with a color</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-  <p>Notes</p>
+  <p>Notes:</p>
 <ol>
   <li>If "angles" is given after "sides", then A,B,C are omitted (since the "sides,a,b,c" will define the triangle).</li>
   <li>If "sides" is used after "angles", then a,b,c are omitted (since the "angles,A,B,C" will define the triangle).</li>
   <li>If "angles" is used to define triangle, then angles should be given in degrees, and the degree symbol will displayed by default. To not display the degree symbol, use "rad" in the label. E.g. "angles,50,60,70,A rad,B rad,C rad"</li>
-  <li>If neither "angles" nor "sides" are used, then defaults to "random".
+  <li>If neither "angles" nor "sides" are used, then defaults to "random".</li>
   <li>The right angle box symbol is always displayed, unless an angle arc is also used on the right angle.</li>
   <li>Common Greek letters (pi, alpha, beta, gamma, theta, phi, tau) will be displayed as their html symbols. E.g. you can type a label as "3 pi/4" or "alpha". Using a Greek letter will suppress the degree symbol.</li>
   <li>If a label is a point, type it as (x;y).</li>
   <li>For "sides,a,b,c" and "angles,A,B,C", the number "a" is the side opposite angle "A", etc.</li>
   <li>By default, triangles are drawn with vertex 0 at bottom left, vertex 1 at bottom right, and vertex 2 at top. Use "rotate" to rotate the triangle.</li>
 </ol>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_triangle("angles,30,60,90,pi/6,pi/3")</strong> -- A 30-60-90 right triangle with angle labels &pi;/6 and &pi;/3. The right angle box is displayed by default.</p>
-<p><strong>$gr = draw_triangle("sides,5,10,12,a,b,c", "angles,A,B,C")</strong> -- A triangle with side lengths 5, 10 and 12, labeled with letters a,b,c. Angles are labeled with A,B,C.</p>
-<p><strong>$gr = draw_triangle("rotate","points","colorfill,violet")</strong> -- A random triangle with points on the vertices (unlabeled), drawn with random rotation. Triangle is shaded the color violet.</p>
-<p><strong>$gr = draw_triangle("angles,30,90,60","rotate,90")</strong> -- A 30-60-90 triangle rotated so the right edge is drawn vertically and the right angle is at top right.
-<p><strong>$gr = draw_triangle("random","points,P,Q,R","angles,a,b,c,(,((,(((")</strong> -- A triangle with random angles, points are labeled P,Q,R, angles are labeled a,b,c and they have arcs (, (( and (((.</p>
-<p><strong>$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")</strong> -- A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and an altitude drawn down from point A, labeled with the letter "P".</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_triangle("angles,30,60,90,pi/6,pi/3")
+// A 30-60-90 right triangle with angle labels pi/6 and pi/3. The right angle
+// box is displayed by default.
 
+$gr = draw_triangle("sides,5,10,12,a,b,c", "angles,A,B,C")
+// A triangle with side lengths 5, 10 and 12, labeled with letters a,b,c.
+// Angles are labeled with A,B,C.
 
-<p><a name="polygon"></a></p>
-<h2><strong>draw_polygon</strong></h2>
-<p>Draws and labels a polygon with n sides.</p>
-<p>Points drawn counterclockwise. By default, first side is horizontal on the bottom.</p>
-<p>Syntax: draw_polygon([n],["option 1", "option 2", ...])</p>
-<p>draw_polygon() -- this draws a random polygon with between 3 and 9 sides.</p>
-<p>draw_polygon(n) -- this draws an n-sided polygon. Maximum number of sides is 50.
+$gr = draw_triangle("rotate","points","colorfill,violet")
+// A random triangle with points on the vertices (unlabeled), drawn with
+// random rotation. Triangle is shaded the color violet.
+
+$gr = draw_triangle("angles,30,90,60","rotate,90")
+// A 30-60-90 triangle rotated so the right edge is drawn vertically and
+// the right angle is at top right.
+
+$gr = draw_triangle("random","points,P,Q,R","angles,a,b,c,(,((,(((")
+// A triangle with random angles, points are labeled P,Q,R, angles are
+// labeled a,b,c and they have arcs (, (( and (((.
+
+$gr = draw_triangle("points,A,B,C","angles,30,110,40","altitude,1,0,0,P")
+// A 30-110-40 triangle (unlabeled angles) with vertices labeled A,B,C, and
+// an altitude drawn down from point A, labeled with the letter "P".</pre></details>
+
+<h3 id="polygon"><a name="polygon">draw_polygon</a></h3>
+<p><strong>draw_polygon([n], ["option 1", "option 2", ...])</strong></p>
+<p>Draws and labels a polygon with n sides. Points drawn counterclockwise. By default, first side is horizontal on the bottom. <code>draw_polygon()</code> draws a random polygon with between 3 and 9 sides. <code>draw_polygon(n)</code> draws an n-sided polygon. Maximum number of sides is 50.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"points,[lab1,lab2,...,labn]"</strong> Labels the vertices counterclockwise from bottom-left. If label is a point (a,b), type it as (a;b).</li>
@@ -296,16 +281,13 @@
   <li><strong>"colorfill,color"</strong> shades interior of the shape with a color</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_polygon(5,"axes","norotate","regular","points,P")</strong> -- A regular pentagon with points on vertices, and first vertex on positive x-axis labeled "P".</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_polygon(5,"axes","norotate","regular","points,P")
+// A regular pentagon with points on vertices, and first vertex on positive
+// x-axis labeled "P".</pre></details>
 
-
-<p><a name="prismcubes"></a></p>
-<h2><strong>draw_prismcubes</strong></h2>
-<p>Draws a rectangular prism sliced into cubes.</p>
-<p>Syntax: draw_prismcubes([option 1],[option 2],[option 3]</p>
-<p>draw_prismcubes() -- this draws a cube with no labels.</p>
+<h3 id="prismcubes"><a name="prismcubes">draw_prismcubes</a></h3>
+<p><strong>draw_prismcubes([option 1], [option 2], [option 3])</strong></p>
+<p>Draws a rectangular prism sliced into cubes. <code>draw_prismcubes()</code> draws a cube with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
 <ul>
   <li><strong>"cubes,length,height,depth"</strong> Draws a rectangular prism made of cubes, that is length x height x depth. Maximum of each dimension is 20.</li>
@@ -314,43 +296,36 @@
   <li><strong>"colorfill,color"</strong> shades surface of the shape with a color</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_prismcubes("cubes,2,5,3","labels,a,b,c")</strong> -- A 2x5x3 rectangular prism of cubes, dimensions labeled a, b and c.</p>
-<p><strong>$gr = draw_prismcubes("labels,L,H,W", "colorfill,yellow")</strong> -- A 1x1x1 cube, dimensions labeled L, H and W. Surface of the prism is shaded yellow.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_prismcubes("cubes,2,5,3","labels,a,b,c")
+// A 2x5x3 rectangular prism of cubes, dimensions labeled a, b and c.
 
+$gr = draw_prismcubes("labels,L,H,W", "colorfill,yellow")
+// A 1x1x1 cube, dimensions labeled L, H and W. Surface of the prism is shaded yellow.</pre></details>
 
-<p><a name="pyramid"></a></p>
-<h2><strong>draw_pyramid</strong></h2>
-<p>Draws and labels a pyramid with rectangular base.</p>
-<p>Syntax: draw_pyramid([length,width,height],[option 1],[option 2],[option 3]</p>
-<p>draw_pyramid() -- draws a random pyramid with no labels.</p>
+<h3 id="pyramid"><a name="pyramid">draw_pyramid</a></h3>
+<p><strong>draw_pyramid([length,width,height], [option 1], [option 2], [option 3])</strong></p>
+<p>Draws and labels a pyramid with rectangular base. <code>draw_pyramid()</code> draws a random pyramid with no labels.</p>
 <p>Each option is a list inside quotes. Options include:</p>
-
 <ul>
   <li><strong>"length,label"</strong> labels the front edge of the rectangular base.</li>
   <li><strong>"width,label"</strong> labels the front edge of the rectangular base.</li>
   <li><strong>"height,[label]"</strong> draws the height of the pyramid with optional label.</li>
   <li><strong>"slant1,[label]"</strong> draws the slant height on the right face of the pyramid with optional label.</li>
   <li><strong>"slant2,[label]"</strong> draws the slant height on the front face of the pyramid with optional label.</li>
-  <li><strong>"fill,[percent],[color]"</strong> fills the pyramid up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omiited, fill is lightblue.</li>
+  <li><strong>"fill,[percent],[color]"</strong> fills the pyramid up to specified percent of its height. If 'percent' omitted, fills up to a random percent of the height. Third argument is the color name. If color name omitted, fill is lightblue.</li>
   <li><strong>"invert"</strong> inverts the pyramid.</li>
   <li><strong>"size,length"</strong> sets the image size to be length x length. [Default is 300x300]</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_pyramid(4,5,6,"length,4","width,5","height,6","fill,30","invert")</strong> -- A pyramid with tip at bottom and rectangular base at top, filled with colored material up to 30 percent of its height, with the rear edge of the base labeled 4, the left edge of the base labeled 5 and its height drawn and labeled 6.</p>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_pyramid(4,5,6,"length,4","width,5","height,6","fill,30","invert")
+// A pyramid with tip at bottom and rectangular base at top, filled with colored
+// material up to 30 percent of its height, with the rear edge of the base labeled
+// 4, the left edge of the base labeled 5 and its height drawn and labeled 6.</pre></details>
 
-
-<p><a name="polyomino"></a></p>
-<h2><strong>draw_polyomino</strong></h2>
-<p>Draws and labels a random, connected polyomino.</p>
-<p>Syntax: draw_polyomino([n],[option 1],[option 2],[option 3])</p>
-<p>draw_polyomino() -- draws a random polyomino with between 3 and 9 squares.</p>
-<p>draw_polyomino(n) -- draws a random polyomino with at least n squares.</p>
+<h3 id="polyomino"><a name="polyomino">draw_polyomino</a></h3>
+<p><strong>draw_polyomino([n], [option 1], [option 2], [option 3])</strong></p>
+<p>Draws and labels a random, connected polyomino. <code>draw_polyomino()</code> draws a random polyomino with between 3 and 9 squares. <code>draw_polyomino(n)</code> draws a random polyomino with at least n squares.</p>
 <p>Each option is a list inside quotes. Options include:</p>
-
 <ul>
   <li><strong>"fill,[color]"</strong> shades in the polyomino with optional color. Omit [color] to get a random color.</li>
   <li><strong>"grid"</strong> shows the background grid.</li>
@@ -358,8 +333,13 @@
   <li><strong>"size,length"</strong> sets the image size to be length pixels wide. [Default width is 300]</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
-<br />
-<p>Examples:</p>
-<p><strong>$gr = draw_polyomino(5,"fill,transblue","grid")</strong> -- A random polyomino with 5 squares (i.e. a "pentomino"), shaded transparent blue, and shown on a grid.</p>
-<p><strong>$gr,$a,$p = draw_polyomino("fill","data")</strong> -- $gr is a random polyomino with between 3 and 9 squares, shaded with a random color; $a is the number of squares in the shape; $p is the perimeter of the shape</p>
-<a href="#top">Back to top of page</a>
+<details class="example"><summary>Examples</summary><pre>$gr = draw_polyomino(5,"fill,transblue","grid")
+// A random polyomino with 5 squares (i.e. a "pentomino"), shaded transparent
+// blue, and shown on a grid.
+
+$gr,$a,$p = draw_polyomino("fill","data")
+// $gr is a random polyomino with between 3 and 9 squares, shaded with a random
+// color; $a is the number of squares in the shape; $p is the perimeter of the shape</pre></details>
+
+<a href="#top">Back to top of page</a></body>
+</html>

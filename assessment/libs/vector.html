@@ -3,9 +3,11 @@
     <title>vector help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library vector</h1>
-Vector functions.  Version 1.0, April 4, 2006
-<BR><ul>
+<p>Vector functions. Version 1.0, April 4, 2006</p>
+<ul>
 <li><a href="#dotp">dotp</a></li>
 <li><a href="#crossp">crossp</a></li>
 <li><a href="#vecnorm">vecnorm</a></li>
@@ -15,40 +17,72 @@ Vector functions.  Version 1.0, April 4, 2006
 <li><a href="#veccompareset">veccompareset</a></li>
 <li><a href="#veccomparesamespan">veccomparesamespan</a></li>
 </ul>
-<h3><a name="dotp">dotp</a></h3>
-dotp(a,b)
-<BR>dot product of vectors a and b
-<BR>a,b arrays (1+ elements)
-<BR><h3><a name="crossp">crossp</a></h3>
-crossp(a,b)
-<BR>cross product of vectors a and b
-<BR>a,b arrays (3 elements).  Returns array.
-<BR><h3><a name="vecnorm">vecnorm</a></h3>
-vecnorm(a)
-<BR>returns magnitude of vector a
-<BR>a array (1+ elements)
-<BR><h3><a name="vecsum">vecsum</a></h3>
-vecsum(a,b)
-<BR>returns sum a+b
-<BR>a,b arrays same length
-<BR><h3><a name="vecdiff">vecdiff</a></h3>
-vecdiff(a,b)
-<BR>returns difference a-b
-<BR>a,b arrays same length
-<BR><h3><a name="vecprod">vecprod</a></h3>
-vecprod(a,c)
-<BR>returns product c*a
-<BR>a array, c scalar
-<BR><h3><a name="veccompareset">veccompareset</a></h3>
-veccompareset(a,b)
-<BR>a and b are both arrays of vectors, e.g. $a = array(array(1,2,3),array(3,4,5))
-<BR>returns a value between 0 (no overlap) and 1 (sets are equivalent)
-<BR>calculated as n(a intersect b)/max(n(a),n(b))
-<BR><h3><a name="veccomparesamespan">veccomparesamespan</a></h3>
-veccomparesamespan(A,B)
-<BR>determins if span(A) = span(B), where A is a linearly independent set.
-<BR>a and b are both arrays of vectors, e.g. $A = array(array(1,2,3),array(3,4,5))
-<BR>Note that if you want to use the columns of a matrix as A, you'll need to
-<BR>&nbsp;&nbsp;transpose the matrix 
-<BR>Returns true or false
-<BR>
+
+<h3 id="dotp"><a name="dotp">dotp</a></h3>
+<p><strong>dotp(a, b)</strong></p>
+<p>Dot product of vectors <code>a</code> and <code>b</code>.</p>
+<ul>
+<li><strong>a, b</strong>: arrays (1+ elements).</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>dotp(array(1,2,3), array(4,5,6))  // 32</pre></details>
+
+<h3 id="crossp"><a name="crossp">crossp</a></h3>
+<p><strong>crossp(a, b)</strong></p>
+<p>Cross product of vectors <code>a</code> and <code>b</code>.</p>
+<ul>
+<li><strong>a, b</strong>: arrays (3 elements). Returns array.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>crossp(array(1,0,0), array(0,1,0))  // array(0,0,1)</pre></details>
+
+<h3 id="vecnorm"><a name="vecnorm">vecnorm</a></h3>
+<p><strong>vecnorm(a)</strong></p>
+<p>Returns the magnitude of vector <code>a</code>.</p>
+<ul>
+<li><strong>a</strong>: array (1+ elements).</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>vecnorm(array(3,4))  // 5</pre></details>
+
+<h3 id="vecsum"><a name="vecsum">vecsum</a></h3>
+<p><strong>vecsum(a, b)</strong></p>
+<p>Returns the sum <code>a+b</code>.</p>
+<ul>
+<li><strong>a, b</strong>: arrays of the same length.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>vecsum(array(1,2,3), array(4,5,6))  // array(5,7,9)</pre></details>
+
+<h3 id="vecdiff"><a name="vecdiff">vecdiff</a></h3>
+<p><strong>vecdiff(a, b)</strong></p>
+<p>Returns the difference <code>a-b</code>.</p>
+<ul>
+<li><strong>a, b</strong>: arrays of the same length.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>vecdiff(array(4,5,6), array(1,2,3))  // array(3,3,3)</pre></details>
+
+<h3 id="vecprod"><a name="vecprod">vecprod</a></h3>
+<p><strong>vecprod(a, c)</strong></p>
+<p>Returns the product <code>c*a</code>.</p>
+<ul>
+<li><strong>a</strong>: array.</li>
+<li><strong>c</strong>: scalar.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>vecprod(array(1,2,3), 3)  // array(3,6,9)</pre></details>
+
+<h3 id="veccompareset"><a name="veccompareset">veccompareset</a></h3>
+<p><strong>veccompareset(a, b)</strong></p>
+<p><code>a</code> and <code>b</code> are both arrays of vectors, e.g. <code>$a = array(array(1,2,3),array(3,4,5))</code>.</p>
+<p>Returns a value between 0 (no overlap) and 1 (sets are equivalent), calculated as <code>n(a intersect b)/max(n(a),n(b))</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$a = array(array(1,2,3), array(3,4,5))
+$b = array(array(1,2,3), array(0,0,0))
+veccompareset($a, $b)  // 0.5</pre></details>
+
+<h3 id="veccomparesamespan"><a name="veccomparesamespan">veccomparesamespan</a></h3>
+<p><strong>veccomparesamespan(A, B)</strong></p>
+<p>Determines if <code>span(A) = span(B)</code>, where <code>A</code> is a linearly independent set.</p>
+<ul>
+<li><strong>A, B</strong>: arrays of vectors, e.g. <code>$A = array(array(1,2,3),array(3,4,5))</code>. Note that if you want to use the columns of a matrix as A, you'll need to transpose the matrix.</li>
+</ul>
+<p>Returns true or false.</p>
+<details class="example"><summary>Examples</summary><pre>$A = array(array(1,0,0), array(0,1,0))
+$B = array(array(2,0,0), array(0,3,0))
+veccomparesamespan($A, $B)  // true</pre></details>
+</body></html>

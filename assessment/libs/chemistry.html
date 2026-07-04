@@ -5,11 +5,12 @@
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head>
     <body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library chemistry</h1>
-A collection of chemistry routines
-<BR>
-<BR>Version 0.4 Jan 17 2025
-<BR><ul>
+<p>A collection of chemistry routines</p>
+<p>Version 0.4 Jan 17 2025</p>
+<ul>
 <li><a href="#chem_disp">chem_disp</a></li>
 <li><a href="#chem_mathdisp">chem_mathdisp</a></li>
 <li><a href="#chem_eqndisp">chem_eqndisp</a></li>
@@ -35,140 +36,192 @@ A collection of chemistry routines
 <li><a href="#chem_showmolecule">chem_showmolecule</a></li>
 <li><a href="#chem_vsepr">chem_vsepr</a></li>
 </ul>
-<h3><a name="chem_disp">chem_disp</a></h3>
-chem_disp(compound) 
-<BR>formats a compound for display in as HTML
-<BR><h3><a name="chem_mathdisp">chem_mathdisp</a></h3>
-chem_mathdisp(compound) 
-<BR>formats a compound for better display in math mode
-<br><h3><a name="chem_eqndisp">chem_eqndisp</a></h3>
-<p>chem_eqndisp(reactants, products, coefficients, [arrow, phases])</p>
+
+<h3 id="chem_disp"><a name="chem_disp">chem_disp</a></h3>
+<p><strong>chem_disp(compound)</strong></p>
+<p>Formats a compound for display as HTML.</p>
+<details class="example"><summary>Examples</summary><pre>echo chem_disp("H2O")  // "H<sub>2</sub>O"</pre></details>
+
+<h3 id="chem_mathdisp"><a name="chem_mathdisp">chem_mathdisp</a></h3>
+<p><strong>chem_mathdisp(compound)</strong></p>
+<p>Formats a compound for better display in math mode.</p>
+<details class="example"><summary>Examples</summary><pre>$showanswer = chem_mathdisp("H2O")</pre></details>
+
+<h3 id="chem_eqndisp"><a name="chem_eqndisp">chem_eqndisp</a></h3>
+<p><strong>chem_eqndisp(reactants, products, coefficients, [arrow, phases])</strong></p>
 <p>Generates a display string for a chemical reaction.</p>
 <ul class="nomark">
-    <li>reactants: array of compounds</li>
-    <li>products: array of compounds</li>
-    <li>coefficients: array of coefficients for both reactants and products. The output of 
+    <li><strong>reactants</strong>: array of compounds.</li>
+    <li><strong>products</strong>: array of compounds.</li>
+    <li><strong>coefficients</strong>: array of coefficients for both reactants and products. The output of
         chem_balancereaction can be used for this.</li>
-    <li>arrow: optional, a string for the arrow in the reaction. Defaults to <code>-&gt;</code></li>
-    <li>phases: optional, an array of phases for both reactants and products.</li>
+    <li><strong>arrow</strong>: optional, a string for the arrow in the reaction. Defaults to <code>-&gt;</code></li>
+    <li><strong>phases</strong>: optional, an array of phases for both reactants and products.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$coeffs = chem_balancereaction(array("H2","O2"), array("H2O"))
+$showanswer = chem_eqndisp(array("H2","O2"), array("H2O"), $coeffs)</pre></details>
 
-<BR><h3><a name="chem_isotopedisp">chem_isotopedisp</a></h3>
-chem_isotopedisp(element,super,sub,[noitalic])
-<BR>formats a math display string for an isotope with the given element,
-<BR>&nbsp;superscript, and subscript. Set noitalic to true to un-italic element.
-<BR><h3><a name="chem_getsymbol">chem_getsymbol</a></h3>
-chem_getsymbol(atomic number)
-<BR>returns the chemical symbol given the atomic number
-<BR><h3><a name="chem_getnumber">chem_getnumber</a></h3>
-chem_getnumber(symbol)
-<BR>returns the atomic number given the chemical symbol 
-<BR><h3><a name="chem_getname">chem_getname</a></h3>
-chem_getname(atomic number)
-<BR>returns the chemical name given the atomic number
-<BR><h3><a name="chem_getweight">chem_getweight</a></h3>
-chem_getweight(atomic number)
-<BR>returns the chemical standard atomic weight given the atomic number
-<BR><h3><a name="chem_getmeltingpoint">chem_getmeltingpoint</a></h3>
-chem_getmeltingpoint(atomic number)
-<BR>returns the melting point given the atomic number
-<BR>beware: some elements return weird non-numeric values
-<BR><h3><a name="chem_getboilingpoint">chem_getboilingpoint</a></h3>
-chem_getboilingpoint(atomic number)
-<BR>returns the boiling point given the atomic number
-<BR>beware: some elements return weird non-numeric values
-<BR><h3><a name="chem_getfamily">chem_getfamily</a></h3>
-chem_getfamily(atomic number)
-<BR>returns the family given the atomic number
-<BR>Values may be:  "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen", 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Transition Metal", "Lanthanide",  or "Actinide"
-<BR><h3><a name="chem_randelementbyfamily">chem_randelementbyfamily</a></h3>
-chem_randelementbyfamily(family)
-<BR>returns the atomic number of a random element from a family
-<BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Halogen", "Transition Metal", "Lanthanide", or "Actinide"
-<BR><h3><a name="chem_diffrandelementsbyfamily">chem_diffrandelementsbyfamily</a></h3>
-chem_diffrandelementsbyfamily(family, n)
-<BR>returns an array of n atomic numbers for random elements from a family
-<BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Halogen", "Transition Metal", "Lanthanide", or "Actinide"
-<BR><h3><a name="chem_getrandcompound">chem_getrandcompound</a></h3>
-chem_getrandcompound(type)
-<BR>returns an array of (compound name, compound formula)
-<BR>valid types are: twobasic, twosub, threeplus, parens
-<BR>if type is not supplied, compound is chosen randomly from all
-<BR><h3><a name="chem_getdiffrandcompounds">chem_getdiffrandcompounds</a></h3>
-chem_getdiffrandcompounds(n,type)
-<BR>returns an array n arrays of (compound name, compound formula)
-<BR>valid types are: twobasic, twosub, threeplus, parens
-<BR>if type is not supplied, compound is chosen randomly from all
-<BR><h3><a name="chem_decomposecompound">chem_decomposecompound</a></h3>
-chem_decomposecompound(compound)
-<BR>breaks a compound into an array of elements and an array of atom counts
-<BR><h3><a name="chem_getcompoundmolmass">chem_getcompoundmolmass</a></h3>
-chem_getcompoundmolmass(compound, [round])
-<BR>gets the molecular mass of the given compound
-<BR>&nbsp;round: decimals to round the individual atoms' molecular mass to during calculuations
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default: no additional rounding (4 decimal place accuracy)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;special value: .5.  Rounds all values to whole numbers, except Cl and Cu to nearest .5 
-<BR><h3><a name="chem_randcation">chem_randcation</a></h3>
-chem_randcation([group,name type,include uncommon])
-<BR>group name:  simple, basic (simple + NH_4), polyvalent, or all. Default = all
-<BR>name type: "common" (iron (II)) or "alternate" (ferrous)  default = common
-<BR>include uncommon: set true to include francium, radium, cadmium, etc.
-<BR>returns array(symbol, charge, name)
-<BR><h3><a name="chem_randanion">chem_randanion</a></h3>
-chem_randanion([group,name type,include uncommon])
-<BR>group name:  simple, polyatomic, or all. Default = all
-<BR>name type: "common" (bicarbonate) or "alternate" (hydrogen carbonate)  default = common
-<BR>include uncommon: set true to include selenide, peroxide
-<BR>returns array(symbol, charge, name)
-<BR><h3><a name="chem_makeioniccompound">chem_makeioniccompound</a></h3>
-chem_makeioniccompound(cation, anion)
-<BR>takes a cation and anion
-<BR>&nbsp;&nbsp;these are the array returned by chem_randcation and chem_randanion
-<BR>returns array(formula, name)
-<BR><h3><a name="chem_getsolubility">chem_getsolubility</a></h3>
-chem_getsolubility(cation, anion)
-<BR>&nbsp;&nbsp;takes a cation array and anion array (from chem_randcation and chem_randanion)
-<BR>&nbsp;&nbsp;and returns solubility information from <a href="https://en.wikipedia.org/wiki/Solubility_chart">https://en.wikipedia.org/wiki/Solubility_chart</a>
-<BR>Currently missing data for 
-<BR>&nbsp;&nbsp;Cations: Cd, Fr, Ra, Cr 2+, Mn 3+, Co 3+, Ni 3+, Cu 1+, Au 1+, Sn 4+, Pb 4+, Hg_2
-<BR>&nbsp;&nbsp;Anions: N, P, C, Se, ClO, ClO_2, ClO_3, HCO_3, H_2PO_4, HSO_3, HSO_4, IO_3, MnO_4, NO_2, CrO_4, Cr_2O_7, HPO_4, SO_3, SiO_3, AsO_4, PO_3, O_2 
-<BR>returns array(stateName, abbreviation)
+<h3 id="chem_isotopedisp"><a name="chem_isotopedisp">chem_isotopedisp</a></h3>
+<p><strong>chem_isotopedisp(element, super, sub, [noitalic])</strong></p>
+<p>Formats a math display string for an isotope with the given element,
+  superscript, and subscript. Set <code>noitalic</code> to true to un-italicize the element.</p>
+<details class="example"><summary>Examples</summary><pre>$showanswer = chem_isotopedisp("C", 14, 6)  // carbon-14</pre></details>
 
-<BR><h3><a name="chem_balancereaction">chem_balancereaction</a></h3>
-<p>chem_balancereaction(reactants, products)</p>
-<p>Balances a chemical reaction, returning an array of coefficients for the compounds</p>
+<h3 id="chem_getsymbol"><a name="chem_getsymbol">chem_getsymbol</a></h3>
+<p><strong>chem_getsymbol(atomic number)</strong></p>
+<p>Returns the chemical symbol given the atomic number.</p>
+<details class="example"><summary>Examples</summary><pre>chem_getsymbol(6)  // "C"</pre></details>
+
+<h3 id="chem_getnumber"><a name="chem_getnumber">chem_getnumber</a></h3>
+<p><strong>chem_getnumber(symbol)</strong></p>
+<p>Returns the atomic number given the chemical symbol.</p>
+<details class="example"><summary>Examples</summary><pre>chem_getnumber("C")  // 6</pre></details>
+
+<h3 id="chem_getname"><a name="chem_getname">chem_getname</a></h3>
+<p><strong>chem_getname(atomic number)</strong></p>
+<p>Returns the chemical name given the atomic number.</p>
+<details class="example"><summary>Examples</summary><pre>chem_getname(6)  // "Carbon"</pre></details>
+
+<h3 id="chem_getweight"><a name="chem_getweight">chem_getweight</a></h3>
+<p><strong>chem_getweight(atomic number)</strong></p>
+<p>Returns the chemical standard atomic weight given the atomic number.</p>
+<details class="example"><summary>Examples</summary><pre>chem_getweight(6)  // 12.011</pre></details>
+
+<h3 id="chem_getmeltingpoint"><a name="chem_getmeltingpoint">chem_getmeltingpoint</a></h3>
+<p><strong>chem_getmeltingpoint(atomic number)</strong></p>
+<p>Returns the melting point given the atomic number.</p>
+<p>Beware: some elements return weird non-numeric values.</p>
+<details class="example"><summary>Examples</summary><pre>chem_getmeltingpoint(29)  // melting point of copper</pre></details>
+
+<h3 id="chem_getboilingpoint"><a name="chem_getboilingpoint">chem_getboilingpoint</a></h3>
+<p><strong>chem_getboilingpoint(atomic number)</strong></p>
+<p>Returns the boiling point given the atomic number.</p>
+<p>Beware: some elements return weird non-numeric values.</p>
+<details class="example"><summary>Examples</summary><pre>chem_getboilingpoint(29)  // boiling point of copper</pre></details>
+
+<h3 id="chem_getfamily"><a name="chem_getfamily">chem_getfamily</a></h3>
+<p><strong>chem_getfamily(atomic number)</strong></p>
+<p>Returns the family given the atomic number.</p>
+<p>Values may be: "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen",
+  "Transition Metal", "Lanthanide", or "Actinide"</p>
+<details class="example"><summary>Examples</summary><pre>chem_getfamily(11)  // "Alkaline"</pre></details>
+
+<h3 id="chem_randelementbyfamily"><a name="chem_randelementbyfamily">chem_randelementbyfamily</a></h3>
+<p><strong>chem_randelementbyfamily(family)</strong></p>
+<p>Returns the atomic number of a random element from a family.</p>
+<p>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth",
+  "Halogen", "Transition Metal", "Lanthanide", or "Actinide"</p>
+<details class="example"><summary>Examples</summary><pre>$el = chem_randelementbyfamily("Halogen")</pre></details>
+
+<h3 id="chem_diffrandelementsbyfamily"><a name="chem_diffrandelementsbyfamily">chem_diffrandelementsbyfamily</a></h3>
+<p><strong>chem_diffrandelementsbyfamily(family, n)</strong></p>
+<p>Returns an array of <code>n</code> atomic numbers for random elements from a family.</p>
+<p>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth",
+  "Halogen", "Transition Metal", "Lanthanide", or "Actinide"</p>
+<details class="example"><summary>Examples</summary><pre>$els = chem_diffrandelementsbyfamily("Halogen", 3)</pre></details>
+
+<h3 id="chem_getrandcompound"><a name="chem_getrandcompound">chem_getrandcompound</a></h3>
+<p><strong>chem_getrandcompound(type)</strong></p>
+<p>Returns an array of (compound name, compound formula).</p>
+<p>Valid types are: twobasic, twosub, threeplus, parens. If type is not supplied, compound is chosen randomly from all.</p>
+<details class="example"><summary>Examples</summary><pre>list($name, $formula) = chem_getrandcompound("twobasic")</pre></details>
+
+<h3 id="chem_getdiffrandcompounds"><a name="chem_getdiffrandcompounds">chem_getdiffrandcompounds</a></h3>
+<p><strong>chem_getdiffrandcompounds(n, type)</strong></p>
+<p>Returns an array of <code>n</code> arrays of (compound name, compound formula).</p>
+<p>Valid types are: twobasic, twosub, threeplus, parens. If type is not supplied, compound is chosen randomly from all.</p>
+<details class="example"><summary>Examples</summary><pre>$compounds = chem_getdiffrandcompounds(3, "twobasic")</pre></details>
+
+<h3 id="chem_decomposecompound"><a name="chem_decomposecompound">chem_decomposecompound</a></h3>
+<p><strong>chem_decomposecompound(compound)</strong></p>
+<p>Breaks a compound into an array of elements and an array of atom counts.</p>
+<details class="example"><summary>Examples</summary><pre>list($elements, $counts) = chem_decomposecompound("H2O")
+// $elements = array("H","O"); $counts = array(2,1)</pre></details>
+
+<h3 id="chem_getcompoundmolmass"><a name="chem_getcompoundmolmass">chem_getcompoundmolmass</a></h3>
+<p><strong>chem_getcompoundmolmass(compound, [round])</strong></p>
+<p>Gets the molecular mass of the given compound.</p>
+<ul>
+<li><strong>round</strong>: decimals to round the individual atoms' molecular mass to during calculations. Default: no additional rounding (4 decimal place accuracy). Special value: .5. Rounds all values to whole numbers, except Cl and Cu to nearest .5.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>chem_getcompoundmolmass("H2O")  // 18.0152</pre></details>
+
+<h3 id="chem_randcation"><a name="chem_randcation">chem_randcation</a></h3>
+<p><strong>chem_randcation([group, name type, include uncommon])</strong></p>
+<ul>
+<li><strong>group</strong>: simple, basic (simple + NH_4), polyvalent, or all. Default = all.</li>
+<li><strong>name type</strong>: "common" (iron (II)) or "alternate" (ferrous). Default = common.</li>
+<li><strong>include uncommon</strong>: set true to include francium, radium, cadmium, etc.</li>
+</ul>
+<p>Returns <code>array(symbol, charge, name)</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($symbol, $charge, $name) = chem_randcation("basic")</pre></details>
+
+<h3 id="chem_randanion"><a name="chem_randanion">chem_randanion</a></h3>
+<p><strong>chem_randanion([group, name type, include uncommon])</strong></p>
+<ul>
+<li><strong>group</strong>: simple, polyatomic, or all. Default = all.</li>
+<li><strong>name type</strong>: "common" (bicarbonate) or "alternate" (hydrogen carbonate). Default = common.</li>
+<li><strong>include uncommon</strong>: set true to include selenide, peroxide.</li>
+</ul>
+<p>Returns <code>array(symbol, charge, name)</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($symbol, $charge, $name) = chem_randanion("polyatomic")</pre></details>
+
+<h3 id="chem_makeioniccompound"><a name="chem_makeioniccompound">chem_makeioniccompound</a></h3>
+<p><strong>chem_makeioniccompound(cation, anion)</strong></p>
+<p>Takes a cation and anion - these are the arrays returned by chem_randcation and chem_randanion.</p>
+<p>Returns <code>array(formula, name)</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$cation = chem_randcation("basic")
+$anion = chem_randanion("simple")
+list($formula, $name) = chem_makeioniccompound($cation, $anion)</pre></details>
+
+<h3 id="chem_getsolubility"><a name="chem_getsolubility">chem_getsolubility</a></h3>
+<p><strong>chem_getsolubility(cation, anion)</strong></p>
+<p>Takes a cation array and anion array (from chem_randcation and chem_randanion)
+  and returns solubility information from <a href="https://en.wikipedia.org/wiki/Solubility_chart">https://en.wikipedia.org/wiki/Solubility_chart</a>.</p>
+<p>Currently missing data for:</p>
+<ul>
+<li>Cations: Cd, Fr, Ra, Cr 2+, Mn 3+, Co 3+, Ni 3+, Cu 1+, Au 1+, Sn 4+, Pb 4+, Hg_2</li>
+<li>Anions: N, P, C, Se, ClO, ClO_2, ClO_3, HCO_3, H_2PO_4, HSO_3, HSO_4, IO_3, MnO_4, NO_2, CrO_4, Cr_2O_7, HPO_4, SO_3, SiO_3, AsO_4, PO_3, O_2</li>
+</ul>
+<p>Returns <code>array(stateName, abbreviation)</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$cation = chem_randcation("basic")
+$anion = chem_randanion("simple")
+list($state, $abbr) = chem_getsolubility($cation, $anion)</pre></details>
+
+<h3 id="chem_balancereaction"><a name="chem_balancereaction">chem_balancereaction</a></h3>
+<p><strong>chem_balancereaction(reactants, products)</strong></p>
+<p>Balances a chemical reaction, returning an array of coefficients for the compounds.</p>
 <ul class="nomark">
-    <li>reactants: array of compounds</li>
-    <li>products: array of compounds</li>
+    <li><strong>reactants</strong>: array of compounds.</li>
+    <li><strong>products</strong>: array of compounds.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$coeffs = chem_balancereaction(array("H2","O2"), array("H2O"))  // array(2,1,2)</pre></details>
 
-<BR><h3><a name="chem_showmolecule">chem_showmolecule</a></h3>
-    <p>chem_showmolecule(string, [width, height, alttext, format])</p>
-    <p>Draws a 2D molecule diagram.</p>
-    <ul class="nomark">
-        <li>string: The string should be one generated by the
-            <a href="moleculehelper.html">molecule helper</a>; just assign
-            the result to something other than $answer and pass it in as the string to this function.</li>
-        <li>width: width (default 300)</li>
-        <li>height: height (default 225)</li>
-        <li>alttext: use to provide an accessible alternative text for the drawing.</li>
-        <li>format: set to "condensed" to show atom labels on drawing</li>
-    </ul>  
+<h3 id="chem_showmolecule"><a name="chem_showmolecule">chem_showmolecule</a></h3>
+<p><strong>chem_showmolecule(string, [width, height, alttext, format])</strong></p>
+<p>Draws a 2D molecule diagram.</p>
+<ul class="nomark">
+    <li><strong>string</strong>: The string should be one generated by the
+        <a href="moleculehelper.html">molecule helper</a>; just assign
+        the result to something other than $answer and pass it in as the string to this function.</li>
+    <li><strong>width</strong>: width (default 300)</li>
+    <li><strong>height</strong>: height (default 225)</li>
+    <li><strong>alttext</strong>: use to provide an accessible alternative text for the drawing.</li>
+    <li><strong>format</strong>: set to "condensed" to show atom labels on drawing.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = chem_showmolecule($molstring, 300, 225, "Structure of ethanol")</pre></details>
 
-<BR><h3><a name="chem_vsepr">chem_vsepr</a></h3>
-    <p>chem_vsepr(steric number, number of lone pairs)</p>
-    <p>Looks up molecular geometry based on VSEPR Theory</p>
-    <p> Returns an array containing:</p>
-    <ul class="nomark">
-        <li>Molecular Geometry</li>
-        <li>Electron Geometry</li>
-        <li>Bond Angle (approximate for a general case)</li> 
-        <li>Polarity (assuming equal electronegativity)</li>
-        <li>Hybridization of central atom</li>
-    </ul>
-    Example: chem_vsepr(3,2) => array('Bent', 'Trigonal Planar', '&#60;120', 'Polar', 'sp^2')
+<h3 id="chem_vsepr"><a name="chem_vsepr">chem_vsepr</a></h3>
+<p><strong>chem_vsepr(steric number, number of lone pairs)</strong></p>
+<p>Looks up molecular geometry based on VSEPR Theory.</p>
+<p>Returns an array containing:</p>
+<ul class="nomark">
+    <li>Molecular Geometry</li>
+    <li>Electron Geometry</li>
+    <li>Bond Angle (approximate for a general case)</li>
+    <li>Polarity (assuming equal electronegativity)</li>
+    <li>Hybridization of central atom</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>chem_vsepr(3, 2)  // array('Bent', 'Trigonal Planar', '&#60;120', 'Polar', 'sp^2')</pre></details>
 </body>
 </html>

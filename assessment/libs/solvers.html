@@ -3,22 +3,23 @@
     <title>solvers help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library solvers</h1>
-Some solving algorithms.  Version 1.1 March 25, 2014
-<BR><ul>
+<p>Some solving algorithms. Version 1.1 March 25, 2014</p>
+<ul>
 <li><a href="#bisectionsolve">bisectionsolve</a></li>
 <li><a href="#discretenewtons">discretenewtons</a></li>
 </ul>
 
-<h3><a name="bisectionsolve">bisectionsolve</a></h3>
-<p>bisectionsolve(function, xmin, xmax)</p>
-<p>Applies bisection to find a root of hte function on the interval [xmin, xmax]. 
-    This function only works if there is exactly one root in the interval.</p>
+<h3 id="bisectionsolve"><a name="bisectionsolve">bisectionsolve</a></h3>
+<p><strong>bisectionsolve(function, xmin, xmax)</strong></p>
+<p>Applies bisection to find a root of the function on the interval [xmin, xmax]. This function only works if there is exactly one root in the interval.</p>
+<details class="example"><summary>Examples</summary><pre>$root = bisectionsolve("x^2-2", 0, 2)  // approximately 1.41421356</pre></details>
 
-<h3><a name="discretenewtons">discretenewtons</a></h3>
-discretenewtons(function,xmin,xmax,[guess]) 
-<BR>applies a discrete form of Newton's method to find a root of the function
-<BR>on the interval [xmin,xmax].  Starts at midpoint of interval, or at guess if
-<BR>provided.  If method fails to converge, or converges outside interval, the
-<BR>method returns null.  Make sure function uses the variable x
-<BR>
+<h3 id="discretenewtons"><a name="discretenewtons">discretenewtons</a></h3>
+<p><strong>discretenewtons(function, xmin, xmax, [guess])</strong></p>
+<p>Applies a discrete form of Newton's method to find a root of the function on the interval [xmin, xmax]. Starts at the midpoint of the interval, or at <code>guess</code> if provided. If the method fails to converge, or converges outside the interval, the method returns null. Make sure the function uses the variable <code>x</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$root = discretenewtons("x^3-x-2", 1, 2)
+$root2 = discretenewtons("x^3-x-2", 1, 2, 1.5)  // starting from guess of 1.5</pre></details>
+</body></html>

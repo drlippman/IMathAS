@@ -4,6 +4,8 @@
     <title>polys help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library polys</h1>
 <p>Polynomial functions.  Version 1.2, Jan 7, 2026</p>
 <ul>
@@ -24,155 +26,183 @@
 <li><a href="#describepoly">describepoly</a></li>
 <li><a href="#describerational">describerational</a></li>
 </ul>
-<h3><a name="formpoly">formpoly</a></h3>
-<p><b>formpoly(coefficients, powers or degree)</b></p>
+<h3 id="formpoly"><a name="formpoly">formpoly</a></h3>
+<p><strong>formpoly(coefficients, powers or degree)</strong></p>
 <p>Creates a polynomial object. Use <code>writepoly</code> to create a display form of the polynomial.</p>
 <ul>
-<li><b>coefficients</b>: list/array of coefficients.</li>
-<li><b>powers or degree</b>: list/array of powers, or highest degree. Highest degree assumes coefficients correspond to consecutively decreasing powers.</li>
+<li><strong>coefficients</strong>: list/array of coefficients.</li>
+<li><strong>powers or degree</strong>: list/array of powers, or highest degree. Highest degree assumes coefficients correspond to consecutively decreasing powers.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>// 3x^2+1
+$p = formpoly(array(3,1), array(2,0))
+$p2 = formpoly(array(3,0,1), 2)  // same polynomial, using degree</pre></details>
 
-<h3><a name="formpolyfromroots">formpolyfromroots</a></h3>
-<p><b>formpolyfromroots(stretch, roots, [multiplicities])</b></p>
+<h3 id="formpolyfromroots"><a name="formpolyfromroots">formpolyfromroots</a></h3>
+<p><strong>formpolyfromroots(stretch, roots, [multiplicities])</strong></p>
 <p>Create a polynomial object from roots. Use <code>writepoly</code> to create a display form of the polynomial.</p>
 <ul>
-<li><b>stretch</b>: a stretch factor; the A in A*(x-root)(x-root)...</li>
-<li><b>roots</b>: an array of the roots (zeros, x-intercepts). For a complex root pair a±bi provide a single array <code>[a,b]</code> as the root.</li>
-<li><b>multiplicities</b> (optional): an array of multiplicities of the roots; assumed to be all 1 if not provided.</li>
+<li><strong>stretch</strong>: a stretch factor; the A in A*(x-root)(x-root)...</li>
+<li><strong>roots</strong>: an array of the roots (zeros, x-intercepts). For a complex root pair a&plusmn;bi provide a single array <code>[a,b]</code> as the root.</li>
+<li><strong>multiplicities</strong> (optional): an array of multiplicities of the roots; assumed to be all 1 if not provided.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$p = formpolyfromroots(2, array(1,3))  // 2(x-1)(x-3)
+$p2 = formpolyfromroots(1, array(0,2), array(1,2))  // x(x-2)^2</pre></details>
 
-<h3><a name="writepoly">writepoly</a></h3>
-<p><b>writepoly(poly, [var, showzeros])</b></p>
+<h3 id="writepoly"><a name="writepoly">writepoly</a></h3>
+<p><strong>writepoly(poly, [var, showzeros])</strong></p>
 <p>Creates a display form for a polynomial object.</p>
 <ul>
-<li><b>poly</b>: polynomial object, created with <code>formpoly</code>.</li>
-<li><b>var</b>: input variable. Defaults to <code>x</code>.</li>
-<li><b>showzeros</b>: optional, defaults to <code>false</code>. If <code>true</code>, shows zero coefficients.</li>
+<li><strong>poly</strong>: polynomial object, created with <code>formpoly</code>.</li>
+<li><strong>var</strong>: input variable. Defaults to <code>x</code>.</li>
+<li><strong>showzeros</strong>: optional, defaults to <code>false</code>. If <code>true</code>, shows zero coefficients.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$p = formpoly(array(3,1), array(2,0))
+$showanswer = writepoly($p)  // "3x^2+1"
+$showanswer2 = writepoly($p, "t")  // "3t^2+1"</pre></details>
 
-<h3><a name="writepolyfrac">writepolyfrac</a></h3>
-<p><b>writepolyfrac(poly, [var, showzeros])</b></p>
+<h3 id="writepolyfrac"><a name="writepolyfrac">writepolyfrac</a></h3>
+<p><strong>writepolyfrac(poly, [var, showzeros])</strong></p>
 <p>Creates a display form for a polynomial object, converting decimal coefficients to fractions where possible.</p>
 <ul>
-<li><b>poly</b>: polynomial object, created with <code>formpoly</code>.</li>
-<li><b>var</b>: input variable. Defaults to <code>x</code>.</li>
-<li><b>showzeros</b>: optional, defaults to <code>false</code>. If <code>true</code>, shows zero coefficients.</li>
+<li><strong>poly</strong>: polynomial object, created with <code>formpoly</code>.</li>
+<li><strong>var</strong>: input variable. Defaults to <code>x</code>.</li>
+<li><strong>showzeros</strong>: optional, defaults to <code>false</code>. If <code>true</code>, shows zero coefficients.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$p = formpoly(array(0.5,0.25), array(2,0))
+$showanswer = writepolyfrac($p)  // "1/2x^2+1/4"</pre></details>
 
-<h3><a name="addpolys">addpolys</a></h3>
-<p><b>addpolys(poly1, poly2)</b></p>
+<h3 id="addpolys"><a name="addpolys">addpolys</a></h3>
+<p><strong>addpolys(poly1, poly2)</strong></p>
 <p>Adds two polynomials, arranging terms from highest to lowest powers.</p>
 <ul>
-<li><b>poly1</b>: first polynomial.</li>
-<li><b>poly2</b>: second polynomial.</li>
+<li><strong>poly1</strong>: first polynomial.</li>
+<li><strong>poly2</strong>: second polynomial.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$sum = addpolys($p1, $p2)</pre></details>
 
-<h3><a name="subtpolys">subtpolys</a></h3>
-<p><b>subtpolys(poly1, poly2)</b></p>
+<h3 id="subtpolys"><a name="subtpolys">subtpolys</a></h3>
+<p><strong>subtpolys(poly1, poly2)</strong></p>
 <p>Subtracts polynomials (<code>poly1 - poly2</code>), arranging terms from highest to lowest powers.</p>
 <ul>
-<li><b>poly1</b>: minuend polynomial.</li>
-<li><b>poly2</b>: subtrahend polynomial.</li>
+<li><strong>poly1</strong>: minuend polynomial.</li>
+<li><strong>poly2</strong>: subtrahend polynomial.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$diff = subtpolys($p1, $p2)</pre></details>
 
-<h3><a name="multpolys">multpolys</a></h3>
-<p><b>multpolys(poly1, poly2)</b></p>
+<h3 id="multpolys"><a name="multpolys">multpolys</a></h3>
+<p><strong>multpolys(poly1, poly2)</strong></p>
 <p>Multiplies two polynomials.</p>
 <ul>
-<li><b>poly1</b>: first polynomial.</li>
-<li><b>poly2</b>: second polynomial.</li>
+<li><strong>poly1</strong>: first polynomial.</li>
+<li><strong>poly2</strong>: second polynomial.</li>
 </ul>
-    
-<h3><a name="divpolys">divpolys</a></h3>
-<p><b>divpolys(poly1, poly2)</b></p>
+<details class="example"><summary>Examples</summary><pre>$prod = multpolys($p1, $p2)</pre></details>
+
+<h3 id="divpolys"><a name="divpolys">divpolys</a></h3>
+<p><strong>divpolys(poly1, poly2)</strong></p>
 <p>Divides polynomials (<code>poly1 / poly2</code>).</p>
 <ul>
-<li>Returns an array with two elements: <b>quotient</b> and <b>remainder</b>, each a polynomial object.</li>
-<li><b>poly1</b>: dividend polynomial.</li>
-<li><b>poly2</b>: divisor polynomial.</li>
+<li>Returns an array with two elements: <strong>quotient</strong> and <strong>remainder</strong>, each a polynomial object.</li>
+<li><strong>poly1</strong>: dividend polynomial.</li>
+<li><strong>poly2</strong>: divisor polynomial.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>list($quotient, $remainder) = divpolys($p1, $p2)</pre></details>
 
-<h3><a name="scalepoly">scalepoly</a></h3>
-<p><b>scalepoly(poly, c)</b></p>
+<h3 id="scalepoly"><a name="scalepoly">scalepoly</a></h3>
+<p><strong>scalepoly(poly, c)</strong></p>
 <p>Multiplies each term of <code>poly</code> by constant <code>c</code>.</p>
 <ul>
-<li><b>poly</b>: polynomial to scale.</li>
-<li><b>c</b>: constant multiplier.</li>
+<li><strong>poly</strong>: polynomial to scale.</li>
+<li><strong>c</strong>: constant multiplier.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$scaled = scalepoly($p, 3)</pre></details>
 
-<h3><a name="derivepoly">derivepoly</a></h3>
-<p><b>derivepoly(poly)</b></p>
+<h3 id="derivepoly"><a name="derivepoly">derivepoly</a></h3>
+<p><strong>derivepoly(poly)</strong></p>
 <p>Computes the derivative of <code>poly</code>.</p>
 <ul>
-<li><b>poly</b>: polynomial to differentiate.</li>
+<li><strong>poly</strong>: polynomial to differentiate.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$deriv = derivepoly($p)</pre></details>
 
-<h3><a name="polypower">polypower</a></h3>
-<p><b>polypower(poly, power)</b></p>
+<h3 id="polypower"><a name="polypower">polypower</a></h3>
+<p><strong>polypower(poly, power)</strong></p>
 <p>Calculates <code>poly</code><sup><code>power</code></sup>.</p>
 <ul>
-<li><b>poly</b>: base polynomial.</li>
-<li><b>power</b>: exponent (integer).</li>
+<li><strong>poly</strong>: base polynomial.</li>
+<li><strong>power</strong>: exponent (integer).</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$squared = polypower($p, 2)</pre></details>
 
-<h3><a name="quadroot">quadroot</a></h3>
-<p><b>quadroot(a, b, c)</b></p>
+<h3 id="quadroot"><a name="quadroot">quadroot</a></h3>
+<p><strong>quadroot(a, b, c)</strong></p>
 <p>Solves the quadratic equation <code>ax^2 + bx + c = 0</code>. Returns an array of the two solutions ordered smaller then larger. If no real solutions exist, an array of <code>"DNE"</code> strings is returned.</p>
 <ul>
-<li><b>a, b, c</b>: coefficients of the quadratic.</li>
+<li><strong>a, b, c</strong>: coefficients of the quadratic.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>quadroot(1, -3, 2)  // array(1, 2)
+quadroot(1, 0, 1)  // array("DNE", "DNE")</pre></details>
 
-<h3><a name="getcoef">getcoef</a></h3>
-<p><b>getcoef(poly, degree)</b></p>
+<h3 id="getcoef"><a name="getcoef">getcoef</a></h3>
+<p><strong>getcoef(poly, degree)</strong></p>
 <p>Gets the coefficient corresponding to the specified degree. If no such term is defined, <code>0</code> is returned.</p>
 <ul>
-<li><b>poly</b>: polynomial object, created with <code>formpoly</code>.</li>
-<li><b>degree</b>: degree of the term to get the coefficient of.</li>
+<li><strong>poly</strong>: polynomial object, created with <code>formpoly</code>.</li>
+<li><strong>degree</strong>: degree of the term to get the coefficient of.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$p = formpoly(array(3,1), array(2,0))
+getcoef($p, 2)  // 3
+getcoef($p, 1)  // 0</pre></details>
 
-<h3><a name="polys_getdegree">polys_getdegree</a></h3>
-<p><b>polys_getdegree(poly)</b></p>
+<h3 id="polys_getdegree"><a name="polys_getdegree">polys_getdegree</a></h3>
+<p><strong>polys_getdegree(poly)</strong></p>
 <p>Returns the degree of the polynomial.</p>
 <ul>
-<li><b>poly</b>: polynomial object.</li>
+<li><strong>poly</strong>: polynomial object.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$p = formpoly(array(3,1), array(2,0))
+polys_getdegree($p)  // 2</pre></details>
 
-<h3><a name="describepoly">describepoly</a></h3>
-<p><b>describepoly(eqn, xints, [invar, outvar, other])</b></p>
-<p>Generates a text description of a polynomial that you can use as 
+<h3 id="describepoly"><a name="describepoly">describepoly</a></h3>
+<p><strong>describepoly(eqn, xints, [invar, outvar, other])</strong></p>
+<p>Generates a text description of a polynomial that you can use as
     an input to replacealttext when the auto-generated table of values
-    isn't sufficient for accessibility.  Note the function only describes 
+    isn't sufficient for accessibility. Note the function only describes
     behavior at roots for multiplicity 1 and 2 behaviors.
 </p>
 <ul>
-    <li><b>eqn</b>: string equation, like "3(x-2)(x-3)"</li>
-    <li><b>xints</b>: array of x-intercepts, like  [2,3]</li>
-    <li><b>invar</b>: (optional) input variable (default "x")</li>
-    <li><b>outvar</b>: (optional) output variable (default "y")</li>
-    <li><b>other</b>: (optional) array of other features you want to note
-        each of form 
+    <li><strong>eqn</strong>: string equation, like "3(x-2)(x-3)"</li>
+    <li><strong>xints</strong>: array of x-intercepts, like  [2,3]</li>
+    <li><strong>invar</strong>: (optional) input variable (default "x")</li>
+    <li><strong>outvar</strong>: (optional) output variable (default "y")</li>
+    <li><strong>other</strong>: (optional) array of other features you want to note
+        each of form
         [xval, 'description'] or 'description'
  		ex: [[3, 'local minimum'], 'graph is concave up'].
         if xval is given, it will calculate the y and generate "description at (xval,yval)"</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$desc = describepoly("3(x-2)(x-3)", array(2,3))
+$desc2 = describepoly("(x-1)^2", array(1), "x", "y", array([1, 'local minimum']))</pre></details>
 
-<h3><a name="describerational">describerational</a></h3>
-<p><b>describerational(eqn, xints, vas, ha, [invar, outvar, other])</b></p>
-<p>Generates a text description of a rational function that you can use as 
+<h3 id="describerational"><a name="describerational">describerational</a></h3>
+<p><strong>describerational(eqn, xints, vas, ha, [invar, outvar, other])</strong></p>
+<p>Generates a text description of a rational function that you can use as
     an input to replacealttext when the auto-generated table of values
-    isn't sufficient for accessibility. Note the function only describes 
+    isn't sufficient for accessibility. Note the function only describes
     behavior at roots and asymptotes for multiplicity 1 and 2 behaviors.
 </p>
 <ul>
-    <li><b>eqn</b>: string equation, like <code>"2((x-3)(x-2))/((x-4)(x+1))"</code></li>
-    <li><b>xints</b>: array of x-intercepts, like [2,3]</li>
-    <li><b>vas</b>: array of x-coordinates of vertical asymptotes, like [-1,4]</li>
-    <li><b>ha</b>: horizontal asymptote value, null if none, ex: 2</li>
-    <li><b>invar</b>: (optional) input variable (default "x")</li>
-    <li><b>outvar</b>: (optional) output variable (default "y")</li>
-    <li><b>other</b>: (optional) array of other features you want to note
-        each of form 
+    <li><strong>eqn</strong>: string equation, like <code>"2((x-3)(x-2))/((x-4)(x+1))"</code></li>
+    <li><strong>xints</strong>: array of x-intercepts, like [2,3]</li>
+    <li><strong>vas</strong>: array of x-coordinates of vertical asymptotes, like [-1,4]</li>
+    <li><strong>ha</strong>: horizontal asymptote value, null if none, ex: 2</li>
+    <li><strong>invar</strong>: (optional) input variable (default "x")</li>
+    <li><strong>outvar</strong>: (optional) output variable (default "y")</li>
+    <li><strong>other</strong>: (optional) array of other features you want to note
+        each of form
         <code>[xval, 'description']</code> or <code>'description'</code>
  		ex: <code>[[3, 'local minimum'], 'slant asymptote of y=x+1']</code>.
         if xval is given, it will calculate the y and generate <code>"description at (xval,yval)"</code></li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$desc = describerational("2((x-3)(x-2))/((x-4)(x+1))", array(2,3), array(-1,4), 2)</pre></details>
+</body></html>

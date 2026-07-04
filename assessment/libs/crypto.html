@@ -4,9 +4,11 @@
         <title>crypto help</title>
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library crypto</h1>
-Cryptography functions, Nov 2, 2012
-<BR><ul>
+<p>Cryptography functions, Nov 2, 2012</p>
+<ul>
 <li><a href="#chunktext">chunktext</a></li>
 <li><a href="#randfiveletterword">randfiveletterword</a></li>
 <li><a href="#randmilphrase">randmilphrase</a></li>
@@ -17,55 +19,80 @@ Cryptography functions, Nov 2, 2012
 <li><a href="#modularexponent">modularexponent</a></li>
 <li><a href="#cryptorsakeys">cryptorsakeys</a></li>
 </ul>
-<h3><a name="chunktext">chunktext</a></h3>
-chunktext(text, size)
-<BR>adds spaces between chunks of text of the given size
-<BR><h3><a name="randfiveletterword">randfiveletterword</a></h3>
-randfiveletterword()
-<BR>returns a random five-letter word
-<BR><h3><a name="randmilphrase">randmilphrase</a></h3>
-randmilphrase([removespaces],[pad])
-<BR>returns a random military-ish phrase like "at noon march towards target"
-<BR>if removespaces is set to true, all spaces will be removed
-<BR>if pad is set to a number N, then the phrase will be padded with random characters
-<BR>for a transposition cipher with N columns.
-<BR><h3><a name="shiftcipher">shiftcipher</a></h3>
-shiftcipher(message, shift, [alpha] [rotate]) 
-<BR>encrypts the message using a basic Caesar shift substitution cipher.
-<BR>shift can be numeric value (e.g., 3 means A encrypts as D), or can be a letter
-<BR>  indicating what A encrypts as
-<BR>alpha should be "alpha" for A-Z or "alphanum" for A-Z0-9.  Defaults to "alpha"
-<BR>if rotate is set to true, then the shift will be increased after each letter
-<BR>  is encrypted.  Can set to a number to shift by more 1 after each letter.
-<BR><h3><a name="randsubmap">randsubmap</a></h3>
-randsubmap([charset])
-<BR>generates a random substitution mapping
-<BR>by default uses A-Z.  Set charset="alphanum" or A-Z0-9
-<BR><h3><a name="subcipher">subcipher</a></h3>
-subcipher(message, submap, [alpha] [rotate]) 
-<BR>encrypts the message using a general substitution cipher.
-<BR>submap is a string consisting of all characters of the character set in 
-<BR> desired mapping order
-<BR>alpha should be "alpha" for A-Z or "alphanum" for A-Z0-9.  Defaults to "alpha"
-<BR>if rotate is set to true, then the shift will be increased after each letter
-<BR>  is encrypted.  Can set to a number to shift by more 1 after each letter.
-<BR><h3><a name="transcipher">transcipher</a></h3>
-transcipher(message, columns, [order])
-<BR>encrypts a message using a basic transposition cipher, writing the message
-<BR>in rows, each with the given number of columns.  The encrypted message is
-<BR>then formed by reading down the columns.
-<BR>message is padded if needed with A's.
-<BR>by default, the columns are read from left to right.  If an array of numbers (0 to cols-1)
-<BR>are provided for order, they will specify the order to read.  If a word is
-<BR>fed in for order, it will serve as the the code-word, and columsn will be read
-<BR>in the alphabetic order of the letters in the word (e.g. day would mean 2 1 3
-<BR>since a is the first of the letters in the alphabet, d is 2nd, etc)
-<BR>
-<BR><h3><a name="modularexponent">modularexponent</a></h3>
-modularexponent(base, exponent, modulus)
-<BR>calculates base^exponent mod modulus
-<BR><h3><a name="cryptorsakeys">cryptorsakeys</a></h3>
-cryptorsakeys(p, q) 
-<BR>given two primes, p and q, returns array(n, e, d)
-<BR>where n and e form the public key, and d is the private key
-<BR>
+
+<h3 id="chunktext"><a name="chunktext">chunktext</a></h3>
+<p><strong>chunktext(text, size)</strong></p>
+<p>Adds spaces between chunks of text of the given size.</p>
+<details class="example"><summary>Examples</summary><pre>chunktext("HELLOWORLDABC", 5)  // "HELLO WORLD ABC"</pre></details>
+
+<h3 id="randfiveletterword"><a name="randfiveletterword">randfiveletterword</a></h3>
+<p><strong>randfiveletterword()</strong></p>
+<p>Returns a random five-letter word.</p>
+<details class="example"><summary>Examples</summary><pre>$word = randfiveletterword()  // e.g. "HOUSE"</pre></details>
+
+<h3 id="randmilphrase"><a name="randmilphrase">randmilphrase</a></h3>
+<p><strong>randmilphrase([removespaces], [pad])</strong></p>
+<p>Returns a random military-ish phrase like "at noon march towards target".</p>
+<ul>
+<li><strong>removespaces</strong>: Optional - if set to true, all spaces will be removed.</li>
+<li><strong>pad</strong>: Optional - if set to a number <code>N</code>, then the phrase will be padded with random characters for a transposition cipher with <code>N</code> columns.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$phrase = randmilphrase()  // e.g. "at noon march towards target"
+$phrase2 = randmilphrase(true)  // e.g. "atnoonmarchtowardstarget"
+$phrase3 = randmilphrase(true, 6)  // padded to a multiple of 6 characters</pre></details>
+
+<h3 id="shiftcipher"><a name="shiftcipher">shiftcipher</a></h3>
+<p><strong>shiftcipher(message, shift, [alpha], [rotate])</strong></p>
+<p>Encrypts the message using a basic Caesar shift substitution cipher.</p>
+<ul>
+<li><strong>message</strong>: the text to encrypt.</li>
+<li><strong>shift</strong>: can be a numeric value (e.g., 3 means A encrypts as D), or can be a letter indicating what A encrypts as.</li>
+<li><strong>alpha</strong>: Optional - should be "alpha" for A-Z or "alphanum" for A-Z0-9. Defaults to "alpha".</li>
+<li><strong>rotate</strong>: Optional - if set to true, then the shift will be increased after each letter is encrypted. Can be set to a number to shift by more than 1 after each letter.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>shiftcipher("ATTACK", 3)  // "DWWDFN"
+shiftcipher("ATTACK", "D")  // "DWWDFN" (D is what A shifts to)
+shiftcipher("ATTACK", 1, "alpha", true)  // rotating shift, e.g. "BVVEGQ"</pre></details>
+
+<h3 id="randsubmap"><a name="randsubmap">randsubmap</a></h3>
+<p><strong>randsubmap([charset])</strong></p>
+<p>Generates a random substitution mapping.</p>
+<p>By default uses A-Z. Set <code>charset</code> to "alphanum" for A-Z0-9.</p>
+<details class="example"><summary>Examples</summary><pre>$map = randsubmap()  // random mapping of A-Z, e.g. "QWERTYUIOPASDFGHJKLZXCVBNM"
+$map2 = randsubmap("alphanum")  // random mapping of A-Z0-9</pre></details>
+
+<h3 id="subcipher"><a name="subcipher">subcipher</a></h3>
+<p><strong>subcipher(message, submap, [alpha], [rotate])</strong></p>
+<p>Encrypts the message using a general substitution cipher.</p>
+<ul>
+<li><strong>message</strong>: the text to encrypt.</li>
+<li><strong>submap</strong>: a string consisting of all characters of the character set in the desired mapping order.</li>
+<li><strong>alpha</strong>: Optional - should be "alpha" for A-Z or "alphanum" for A-Z0-9. Defaults to "alpha".</li>
+<li><strong>rotate</strong>: Optional - if set to true, then the shift will be increased after each letter is encrypted. Can be set to a number to shift by more than 1 after each letter.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$map = randsubmap()
+$enc = subcipher("ATTACK", $map)  // encrypts ATTACK using the random mapping</pre></details>
+
+<h3 id="transcipher"><a name="transcipher">transcipher</a></h3>
+<p><strong>transcipher(message, columns, [order])</strong></p>
+<p>Encrypts a message using a basic transposition cipher, writing the message in rows, each with the given number of columns. The encrypted message is then formed by reading down the columns. The message is padded if needed with A's.</p>
+<ul>
+<li><strong>message</strong>: the text to encrypt.</li>
+<li><strong>columns</strong>: number of columns to write the message into.</li>
+<li><strong>order</strong>: Optional - by default, the columns are read left to right. If an array of numbers (0 to cols-1) is provided, they specify the order to read the columns. If a word is given instead, it serves as the code-word, and columns are read in the alphabetic order of the letters in the word (e.g. "day" would mean 2 1 3, since a is the first of the letters alphabetically, d is 2nd, etc).</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>transcipher("ATTACKATDAWN", 3)  // reads columns left to right
+transcipher("ATTACKATDAWN", 3, array(2,0,1))  // reads columns in a custom order
+transcipher("ATTACKATDAWN", 3, "day")  // columns read in alphabetic order of "day"</pre></details>
+
+<h3 id="modularexponent"><a name="modularexponent">modularexponent</a></h3>
+<p><strong>modularexponent(base, exponent, modulus)</strong></p>
+<p>Calculates <code>base^exponent mod modulus</code>.</p>
+<details class="example"><summary>Examples</summary><pre>modularexponent(4, 13, 497)  // 445</pre></details>
+
+<h3 id="cryptorsakeys"><a name="cryptorsakeys">cryptorsakeys</a></h3>
+<p><strong>cryptorsakeys(p, q)</strong></p>
+<p>Given two primes, <code>p</code> and <code>q</code>, returns <code>array(n, e, d)</code> where <code>n</code> and <code>e</code> form the public key, and <code>d</code> is the private key.</p>
+<details class="example"><summary>Examples</summary><pre>list($n, $e, $d) = cryptorsakeys(61, 53)
+// $n, $e is the public key; $d is the private key</pre></details>
+</body></html>

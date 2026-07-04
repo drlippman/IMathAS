@@ -3,34 +3,51 @@
     <title>interval help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library interval</h1>
-Interval functions, Version 1.1 March 2, 2010
-<BR><ul>
+<p>Interval functions, Version 1.1 March 2, 2010</p>
+<ul>
 <li><a href="#forminterval">forminterval</a></li>
 <li><a href="#linegraph">linegraph</a></li>
 <li><a href="#linegraphbrackets">linegraphbrackets</a></li>
 <li><a href="#intervalstodraw">intervalstodraw</a></li>
 </ul>
-<h3><a name="forminterval">forminterval</a></h3>
-forminterval(min,max,minmarkertype,maxmarkertype)
-<BR>Forms an interval string, like "[2,3)"
-<BR>min,max: min and max of interval
-<BR>minmarkertype, maxmarkertype: 0 for open, 1 for closed
-<BR><h3><a name="linegraph">linegraph</a></h3>
-linegraph(intervals,[xmin,xmax,xscl,width,height])
-<BR>Creates a line graph
-<BR>intervals:  string or array of strings in interval notation, ex: [2,5)
-<BR><h3><a name="linegraphbrackets">linegraphbrackets</a></h3>
-linegraphbrackets(intervals,[xmin,xmax,xscl,width,height])
-<BR>Creates a line graph using brackets/parens instead of open/closed dots
-<BR>intervals:  string or array of strings in interval notation, ex: [2,5)
-<br>xscl can be a number, or "labelscl:tickscl" to have labels and tick marks 
-    at different spacing.
-<BR><h3><a name="intervalstodraw">intervalstodraw</a></h3>
-intervalstodraw(interval,xmin,xmax)
-<BR>converts an interval like (-oo,4]U(3,5] into an array of strings 
-<BR>suitable for use as $answers for a drawing question with 
-<BR>$answerformat = 'numberline'
-<BR>also provide xmin and xmax, the min and max of the drawing grid
-<BR>if different than the default -5 to 5
-<BR>
+
+<h3 id="forminterval"><a name="forminterval">forminterval</a></h3>
+<p><strong>forminterval(min, max, minmarkertype, maxmarkertype)</strong></p>
+<p>Forms an interval string, like "[2,3)".</p>
+<ul>
+<li><strong>min, max</strong>: min and max of the interval.</li>
+<li><strong>minmarkertype, maxmarkertype</strong>: 0 for open, 1 for closed.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>forminterval(2, 3, 1, 0)  // "[2,3)"</pre></details>
+
+<h3 id="linegraph"><a name="linegraph">linegraph</a></h3>
+<p><strong>linegraph(intervals, [xmin, xmax, xscl, width, height])</strong></p>
+<p>Creates a line graph.</p>
+<ul>
+<li><strong>intervals</strong>: string or array of strings in interval notation, e.g. "[2,5)".</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>linegraph("[2,5)")
+linegraph(array("(-oo,-1]", "[2,5)"), -10, 10)</pre></details>
+
+<h3 id="linegraphbrackets"><a name="linegraphbrackets">linegraphbrackets</a></h3>
+<p><strong>linegraphbrackets(intervals, [xmin, xmax, xscl, width, height])</strong></p>
+<p>Creates a line graph using brackets/parens instead of open/closed dots.</p>
+<ul>
+<li><strong>intervals</strong>: string or array of strings in interval notation, e.g. "[2,5)".</li>
+<li><strong>xscl</strong>: can be a number, or "labelscl:tickscl" to have labels and tick marks at different spacing.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>linegraphbrackets("[2,5)")
+linegraphbrackets("[2,5)", -10, 10, "2:1")  // labels every 2, ticks every 1</pre></details>
+
+<h3 id="intervalstodraw"><a name="intervalstodraw">intervalstodraw</a></h3>
+<p><strong>intervalstodraw(interval, xmin, xmax)</strong></p>
+<p>Converts an interval like <code>(-oo,4]U(3,5]</code> into an array of strings suitable for use as <code>$answers</code> for a drawing question with <code>$answerformat = 'numberline'</code>.</p>
+<ul>
+<li><strong>xmin, xmax</strong>: the min and max of the drawing grid, if different than the default -5 to 5.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$answers = intervalstodraw("(-oo,4]U(3,5]")
+$answers2 = intervalstodraw("[-8,8]", -10, 10)</pre></details>
+</body></html>

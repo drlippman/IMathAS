@@ -4,9 +4,11 @@
         <title>fractions help</title>
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library fractions</h1>
-Fraction operations library
-<BR><ul>
+<p>Fraction operations library</p>
+<ul>
 <li><a href="#fractionrand">fractionrand</a></li>
 <li><a href="#fractiondiffdrands">fractiondiffdrands</a></li>
 <li><a href="#fractiondiffdrandsfrom">fractiondiffdrandsfrom</a></li>
@@ -22,49 +24,77 @@ Fraction operations library
 <li><a href="#fractionpower">fractionpower</a></li>
 <li><a href="#fractionroot">fractionroot</a></li>
 </ul>
-<h3><a name="fractionrand">fractionrand</a></h3>
-fractionrand(denom) 
-<BR>returns a proper reduced fraction with the given denominator
-<BR><h3><a name="fractiondiffdrands">fractiondiffdrands</a></h3>
-fractiondiffdrands(min,max,n,[order]) {
-<BR>returns n fractions with different denominators from min to max. Can set order to 'inc' or 'dec' to sort the values
-<BR><h3><a name="fractiondiffdrandsfrom">fractiondiffdrandsfrom</a></h3>
-fractiondiffdrandsfrom(list,n,[order]) {
-<BR>returns n fractions with different denominators from the list. Can set order to 'inc' or 'dec' to sort the values
-<BR><h3><a name="fractionparse">fractionparse</a></h3>
-fractionparse(fraction)
-<BR>converts a fraction into an array(num, denom)
-<BR><h3><a name="fractiontomixed">fractiontomixed</a></h3>
-fractiontomixed(f)
-<BR>converts a fraction string to a mixed number string
-<BR><h3><a name="fractiontodecimal">fractiontodecimal</a></h3>
-fractiontodecimal(f)
-<BR><h3><a name="fractionreduce">fractionreduce</a></h3>
-fractionreduce(f)
-<BR>takes a fraction string or array(num,denom)
-<BR>returns a reduced fraction string
-<BR><h3><a name="fractionadd">fractionadd</a></h3>
-fractionadd(f1,f2,[f3,f4,...])
-<BR>adds a set of fractions, returning a reduced fraction sum
-<BR><h3><a name="fractionsubtract">fractionsubtract</a></h3>
-fractionsubtract(f1,f2,[f3,f4,...])
-<BR>subtract a set of fractions, returning a reduced fraction difference
-<BR>f1 - f2 - f3 - f4 etc.
-<BR><h3><a name="fractionmultiply">fractionmultiply</a></h3>
-fractionmultiply(f1,f2,[f3,f4,...])
-<BR>multiply a set of fractions, returning a reduced fraction
-<BR><h3><a name="fractiondivide">fractiondivide</a></h3>
-fractiondivide(f1,f2,[f3,f4,...])
-<BR>divide a set of fractions, returning a reduced fraction
-<BR>f1 -: f2 -: f3 -: f4
-<BR><h3><a name="fractionneg">fractionneg</a></h3>
-fractionneg(frac)
-<BR>change the sign of a fraction
-<BR><h3><a name="fractionpower">fractionpower</a></h3>
-fractionpower(frac, power)
-<BR>raises a fraction to a power
-<BR><h3><a name="fractionroot">fractionroot</a></h3>
-fractionroot(frac, [root, rationalize])
-<BR>finds the root of the fraction (defaults to square root). Rationalizes
-<BR>the denominator by default.  The output is a string.
-<BR>
+
+<h3 id="fractionrand"><a name="fractionrand">fractionrand</a></h3>
+<p><strong>fractionrand(denom)</strong></p>
+<p>Returns a proper reduced fraction with the given denominator.</p>
+<details class="example"><summary>Examples</summary><pre>fractionrand(12)  // e.g. "5/12"</pre></details>
+
+<h3 id="fractiondiffdrands"><a name="fractiondiffdrands">fractiondiffdrands</a></h3>
+<p><strong>fractiondiffdrands(min, max, n, [order])</strong></p>
+<p>Returns <code>n</code> fractions with different denominators from min to max. Can set order to 'inc' or 'dec' to sort the values.</p>
+<details class="example"><summary>Examples</summary><pre>fractiondiffdrands(2, 10, 3)  // e.g. array("1/7", "3/4", "5/9")
+fractiondiffdrands(2, 10, 3, "inc")  // sorted increasing</pre></details>
+
+<h3 id="fractiondiffdrandsfrom"><a name="fractiondiffdrandsfrom">fractiondiffdrandsfrom</a></h3>
+<p><strong>fractiondiffdrandsfrom(list, n, [order])</strong></p>
+<p>Returns <code>n</code> fractions with different denominators from the list. Can set order to 'inc' or 'dec' to sort the values.</p>
+<details class="example"><summary>Examples</summary><pre>fractiondiffdrandsfrom(array(2,4,6,8), 2)  // e.g. array("1/4", "3/8")</pre></details>
+
+<h3 id="fractionparse"><a name="fractionparse">fractionparse</a></h3>
+<p><strong>fractionparse(fraction)</strong></p>
+<p>Converts a fraction into <code>array(num, denom)</code>.</p>
+<details class="example"><summary>Examples</summary><pre>fractionparse("3/4")  // array(3, 4)</pre></details>
+
+<h3 id="fractiontomixed"><a name="fractiontomixed">fractiontomixed</a></h3>
+<p><strong>fractiontomixed(f)</strong></p>
+<p>Converts a fraction string to a mixed number string.</p>
+<details class="example"><summary>Examples</summary><pre>fractiontomixed("7/2")  // "3 1/2"</pre></details>
+
+<h3 id="fractiontodecimal"><a name="fractiontodecimal">fractiontodecimal</a></h3>
+<p><strong>fractiontodecimal(f)</strong></p>
+<p>Converts a fraction string to a decimal value.</p>
+<details class="example"><summary>Examples</summary><pre>fractiontodecimal("3/4")  // 0.75</pre></details>
+
+<h3 id="fractionreduce"><a name="fractionreduce">fractionreduce</a></h3>
+<p><strong>fractionreduce(f)</strong></p>
+<p>Takes a fraction string or <code>array(num,denom)</code>. Returns a reduced fraction string.</p>
+<details class="example"><summary>Examples</summary><pre>fractionreduce("4/8")  // "1/2"
+fractionreduce(array(4,8))  // "1/2"</pre></details>
+
+<h3 id="fractionadd"><a name="fractionadd">fractionadd</a></h3>
+<p><strong>fractionadd(f1, f2, [f3, f4, ...])</strong></p>
+<p>Adds a set of fractions, returning a reduced fraction sum.</p>
+<details class="example"><summary>Examples</summary><pre>fractionadd("1/2", "1/3")  // "5/6"</pre></details>
+
+<h3 id="fractionsubtract"><a name="fractionsubtract">fractionsubtract</a></h3>
+<p><strong>fractionsubtract(f1, f2, [f3, f4, ...])</strong></p>
+<p>Subtracts a set of fractions, returning a reduced fraction difference: <code>f1 - f2 - f3 - f4</code> etc.</p>
+<details class="example"><summary>Examples</summary><pre>fractionsubtract("5/6", "1/3")  // "1/2"</pre></details>
+
+<h3 id="fractionmultiply"><a name="fractionmultiply">fractionmultiply</a></h3>
+<p><strong>fractionmultiply(f1, f2, [f3, f4, ...])</strong></p>
+<p>Multiplies a set of fractions, returning a reduced fraction.</p>
+<details class="example"><summary>Examples</summary><pre>fractionmultiply("2/3", "3/4")  // "1/2"</pre></details>
+
+<h3 id="fractiondivide"><a name="fractiondivide">fractiondivide</a></h3>
+<p><strong>fractiondivide(f1, f2, [f3, f4, ...])</strong></p>
+<p>Divides a set of fractions, returning a reduced fraction: <code>f1 &divide; f2 &divide; f3 &divide; f4</code>.</p>
+<details class="example"><summary>Examples</summary><pre>fractiondivide("1/2", "3/4")  // "2/3"</pre></details>
+
+<h3 id="fractionneg"><a name="fractionneg">fractionneg</a></h3>
+<p><strong>fractionneg(frac)</strong></p>
+<p>Changes the sign of a fraction.</p>
+<details class="example"><summary>Examples</summary><pre>fractionneg("3/4")  // "-3/4"</pre></details>
+
+<h3 id="fractionpower"><a name="fractionpower">fractionpower</a></h3>
+<p><strong>fractionpower(frac, power)</strong></p>
+<p>Raises a fraction to a power.</p>
+<details class="example"><summary>Examples</summary><pre>fractionpower("2/3", 2)  // "4/9"</pre></details>
+
+<h3 id="fractionroot"><a name="fractionroot">fractionroot</a></h3>
+<p><strong>fractionroot(frac, [root, rationalize])</strong></p>
+<p>Finds the root of the fraction (defaults to square root). Rationalizes the denominator by default. The output is a string.</p>
+<details class="example"><summary>Examples</summary><pre>fractionroot("4/9")  // "2/3"
+fractionroot("1/2", 2, false)  // not rationalized, e.g. "1/sqrt(2)"</pre></details>
+</body></html>

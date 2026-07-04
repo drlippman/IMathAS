@@ -3,49 +3,20 @@
     <head>
         <title>logic help</title>
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
-        <style>
-            table {border: 0px;
-                border-style: solid;}
-            table th {padding: 50px;
-                margin: 50px;}
-            table td {padding: 5px 5px 50px 5px;
-                margin: 50px;}
-            table table {border-collapse: collapse;}
-            table table td {border: 3px;
-                border-style: solid;
-                text-align: left;
-                vertical-align: top;
-                margin:4px;
-                padding:10px;}
-            table table th {border: 0px solid;
-                text-align: left;
-                vertical-align: top;
-                margin:4px;
-                padding:10px;}
-            table caption {
-                position: absolute;
-                right: 0px;
-                top: 0px;
-                width: 1px;
-                height: 1px;
-                overflow: hidden;
-                color: transparent;
-                }
-        </style>
     </head>
 <body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library logic</h1>
-Version 1.0: April 18, 2022<br />
-Created by Avery Flowers<br /><br />
-A collection of functions designed to aid in the creation of basic logic questions.<br />
-<br />
-
-Note: All variables used in these functions must be single alphabetical characters. Greek words or symbols are not supported.<br />
-Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 'iff'. Other synonymous words (such as 'not', 'ifthen', 'oplus', 'wedge', 'vee') can be used as well.<br />
+<p>Version 1.0: April 18, 2022</p>
+<p>Created by Avery Flowers</p>
+<p>A collection of functions designed to aid in the creation of basic logic questions.</p>
+<p>Note: All variables used in these functions must be single alphabetical characters. Greek words or symbols are not supported.</p>
+<p>Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 'iff'. Other synonymous words (such as 'not', 'ifthen', 'oplus', 'wedge', 'vee') can be used as well.</p>
 
 <ul>
 <li><a href="#logicallyequivalent">logicallyequivalent</a></li>
-<li><a href="#logcallyimplies">logcallyimplies</a></li>
+<li><a href="#logicallyimplies">logicallyimplies</a></li>
 <li><a href="#logicevaluate">logicevaluate</a></li>
 <li><a href="#logicevaluateall">logicevaluateall</a></li>
 <li><a href="#logicrand">logicrand</a></li>
@@ -56,240 +27,121 @@ Note: The valid logical operations are 'and', 'or', 'xor', 'neg', 'implies' and 
 <li><a href="#logiclegend">logiclegend</a></li>
 </ul>
 
-<table role="presentation">
-<tr>
-    <td>
-        <h3><a name="logicallyequivalent">logicallyequivalent(exp1,exp2,vars)</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp1</i>: A logical expression.<br />
-                    <i>exp2</i>: A logical expression.<br />
-                    <i>vars</i>: An array/list of variables.</td>
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>1 (TRUE) if <i>exp1</i> is logically equivalent to <i>exp2</i>. 0 (FALSE) otherwise.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="logicallyequivalent"><a name="logicallyequivalent">logicallyequivalent</a></h3>
+<p><strong>logicallyequivalent(exp1, exp2, vars)</strong></p>
+<ul>
+    <li><strong>exp1</strong>: A logical expression.</li>
+    <li><strong>exp2</strong>: A logical expression.</li>
+    <li><strong>vars</strong>: An array/list of variables.</li>
+</ul>
+<p><em>Returns:</em> 1 (TRUE) if <code>exp1</code> is logically equivalent to <code>exp2</code>. 0 (FALSE) otherwise.</p>
 
-<tr>
-    <td>
-        <h3><a name="logcallyimplies">logcallyimplies(exp1,exp2,vars)</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp1</i>: A logical expression.<br />
-                    <i>exp2</i>: A logical expression.<br />
-                    <i>vars</i>: An array/list of variables.</td>
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>1 (TRUE) if <i>exp1</i> logically implies <i>exp2</i>. 0 (FALSE) otherwise.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="logicallyimplies"><a name="logicallyimplies">logicallyimplies</a></h3>
+<p><strong>logicallyimplies(exp1, exp2, vars)</strong></p>
+<ul>
+    <li><strong>exp1</strong>: A logical expression.</li>
+    <li><strong>exp2</strong>: A logical expression.</li>
+    <li><strong>vars</strong>: An array/list of variables.</li>
+</ul>
+<p><em>Returns:</em> 1 (TRUE) if <code>exp1</code> logically implies <code>exp2</code>. 0 (FALSE) otherwise.</p>
 
-<tr>
-    <td>
-        <h3><a name="logicevaluate">logicevaluate(exp,vars,truths)</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp</i>: A logical expression.<br />
-                    <i>vars</i>: An array (or list) of variables contained within the expression.<br />
-                    <i>truths</i>: An array (or list) the same size as <i>vars</i>, containing binary or boolean values to be assigned to each entry in <i>vars</i>.</td>
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>A binary digit corresponding to the truth value of <i>exp</i> if each variable in <i>vars</i> is replaced with the corresponding binary digit (truth value) in <i>truths</i></td>
-            </tr>
-            <tr>
-                <th>Example:</th>
-                <td><code>logicevaluate('a implies b','a,b','1,0')</code> would output 0 (FALSE), since a->b is false when a=1 and b=0.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="logicevaluate"><a name="logicevaluate">logicevaluate</a></h3>
+<p><strong>logicevaluate(exp, vars, truths)</strong></p>
+<ul>
+    <li><strong>exp</strong>: A logical expression.</li>
+    <li><strong>vars</strong>: An array (or list) of variables contained within the expression.</li>
+    <li><strong>truths</strong>: An array (or list) the same size as <code>vars</code>, containing binary or boolean values to be assigned to each entry in <code>vars</code>.</li>
+</ul>
+<p><em>Returns:</em> a binary digit corresponding to the truth value of <code>exp</code> if each variable in <code>vars</code> is replaced with the corresponding binary digit (truth value) in <code>truths</code>.</p>
+<details class="example"><summary>Examples</summary><pre>logicevaluate('a implies b', 'a,b', '1,0')
+// 0 (FALSE), since a->b is false when a=1 and b=0</pre></details>
 
-<tr>
-    <td>
-        <h3><a name="logicevaluateall">logicevaluateall(exp,vars)</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp</i>: A logical expression.<br />
-                    <i>vars</i>: An array (or list) of variables contained within the expression.</td>
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>A bitstring of length 2^|<i>vars</i>|. The bit in position i (indexed at 0) is the result of the <i>logicevaluate</i> function with the <i>truth</i> array equalling the binary representation of i.</td>
-            </tr>
-            <tr>
-                <th>Example:</th>
-                <td><code>logicevaluateall('a and b','a,b')</code> would output <code>array(0,0,0,1)</code>The entry at index 2 (binary 10) corresponds to evaluating 'a and b' with a=1 and b=0. Remember that arrays are 0-indexed.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="logicevaluateall"><a name="logicevaluateall">logicevaluateall</a></h3>
+<p><strong>logicevaluateall(exp, vars)</strong></p>
+<ul>
+    <li><strong>exp</strong>: A logical expression.</li>
+    <li><strong>vars</strong>: An array (or list) of variables contained within the expression.</li>
+</ul>
+<p><em>Returns:</em> a bitstring of length 2^|<code>vars</code>|. The bit in position i (indexed at 0) is the result of the <code>logicevaluate</code> function with the <code>truth</code> array equalling the binary representation of i.</p>
+<details class="example"><summary>Examples</summary><pre>logicevaluateall('a and b', 'a,b')
+// array(0,0,0,1)
+// The entry at index 2 (binary 10) corresponds to evaluating 'a and b' with a=1 and b=0.
+// Remember that arrays are 0-indexed.</pre></details>
 
-<tr>
-    <td>
-        <h3><a name="logicrand">logicrand(vars,ops,bnum,unum)</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>vars</i>: An array (or list) of variables.<br />
-                    <i>ops</i>: An array (or list) of logical binary operations (and,or,xor,implies,iff)<br />
-                    <i>bnum</i>: An array (or list) of integers between 1 and 4<br />
-                    <i>unum</i>: An array (or list) of integers between 0 and 2*(the minimum entry in bnum)+1<br />
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>A random logical expression containing variables from the <i>vars</i> array, operations from the <i>ops</i> array. The number of binary operations will be a random element of <i>bnum</i>. The number of negations will be a random element of <i>unum</i>. Tries to avoid 'silly' expressions such as (p and q) or (q and p) for example.</td>
-            </tr>
-            <tr>
-                <th>Example:</th>
-                <td>logicrand("p,q,r","and,or,xor",2,1) will return a random expression using p, q, r with 2 binary operations (and, or, xor only) and 1 negation symbol. For instance, it could return the string 'r and not (p xor q)'.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="logicrand"><a name="logicrand">logicrand</a></h3>
+<p><strong>logicrand(vars, ops, bnum, unum)</strong></p>
+<ul>
+    <li><strong>vars</strong>: An array (or list) of variables.</li>
+    <li><strong>ops</strong>: An array (or list) of logical binary operations (and,or,xor,implies,iff).</li>
+    <li><strong>bnum</strong>: An array (or list) of integers between 1 and 4.</li>
+    <li><strong>unum</strong>: An array (or list) of integers between 0 and 2*(the minimum entry in bnum)+1.</li>
+</ul>
+<p><em>Returns:</em> a random logical expression containing variables from the <code>vars</code> array, operations from the <code>ops</code> array. The number of binary operations will be a random element of <code>bnum</code>. The number of negations will be a random element of <code>unum</code>. Tries to avoid 'silly' expressions such as (p and q) or (q and p) for example.</p>
+<details class="example"><summary>Examples</summary><pre>logicrand("p,q,r", "and,or,xor", 2, 1)
+// a random expression using p, q, r with 2 binary operations (and, or, xor only)
+// and 1 negation symbol, e.g. 'r and not (p xor q)'</pre></details>
 
-<tr>
-    <td>
-        <h3><a name="logicmakepretty">logicmakepretty(exp)</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp</i>: A logical expression.
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>Converts the output of the logical functions here to a format to be 'prettified' (removing unnecessary parentheses, double negations, etc.) for display in the Question Text</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="logicmakepretty"><a name="logicmakepretty">logicmakepretty</a></h3>
+<p><strong>logicmakepretty(exp)</strong></p>
+<ul>
+    <li><strong>exp</strong>: A logical expression.</li>
+</ul>
+<p><em>Returns:</em> converts the output of the logical functions here to a format to be 'prettified' (removing unnecessary parentheses, double negations, etc.) for display in the Question Text.</p>
 
-<tr>
-    <td>
-        <h3><a name="logicsteps">logicsteps(exp)</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp</i>: A logical expression.
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>An array of logical subexpressions of <i>exp</i>, each entry applying one operation to the previous entry until the last entry is <i>exp</i>. This shows the 'steps' required to evaluate or construct <i>exp</i>.</td>
-            </tr>
-            <tr>
-                <th>Example:</th>
-                <td><code>logicsteps('(p and q) or not p')</code> would return array('p and q', 'not p', '(p and q) or not p') since these are the steps necessary to evaluate '(p and q) or not p'.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="logicsteps"><a name="logicsteps">logicsteps</a></h3>
+<p><strong>logicsteps(exp)</strong></p>
+<ul>
+    <li><strong>exp</strong>: A logical expression.</li>
+</ul>
+<p><em>Returns:</em> an array of logical subexpressions of <code>exp</code>, each entry applying one operation to the previous entry until the last entry is <code>exp</code>. This shows the 'steps' required to evaluate or construct <code>exp</code>.</p>
+<details class="example"><summary>Examples</summary><pre>logicsteps('(p and q) or not p')
+// array('p and q', 'not p', '(p and q) or not p')</pre></details>
 
-<tr>
-    <td>
-        <h3><a name="truthtable">truthtable(exp, [showResult=FALSE], [showSteps=TRUE], [offset=0])</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp</i>: A logical expression.<br />
-                    <i>showResult</i>: If FALSE (default), each entry in the constructed truth table (beyond the atomic variables) will contain an answerbox [AB#]. If TRUE, the constructed truth table will be completed with T's and F's.
-                       If 2, the truth table will be filled in, and [AB#] will be placed in the header for the expression(s).
-                       If 3, the truth table will be filled in, and a single [AB] will be placed in the header for hte expression.<br />
-                    <i>showSteps</i>: If TRUE (default), the constructed truth table will have a column for each subexpression of <i>exp</i>. If FALSE only the atomic variables and <i>exp</i> will be included in the table.<br />
-                    <i>offset</i>: Only applies when showResult is FALSE. Gives the index of the first answerbox to be contained in the truth table. For instance, if <i>offset</i>=3, then the first entry in the truth table will be '[AB3]'.<br />
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>A string containing HTML code for a truth table for <i>exp</i>, using T's and F's for true and false.</td>
-            </tr>
-            <tr>
-                <th>Example:</th>
-                <td> <code>truthtable('(p and q) or not p',TRUE,TRUE)</code> would return a string for the table shown below (but in math display mode):
-                
-                    <table style="border: 0px solid; margin: 3px; border-collapse:collapse; border-style: hidden; ">
-                    <caption>Truth table</caption>
-                    <tr><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">q</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q)</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">neg p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q) or neg p</th></tr>
-                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
-                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td></tr>
-                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
-                    <tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr></table>
-    
-                </td>
-            </tr>
-            <tr>
-                <th>Note:</th>
-                <td>This does <b>not</b> change the $anstypes or $answer values. It should be used with truthtableanswers function below.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<h3 id="truthtable"><a name="truthtable">truthtable</a></h3>
+<p><strong>truthtable(exp, [showResult=FALSE], [showSteps=TRUE], [offset=0])</strong></p>
+<ul>
+    <li><strong>exp</strong>: A logical expression.</li>
+    <li><strong>showResult</strong>: If FALSE (default), each entry in the constructed truth table (beyond the atomic variables) will contain an answerbox [AB#]. If TRUE, the constructed truth table will be completed with T's and F's. If 2, the truth table will be filled in, and [AB#] will be placed in the header for the expression(s). If 3, the truth table will be filled in, and a single [AB] will be placed in the header for the expression.</li>
+    <li><strong>showSteps</strong>: If TRUE (default), the constructed truth table will have a column for each subexpression of <code>exp</code>. If FALSE only the atomic variables and <code>exp</code> will be included in the table.</li>
+    <li><strong>offset</strong>: Only applies when showResult is FALSE. Gives the index of the first answerbox to be contained in the truth table. For instance, if <code>offset</code>=3, then the first entry in the truth table will be '[AB3]'.</li>
+</ul>
+<p><em>Returns:</em> a string containing HTML code for a truth table for <code>exp</code>, using T's and F's for true and false.</p>
+<p><em>Note:</em> This does <strong>not</strong> change the $anstypes or $answer values. It should be used with the truthtableanswers function below.</p>
+<details class="example"><summary>Examples</summary><pre>truthtable('(p and q) or not p', TRUE, TRUE)
+// returns a string for the table shown below (but in math display mode):</pre>
+<table style="border: 0px solid; margin: 3px; border-collapse:collapse; border-style: hidden; ">
+<caption>Truth table</caption>
+<tr><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">q</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q)</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">neg p</th><th style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">(p and q) or neg p</th></tr>
+<tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
+<tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td></tr>
+<tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
+<tr><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">F</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td><td style="border:2px solid; padding: 10px; text-align: center; vertical-align: center;">T</td></tr>
+</table>
+</details>
 
-<tr>
-    <td>
-        <h3><a name="truthtableanswers">truthtableanswers(exp, [showSteps=TRUE])</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Input:</th>
-                <td><i>exp</i>: A logical expression.<br />
-                    <i>showSteps</i>: If TRUE (default), the constructed truth table will have a column for each subexpression of <i>exp</i>. If FALSE only the atomic variables and <i>exp</i> will be included in the table.<br />
-            </tr>
-            <tr>
-                <th>Output:</th>
-                <td>An array of binary truth values containing the answer to each answerbox in the truthtable function.</td>
-            </tr>
-            <tr>
-                <th>Note:</th>
-                <td>This is useful for autogenerating answers to the answerboxes found in truthtable. It does <b>not</b> affect $anstypes or $answer. It is recommended you place something like the following in the Common Control box:<br >
-                    <pre>
-$exp = 'p and q or not r'
+<h3 id="truthtableanswers"><a name="truthtableanswers">truthtableanswers</a></h3>
+<p><strong>truthtableanswers(exp, [showSteps=TRUE])</strong></p>
+<ul>
+    <li><strong>exp</strong>: A logical expression.</li>
+    <li><strong>showSteps</strong>: If TRUE (default), the constructed truth table will have a column for each subexpression of <code>exp</code>. If FALSE only the atomic variables and <code>exp</code> will be included in the table.</li>
+</ul>
+<p><em>Returns:</em> an array of binary truth values containing the answer to each answerbox in the truthtable function.</p>
+<p><em>Note:</em> This is useful for autogenerating answers to the answerboxes found in truthtable. It does <strong>not</strong> affect $anstypes or $answer. It is recommended you place something like the following in the Common Control box:</p>
+<details class="example"><summary>Examples</summary><pre>$exp = 'p and q or not r'
 $table = truthtable($exp, FALSE,TRUE)
 $tableanswers = truthtableanswers($exp,TRUE)
-$numboxes = count($tableanswers)-1<br />
+$numboxes = count($tableanswers)-1
 for($i=0..$numboxes){
-&nbsp;&nbsp;&nbsp;&nbsp;$anstypes[$i] = "choices"
-&nbsp;&nbsp;&nbsp;&nbsp;$displayformat[$i] = "select"
-&nbsp;&nbsp;&nbsp;&nbsp;$questions[$i] = array('F','T')  // Order is important: F=0 and T=1
-&nbsp;&nbsp;&nbsp;&nbsp;$noshuffle[$i] = "all"
-&nbsp;&nbsp;&nbsp;&nbsp;$answer[$i] = $tableanswers[$i]
-}
-                    </pre>
-                    
-                </td>
-            </tr>
-        </table>
-    </td>
-</tr>
+    $anstypes[$i] = "choices"
+    $displayformat[$i] = "select"
+    $questions[$i] = array('F','T')  // Order is important: F=0 and T=1
+    $noshuffle[$i] = "all"
+    $answer[$i] = $tableanswers[$i]
+}</pre></details>
 
-<tr>
-    <td>
-        <h3><a name="logiclegend">logiclegend()</a></h3>
-        <table valign="top">
-            <caption>Details</caption>
-            <tr>
-                <th>Output:</th>
-                <td>An simple string of HTML syntax that generates a table showing keyboard shortcuts for entering logic expressions.</td>
-            </tr>
-        </table>
-    </td>
-</tr>
-</table>
+<h3 id="logiclegend"><a name="logiclegend">logiclegend</a></h3>
+<p><strong>logiclegend()</strong></p>
+<p><em>Returns:</em> a simple string of HTML syntax that generates a table showing keyboard shortcuts for entering logic expressions.</p>
 
+</body>
+</html>

@@ -3,9 +3,11 @@
     <title>stats help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library stats</h1>
-A library of Stats functions.  Version 1.30, Nov 20, 2021
-<BR><ul>
+<p>A library of Stats functions. Version 1.30, Nov 20, 2021</p>
+<ul>
 <li><a href="#nCr">nCr</a></li>
 <li><a href="#nPr">nPr</a></li>
 <li><a href="#mean">mean</a></li>
@@ -79,510 +81,626 @@ A library of Stats functions.  Version 1.30, Nov 20, 2021
 <li><a href="#student_t">Two-sample student t-test</a></li>
 
 </ul>
-<h3><a name="nCr">nCr</a></h3>
-nCr(n,r)
-<BR>The Choose function
-<BR><h3><a name="nPr">nPr</a></h3>
-nPr(n,r)
-<BR>The Permutations function
-<BR><h3><a name="mean">mean</a></h3>
-mean(array,[weights])
-<BR>Finds the mean of an array of numbers.  Optionally you can provide a
-  corresponding array of weights or frequencies to do a weighted mean.
-<BR><h3><a name="variance">variance</a></h3>
-variance(array,[weights])
-<BR>the (sample) variance of an array of numbers. Optionally you can provide a
-  corresponding array of weights or frequencies to do a weighted variance.
-<BR><h3><a name="stdev">stdev</a></h3>
-stdev(array, [weights])
-<BR>the (sample) standard deviation of an array of numbers.  Optionally you can provide a
-  corresponding array of weights or frequencies to do a weighted stdev.
-<BR><h3><a name="absmeandev">absmeandev</a></h3>
-absmeandev(array)
-<BR>the absolute mean deviation of an array of numbers
-<BR><h3><a name="percentile">percentile</a></h3>
-percentile(array,percentile)
-<BR>example: percentile($a,30) would find the 30th percentile of the data
-<BR>Calculates using the p/100*(N) method (e.g. Triola)
 
-<BR><h3><a name="interppercentile">interppercentile</a></h3>
-<BR>interppercentile(array, percentile, [mode])
-<BR>Interpolated percentile. Finds the percentile using an interpolated method.
-<BR>&nbsp; mode=1 (def): Matches Excel's PERCENTILE.EXC, JMP, and recommended by NIST
-<BR>&nbsp; &nbsp; except that this function will return the lowest/highest value if needed.
-<BR>&nbsp; mode=2: Matches Excel's PERCENTILE.INC (and older percentile)
-<BR>&nbsp; mode=3: Matches Mathlab's prctile function
+<h3 id="nCr"><a name="nCr">nCr</a></h3>
+<p><strong>nCr(n, r)</strong></p>
+<p>The Choose function.</p>
+<details class="example"><summary>Examples</summary><pre>nCr(5, 2)  // 10</pre></details>
 
-<BR><h3><a name="Nplus1percentile">Nplus1percentile</a></h3>
-Nplus1percentile(array,percentile)
-<BR>example: percentile($a,30) would find the 30th percentile of the data
-<BR>Calculates using the p/100*(N+1) method (e.g. OpenStax).
-<BR><h3><a name="quartile">quartile</a></h3>
-quartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using percentiles.
-<BR><h3><a name="TIquartile">TIquartile</a></h3>
-TIquartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the TI-84 method.
-<BR><h3><a name="Excelquartile">Excelquartile</a></h3>
-Excelquartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the Excel method, matching the older
-  QUARTILE function or the newer QUARTILE.INC function.
-<BR><h3><a name="Excelquartileexc">Excelquartileexc</a></h3>
-Excelquartileexc(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the Excel method, matching
-  QUARTILE.EXC function.
-<BR><h3><a name="Nplus1quartile">Nplus1quartile</a></h3>
-Nplus1quartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Calculates using the N+1 method, which is like
-<BR>percentiles, but calculated using N+1 (OpenStax).
-<BR><h3><a name="allquartile">allquartile</a></h3>
-allquartile(array,quartile)
-<BR>finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
-<BR>array of numbers.  Uses all the quartile methods, and returns an "or" joined
-<BR>string of all unique answers.
-<BR><h3><a name="median">median</a></h3>
-median(array)
-<BR>returns the median of an array of numbers
-<BR><h3><a name="modes">modes</a></h3>
-modes(array)
-<br>Returns the mode or modes of the data array as a comma-separated list.
-If all the values have the same frequency it returns DNE.
-<BR><h3><a name="forceonemode">forceonemode</a></h3>
-forceonemode(array)
-<br>Returns the mode of the data array.  If the data does not have one unique
-mode, the data array will be altered to only have one mode.  Because this
+<h3 id="nPr"><a name="nPr">nPr</a></h3>
+<p><strong>nPr(n, r)</strong></p>
+<p>The Permutations function.</p>
+<details class="example"><summary>Examples</summary><pre>nPr(5, 2)  // 20</pre></details>
+
+<h3 id="mean"><a name="mean">mean</a></h3>
+<p><strong>mean(array, [weights])</strong></p>
+<p>Finds the mean of an array of numbers. Optionally you can provide a
+  corresponding array of weights or frequencies to do a weighted mean.</p>
+<details class="example"><summary>Examples</summary><pre>mean(array(2,4,6,8))  // 5
+mean(array(2,4,6), array(1,2,1))  // weighted mean</pre></details>
+
+<h3 id="variance"><a name="variance">variance</a></h3>
+<p><strong>variance(array, [weights])</strong></p>
+<p>The (sample) variance of an array of numbers. Optionally you can provide a
+  corresponding array of weights or frequencies to do a weighted variance.</p>
+<details class="example"><summary>Examples</summary><pre>variance(array(2,4,6,8))</pre></details>
+
+<h3 id="stdev"><a name="stdev">stdev</a></h3>
+<p><strong>stdev(array, [weights])</strong></p>
+<p>The (sample) standard deviation of an array of numbers. Optionally you can provide a
+  corresponding array of weights or frequencies to do a weighted stdev.</p>
+<details class="example"><summary>Examples</summary><pre>stdev(array(2,4,6,8))</pre></details>
+
+<h3 id="absmeandev"><a name="absmeandev">absmeandev</a></h3>
+<p><strong>absmeandev(array)</strong></p>
+<p>The absolute mean deviation of an array of numbers.</p>
+<details class="example"><summary>Examples</summary><pre>absmeandev(array(2,4,6,8))</pre></details>
+
+<h3 id="percentile"><a name="percentile">percentile</a></h3>
+<p><strong>percentile(array, percentile)</strong></p>
+<p>Calculates using the p/100*(N) method (e.g. Triola).</p>
+<details class="example"><summary>Examples</summary><pre>percentile($a, 30)  // finds the 30th percentile of the data</pre></details>
+
+<h3 id="interppercentile"><a name="interppercentile">interppercentile</a></h3>
+<p><strong>interppercentile(array, percentile, [mode])</strong></p>
+<p>Interpolated percentile. Finds the percentile using an interpolated method.</p>
+<ul>
+<li><strong>mode=1</strong> (default): Matches Excel's PERCENTILE.EXC, JMP, and recommended by NIST, except that this function will return the lowest/highest value if needed.</li>
+<li><strong>mode=2</strong>: Matches Excel's PERCENTILE.INC (and older percentile).</li>
+<li><strong>mode=3</strong>: Matches Matlab's prctile function.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>interppercentile($a, 30)
+interppercentile($a, 30, 2)  // matches Excel's PERCENTILE.INC</pre></details>
+
+<h3 id="Nplus1percentile"><a name="Nplus1percentile">Nplus1percentile</a></h3>
+<p><strong>Nplus1percentile(array, percentile)</strong></p>
+<p>Calculates using the p/100*(N+1) method (e.g. OpenStax).</p>
+<details class="example"><summary>Examples</summary><pre>Nplus1percentile($a, 30)  // finds the 30th percentile of the data</pre></details>
+
+<h3 id="quartile"><a name="quartile">quartile</a></h3>
+<p><strong>quartile(array, quartile)</strong></p>
+<p>Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+array of numbers. Calculates using percentiles.</p>
+<details class="example"><summary>Examples</summary><pre>quartile($a, 1)  // 1st quartile</pre></details>
+
+<h3 id="TIquartile"><a name="TIquartile">TIquartile</a></h3>
+<p><strong>TIquartile(array, quartile)</strong></p>
+<p>Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+array of numbers. Calculates using the TI-84 method.</p>
+<details class="example"><summary>Examples</summary><pre>TIquartile($a, 1)</pre></details>
+
+<h3 id="Excelquartile"><a name="Excelquartile">Excelquartile</a></h3>
+<p><strong>Excelquartile(array, quartile)</strong></p>
+<p>Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+array of numbers. Calculates using the Excel method, matching the older
+QUARTILE function or the newer QUARTILE.INC function.</p>
+<details class="example"><summary>Examples</summary><pre>Excelquartile($a, 1)</pre></details>
+
+<h3 id="Excelquartileexc"><a name="Excelquartileexc">Excelquartileexc</a></h3>
+<p><strong>Excelquartileexc(array, quartile)</strong></p>
+<p>Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+array of numbers. Calculates using the Excel method, matching
+the QUARTILE.EXC function.</p>
+<details class="example"><summary>Examples</summary><pre>Excelquartileexc($a, 1)</pre></details>
+
+<h3 id="Nplus1quartile"><a name="Nplus1quartile">Nplus1quartile</a></h3>
+<p><strong>Nplus1quartile(array, quartile)</strong></p>
+<p>Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+array of numbers. Calculates using the N+1 method, which is like
+percentiles, but calculated using N+1 (OpenStax).</p>
+<details class="example"><summary>Examples</summary><pre>Nplus1quartile($a, 1)</pre></details>
+
+<h3 id="allquartile"><a name="allquartile">allquartile</a></h3>
+<p><strong>allquartile(array, quartile)</strong></p>
+<p>Finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
+array of numbers. Uses all the quartile methods, and returns an "or" joined
+string of all unique answers.</p>
+<details class="example"><summary>Examples</summary><pre>allquartile($a, 1)  // e.g. "12 or 13"</pre></details>
+
+<h3 id="median"><a name="median">median</a></h3>
+<p><strong>median(array)</strong></p>
+<p>Returns the median of an array of numbers.</p>
+<details class="example"><summary>Examples</summary><pre>median(array(1,3,5,7,9))  // 5</pre></details>
+
+<h3 id="modes"><a name="modes">modes</a></h3>
+<p><strong>modes(array)</strong></p>
+<p>Returns the mode or modes of the data array as a comma-separated list.
+If all the values have the same frequency it returns DNE.</p>
+<details class="example"><summary>Examples</summary><pre>modes(array(1,2,2,3,3,4))  // "2,3"</pre></details>
+
+<h3 id="forceonemode"><a name="forceonemode">forceonemode</a></h3>
+<p><strong>forceonemode(array)</strong></p>
+<p>Returns the mode of the data array. If the data does not have one unique
+mode, the data array will be altered to only have one mode. Because this
 function can alter the given array, be sure to call it before any functions that
-use the array.
-<BR><h3><a name="freqdist">freqdist</a></h3>
-freqdist(array,label,start,classwidth)
-<BR>display macro.  Returns an HTML table that is a frequency distribution of
-<BR>the data
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;label: name of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR><h3><a name="frequency">frequency</a></h3>
-frequency(array,start,classwidth, [end])
-<BR>Returns an array of frequencies for the data grouped into classes
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR>&nbsp;end: end of last class. optional, but recommended to ensure the resulting array 
-    includes the last class.
-<BR><h3><a name="countif">countif</a></h3>
-countif(array,condition)
-<BR>Returns count of items in array that meet condition
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;condition: a condition, using x for data values
-<BR>Example: countif($a,"x<3 && x>2")
-<BR><h3><a name="histogram">histogram</a></h3>
-histogram(array,label,start,classwidth,[labelstart,upper,width,height,showgrid,fill,stroke])
-<BR>display macro.  Creates a histogram from a data set
-<BR>&nbsp;array: array of data values
-<BR>&nbsp;label: name of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
-<BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
-<BR>&nbsp;width,height (optional): width and height in pixels of graph
-<BR>&nbsp;showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
-<BR>&nbsp;fill (optional) = the fill color of the bins; default is blue
-<BR>&nbsp;stroke (optional) = the line color of the bins; default is black
-<BR><h3><a name="fdhistogram">fdhistogram</a></h3>
-fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height,showgrid,fill,stroke])
-<BR>display macro.  Creates a histogram from frequency array
-<BR>&nbsp;freqarray: array of frequencies
-<BR>&nbsp;label: name of data values
-<BR>&nbsp;start: first lower class limit
-<BR>&nbsp;classwidth: width of the classes
-<BR>&nbsp;labelstart (optional): value to start axis labeling at.  Defaults to start
-<BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
-<BR>&nbsp;width,height (optional): width and height in pixels of graph
-<BR>&nbsp;showgrid (optional): the horizontal grid lines; default is true to show; set false to hide
-<BR>&nbsp;fill (optional) = the fill color of the bins; default is blue
-<BR>&nbsp;stroke (optional) = the line color of the bins; default is black
-<p>To fill in only some optional parameters, the 5th argument can instead be an associate array 
- of values to fill in, like ['width'=>500, 'fill'=>'blue'].  When used this way, 'vertlabel' can 
+use the array.</p>
+<details class="example"><summary>Examples</summary><pre>$mode = forceonemode($a)</pre></details>
+
+<h3 id="freqdist"><a name="freqdist">freqdist</a></h3>
+<p><strong>freqdist(array, label, start, classwidth)</strong></p>
+<p>Display macro. Returns an HTML table that is a frequency distribution of
+the data.</p>
+<ul>
+<li><strong>array</strong>: array of data values.</li>
+<li><strong>label</strong>: name of data values.</li>
+<li><strong>start</strong>: first lower class limit.</li>
+<li><strong>classwidth</strong>: width of the classes.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>echo freqdist($a, "Height", 60, 5)</pre></details>
+
+<h3 id="frequency"><a name="frequency">frequency</a></h3>
+<p><strong>frequency(array, start, classwidth, [end])</strong></p>
+<p>Returns an array of frequencies for the data grouped into classes.</p>
+<ul>
+<li><strong>array</strong>: array of data values.</li>
+<li><strong>start</strong>: first lower class limit.</li>
+<li><strong>classwidth</strong>: width of the classes.</li>
+<li><strong>end</strong>: end of last class. Optional, but recommended to ensure the resulting array includes the last class.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$freq = frequency($a, 60, 5, 80)</pre></details>
+
+<h3 id="countif"><a name="countif">countif</a></h3>
+<p><strong>countif(array, condition)</strong></p>
+<p>Returns the count of items in array that meet the condition.</p>
+<ul>
+<li><strong>array</strong>: array of data values.</li>
+<li><strong>condition</strong>: a condition, using x for data values.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>countif($a, "x<3 && x>2")</pre></details>
+
+<h3 id="histogram"><a name="histogram">histogram</a></h3>
+<p><strong>histogram(array, label, start, classwidth, [labelstart, upper, width, height, showgrid, fill, stroke])</strong></p>
+<p>Display macro. Creates a histogram from a data set.</p>
+<ul>
+<li><strong>array</strong>: array of data values.</li>
+<li><strong>label</strong>: name of data values.</li>
+<li><strong>start</strong>: first lower class limit.</li>
+<li><strong>classwidth</strong>: width of the classes.</li>
+<li><strong>labelstart</strong> (optional): value to start axis labeling at. Defaults to start.</li>
+<li><strong>upper</strong> (optional): first upper class limit. Defaults to start+classwidth.</li>
+<li><strong>width, height</strong> (optional): width and height in pixels of graph.</li>
+<li><strong>showgrid</strong> (optional): the horizontal grid lines; default is true to show; set false to hide.</li>
+<li><strong>fill</strong> (optional) = the fill color of the bins; default is blue.</li>
+<li><strong>stroke</strong> (optional) = the line color of the bins; default is black.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = histogram($a, "Height", 60, 5)</pre></details>
+
+<h3 id="fdhistogram"><a name="fdhistogram">fdhistogram</a></h3>
+<p><strong>fdhistogram(freqarray, label, start, cw, [labelstart, upper, width, height, showgrid, fill, stroke])</strong></p>
+<p>Display macro. Creates a histogram from a frequency array.</p>
+<ul>
+<li><strong>freqarray</strong>: array of frequencies.</li>
+<li><strong>label</strong>: name of data values.</li>
+<li><strong>start</strong>: first lower class limit.</li>
+<li><strong>classwidth</strong>: width of the classes.</li>
+<li><strong>labelstart</strong> (optional): value to start axis labeling at. Defaults to start.</li>
+<li><strong>upper</strong> (optional): first upper class limit. Defaults to start+classwidth.</li>
+<li><strong>width, height</strong> (optional): width and height in pixels of graph.</li>
+<li><strong>showgrid</strong> (optional): the horizontal grid lines; default is true to show; set false to hide.</li>
+<li><strong>fill</strong> (optional) = the fill color of the bins; default is blue.</li>
+<li><strong>stroke</strong> (optional) = the line color of the bins; default is black.</li>
+</ul>
+<p>To fill in only some optional parameters, the 5th argument can instead be an associative array
+ of values to fill in, like <code>['width'=>500, 'fill'=>'blue']</code>. When used this way, 'vertlabel' can
  be used to change the vertical axis label, and 'valuelabels'=>true can be used to add frequency labels
  above the bars.</p>
- <h3><a name="stem_plot"></a><strong>stem_plot</strong>(data, [options])</h3>
- <p>The function stem_plot() produces a basic stem-and-leaf display. </p>
- <p><em>Parameters:</em></p>
- <ul>
-     <li><strong>data</strong>: array of data.</li>
-     <li><strong>options</strong>(optional): array of options:</li>
-     <ul>
-         <li>options['key'] = false will remove key. For example, by default there is a key such as Key: 3|4 means 34 and will be removed if false. If $options['customkey'] is set, then options['key'] will be ignored.</li>
-         <li>options['customkey'] = string for a custom key.</li>
-         <li>options['space'] = false will remove the space between each leaf digit. By default the spacing looks like 3| 1 2 2 3 4 5, setting to false will yield 3|122345.</li>
-         <li>options['stemlabel'] = string for a custom label for Stem.</li>
-         <li>options['leaflabel'] = string for a custom label for Leaf.</li>
-         <li>options['split'] = true will make a split stem-and-leaf display. For example, a stem such as 3|2345789 will be split to two stems 3|234 and 3|5789.</li>
-     </ul>
- </ul>
- <p>&nbsp;<em>Returns:</em></p>
- <p>Stem-and-leaf display</p>
-<BR><h3><a name="fdbargraph">fdbargraph</a></h3>
-fdbargraph(barlabels,freqarray,label,[width,height,options])
-<BR>barlabels: array of labels for the bars
-<BR>freqarray: array of frequencies/heights for the bars
-<BR>label: general label for bars
-<BR>width,height (optional): width and height for graph
-<BR>options (optional): array of options:
-<BR>&nbsp;&nbsp;options['valuelabels'] = array of value labels, to be placed above bars
-<BR>&nbsp;&nbsp;options['showgrid'] = false to hide the horizontal grid lines
-<BR>&nbsp;&nbsp;options['vertlabel'] = label for vertical axis. Defaults to none
-<BR>&nbsp;&nbsp;options['gap'] = gap (0 &le; gap &lt; 1) between bars
-<BR>&nbsp;&nbsp;options['toplabel'] = label for top of chart
-<BR>&nbsp;&nbsp;options['fill'] = fill color of the bars; default is blue
-<BR>&nbsp;&nbsp;options['stroke'] = line color of the bars; default is black
+<details class="example"><summary>Examples</summary><pre>$img = fdhistogram($freq, "Height", 60, 5, ['width'=>500, 'valuelabels'=>true])</pre></details>
 
-<h3><a name="cluster_bargraph"></a><strong>cluster_bargraph</strong>(var1labels, var2labels,freqarray,label,[width,height,options])</h3>
-<p>The function cluster_bargraph() graphs a cluster bar graph also known as group bar chart or mult-series bar chart. </p>
-<p><em>Parameters:</em></p>
+<h3 id="stem_plot"><a name="stem_plot">stem_plot</a></h3>
+<p><strong>stem_plot(data, [options])</strong></p>
+<p>Produces a basic stem-and-leaf display.</p>
 <ul>
-    <li><strong>var1labels</strong>: array of labels for the categories for variable 1 which appear on the horizontal axis </li>
-    <li><strong>var2labels</strong>: array of labels for the categories for variable 2 which appears in the legend.</li>
-    <li><strong>freqarray</strong>: array of arrays holding the frequencies/heights for each bar. Note: freqarray should have the form [[1,3,5],[5,3,5],[1,3,2],[3,6,4]] or 
-    array(array(1,3,5),array(5,3,5),array(1,3,2),array(3,6,4)), which corresponds to variable 1 having 3 categories (3 clusters) and variable 2 having 4 categories (4 bars for each cluster).</li>
-    <li><strong>label</strong>: general label for bars</li>
-    <li><strong>width</strong>,<strong>height</strong>(optional): width and height for graph</li>
-    <li><strong>options</strong>(optional): array of options:</li>
+    <li><strong>data</strong>: array of data.</li>
+    <li><strong>options</strong> (optional): array of options:
     <ul>
-        <li>options['valuelabels'] = array of value labels, to be placed above each bar</li>
-        <li>options['showgrid'] = false to hide the horizontal grid lines</li>
-        <li>options['vertlabel'] = label for vertical axis. Defaults to none</li>
-        <li>options['gap'] = gap (0 &le; gap &lt; 1) between bars</li>
-        <li>options['toplabel'] = label for top of chart</li>
-        <li>options['colors'] = array of colors for each bar in the clusters</li>
-        <li>options['stroke'] = line color of the bars; default is black</li>
-        <li>options['var1name'] = a string for the variable 1 name for alternative text </li>
-        <li>options['var2name'] = a string for the variable 2 name for alternative text </li>
+        <li><code>options['key']</code> = false will remove key. For example, by default there is a key such as "Key: 3|4 means 34" and will be removed if false. If <code>$options['customkey']</code> is set, then <code>options['key']</code> will be ignored.</li>
+        <li><code>options['customkey']</code> = string for a custom key.</li>
+        <li><code>options['space']</code> = false will remove the space between each leaf digit. By default the spacing looks like "3| 1 2 2 3 4 5", setting to false will yield "3|122345".</li>
+        <li><code>options['stemlabel']</code> = string for a custom label for Stem.</li>
+        <li><code>options['leaflabel']</code> = string for a custom label for Leaf.</li>
+        <li><code>options['split']</code> = true will make a split stem-and-leaf display. For example, a stem such as "3|2345789" will be split to two stems "3|234" and "3|5789".</li>
     </ul>
+    </li>
 </ul>
-<p>&nbsp;<em>Returns:</em></p>
-<p>Cluster bargraph</p>
-<p>&nbsp;</p>
-     
-<BR><h3><a name="piechart">piechart</a></h3>
-piechart(percents, labels, {width, height})
-<BR>create a piechart
-<BR>percents: array of pie percents (should total 100%)
-<BR>labels: array of labels for each pie piece
-<BR>uses Google Charts API
-<BR><h3><a name="normrand">normrand</a></h3>
-normrand(mu,sigma,n, [rnd, positive, skew])
-<BR>returns an array of n random numbers that are normally distributed with given
-<BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
-<BR>specify rnd to round to that many digit
-<BR>set positive to true to not include negative values
-<BR>set skew to a nonzero value to skew the data
-<BR><h3><a name="expdistrand">expdistrand</a></h3>
-expdistrand(mu, n, [rnd])
-<BR>returns an array of n random numbers that are exponentially distributed
-<BR>with given mean mu.
-<BR>specify rnd to round to that many digits (default 3)
+<p><em>Returns:</em> a stem-and-leaf display.</p>
+<details class="example"><summary>Examples</summary><pre>$plot = stem_plot(array(21,22,22,23,25,31,34), ['split'=>true])</pre></details>
 
-<h3><a name="stats_randg">stats_randg</a></h3>
-<p>stats_randg(shape, n)</p>
-<p>returns an array of n random numbers from a gamma distribution</p>
+<h3 id="fdbargraph"><a name="fdbargraph">fdbargraph</a></h3>
+<p><strong>fdbargraph(barlabels, freqarray, label, [width, height, options])</strong></p>
+<ul>
+<li><strong>barlabels</strong>: array of labels for the bars.</li>
+<li><strong>freqarray</strong>: array of frequencies/heights for the bars.</li>
+<li><strong>label</strong>: general label for bars.</li>
+<li><strong>width, height</strong> (optional): width and height for graph.</li>
+<li><strong>options</strong> (optional): array of options:
+<ul>
+  <li><code>options['valuelabels']</code> = array of value labels, to be placed above bars.</li>
+  <li><code>options['showgrid']</code> = false to hide the horizontal grid lines.</li>
+  <li><code>options['vertlabel']</code> = label for vertical axis. Defaults to none.</li>
+  <li><code>options['gap']</code> = gap (0 &le; gap &lt; 1) between bars.</li>
+  <li><code>options['toplabel']</code> = label for top of chart.</li>
+  <li><code>options['fill']</code> = fill color of the bars; default is blue.</li>
+  <li><code>options['stroke']</code> = line color of the bars; default is black.</li>
+</ul>
+</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = fdbargraph(array("A","B","C"), array(4,7,2), "Category")</pre></details>
 
-<h3><a name="stats_randF">stats_randF</a></h3>
-<p>stats_randF(df1, df2, n)</p>
-<p>returns an array of n random numbers from an F disstribution with df1 and df2 degrees of freedom</p>
+<h3 id="cluster_bargraph"><a name="cluster_bargraph">cluster_bargraph</a></h3>
+<p><strong>cluster_bargraph(var1labels, var2labels, freqarray, label, [width, height, options])</strong></p>
+<p>Graphs a cluster bar graph, also known as a group bar chart or multi-series bar chart.</p>
+<ul>
+    <li><strong>var1labels</strong>: array of labels for the categories for variable 1 which appear on the horizontal axis.</li>
+    <li><strong>var2labels</strong>: array of labels for the categories for variable 2 which appears in the legend.</li>
+    <li><strong>freqarray</strong>: array of arrays holding the frequencies/heights for each bar. Note: freqarray should have the form <code>[[1,3,5],[5,3,5],[1,3,2],[3,6,4]]</code> or
+    <code>array(array(1,3,5),array(5,3,5),array(1,3,2),array(3,6,4))</code>, which corresponds to variable 1 having 3 categories (3 clusters) and variable 2 having 4 categories (4 bars for each cluster).</li>
+    <li><strong>label</strong>: general label for bars.</li>
+    <li><strong>width, height</strong> (optional): width and height for graph.</li>
+    <li><strong>options</strong> (optional): array of options:
+    <ul>
+        <li><code>options['valuelabels']</code> = array of value labels, to be placed above each bar.</li>
+        <li><code>options['showgrid']</code> = false to hide the horizontal grid lines.</li>
+        <li><code>options['vertlabel']</code> = label for vertical axis. Defaults to none.</li>
+        <li><code>options['gap']</code> = gap (0 &le; gap &lt; 1) between bars.</li>
+        <li><code>options['toplabel']</code> = label for top of chart.</li>
+        <li><code>options['colors']</code> = array of colors for each bar in the clusters.</li>
+        <li><code>options['stroke']</code> = line color of the bars; default is black.</li>
+        <li><code>options['var1name']</code> = a string for the variable 1 name for alternative text.</li>
+        <li><code>options['var2name']</code> = a string for the variable 2 name for alternative text.</li>
+    </ul>
+    </li>
+</ul>
+<p><em>Returns:</em> the cluster bargraph.</p>
+<details class="example"><summary>Examples</summary><pre>$img = cluster_bargraph(array("2022","2023","2024"), array("North","South"),
+    array(array(10,15,12), array(8,11,9)), "Sales")</pre></details>
 
-<h3><a name="stats_randt">stats_randt</a></h3>
-<p>stats_randt(mu, sigma, df, n)</p>
-<p>returns an array of n random numbers from a t-distribution with given mean mu,
-    standard distribution sigma, and degrees of freedom df.
-</p>
+<h3 id="piechart"><a name="piechart">piechart</a></h3>
+<p><strong>piechart(percents, labels, {width, height})</strong></p>
+<p>Creates a piechart, using the Google Charts API.</p>
+<ul>
+<li><strong>percents</strong>: array of pie percents (should total 100%).</li>
+<li><strong>labels</strong>: array of labels for each pie piece.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = piechart(array(25,50,25), array("A","B","C"))</pre></details>
 
-<h3><a name="stats_randchi2">stats_randchi2</a></h3>
-<p>stats_randchi2(df, n)</p>
-<p>returns an array of n random numbers from a chi squared distribution with df degrees of freedom</p>
+<h3 id="normrand"><a name="normrand">normrand</a></h3>
+<p><strong>normrand(mu, sigma, n, [rnd, positive, skew])</strong></p>
+<p>Returns an array of n random numbers that are normally distributed with the given
+mean mu and standard deviation sigma. Uses the Box-Muller transform.</p>
+<ul>
+<li><strong>rnd</strong>: round to this many digits.</li>
+<li><strong>positive</strong>: set true to not include negative values.</li>
+<li><strong>skew</strong>: set to a nonzero value to skew the data.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$data = normrand(70, 3, 20, 1)</pre></details>
 
-<h3><a name="stats_randpoisson">stats_randpoisson</a></h3>
-<p>stats_randpoisson(lambda, n)</p>
-<p>returns an array of n random numbers from a Poisson distribution with parameter lambda.</p>
+<h3 id="expdistrand"><a name="expdistrand">expdistrand</a></h3>
+<p><strong>expdistrand(mu, n, [rnd])</strong></p>
+<p>Returns an array of n random numbers that are exponentially distributed
+with the given mean mu. Specify rnd to round to that many digits (default 3).</p>
+<details class="example"><summary>Examples</summary><pre>$data = expdistrand(5, 20)</pre></details>
 
-<BR><h3><a name="boxplot">boxplot</a></h3>
-boxplot(array,axislabel,[options])
-<BR>draws a boxplot based on the data in array, with given axislabel
-<BR>and optionally a datalabel (to topleft of boxplot)
-<BR>array also be an array of dataarrays to do comparative boxplots
-<BR>opts is an array of options:
-<BR>&nbsp;&nbsp;&nbsp;"datalabels" = array of data labels for comparative boxplots
-<BR>&nbsp;&nbsp;&nbsp;"showvals" = true to show 5 number summary above boxplot
-<BR>&nbsp;&nbsp;&nbsp;"showoutliers" = true to put whiskers at values inside 1.5IQR fence and show outliers
-<BR>&nbsp;&nbsp;&nbsp;"qmethod" = quartile method: "N", "TI", "Excel" or "Nplus1"
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N: percentile method, using .25*n
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nplus1: percentile method, using .25*(n+1)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TI: TI calculator method, a mix of n and nplus1 methods
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Excel: A method based on (n-1), with some linear interpolation
-<BR>&nbsp;&nbsp;&nbsp;"width" = width of the boxplot
-<BR>For backwards compatability, options can also just be an array of datalabels
-<p>Examples using options array:</p>
-<pre>
-  $opts = ['qmethod'=>'N', 'width'=>300]
-  $b = boxplot($data, "Heights", $opts)
-</pre>
-<p>or</p>
-<pre>
-  $b = boxplot([$data1,$data2],"Heights", ['datalabels'=>['Group 1','Group 2'], 'showvals'=>true])
-</pre>
-<BR><h3><a name="normalcdf">normalcdf</a></h3>
-normalcdf(z,[dec])
-<BR>calculates the area under the standard normal distribution to the left of the
-<BR>z-value z, to dec decimals (defaults to 4)
-<BR>based on someone else's code - can't remember whose!
-<BR><h3><a name="tcdf">tcdf</a></h3>
-tcdf(t,df,[dec])
-<BR>calculates the area under the t-distribution with "df" degrees of freedom
-<BR>to the left of the t-value t
-<BR>based on code from www.math.ucla.edu/~tom/distributions/tDist.html
-<BR><h3><a name="invnormalcdf">invnormalcdf</a></h3>
-invnormalcdf(p,[dec])
-<BR>Inverse Normal CDF
-<BR>finds the z-value with a left-tail area of p, to dec decimals (default 5)
-<BR>&nbsp;from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
-<BR><h3><a name="invtcdf">invtcdf</a></h3>
-invtcdf(p,df,[dec])
-<BR>the inverse Student's t-distribution
-<BR>computes the t-value with a left-tail probability of p, with df degrees of freedom
-<BR>to dec decimal places (default 4)
-<BR>&nbsp;from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
-<BR><h3><a name="linreg">linreg</a></h3>
-linreg(xarray,yarray)
-<BR>Computes the linear correlation coefficient, and slope and intercept of
-<BR>regression line, based on array/list of x-values and array/list of y-values
-<BR>Returns as array:  r,slope,intercept
-<BR><h3><a name="expreg">expreg</a></h3>
-expreg(xarray,yarray)
-<BR>Computes the exponential correlation coefficient, and base and intercept of
-<BR>regression exponential, based on array/list of x-values and array/list of y-values
-<BR>Returns as array:  r,base,intercept
-<BR><h3><a name="checklineagainstdata">checklineagainstdata</a></h3>
-checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
-<BR>intended for checking a student answer for fitting a line to data.  Determines
-<BR>if the student answer is within the confidence bounds for the regression equation.
-<BR>xarray, yarray:  list/array of data values
-<BR>student answer:  the $stuanswers[$thisq] which is a line equation like "2x+3"
-<BR>variable:  defaults to "x"
-<BR>alpha: for confidence bound.  defaults to .05
-<BR>return array(answer, showanswer) to be used to set $answer and $showanswer
-<BR><h3><a name="checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></h3>
-checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid, snaptogrid])
-<BR>intended for checking a student answer for drawing a line fit to data.  Determines
-<BR>if the student answer is within the confidence bounds for the regression equation.
-<BR>xarray, yarray:  list/array of data values
-<BR>student answer from draw:  the $stuanswers[$thisq]
-<BR>grade dots: default false.  If true, will grade that dots of xarray,yarray were plotted
-<BR>alpha: for confidence bound.  defaults to .05
-<BR>grid:  If you've modified the grid, include it here 
-<BR>snaptogrid: If you're using snaptogrid, include it here
-<BR>return array(answer, showanswer) to be used to set $answer and $showanswer
-<BR><h3><a name="binomialpdf">binomialpdf</a></h3>
-binomialpdf(N,p,x)
-<BR>Computes the probability of x successes out of N trials
-<BR>where each trial has probability p of success
-<BR><h3><a name="binomialcdf">binomialcdf</a></h3>
-binomialcdf(N,p,x)
-<BR>Computes the probably of &lt;=x successes out of N trials
-<BR>where each trial has probability p of success
-<BR>
+<h3 id="stats_randg"><a name="stats_randg">stats_randg</a></h3>
+<p><strong>stats_randg(shape, n)</strong></p>
+<p>Returns an array of n random numbers from a gamma distribution.</p>
+<details class="example"><summary>Examples</summary><pre>$data = stats_randg(2, 20)</pre></details>
 
-<h3><a name="negbinomialpdf">negbinomialpdf</a></h3>
-<p>negbinomialpdf(k, r, p)<br>
-Probability of exactly k failures before the r'th success, where
+<h3 id="stats_randF"><a name="stats_randF">stats_randF</a></h3>
+<p><strong>stats_randF(df1, df2, n)</strong></p>
+<p>Returns an array of n random numbers from an F distribution with df1 and df2 degrees of freedom.</p>
+<details class="example"><summary>Examples</summary><pre>$data = stats_randF(3, 10, 20)</pre></details>
+
+<h3 id="stats_randt"><a name="stats_randt">stats_randt</a></h3>
+<p><strong>stats_randt(mu, sigma, df, n)</strong></p>
+<p>Returns an array of n random numbers from a t-distribution with given mean mu,
+    standard deviation sigma, and degrees of freedom df.</p>
+<details class="example"><summary>Examples</summary><pre>$data = stats_randt(0, 1, 10, 20)</pre></details>
+
+<h3 id="stats_randchi2"><a name="stats_randchi2">stats_randchi2</a></h3>
+<p><strong>stats_randchi2(df, n)</strong></p>
+<p>Returns an array of n random numbers from a chi-squared distribution with df degrees of freedom.</p>
+<details class="example"><summary>Examples</summary><pre>$data = stats_randchi2(5, 20)</pre></details>
+
+<h3 id="stats_randpoisson"><a name="stats_randpoisson">stats_randpoisson</a></h3>
+<p><strong>stats_randpoisson(lambda, n)</strong></p>
+<p>Returns an array of n random numbers from a Poisson distribution with parameter lambda.</p>
+<details class="example"><summary>Examples</summary><pre>$data = stats_randpoisson(4, 20)</pre></details>
+
+<h3 id="boxplot"><a name="boxplot">boxplot</a></h3>
+<p><strong>boxplot(array, axislabel, [options])</strong></p>
+<p>Draws a boxplot based on the data in array, with the given axislabel.
+Array can also be an array of dataarrays to do comparative boxplots.</p>
+<p><strong>options</strong> is an array of options:</p>
+<ul>
+<li><code>"datalabels"</code> = array of data labels for comparative boxplots.</li>
+<li><code>"showvals"</code> = true to show the 5 number summary above the boxplot.</li>
+<li><code>"showoutliers"</code> = true to put whiskers at values inside the 1.5IQR fence and show outliers.</li>
+<li><code>"qmethod"</code> = quartile method: "N", "TI", "Excel" or "Nplus1"
+  <ul>
+    <li>N: percentile method, using .25*n</li>
+    <li>Nplus1: percentile method, using .25*(n+1)</li>
+    <li>TI: TI calculator method, a mix of N and Nplus1 methods</li>
+    <li>Excel: a method based on (n-1), with some linear interpolation</li>
+  </ul>
+</li>
+<li><code>"width"</code> = width of the boxplot.</li>
+</ul>
+<p>For backwards compatibility, options can also just be an array of datalabels.</p>
+<details class="example"><summary>Examples</summary><pre>$opts = ['qmethod'=>'N', 'width'=>300]
+$b = boxplot($data, "Heights", $opts)
+
+// or comparative boxplots
+$b = boxplot([$data1,$data2], "Heights", ['datalabels'=>['Group 1','Group 2'], 'showvals'=>true])</pre></details>
+
+<h3 id="normalcdf"><a name="normalcdf">normalcdf</a></h3>
+<p><strong>normalcdf(z, [dec])</strong></p>
+<p>Calculates the area under the standard normal distribution to the left of the
+z-value z, to dec decimals (defaults to 4).</p>
+<details class="example"><summary>Examples</summary><pre>normalcdf(1.96)  // approximately 0.975</pre></details>
+
+<h3 id="tcdf"><a name="tcdf">tcdf</a></h3>
+<p><strong>tcdf(t, df, [dec])</strong></p>
+<p>Calculates the area under the t-distribution with "df" degrees of freedom
+to the left of the t-value t.</p>
+<details class="example"><summary>Examples</summary><pre>tcdf(2.0, 10)</pre></details>
+
+<h3 id="invnormalcdf"><a name="invnormalcdf">invnormalcdf</a></h3>
+<p><strong>invnormalcdf(p, [dec])</strong></p>
+<p>Inverse Normal CDF. Finds the z-value with a left-tail area of p, to dec decimals (default 5).</p>
+<details class="example"><summary>Examples</summary><pre>invnormalcdf(0.975)  // approximately 1.95996</pre></details>
+
+<h3 id="invtcdf"><a name="invtcdf">invtcdf</a></h3>
+<p><strong>invtcdf(p, df, [dec])</strong></p>
+<p>The inverse Student's t-distribution. Computes the t-value with a left-tail probability of p, with df degrees of freedom,
+to dec decimal places (default 4).</p>
+<details class="example"><summary>Examples</summary><pre>invtcdf(0.975, 10)</pre></details>
+
+<h3 id="linreg"><a name="linreg">linreg</a></h3>
+<p><strong>linreg(xarray, yarray)</strong></p>
+<p>Computes the linear correlation coefficient, and slope and intercept of the
+regression line, based on array/list of x-values and array/list of y-values.</p>
+<p>Returns as array: <code>r,slope,intercept</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($r, $slope, $intercept) = linreg($xarray, $yarray)</pre></details>
+
+<h3 id="expreg"><a name="expreg">expreg</a></h3>
+<p><strong>expreg(xarray, yarray)</strong></p>
+<p>Computes the exponential correlation coefficient, and base and intercept of the
+regression exponential, based on array/list of x-values and array/list of y-values.</p>
+<p>Returns as array: <code>r,base,intercept</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($r, $base, $intercept) = expreg($xarray, $yarray)</pre></details>
+
+<h3 id="checklineagainstdata"><a name="checklineagainstdata">checklineagainstdata</a></h3>
+<p><strong>checklineagainstdata(xarray, yarray, student answer, [variable, alpha])</strong></p>
+<p>Intended for checking a student answer for fitting a line to data. Determines
+if the student answer is within the confidence bounds for the regression equation.</p>
+<ul>
+<li><strong>xarray, yarray</strong>: list/array of data values.</li>
+<li><strong>student answer</strong>: the <code>$stuanswers[$thisq]</code> which is a line equation like "2x+3".</li>
+<li><strong>variable</strong>: defaults to "x".</li>
+<li><strong>alpha</strong>: for confidence bound. Defaults to .05.</li>
+</ul>
+<p>Returns <code>array(answer, showanswer)</code> to be used to set <code>$answer</code> and <code>$showanswer</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($answer, $showanswer) = checklineagainstdata($xarray, $yarray, $stuanswers[$thisq])</pre></details>
+
+<h3 id="checkdrawnlineagainstdata"><a name="checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></h3>
+<p><strong>checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid, snaptogrid])</strong></p>
+<p>Intended for checking a student answer for drawing a line fit to data. Determines
+if the student answer is within the confidence bounds for the regression equation.</p>
+<ul>
+<li><strong>xarray, yarray</strong>: list/array of data values.</li>
+<li><strong>student answer from draw</strong>: the <code>$stuanswers[$thisq]</code>.</li>
+<li><strong>grade dots</strong>: default false. If true, will grade that dots of xarray,yarray were plotted.</li>
+<li><strong>alpha</strong>: for confidence bound. Defaults to .05.</li>
+<li><strong>grid</strong>: if you've modified the grid, include it here.</li>
+<li><strong>snaptogrid</strong>: if you're using snaptogrid, include it here.</li>
+</ul>
+<p>Returns <code>array(answer, showanswer)</code> to be used to set <code>$answer</code> and <code>$showanswer</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($answer, $showanswer) = checkdrawnlineagainstdata($xarray, $yarray, $stuanswers[$thisq])</pre></details>
+
+<h3 id="binomialpdf"><a name="binomialpdf">binomialpdf</a></h3>
+<p><strong>binomialpdf(N, p, x)</strong></p>
+<p>Computes the probability of x successes out of N trials, where each trial has probability p of success.</p>
+<details class="example"><summary>Examples</summary><pre>binomialpdf(10, 0.5, 6)</pre></details>
+
+<h3 id="binomialcdf"><a name="binomialcdf">binomialcdf</a></h3>
+<p><strong>binomialcdf(N, p, x)</strong></p>
+<p>Computes the probability of &lt;=x successes out of N trials, where each trial has probability p of success.</p>
+<details class="example"><summary>Examples</summary><pre>binomialcdf(10, 0.5, 6)</pre></details>
+
+<h3 id="negbinomialpdf"><a name="negbinomialpdf">negbinomialpdf</a></h3>
+<p><strong>negbinomialpdf(k, r, p)</strong></p>
+<p>Probability of exactly k failures before the r'th success, where
 each trial has probability p of success.</p>
+<details class="example"><summary>Examples</summary><pre>negbinomialpdf(3, 2, 0.5)</pre></details>
 
-<h3><a name="negbinomialcdf">negbinomialcdf</a></h3>
-<p>negbinomialcdf(k, r, p)<br>
-Probability there were at most k failures before the r'th success, where
+<h3 id="negbinomialcdf"><a name="negbinomialcdf">negbinomialcdf</a></h3>
+<p><strong>negbinomialcdf(k, r, p)</strong></p>
+<p>Probability there were at most k failures before the r'th success, where
 each trial has probability p of success.</p>
+<details class="example"><summary>Examples</summary><pre>negbinomialcdf(3, 2, 0.5)</pre></details>
 
-<h3><a name="geometricpdf">geometricpdf</a></h3>
-<p>geometricpdf(k, p)<br>
-Probability of exactly k failures before the 1st success, where
+<h3 id="geometricpdf"><a name="geometricpdf">geometricpdf</a></h3>
+<p><strong>geometricpdf(k, p)</strong></p>
+<p>Probability of exactly k failures before the 1st success, where
 each trial has probability p of success.</p>
+<details class="example"><summary>Examples</summary><pre>geometricpdf(3, 0.25)</pre></details>
 
-<h3><a name="geometriccdf">geometriccdf</a></h3>
-<p>geometriccdf(k, p)<br>
-Probability of at most k failures before the 1st success, where
+<h3 id="geometriccdf"><a name="geometriccdf">geometriccdf</a></h3>
+<p><strong>geometriccdf(k, p)</strong></p>
+<p>Probability of at most k failures before the 1st success, where
 each trial has probability p of success.</p>
+<details class="example"><summary>Examples</summary><pre>geometriccdf(3, 0.25)</pre></details>
 
-<h3><a name="hypgeompdf">hypgeompdf</a></h3>
-<p>hypgeompdf(x, N, m, n)<br>
-Hypergeometric distribution. The probably of exactly x successes 
-drawn from a population of N, with m successes in the population, 
+<h3 id="hypgeompdf"><a name="hypgeompdf">hypgeompdf</a></h3>
+<p><strong>hypgeompdf(x, N, m, n)</strong></p>
+<p>Hypergeometric distribution. The probability of exactly x successes
+drawn from a population of N, with m successes in the population,
 and n items drawn from the population.</p>
+<details class="example"><summary>Examples</summary><pre>hypgeompdf(2, 20, 5, 6)</pre></details>
 
-<h3><a name="hypgeomcdf">hypgeomcdf</a></h3>
-<p>hypgeomcdf(x, N, m, n)<br>
-Hypergeometric distribution. The probably of at most x successes 
-drawn from a population of N, with m successes in the population, 
+<h3 id="hypgeomcdf"><a name="hypgeomcdf">hypgeomcdf</a></h3>
+<p><strong>hypgeomcdf(x, N, m, n)</strong></p>
+<p>Hypergeometric distribution. The probability of at most x successes
+drawn from a population of N, with m successes in the population,
 and n items drawn from the population.</p>
+<details class="example"><summary>Examples</summary><pre>hypgeomcdf(2, 20, 5, 6)</pre></details>
 
-<h3><a name="chi2teststat">chi2teststat</a></h3>
-chi2teststat(m)
-<BR>Computes the test stat sum((E-O)^2/E) given a matrix of values
-<BR><h3><a name="chi2cdf">chi2cdf</a></h3>
-chi2cdf(x,df)
-<BR>Computes the area to the left of x under the chi-squared distribution
-<BR>with df degrees of freedom
-<BR><h3><a name="invchi2cdf">invchi2cdf</a></h3>
-invchi2cdf(p,df)
-<BR>Computes the x value with left-tail probability p under the
-<BR>chi-squared distribution with df degrees of freedom
-<BR><h3><a name="fcdf">fcdf</a></h3>
-fcdf(f,df1,df2)
-<BR>Returns the area to right of the F-value f for the f-distribution
-<BR>with df1 and df2 degrees of freedom (technically it's 1-CDF)
-<BR>Algorithm is accurate to approximately 4-5 decimals
-<BR><h3><a name="invfcdf">invfcdf</a></h3>
-invfcdf(p,df1,df2)
-<BR>Computes the f-value with probability of p to the right
-<BR>with degrees of freedom df1 and df2
-<BR>Algorithm is accurate to approximately 2-4 decimal places
-<BR>Less accurate for smaller p-values
-<BR><h3><a name="poissonpdf">poissonpdf</a></h3>
-poissonpdf(lambda, x)
-<BR>Computes the probability of x events
-<BR>with an expectation of lambda events
-<BR><h3><a name="poissoncdf">poissoncdf</a></h3>
-poissoncdf(lambda, x)
-<BR>Computes the probability of &lt;=x events
-<BR>with an expectation of lambda events
-<h3><a name="gamma_cdf">gamma_cdf</a></h3>
-gamma_cdf(x,shape,[scale,offset])
-<BR>Calculated the gamma cdf
-<BR><h3><a name="gamma_inv">gamma_inv</a></h3>
-gamma_inv(p,shape,[scale])
-<BR>Calculates the inverse gamma cdf
-<h3><a name="beta_cdf">beta_cdf</a></h3>
-beta_cdf(x,alpha,beta)
-<BR>Calculated the gamma cdf
-<BR><h3><a name="beta_inv">beta_inv</a></h3>
-beta_inv(p,alpha,beta)
-<BR>Calculates the inverse gamma cdf
-<BR><h3><a name="mosaicplot">mosaicplot</a></h3>
-mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
-<BR>creates a mosaic plot (See http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972)
-<BR>rowlabels: an array of labels for the rows of the display
-<BR>columnlabels: an array of labels for the columns of the display
-<BR>count matrix: a 2-dimensional array.  $m[1][5] will give the count for
-<BR>&nbsp;&nbsp;rowlabel[1] and columnlabel[5]
-<BR>width and height are optional, default to 300 by 300.  Does not include labels
-<BR>
-<BR><h3><a name="csvdownloadlink">csvdownloadlink</a></h3>
-csvdownloadlink([filename],string,array,[string,array]...)
+<h3 id="chi2teststat"><a name="chi2teststat">chi2teststat</a></h3>
+<p><strong>chi2teststat(m)</strong></p>
+<p>Computes the test stat <code>sum((E-O)^2/E)</code> given a matrix of values.</p>
+<details class="example"><summary>Examples</summary><pre>chi2teststat($m)</pre></details>
+
+<h3 id="chi2cdf"><a name="chi2cdf">chi2cdf</a></h3>
+<p><strong>chi2cdf(x, df)</strong></p>
+<p>Computes the area to the left of x under the chi-squared distribution
+with df degrees of freedom.</p>
+<details class="example"><summary>Examples</summary><pre>chi2cdf(9.49, 4)</pre></details>
+
+<h3 id="invchi2cdf"><a name="invchi2cdf">invchi2cdf</a></h3>
+<p><strong>invchi2cdf(p, df)</strong></p>
+<p>Computes the x value with left-tail probability p under the
+chi-squared distribution with df degrees of freedom.</p>
+<details class="example"><summary>Examples</summary><pre>invchi2cdf(0.95, 4)</pre></details>
+
+<h3 id="fcdf"><a name="fcdf">fcdf</a></h3>
+<p><strong>fcdf(f, df1, df2)</strong></p>
+<p>Returns the area to the right of the F-value f for the F-distribution
+with df1 and df2 degrees of freedom (technically it's 1-CDF).</p>
+<p>Algorithm is accurate to approximately 4-5 decimals.</p>
+<details class="example"><summary>Examples</summary><pre>fcdf(3.0, 3, 10)</pre></details>
+
+<h3 id="invfcdf"><a name="invfcdf">invfcdf</a></h3>
+<p><strong>invfcdf(p, df1, df2)</strong></p>
+<p>Computes the F-value with probability of p to the right,
+with degrees of freedom df1 and df2.</p>
+<p>Algorithm is accurate to approximately 2-4 decimal places. Less accurate for smaller p-values.</p>
+<details class="example"><summary>Examples</summary><pre>invfcdf(0.05, 3, 10)</pre></details>
+
+<h3 id="poissonpdf"><a name="poissonpdf">poissonpdf</a></h3>
+<p><strong>poissonpdf(lambda, x)</strong></p>
+<p>Computes the probability of x events with an expectation of lambda events.</p>
+<details class="example"><summary>Examples</summary><pre>poissonpdf(4, 3)</pre></details>
+
+<h3 id="poissoncdf"><a name="poissoncdf">poissoncdf</a></h3>
+<p><strong>poissoncdf(lambda, x)</strong></p>
+<p>Computes the probability of &lt;=x events with an expectation of lambda events.</p>
+<details class="example"><summary>Examples</summary><pre>poissoncdf(4, 3)</pre></details>
+
+<h3 id="gamma_cdf"><a name="gamma_cdf">gamma_cdf</a></h3>
+<p><strong>gamma_cdf(x, shape, [scale, offset])</strong></p>
+<p>Calculates the gamma CDF.</p>
+<details class="example"><summary>Examples</summary><pre>gamma_cdf(5, 2)</pre></details>
+
+<h3 id="gamma_inv"><a name="gamma_inv">gamma_inv</a></h3>
+<p><strong>gamma_inv(p, shape, [scale])</strong></p>
+<p>Calculates the inverse gamma CDF.</p>
+<details class="example"><summary>Examples</summary><pre>gamma_inv(0.5, 2)</pre></details>
+
+<h3 id="beta_cdf"><a name="beta_cdf">beta_cdf</a></h3>
+<p><strong>beta_cdf(x, alpha, beta)</strong></p>
+<p>Calculates the beta CDF.</p>
+<details class="example"><summary>Examples</summary><pre>beta_cdf(0.5, 2, 3)</pre></details>
+
+<h3 id="beta_inv"><a name="beta_inv">beta_inv</a></h3>
+<p><strong>beta_inv(p, alpha, beta)</strong></p>
+<p>Calculates the inverse beta CDF.</p>
+<details class="example"><summary>Examples</summary><pre>beta_inv(0.5, 2, 3)</pre></details>
+
+<h3 id="mosaicplot"><a name="mosaicplot">mosaicplot</a></h3>
+<p><strong>mosaicplot(rowlabels, columnlabels, count matrix, [width, height])</strong></p>
+<p>Creates a mosaic plot (See <a href="http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972">http://www.wamap.org/course/showlinkedtextpublic.php?cid=1383&id=82972</a>).</p>
+<ul>
+<li><strong>rowlabels</strong>: an array of labels for the rows of the display.</li>
+<li><strong>columnlabels</strong>: an array of labels for the columns of the display.</li>
+<li><strong>count matrix</strong>: a 2-dimensional array. <code>$m[1][5]</code> will give the count for rowlabel[1] and columnlabel[5].</li>
+<li><strong>width, height</strong>: optional, default to 300 by 300. Does not include labels.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = mosaicplot(array("Yes","No"), array("A","B","C"), array(array(10,20,15), array(5,8,12)))</pre></details>
+
+<h3 id="csvdownloadlink"><a name="csvdownloadlink">csvdownloadlink</a></h3>
+<p><strong>csvdownloadlink([filename], string, array, [string, array]...)</strong></p>
 <p>Creates a link that downloads the specified data in CSV format. For each column
-  provide a string header and an array of values.  A filename (without the .csv) can 
+  provide a string header and an array of values. A filename (without the .csv) can
   optionally be provided as a first argument.</p>
-<BR><h3><a name="dotplot">dotplot</a></h3>
-dotplot(array,label,[dotspacing,labelspacing,width,height]) 
-<BR>Display macro.  Creates a dotplot from a data set
-<BR> array: array of data values
-<BR> label: title of the dotplot that will be placed below the horizontal axis
-<BR> dotspacing (default 1): horiz spacing of dots; data will be rounded to nearest value
-<br> labelspacing (defaults to dot spacing): spacing of axis labels 
-<BR> width,height (default 300x150): width and height in pixels of graph
-  <p>&nbsp;</p>
-  <p><h3><a name="anova1way"></a><strong>anova1way</strong>(arr1, arr2, [arr3, ...])</h3></p>
-  <p>Function anova1way() performs one-way analysis of variance (ANOVA) on two or more groups and returns the ANOVA table as an array with each row corresponding to Factor A, error (residual), and totals.</p>
-  <p><em>Parameters:</em></p>
-  <ul>
-      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes.</li>
-  </ul>
-  <p>&nbsp;<em>Returns:</em></p>
-  <p>ANOVA table as an array in the following format. 
-    array([SS_A, df_A, MS_A, F_A, P_A], [SS_E, df_E, MS_E], [SS_T, df_T]) 
+<details class="example"><summary>Examples</summary><pre>echo csvdownloadlink("data", "Height", $heights, "Weight", $weights)</pre></details>
+
+<h3 id="dotplot"><a name="dotplot">dotplot</a></h3>
+<p><strong>dotplot(array, label, [dotspacing, labelspacing, width, height])</strong></p>
+<p>Display macro. Creates a dotplot from a data set.</p>
+<ul>
+<li><strong>array</strong>: array of data values.</li>
+<li><strong>label</strong>: title of the dotplot that will be placed below the horizontal axis.</li>
+<li><strong>dotspacing</strong> (default 1): horizontal spacing of dots; data will be rounded to nearest value.</li>
+<li><strong>labelspacing</strong> (defaults to dot spacing): spacing of axis labels.</li>
+<li><strong>width, height</strong> (default 300x150): width and height in pixels of graph.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = dotplot($a, "Height")</pre></details>
+
+<h3 id="anova1way"><a name="anova1way">anova1way</a></h3>
+<p><strong>anova1way(arr1, arr2, [arr3, ...])</strong></p>
+<p>Performs one-way analysis of variance (ANOVA) on two or more groups and returns the ANOVA table as an array with each row corresponding to Factor A, error (residual), and totals.</p>
+<ul>
+    <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes.</li>
+</ul>
+<p><em>Returns:</em> ANOVA table as an array in the following format:
+    <code>array([SS_A, df_A, MS_A, F_A, P_A], [SS_E, df_E, MS_E], [SS_T, df_T])</code>
     where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
-    And A, E, and T correspond to Factor A, error (residual), and total, respectively. This array can be used in anova_table() function to tabulate data for display.</p>
-  <p>&nbsp;</p>
-  <p><h3><a name="anova1way_f"></a><strong>anova1way_f</strong>(arr1, arr2, [arr3,...])</h3></p>
-  <p>Function anova1way_f() performs one-way analysis of variance (ANOVA) on two or more groups and returns F ratio and the corresponding P value as an array.</p>
-  <p><em>Parameters:</em></p>
-  <ul>
-      <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes.</li>
-  </ul>
-  <p>&nbsp;<em>Returns:</em></p>
-  <p>F ratio and the corresponding P value as an array in the form [F ratio, P value].</p>
-  <p>&nbsp;</p>
-  
-  <p><h3><a name="anova2way"></a><strong>anova2way</strong>(arr, [replication = false])</h3></p>
-  <p>Function anova2way() performs two-way analysis of variance (ANOVA) and returns ANOVA table as an array with each row corresponding to Factor A, Factor B, 
-     their interaction (only with replication), error (residual), and totals. </p>
-  <p><em>Parameters:</em></p>
-  <ul>
-      <li><strong>arr</strong>: An array in the following form: 
-         for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factor A with three and Factor B with two levels, and there are four replicates in each group.
-         and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
-      <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
-                       (multiple observations for each group) or without replication (one observation per group)
-                       is to be performed. The default is false - without replication.</li>
-  </ul>
-  <p>&nbsp;<em>Returns:</em></p>
-  <p>ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
-    [[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T]] 
-    where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
-    And A, B, I, E, and T correspond to Factor A, Factor B, their interaction (only with replication), 
-    error (residual), and total, respectively.</p>
-  <p>&nbsp;</p>
-  <p><h3><a name="anova2way_f"></a><strong>anova2way_f</strong>(arr, [replication = false])</h3></p>
-  <p>Function anova2way_f() performs two-way analysis of variance (ANOVA) and returns F ratio and the corresponding P value for Factor A, Factor B and their interaction (if replication is true). </p>
-  <p><em>Parameters:</em></p>
-  <ul>
-    <li><strong>arr</strong>: An array in the following form: 
-      for twoway WITH replication - example: arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]]) has two factors, Factor A with three and Factor B with two levels, and there are four replicates in each group.
-      and for twoway WITHOUT replication - example: arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54]) has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
-   <li><strong>replication</strong>: Optional - boolean (true or false) it specifies whether the ANOVA with replication
-                    (multiple observations for each group) or without replication (one observation per group)
-                    is to be performed. The default is false - without replication.</li>
-  </ul>
-  <p>&nbsp;<em>Returns:</em></p>
-  <p>F ratio and the corresponding P value for Factor A, Factor B and their Interaction (if replication is true)
-    as an array in the form  array([F_A,P_A],[F_B,P_B],[F_I,P_I]). </p>
-  <p>&nbsp;</p>
-  
-  <p><h3><a name="anova_table"></a><strong>anova_table</strong>(arr, [factor = 1, replication = false, roundto = 12, nameA = "Factor A", nameB = "Factor B"])</h3></p>
-  <p>Function anova_table() returns ANOVA table for both oneway and twoway ANOVA - display only. The output of anova1way() and 
-   anova2way() can be used as the input array for this function. </p>
-  <p><em>Parameters:</em></p>
-  <ul>
-      <li><strong>arr</strong>: for oneway: arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_E,df_E,MS_E],[SS_T,df_T])
-        for twoway WITHOUT replication: arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_E,df_E,MS_E],[SS_T,df_T])
-        and for twoway WITH replication: arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T])</li>
-      <li><strong>factor</strong>: number of factors considered in ANOVA - 1 for one-way and 2 for two-way. The default is 1, one-way ANOVA.</li>
-      <li><strong>replication</strong>: Optional - boolean (true or false)- it specifies whether the ANOVA with replication
-                       (multiple observations for each group) or without replication (one observation per group)
-                       is to be performed. The default is false - without replication.</li>
-        <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; 
-          the default is 12 decimal places. </li>
-        <li><strong>NameA</strong>: Optional - the name of factor A as string to be displayed in the table. Default is "Factor A". </li>
-          <li><strong>NameB</strong>: Optional - the name of factor B as string to be displayed in the table. Default is "Factor B". </li>
-  </ul>
-  <p>&nbsp;<em>Returns:</em></p>
-  <p>ANOVA table for displaying data.</p>  
-  <p>&nbsp;</p>
+    A, E, and T correspond to Factor A, error (residual), and total, respectively. This array can be used in the anova_table() function to tabulate data for display.</p>
+<details class="example"><summary>Examples</summary><pre>$result = anova1way(array(4,5,6), array(7,9,8), array(10,12,11))</pre></details>
 
-  <p><h3><a name="student_t"></a><strong>student_t</strong>(arr1, arr2, [equalVar = False, paired = False, roundto = 12])</h3></p>
-  <p>Function student_t() computes t statistic and corresponding P-value for two-sample student t-test.</p>
+<h3 id="anova1way_f"><a name="anova1way_f">anova1way_f</a></h3>
+<p><strong>anova1way_f(arr1, arr2, [arr3, ...])</strong></p>
+<p>Performs one-way analysis of variance (ANOVA) on two or more groups and returns the F ratio and the corresponding P value as an array.</p>
+<ul>
+    <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes.</li>
+</ul>
+<p><em>Returns:</em> F ratio and the corresponding P value as an array in the form <code>[F ratio, P value]</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($F, $P) = anova1way_f(array(4,5,6), array(7,9,8), array(10,12,11))</pre></details>
 
-  <p><em>Parameters:</em></p>
-  <ul>
-      <li><strong>arr1, arr2</strong>: Arrays in the form [2,3,4,5,...]; unequal sample sizes are accepted for independent samples. </li>
-      <li><strong>equalVar</strong>: Optional - Boolean. Set to true for equal population variances; default is false. </li>
-      <li><strong>paired</strong>: Optional - Boolean. Set to true for paired (dependent) samples; default is false.</li>
-      <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; default is 12 decimal places.</li>
-  </ul>
-  <p>&nbsp;<em>Returns:</em></p>
-  <p>t statistic, corresponding P-value (area to the right of t-value -  one-tail), and degree of freedom for two sample student t-test as an array in the form [t, P-value, df].</p>
-  <p>&nbsp;</p> 
+<h3 id="anova2way"><a name="anova2way">anova2way</a></h3>
+<p><strong>anova2way(arr, [replication = false])</strong></p>
+<p>Performs two-way analysis of variance (ANOVA) and returns the ANOVA table as an array with each row corresponding to Factor A, Factor B,
+   their interaction (only with replication), error (residual), and totals.</p>
+<ul>
+    <li><strong>arr</strong>: An array in the following form:
+       for twoway WITH replication - example: <code>arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]])</code> has two factors, Factor A with three and Factor B with two levels, and there are four replicates in each group.
+       and for twoway WITHOUT replication - example: <code>arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54])</code> has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
+    <li><strong>replication</strong>: Optional - boolean (true or false) - specifies whether the ANOVA with replication
+                     (multiple observations for each group) or without replication (one observation per group)
+                     is to be performed. The default is false - without replication.</li>
+</ul>
+<p><em>Returns:</em> ANOVA table as an array in the following format. This array can be used in anova_table() to tabulate data for display.
+  <code>[[SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T]]</code>
+  where SS is sum of the squares, df is the degree of freedom, MS is mean square, F is F ratio, and P is P value.
+  A, B, I, E, and T correspond to Factor A, Factor B, their interaction (only with replication),
+  error (residual), and total, respectively.</p>
+<details class="example"><summary>Examples</summary><pre>$result = anova2way(array([53,61,51], [47,55,51], [46,52,49], [50,58,54]))</pre></details>
 
-  
+<h3 id="anova2way_f"><a name="anova2way_f">anova2way_f</a></h3>
+<p><strong>anova2way_f(arr, [replication = false])</strong></p>
+<p>Performs two-way analysis of variance (ANOVA) and returns the F ratio and the corresponding P value for Factor A, Factor B and their interaction (if replication is true).</p>
+<ul>
+  <li><strong>arr</strong>: An array in the following form:
+    for twoway WITH replication - example: <code>arr=array([[4,5,6,5],[7,9,8,12],[10,12,11,9]],[[6,6,4,4],[13,15,12,12],[12,13,10,13]])</code> has two factors, Factor A with three and Factor B with two levels, and there are four replicates in each group.
+    and for twoway WITHOUT replication - example: <code>arr=array([53,61,51], [47,55,51], [46,52,49], [50,58,54])</code> has two factors, Factor A with three and Factor B with four levels, and there are only one value in each group.</li>
+ <li><strong>replication</strong>: Optional - boolean (true or false) - specifies whether the ANOVA with replication
+                  (multiple observations for each group) or without replication (one observation per group)
+                  is to be performed. The default is false - without replication.</li>
+</ul>
+<p><em>Returns:</em> F ratio and the corresponding P value for Factor A, Factor B and their Interaction (if replication is true)
+  as an array in the form <code>array([F_A,P_A],[F_B,P_B],[F_I,P_I])</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$result = anova2way_f(array([53,61,51], [47,55,51], [46,52,49], [50,58,54]))</pre></details>
+
+<h3 id="anova_table"><a name="anova_table">anova_table</a></h3>
+<p><strong>anova_table(arr, [factor = 1, replication = false, roundto = 12, nameA = "Factor A", nameB = "Factor B"])</strong></p>
+<p>Returns an ANOVA table for both one-way and two-way ANOVA - display only. The output of anova1way() and
+ anova2way() can be used as the input array for this function.</p>
+<ul>
+    <li><strong>arr</strong>: for oneway: <code>arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_E,df_E,MS_E],[SS_T,df_T])</code>;
+      for twoway WITHOUT replication: <code>arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_E,df_E,MS_E],[SS_T,df_T])</code>;
+      and for twoway WITH replication: <code>arr=array([SS_A, df_A, MS_A, F_A, P_A],[SS_B, df_B, MS_B, F_B, P_B],[SS_I, df_I, MS_I, F_I, P_I],[SS_E,df_E,MS_E],[SS_T,df_T])</code></li>
+    <li><strong>factor</strong>: number of factors considered in ANOVA - 1 for one-way and 2 for two-way. The default is 1, one-way ANOVA.</li>
+    <li><strong>replication</strong>: Optional - boolean (true or false) - specifies whether the ANOVA with replication
+                     (multiple observations for each group) or without replication (one observation per group)
+                     is to be performed. The default is false - without replication.</li>
+      <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off;
+        the default is 12 decimal places.</li>
+      <li><strong>NameA</strong>: Optional - the name of factor A as string to be displayed in the table. Default is "Factor A".</li>
+        <li><strong>NameB</strong>: Optional - the name of factor B as string to be displayed in the table. Default is "Factor B".</li>
+</ul>
+<p><em>Returns:</em> ANOVA table for displaying data.</p>
+<details class="example"><summary>Examples</summary><pre>$result = anova1way(array(4,5,6), array(7,9,8), array(10,12,11))
+echo anova_table($result)</pre></details>
+
+<h3 id="student_t"><a name="student_t">student_t</a></h3>
+<p><strong>student_t(arr1, arr2, [equalVar = False, paired = False, roundto = 12])</strong></p>
+<p>Computes the t statistic and corresponding P-value for a two-sample student t-test.</p>
+<ul>
+    <li><strong>arr1, arr2</strong>: Arrays in the form [2,3,4,5,...]; unequal sample sizes are accepted for independent samples.</li>
+    <li><strong>equalVar</strong>: Optional - Boolean. Set to true for equal population variances; default is false.</li>
+    <li><strong>paired</strong>: Optional - Boolean. Set to true for paired (dependent) samples; default is false.</li>
+    <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; default is 12 decimal places.</li>
+</ul>
+<p><em>Returns:</em> t statistic, corresponding P-value (area to the right of the t-value - one-tail), and degrees of freedom for the two sample student t-test as an array in the form <code>[t, P-value, df]</code>.</p>
+<details class="example"><summary>Examples</summary><pre>list($t, $p, $df) = student_t(array(4,5,6,7), array(7,9,8,12))</pre></details>
+</body></html>

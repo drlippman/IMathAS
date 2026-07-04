@@ -66,3 +66,22 @@ details.example pre {
     margin: 0.3em 0 0.2em 0;
     font-size: 0.9em;
 }
+#libhelpback {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin: -10px -10px 1em -10px;
+    padding: 8px 10px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#floating-top-btn {
+    text-decoration: none;
+    font-size: 0.9em;
+}
+#floating-top-btn:hover {
+    text-decoration: underline;
+}

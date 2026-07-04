@@ -13,10 +13,12 @@
 </head>
 
 <body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library matrix</h1>
-Matrix functions.  Version 1.6, Jan 19
-<br>Contributors: David Lippman, Mike Jenck, Larry Green
-<BR><ul>
+<p>Matrix functions. Version 1.6, Jan 19</p>
+<p>Contributors: David Lippman, Mike Jenck, Larry Green</p>
+<ul>
 <li><a href="#matrix">matrix</a></li>
 <li><a href="#matrixformat">matrixformat</a></li>
 <li><a href="#matrixformatfrac">matrixformatfrac</a></li>
@@ -72,300 +74,406 @@ Matrix functions.  Version 1.6, Jan 19
 <li><a href="#matrixParseStuans">matrixParseStuans</a></li>
 <li><a href="#matrixCompare">matrixCompare</a></li>
 </ul>
-<h3><a name="matrix">matrix</a></h3>
-matrix(vals,rows,cols)
-<BR>Creates a new matrix item.
-<BR>Use matrixformat() to create display or $answer from a matrix item
-<BR>vals: list or array of numbers to form matrix values: R1C1,R1C2,...,R2C1,R2C2,...
-<BR>rows, cols: dimensions of matrix
-<BR>To define a matrix using calculations use:
-<BR>$m = matrix(array(3/2,2^3,5+1,3),2,2)
-<BR><h3><a name="matrixformat">matrixformat</a></h3>
-matrixformat(matrix, [bracket])
-<BR>Formats a matrix item into an ASCIIMath string for display or $answer
-<br>Defaults to square brackets, or set bracket to '(' or '|'.
-<BR><h3><a name="matrixformatfrac">matrixformatfrac</a></h3>
-matrixformatfrac(matrix, [bracket])
-<BR>Formats a matrix item into an ASCIIMath string for display or $answer,
-    with entries converted to fractions where possible.
-<br>Defaults to square brackets, or set bracket to '(' or '|'.
-<BR><h3><a name="matrixdisplaytable">matrixdisplaytable</a></h3>
-matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])
-<BR>&nbsp;Create a string that is a valid HTML table syntax for display.
-<BR>&nbsp;matrix: a matrix to be displayed in a HTML table
-<BR>&nbsp;matrixname: a string that holds the matrix name, like A or B.  This does not contain
-<BR>&nbsp;&nbsp;&nbsp;tick marks - if you want them you need to supply them.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default empty string
-<BR>&nbsp;displayASCIIticks: put tick marks around each element of the table, either 0 or 1.
-<BR>&nbsp;&nbsp;&nbsp;Use 0 if you are building an answerbox matrix.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 do not use math ticks (default)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 use math ticks
-<BR>&nbsp;linemode: Show none, augments, or simplex, value is either 0, 1 or 2
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;0 show no lines  (default)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;1 show aumented line
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;2 show simplex  lines
-<BR>&nbsp;headernames: list or array of the variables "x1,x2,x3" that are used for the column titles.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
-<BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
-<BR>&nbsp;rownames: list or array of the variables "x1,x2,x3" that are used for the row titles.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
-<BR>&nbsp;rowheader: string that is entered into the row name column in the header row
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
-<BR>&nbsp;caption: string - caption for the table
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
-<BR><h3><a name="matrixsystemdisp">matrixsystemdisp</a></h3>
-matrixsystemdisp(matrix,[variables,leftbracket])
-<BR>Writes out a matrix as an equivalent system of equations
-<BR>variables is optional array of variables to use
-<BR>leftbracket can be set to false to hide the left bracket
-<BR><h3><a name="matrixgetentry">matrixgetentry</a></h3>
-matrixgetentry(matrix,row,col)
-<BR>get entry from a matrix at given row and col
-<BR>rows and cols are 0 indexed (first row is row 0)
-<BR><h3><a name="matrixgetrow">matrixgetrow</a></h3>
-matrixgetrow(matrix,row,[asArray])
-<BR>get row of a matrix as a new 1xm matrix
-<BR>&nbsp;&nbsp;or array if asArray is set to true
-<BR>rows and cols are 0 indexed (first row is row 0)
-<BR><h3><a name="matrixgetcol">matrixgetcol</a></h3>
-matrixgetcol(matrix,col,[asArray])
-<BR>get col of a matrix as a new nx1 matrix
-<BR>&nbsp;&nbsp;or array if asArray is set to true
-<BR>rows and cols are 0 indexed (first row is row 0)
-<BR><h3><a name="matrixgetsubmatrix">matrixgetsubmatrix</a></h3>
-matrixgetsubmatrix(matrix,rowselector,colselector)
-<BR>gets submatrix.  rowselector and colselector are strings
-<BR>with format:  "start:end".  ":" to select all
-<BR><h3><a name="matrixsum">matrixsum</a></h3>
-matrixsum(matrix,matrix)
-<BR>Adds two matrices
-<BR><h3><a name="matrixdiff">matrixdiff</a></h3>
-matrixdiff(matrix1,matrix2)
-<BR>Subtracts matrix1-matrix2
-<BR><h3><a name="matrixscalar">matrixscalar</a></h3>
-matrixscalar(matrix,n)
-<BR>Multiplies the matrix times the number n
-<BR><h3><a name="matrixprod">matrixprod</a></h3>
-matrixprod(matrix1,matrix2)
-<BR>Calculates the matrix product matrix1*matrix2
-<BR><h3><a name="matrixaugment">matrixaugment</a></h3>
-matrixaugment(matrix1,matrix2)
-<BR>Augments matrix2 to the right side of matrix1
-<BR><h3><a name="matrixrowscale">matrixrowscale</a></h3>
-matrixrowscale(matrix,row,n)
-<BR>Multiplies row of matrix by n
-<BR>matrix rows are 0-indexed; first row is row 0
-<BR><h3><a name="matrixrowswap">matrixrowswap</a></h3>
-matrixrowswap(matrix,row1,row2)
-<BR>swaps rows in matrix
-<BR>matrix rows are 0-indexed; first row is row 0
-<BR><h3><a name="matrixrowcombine">matrixrowcombine</a></h3>
-matrixrowcombine(matrix,row1,a,row2,b,endrow)
-<BR>replaces endrow in matrix with a*row1 + b*row2
-<BR>matrix rows are 0-indexed; first row is row 0
-<BR><h3><a name="matrixrowcombine3">matrixrowcombine3</a></h3>
-matrixrowcombine3(matrix,row1,a,row2,b,row3,c,endrow)
-<BR>replaces endrow in matrix with a*row1 + b*row2 + c*row3
-<BR>matrix rows are 0-indexed; first row is row 0
-<BR><h3><a name="matrixidentity">matrixidentity</a></h3>
-matrixidentity(n)
-<BR>Creates an n x n identity matrix
-<BR><h3><a name="matrixtranspose">matrixtranspose</a></h3>
-matrixtranspose(m)
-<BR>Calculates the transpose of the matrix m
-<BR><h3><a name="matrixrandinvertible">matrixrandinvertible</a></h3>
-randinvertible(n)
-<BR>Creates a random n x n invertible matrix by applying random row combinations to an identity matrix
-<BR>returns an array of two matrices:  M and M^-1
-<BR><h3><a name="matrixrandunreduce">matrixrandunreduce</a></h3>
-matrixrandunreduce(m,n)
-<BR>Randomizes the matrix m by applying n random row combinations. These are sometimes multi-row 
-    combinations, and sometimes additional operations are done to avoid a row of all zeros.
-<BR><h3><a name="matrixinverse">matrixinverse</a></h3>
-matrixinverse(m)
-<BR>Finds the inverse of nxn matrices.
-<BR><h3><a name="matrixinversefrac">matrixinversefrac</a></h3>
-matrixinversefrac(m)
-<BR>Finds the inverse of nxn matrices, with the resulting entries as fractions
-<BR>the fraction entries are strings, so do NOT try to use the result of this
-<BR>for calculations.
-<BR><h3><a name="matrixsolve">matrixsolve</a></h3>
-matrixsolve(A,b)
-<BR>solves the matrix equation Ax = b
-<BR>A and b are both matrices
-<BR>A is nxn, b is nxm
-<BR>returns nxm matrix x so Ax = b
-<BR><h3><a name="matrixsolvefrac">matrixsolvefrac</a></h3>
-matrixsolvefrac(A,b)
-<BR>solves the matrix equation Ax = b
-<BR>A and b are both matrices
-<BR>A is nxn, b is nxm
-<BR>returns nxm matrix x so Ax = b
-<BR>entries may be fractions (as strings), so don't
-<BR>try to use the result in calculations.
-<BR><h3><a name="matrixreduce">matrixreduce</a></h3>
-matrixreduce(A,[rref,frac])
-<BR>reduces the matrix A to echelon or reduced echelon form
-<BR>A is a matrix
-<BR>rref = true for rref, false for echelon (default)
-<BR>frac = true for fraction output, false for decimal output (default)
-<BR>&nbsp;&nbsp;if true, entries may be fractions (as strings), so don't
-<BR>&nbsp;&nbsp;try to use the result in calculations.
-<BR>NOTE:  In most cases, using matrixrandunreduce is a better option than using this!
-<BR><h3><a name="matrixnumsolutions">matrixnumsolutions</a></h3>
-matrixnumsolutions(A,n)
-<BR>A is an arbitrary coefficient matrix augmented with n columns, after
-<BR>&nbsp;being row reduced to reduced echelon form (see matrixreduce)
-<BR>Returns the number of Ax=b equations that have at least one solution
-<BR><h3><a name="matrixround">matrixround</a></h3>
-matrixround(matrix, decimal places)
-<BR>rounds each entry of the matrix the specified decimal places
 
-<BR><h3><a name="matrixFromCols">matrixFromCols</a></h3>
-matrixFromCols(col1, col2, ...)
-<BR>creates a matrix from the given columns. The columns can either be nx1 column matrices,
-    or arrays.
+<h3 id="matrix"><a name="matrix">matrix</a></h3>
+<p><strong>matrix(vals, rows, cols)</strong></p>
+<p>Creates a new matrix item.</p>
+<p>Use <code>matrixformat()</code> to create a display string or <code>$answer</code> from a matrix item.</p>
+<ul>
+<li><strong>vals</strong>: list or array of numbers to form the matrix values, in the order R1C1, R1C2, ..., R2C1, R2C2, ...</li>
+<li><strong>rows, cols</strong>: dimensions of the matrix.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(3/2, 2^3, 5+1, 3), 2, 2)
+// creates the matrix [[3/2, 8], [6, 3]]</pre></details>
 
-<BR><h3><a name="matrixFromRows">matrixFromRows</a></h3>
-matrixFromRows(row1, row2, ...)
-<BR>creates a matrix from the given rows. The row2 can either be 1xn row matrices,
-    or arrays.
-        
-<BR><h3><a name="polyregression">polyregression</a></h3>
-polyregression(x,y,n)
-<BR>find a nth degree polynomial that best fits the data
-<BR>x,y arrays of data
-<BR>returns an array (intercept, linear coeff, quad coeff, ...)
-<BR><br>
-<h3><a name="matrixGetRank">matrixGetRank</a></h3>
-<p>&nbsp;matrixGetRank(matrix)<br>
-&nbsp;returns the rank of a matrix<br>
-</p>
-<h3><a name="arrayIsZeroVector">arrayIsZeroVector</a></h3>
-<p>arrayIsZeroVector(vector)<br>vector is an array, not a matrix.<br>
-determines if a vector is the 0 vector<br>
-</p>
-<h3><a name="matrixFormMatrixFromEigValEigVec">matrixFormMatrixFromEigValEigVec</a></h3>
-<p>matrixFormMatrixFromEigValEigVec(eigenvalues,matrix of eigenvectors)<br>
-eigenvalues: The eigenvalues of the matrix include multiple times if
-multiplicity &gt; 0<br>
-matrix of eigenvectors: imput a matrix that consists of the eigenvectors of the
-original matrix<br>
-returns the matrix PAP^-1<br>
-</p>
+<h3 id="matrixformat"><a name="matrixformat">matrixformat</a></h3>
+<p><strong>matrixformat(matrix, [bracket])</strong></p>
+<p>Formats a matrix item into an ASCIIMath string for display or <code>$answer</code>.</p>
+<p>Defaults to square brackets, or set <code>bracket</code> to <code>'('</code> or <code>'|'</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1,2,3,4), 2, 2)
+$answer = matrixformat($m)  // "[[1,2],[3,4]]"
+$showanswer = matrixformat($m, '(')  // "(1,2),(3,4)" with parentheses</pre></details>
 
-<h3><a name="matrixFromEigenvals">matrixFromEigenvals</a></h3>
-<p>matrixFromEigenvals(eigenvalues)<br>
-Generates a matrix and random eigenvectors, where both have integer values, based on a 
-set of eigenvalues.<br>
-eigenvalues: An array of eigenvalues.  If complex, give one of the conjugate pair as [real,imag].<br>
-Returns array(matrix, eigenvectors), where matrix is in the usual format, and eigenvectors is 
-an array of eigenvectors, where each element of the array is an array of the elements of that 
-eigenvector. If an element is complex, it is returned as [real,imag].  If an eigenvector has 
-complex elements, only one of the conjugate pair is returned.
-</p>
+<h3 id="matrixformatfrac"><a name="matrixformatfrac">matrixformatfrac</a></h3>
+<p><strong>matrixformatfrac(matrix, [bracket])</strong></p>
+<p>Formats a matrix item into an ASCIIMath string for display or <code>$answer</code>, with entries converted to fractions where possible.</p>
+<p>Defaults to square brackets, or set <code>bracket</code> to <code>'('</code> or <code>'|'</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1/2, 2, 4/3, 1), 2, 2)
+$answer = matrixformatfrac($m)  // "[[1/2,2],[4/3,1]]" with fraction entries</pre></details>
 
-<h3><a name="matrixFormatEigenvecs">matrixFormatEigenvecs</a></h3>
-<p>matrixFormatEigenvecs(eigenvectors)<br>
-Takes a set of eigenvectors and formats them for display.  
-It returns an array of strings, each being the asciimath representation of that 
-eigenvector.<br>
-eigenvectors: in the same format matrixFromEigenvals returns. An array of eigenvectors, 
-where each is an array of the elements of that 
-eigenvector.  If an element is complex, it should be entered as [real,imag]. If an 
-eigenvector has complex elements, only one of the conjugate pair should be listed.<br>
-Ex: <code>[[1,2,3], [[1,3],[4,5],2]]</code> would describe the eigenvectors 
-<code>(1,2,3), (1+3i,4+5i,2), and (1-3i,4-5i,2)</code>.
+<h3 id="matrixdisplaytable"><a name="matrixdisplaytable">matrixdisplaytable</a></h3>
+<p><strong>matrixdisplaytable(matrix, [matrixname, displayASCIIticks, linemode, headernames, tablestyle, rownames, rowheader, caption])</strong></p>
+<p>Creates a string that is valid HTML table syntax for displaying the matrix.</p>
+<ul>
+<li><strong>matrix</strong>: the matrix to be displayed in an HTML table.</li>
+<li><strong>matrixname</strong>: a string that holds the matrix name, like A or B. This does not contain tick marks - if you want them you need to supply them. Default is an empty string.</li>
+<li><strong>displayASCIIticks</strong>: put tick marks around each element of the table, either 0 or 1. Use 0 if you are building an answer-box matrix. 0 does not use math ticks (default); 1 uses math ticks.</li>
+<li><strong>linemode</strong>: show none, augmented, or simplex lines, value is either 0, 1, or 2. 0 shows no lines (default); 1 shows an augmented line; 2 shows simplex lines.</li>
+<li><strong>headernames</strong>: list or array of the variables, e.g. "x1,x2,x3", used for the column titles. Default is none.</li>
+<li><strong>tablestyle</strong>: any additional styles for the table that you may want, like "color:#40B3DF;". Default is none.</li>
+<li><strong>rownames</strong>: list or array of the variables, e.g. "x1,x2,x3", used for the row titles. Default is none.</li>
+<li><strong>rowheader</strong>: string that is entered into the row name column in the header row. Default is none.</li>
+<li><strong>caption</strong>: string - caption for the table. Default is none.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1,2,3,4), 2, 2)
+echo matrixdisplaytable($m, "A", 1)  // HTML table displaying A = [[1,2],[3,4]]</pre></details>
 
-</p>
+<h3 id="matrixsystemdisp"><a name="matrixsystemdisp">matrixsystemdisp</a></h3>
+<p><strong>matrixsystemdisp(matrix, [variables, leftbracket])</strong></p>
+<p>Writes out a matrix as an equivalent system of equations.</p>
+<ul>
+<li><strong>variables</strong>: optional array of variables to use.</li>
+<li><strong>leftbracket</strong>: can be set to false to hide the left bracket.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1,2,5, 3,4,6), 2, 3)
+echo matrixsystemdisp($m)  // displays x1 + 2x2 = 5, 3x1 + 4x2 = 6
+echo matrixsystemdisp($m, array("x","y"))  // uses x, y as the variable names</pre></details>
 
-<h3><a name="matrixIsRowsLinInd">matrixIsRowsLinInd</a></h3>
-<p>matrixIsRowsLinInd(matrix)<br>
-matrix: matrix's row vectors are the vectors we are looking at seeing if they
-are linearly independent<br>
-&nbsp;returns true if they are LI and false if they are LD<br>
-</p>
-<h3><a name="matrixIsColsLinInd">matrixIsColsLinInd</a></h3>
-<p>matrixIsColsLinInd(matrix)<br>
-matrix: matrix's column vectors are the vectors we are looking at seeing if they
-are linearly independent<br>
-&nbsp;returns true if they are LI and false if they are LD<br>
-</p>
-<h3><a name="matrixIsEigVec">matrixIsEigVec</a></h3>
-<p>matrixIsEigVec(matrix,eigenvector)<br>
-matrix: the matrix that we are testing<br>
-eigenvector: the possible eigenvector that we are checking.&nbsp; It is an
-array, not a matrix.<br>
-&nbsp;returns true is eigenvector is an eigenvector of matrix. Otherwise it
-returns false<br>
-</p>
-<h3><a name="matrixIsEigVal">matrixIsEigVal</a></h3>
-<p>matrixIsEigVal(matrix,eigenvalue)<br>
-matrix: the matrix that we are testing<br>
-eigenvalue a real number that we are testing to see if it is an eigenvalue of
-matrix.<br>
-</p>
-<h3><a name="matrixGetRowSpace">matrixGetRowSpace</a></h3>
-<p>matrixGetRowSpace(matrix)<br>
-matrix: the matrix that we are finding the row space<br>
-returns a matrix whose rows are a basis of the row space of matrix<br>
-</p>
-<h3><a name="matrixGetColumnSpace">matrixGetColumnSpace</a></h3>
-<p>matrixGetColumnSpace(matrix)<br>
-matrix: the matrix that we are finding the column space<br>
-returns a matrix whose columns are a basis of the column space of matrix<br>
-</p>
-<h3><a name="matrixAxbHasSolution">matrixAxbHasSolution</a></h3>
-<p>matrixAxbHasSolution(matrix A,matrix b)<br>
-A is a marix and b is a mx1 matrix.<br>
-returns true if there is a solution and false if there isn't one<br>
-</p>
-<h3><a name="matrixAspansB">matrixAspansB</a></h3>
-<p>matrixAspansB(matrix A,matrix B)<br>
-A is the possible spanning set<br>
-This tests if the rows of A span the row space of B<br>
-</p>
-<h3><a name="matrixAbasisForB">matrixAbasisForB</a></h3>
-<p>matrixAbasisForB(matrix A, matrix B)<br>
-tests if the rows of A are a basis for the row space of B<br>
-</p>
-<h3><a name="matrixGetMinor">matrixGetMinor</a></h3>
-<p>matrixGetMinor(matrix,rowNo,colNo)<br>
-returns the n-1 by n-1 matrix minor obtained by removing the rowNo row and colNo
-column. Only works for a square matrix.<br>
-</p>
-<h3><a name="matrixDet">matrixDet</a></h3>
-<p>det(matrix)<br>
-returns the determinant of a matrix<br>
-</p>
-<h3><a name="matrixRandomMarix">matrixRandomMatrix</a></h3>
-<p>matrixRandomMatrix(min value, max value,number of rows,number of columns)<br>
-returns matrix with random integer entries where the integers are between max and min values.<br>
-For cases where you'll want to solve Ax=b, use matrixrandinvertible instead</p>
-<h3><a name="matrixRandomSpan">matrixRandomSpan</a></h3>
-<p>matrixRandomSpan(matrix)<br>returns a matrix of rows that span the row space
-of matrix<br>the number of rows of the spanning matrix will either be the same
-or one larger than the original matrix's number of rows.</p>
-<h3><a name="matrixNumberOfRows">matrixNumberOfRows</a></h3>
-<p>matrixNumberOfRows(matrix)<br>&nbsp;returns the number of rows of a matrix</p>
-<h3><a name="matrixNumberOfColumns">matrixNumberOfColumns</a></h3>
-<p>matrixNumberOfColumns(matrix)<br>/returns the number of columns of a matrix</p>
+<h3 id="matrixgetentry"><a name="matrixgetentry">matrixgetentry</a></h3>
+<p><strong>matrixgetentry(matrix, row, col)</strong></p>
+<p>Gets the entry from a matrix at the given row and column.</p>
+<p>Rows and columns are 0-indexed (the first row is row 0).</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1,2,3,4), 2, 2)
+$v = matrixgetentry($m, 1, 0)  // 3</pre></details>
 
-<h3><a name="matrixParseStuans">matrixParseStuans</a></h3>
-<p>matrixParseStuans(student answer)</p>
-<p>Converts a students matrix answer into a single array of values</p>
-<p>student answer can come from <code>$stuanswers[$thisq]</code> for single-part
-questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for
-multi-part</p>
+<h3 id="matrixgetrow"><a name="matrixgetrow">matrixgetrow</a></h3>
+<p><strong>matrixgetrow(matrix, row, [asArray])</strong></p>
+<p>Gets a row of a matrix as a new 1xm matrix, or as an array if <code>asArray</code> is set to true.</p>
+<p>Rows are 0-indexed (the first row is row 0).</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1,2,3,4), 2, 2)
+$row = matrixgetrow($m, 0)  // matrix [[1,2]]
+$rowarr = matrixgetrow($m, 0, true)  // array(1,2)</pre></details>
 
-<h3><a name="matrixCompare">matrixCompare</a></h3>
-<p>matrixCompare(test matrix, correct matrix, [tol])</p>
-<p>Compares the test matrix to the correct matrix, and returns  
-true if they are equivalent up to the tolerance.
-Set tol to specify the relative tolerance (defaults to .001), 
-or prefix with | for an absolute tolerance.</p>
-</p>
-<p>&nbsp;</p>
-<p><br>
-</p>
+<h3 id="matrixgetcol"><a name="matrixgetcol">matrixgetcol</a></h3>
+<p><strong>matrixgetcol(matrix, col, [asArray])</strong></p>
+<p>Gets a column of a matrix as a new nx1 matrix, or as an array if <code>asArray</code> is set to true.</p>
+<p>Columns are 0-indexed (the first column is column 0).</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1,2,3,4), 2, 2)
+$col = matrixgetcol($m, 1)  // matrix [[2],[4]]
+$colarr = matrixgetcol($m, 1, true)  // array(2,4)</pre></details>
+
+<h3 id="matrixgetsubmatrix"><a name="matrixgetsubmatrix">matrixgetsubmatrix</a></h3>
+<p><strong>matrixgetsubmatrix(matrix, rowselector, colselector)</strong></p>
+<p>Gets a submatrix. <code>rowselector</code> and <code>colselector</code> are strings with the format <code>"start:end"</code>. Use <code>":"</code> to select all.</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrix(array(1,2,3, 4,5,6, 7,8,9), 3, 3)
+$sub = matrixgetsubmatrix($m, "0:1", ":")  // first two rows, all columns
+$sub2 = matrixgetsubmatrix($m, "1:2", "1:2")  // bottom-right 2x2 block</pre></details>
+
+<h3 id="matrixsum"><a name="matrixsum">matrixsum</a></h3>
+<p><strong>matrixsum(matrix1, matrix2)</strong></p>
+<p>Adds two matrices.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$B = matrix(array(5,6,7,8), 2, 2)
+$C = matrixsum($A, $B)  // [[6,8],[10,12]]</pre></details>
+
+<h3 id="matrixdiff"><a name="matrixdiff">matrixdiff</a></h3>
+<p><strong>matrixdiff(matrix1, matrix2)</strong></p>
+<p>Subtracts <code>matrix1 - matrix2</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(5,6,7,8), 2, 2)
+$B = matrix(array(1,2,3,4), 2, 2)
+$C = matrixdiff($A, $B)  // [[4,4],[4,4]]</pre></details>
+
+<h3 id="matrixscalar"><a name="matrixscalar">matrixscalar</a></h3>
+<p><strong>matrixscalar(matrix, n)</strong></p>
+<p>Multiplies the matrix times the number <code>n</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$C = matrixscalar($A, 3)  // [[3,6],[9,12]]</pre></details>
+
+<h3 id="matrixprod"><a name="matrixprod">matrixprod</a></h3>
+<p><strong>matrixprod(matrix1, matrix2)</strong></p>
+<p>Calculates the matrix product <code>matrix1 * matrix2</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$B = matrix(array(5,6,7,8), 2, 2)
+$C = matrixprod($A, $B)  // [[19,22],[43,50]]</pre></details>
+
+<h3 id="matrixaugment"><a name="matrixaugment">matrixaugment</a></h3>
+<p><strong>matrixaugment(matrix1, matrix2)</strong></p>
+<p>Augments matrix2 to the right side of matrix1.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$b = matrix(array(5,6), 2, 1)
+$Aug = matrixaugment($A, $b)  // [[1,2,5],[3,4,6]]</pre></details>
+
+<h3 id="matrixrowscale"><a name="matrixrowscale">matrixrowscale</a></h3>
+<p><strong>matrixrowscale(matrix, row, n)</strong></p>
+<p>Multiplies the given row of matrix by <code>n</code>.</p>
+<p>Matrix rows are 0-indexed; the first row is row 0.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$B = matrixrowscale($A, 0, 2)  // [[2,4],[3,4]]</pre></details>
+
+<h3 id="matrixrowswap"><a name="matrixrowswap">matrixrowswap</a></h3>
+<p><strong>matrixrowswap(matrix, row1, row2)</strong></p>
+<p>Swaps two rows in the matrix.</p>
+<p>Matrix rows are 0-indexed; the first row is row 0.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$B = matrixrowswap($A, 0, 1)  // [[3,4],[1,2]]</pre></details>
+
+<h3 id="matrixrowcombine"><a name="matrixrowcombine">matrixrowcombine</a></h3>
+<p><strong>matrixrowcombine(matrix, row1, a, row2, b, endrow)</strong></p>
+<p>Replaces <code>endrow</code> in matrix with <code>a*row1 + b*row2</code>.</p>
+<p>Matrix rows are 0-indexed; the first row is row 0.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$B = matrixrowcombine($A, 0, -3, 1, 1, 1)  // replaces row 1 with -3*row0 + row1</pre></details>
+
+<h3 id="matrixrowcombine3"><a name="matrixrowcombine3">matrixrowcombine3</a></h3>
+<p><strong>matrixrowcombine3(matrix, row1, a, row2, b, row3, c, endrow)</strong></p>
+<p>Replaces <code>endrow</code> in matrix with <code>a*row1 + b*row2 + c*row3</code>.</p>
+<p>Matrix rows are 0-indexed; the first row is row 0.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,0,0, 0,1,0, 0,0,1), 3, 3)
+$B = matrixrowcombine3($A, 0, 2, 1, -1, 2, 3, 2)  // replaces row 2 with 2*row0 - row1 + 3*row2</pre></details>
+
+<h3 id="matrixidentity"><a name="matrixidentity">matrixidentity</a></h3>
+<p><strong>matrixidentity(n)</strong></p>
+<p>Creates an n x n identity matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$I = matrixidentity(3)  // [[1,0,0],[0,1,0],[0,0,1]]</pre></details>
+
+<h3 id="matrixtranspose"><a name="matrixtranspose">matrixtranspose</a></h3>
+<p><strong>matrixtranspose(m)</strong></p>
+<p>Calculates the transpose of the matrix <code>m</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4,5,6), 2, 3)
+$At = matrixtranspose($A)  // [[1,4],[2,5],[3,6]]</pre></details>
+
+<h3 id="matrixrandinvertible"><a name="matrixrandinvertible">matrixrandinvertible</a></h3>
+<p><strong>matrixrandinvertible(n)</strong></p>
+<p>Creates a random n x n invertible matrix by applying random row combinations to an identity matrix.</p>
+<p>Returns an array of two matrices: M and M<sup>-1</sup>.</p>
+<details class="example"><summary>Examples</summary><pre>list($M, $Minv) = matrixrandinvertible(3)
+// $M is a random 3x3 invertible matrix, $Minv is its inverse</pre></details>
+
+<h3 id="matrixrandunreduce"><a name="matrixrandunreduce">matrixrandunreduce</a></h3>
+<p><strong>matrixrandunreduce(m, n)</strong></p>
+<p>Randomizes the matrix <code>m</code> by applying <code>n</code> random row combinations. These are sometimes multi-row combinations, and sometimes additional operations are done to avoid a row of all zeros.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrixreduce($A)  // reduced echelon form
+$B = matrixrandunreduce($A, 4)  // an "unreduced" matrix row-equivalent to $A</pre></details>
+
+<h3 id="matrixinverse"><a name="matrixinverse">matrixinverse</a></h3>
+<p><strong>matrixinverse(m)</strong></p>
+<p>Finds the inverse of an nxn matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(4,7,2,6), 2, 2)
+$Ainv = matrixinverse($A)</pre></details>
+
+<h3 id="matrixinversefrac"><a name="matrixinversefrac">matrixinversefrac</a></h3>
+<p><strong>matrixinversefrac(m)</strong></p>
+<p>Finds the inverse of an nxn matrix, with the resulting entries as fractions.</p>
+<p>The fraction entries are strings, so do NOT try to use the result of this for calculations.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(4,7,2,6), 2, 2)
+$AinvStr = matrixinversefrac($A)  // entries as fraction strings, for display only</pre></details>
+
+<h3 id="matrixsolve"><a name="matrixsolve">matrixsolve</a></h3>
+<p><strong>matrixsolve(A, b)</strong></p>
+<p>Solves the matrix equation <code>Ax = b</code>. <code>A</code> and <code>b</code> are both matrices; <code>A</code> is nxn, <code>b</code> is nxm. Returns the nxm matrix <code>x</code> so that <code>Ax = b</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$b = matrix(array(5,6), 2, 1)
+$x = matrixsolve($A, $b)</pre></details>
+
+<h3 id="matrixsolvefrac"><a name="matrixsolvefrac">matrixsolvefrac</a></h3>
+<p><strong>matrixsolvefrac(A, b)</strong></p>
+<p>Solves the matrix equation <code>Ax = b</code>. <code>A</code> and <code>b</code> are both matrices; <code>A</code> is nxn, <code>b</code> is nxm. Returns the nxm matrix <code>x</code> so that <code>Ax = b</code>.</p>
+<p>Entries may be fractions (as strings), so don't try to use the result in calculations.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$b = matrix(array(5,6), 2, 1)
+$xStr = matrixsolvefrac($A, $b)  // solution with fraction-string entries, for display</pre></details>
+
+<h3 id="matrixreduce"><a name="matrixreduce">matrixreduce</a></h3>
+<p><strong>matrixreduce(A, [rref, frac])</strong></p>
+<p>Reduces the matrix <code>A</code> to echelon or reduced echelon form.</p>
+<ul>
+<li><strong>A</strong>: a matrix.</li>
+<li><strong>rref</strong>: true for rref, false for echelon (default).</li>
+<li><strong>frac</strong>: true for fraction output, false for decimal output (default). If true, entries may be fractions (as strings), so don't try to use the result in calculations.</li>
+</ul>
+<p>NOTE: in most cases, using <code>matrixrandunreduce</code> is a better option than using this!</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3, 4,5,6, 7,8,10), 3, 3)
+$echelon = matrixreduce($A)
+$rref = matrixreduce($A, true)</pre></details>
+
+<h3 id="matrixnumsolutions"><a name="matrixnumsolutions">matrixnumsolutions</a></h3>
+<p><strong>matrixnumsolutions(A, n)</strong></p>
+<p><code>A</code> is an arbitrary coefficient matrix augmented with <code>n</code> columns, after being row reduced to reduced echelon form (see <code>matrixreduce</code>).</p>
+<p>Returns the number of <code>Ax=b</code> equations that have at least one solution.</p>
+<details class="example"><summary>Examples</summary><pre>$Arref = matrixreduce($Augmented, true)
+$count = matrixnumsolutions($Arref, 1)</pre></details>
+
+<h3 id="matrixround"><a name="matrixround">matrixround</a></h3>
+<p><strong>matrixround(matrix, decimalplaces)</strong></p>
+<p>Rounds each entry of the matrix to the specified number of decimal places.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1/3, 2/3, 1, 4/3), 2, 2)
+$Arounded = matrixround($A, 2)  // [[0.33,0.67],[1,1.33]]</pre></details>
+
+<h3 id="matrixFromCols"><a name="matrixFromCols">matrixFromCols</a></h3>
+<p><strong>matrixFromCols(col1, col2, ...)</strong></p>
+<p>Creates a matrix from the given columns. The columns can either be nx1 column matrices, or arrays.</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrixFromCols(array(1,2,3), array(4,5,6))  // [[1,4],[2,5],[3,6]]</pre></details>
+
+<h3 id="matrixFromRows"><a name="matrixFromRows">matrixFromRows</a></h3>
+<p><strong>matrixFromRows(row1, row2, ...)</strong></p>
+<p>Creates a matrix from the given rows. The rows can either be 1xn row matrices, or arrays.</p>
+<details class="example"><summary>Examples</summary><pre>$m = matrixFromRows(array(1,2,3), array(4,5,6))  // [[1,2,3],[4,5,6]]</pre></details>
+
+<h3 id="polyregression"><a name="polyregression">polyregression</a></h3>
+<p><strong>polyregression(x, y, n)</strong></p>
+<p>Finds an nth degree polynomial that best fits the data.</p>
+<ul>
+<li><strong>x, y</strong>: arrays of data.</li>
+<li><strong>n</strong>: degree of the polynomial to fit.</li>
+</ul>
+<p>Returns an array (intercept, linear coeff, quad coeff, ...).</p>
+<details class="example"><summary>Examples</summary><pre>$x = array(0,1,2,3,4)
+$y = array(1,2.1,3.9,9.2,15.8)
+$coeffs = polyregression($x, $y, 2)  // array(a0, a1, a2) for a0 + a1*x + a2*x^2</pre></details>
+
+<h3 id="matrixGetRank"><a name="matrixGetRank">matrixGetRank</a></h3>
+<p><strong>matrixGetRank(matrix)</strong></p>
+<p>Returns the rank of a matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3, 2,4,6, 0,1,1), 3, 3)
+$rank = matrixGetRank($A)  // 2</pre></details>
+
+<h3 id="arrayIsZeroVector"><a name="arrayIsZeroVector">arrayIsZeroVector</a></h3>
+<p><strong>arrayIsZeroVector(vector)</strong></p>
+<p><code>vector</code> is an array, not a matrix.</p>
+<p>Determines if a vector is the zero vector.</p>
+<details class="example"><summary>Examples</summary><pre>arrayIsZeroVector(array(0,0,0))  // true
+arrayIsZeroVector(array(0,1,0))  // false</pre></details>
+
+<h3 id="matrixFormMatrixFromEigValEigVec"><a name="matrixFormMatrixFromEigValEigVec">matrixFormMatrixFromEigValEigVec</a></h3>
+<p><strong>matrixFormMatrixFromEigValEigVec(eigenvalues, eigenvectors)</strong></p>
+<ul>
+<li><strong>eigenvalues</strong>: the eigenvalues of the matrix, including repeats if multiplicity &gt; 0.</li>
+<li><strong>eigenvectors</strong>: a matrix whose columns are the eigenvectors of the original matrix.</li>
+</ul>
+<p>Returns the matrix <code>PAP^-1</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$eigvals = array(2, -1)
+$eigvecs = matrix(array(1,1, 1,-1), 2, 2)
+$A = matrixFormMatrixFromEigValEigVec($eigvals, $eigvecs)</pre></details>
+
+<h3 id="matrixFromEigenvals"><a name="matrixFromEigenvals">matrixFromEigenvals</a></h3>
+<p><strong>matrixFromEigenvals(eigenvalues)</strong></p>
+<p>Generates a matrix and random eigenvectors, where both have integer values, based on a set of eigenvalues.</p>
+<p><strong>eigenvalues</strong>: an array of eigenvalues. If complex, give one of the conjugate pair as <code>[real, imag]</code>.</p>
+<p>Returns <code>array(matrix, eigenvectors)</code>, where matrix is in the usual format, and eigenvectors is an array of eigenvectors, where each element of the array is an array of the elements of that eigenvector. If an element is complex, it is returned as <code>[real, imag]</code>. If an eigenvector has complex elements, only one of the conjugate pair is returned.</p>
+<details class="example"><summary>Examples</summary><pre>list($A, $eigvecs) = matrixFromEigenvals(array(2, -1, 3))
+// $A has eigenvalues 2, -1, 3; $eigvecs holds a corresponding eigenvector for each</pre></details>
+
+<h3 id="matrixFormatEigenvecs"><a name="matrixFormatEigenvecs">matrixFormatEigenvecs</a></h3>
+<p><strong>matrixFormatEigenvecs(eigenvectors)</strong></p>
+<p>Takes a set of eigenvectors and formats them for display. It returns an array of strings, each being the ASCIIMath representation of that eigenvector.</p>
+<p><strong>eigenvectors</strong>: in the same format <code>matrixFromEigenvals</code> returns. An array of eigenvectors, where each is an array of the elements of that eigenvector. If an element is complex, it should be entered as <code>[real, imag]</code>. If an eigenvector has complex elements, only one of the conjugate pair should be listed.</p>
+<details class="example"><summary>Examples</summary><pre>// [[1,2,3], [[1,3],[4,5],2]] describes the eigenvectors
+// (1,2,3), (1+3i,4+5i,2), and (1-3i,4-5i,2)
+$strs = matrixFormatEigenvecs(array(array(1,2,3), array(array(1,3),array(4,5),2)))</pre></details>
+
+<h3 id="matrixIsRowsLinInd"><a name="matrixIsRowsLinInd">matrixIsRowsLinInd</a></h3>
+<p><strong>matrixIsRowsLinInd(matrix)</strong></p>
+<p><strong>matrix</strong>: the matrix whose row vectors are checked for linear independence.</p>
+<p>Returns true if they are linearly independent and false if they are linearly dependent.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,0, 0,1), 2, 2)
+matrixIsRowsLinInd($A)  // true</pre></details>
+
+<h3 id="matrixIsColsLinInd"><a name="matrixIsColsLinInd">matrixIsColsLinInd</a></h3>
+<p><strong>matrixIsColsLinInd(matrix)</strong></p>
+<p><strong>matrix</strong>: the matrix whose column vectors are checked for linear independence.</p>
+<p>Returns true if they are linearly independent and false if they are linearly dependent.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2, 2,4), 2, 2)
+matrixIsColsLinInd($A)  // false</pre></details>
+
+<h3 id="matrixIsEigVec"><a name="matrixIsEigVec">matrixIsEigVec</a></h3>
+<p><strong>matrixIsEigVec(matrix, eigenvector)</strong></p>
+<ul>
+<li><strong>matrix</strong>: the matrix being tested.</li>
+<li><strong>eigenvector</strong>: the possible eigenvector being checked. It is an array, not a matrix.</li>
+</ul>
+<p>Returns true if eigenvector is an eigenvector of matrix, otherwise returns false.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(2,0, 0,3), 2, 2)
+matrixIsEigVec($A, array(1,0))  // true</pre></details>
+
+<h3 id="matrixIsEigVal"><a name="matrixIsEigVal">matrixIsEigVal</a></h3>
+<p><strong>matrixIsEigVal(matrix, eigenvalue)</strong></p>
+<ul>
+<li><strong>matrix</strong>: the matrix being tested.</li>
+<li><strong>eigenvalue</strong>: a real number being tested to see if it is an eigenvalue of matrix.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(2,0, 0,3), 2, 2)
+matrixIsEigVal($A, 3)  // true</pre></details>
+
+<h3 id="matrixGetRowSpace"><a name="matrixGetRowSpace">matrixGetRowSpace</a></h3>
+<p><strong>matrixGetRowSpace(matrix)</strong></p>
+<p><strong>matrix</strong>: the matrix whose row space is being found.</p>
+<p>Returns a matrix whose rows are a basis of the row space of matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3, 2,4,6), 2, 3)
+$basis = matrixGetRowSpace($A)</pre></details>
+
+<h3 id="matrixGetColumnSpace"><a name="matrixGetColumnSpace">matrixGetColumnSpace</a></h3>
+<p><strong>matrixGetColumnSpace(matrix)</strong></p>
+<p><strong>matrix</strong>: the matrix whose column space is being found.</p>
+<p>Returns a matrix whose columns are a basis of the column space of matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2, 2,4, 3,6), 3, 2)
+$basis = matrixGetColumnSpace($A)</pre></details>
+
+<h3 id="matrixAxbHasSolution"><a name="matrixAxbHasSolution">matrixAxbHasSolution</a></h3>
+<p><strong>matrixAxbHasSolution(A, b)</strong></p>
+<p><strong>A</strong> is a matrix and <strong>b</strong> is an mx1 matrix.</p>
+<p>Returns true if there is a solution and false if there isn't one.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$b = matrix(array(5,6), 2, 1)
+matrixAxbHasSolution($A, $b)  // true</pre></details>
+
+<h3 id="matrixAspansB"><a name="matrixAspansB">matrixAspansB</a></h3>
+<p><strong>matrixAspansB(A, B)</strong></p>
+<p><strong>A</strong> is the possible spanning set.</p>
+<p>This tests if the rows of A span the row space of B.</p>
+<details class="example"><summary>Examples</summary><pre>matrixAspansB($A, $B)  // true or false</pre></details>
+
+<h3 id="matrixAbasisForB"><a name="matrixAbasisForB">matrixAbasisForB</a></h3>
+<p><strong>matrixAbasisForB(A, B)</strong></p>
+<p>Tests if the rows of A are a basis for the row space of B.</p>
+<details class="example"><summary>Examples</summary><pre>matrixAbasisForB($A, $B)  // true or false</pre></details>
+
+<h3 id="matrixGetMinor"><a name="matrixGetMinor">matrixGetMinor</a></h3>
+<p><strong>matrixGetMinor(matrix, rowNo, colNo)</strong></p>
+<p>Returns the (n-1) by (n-1) matrix minor obtained by removing the <code>rowNo</code> row and <code>colNo</code> column. Only works for a square matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3, 4,5,6, 7,8,9), 3, 3)
+$minor = matrixGetMinor($A, 0, 0)  // [[5,6],[8,9]]</pre></details>
+
+<h3 id="matrixDet"><a name="matrixDet">matrixDet</a></h3>
+<p><strong>matrixDet(matrix)</strong></p>
+<p>Returns the determinant of a matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4), 2, 2)
+$d = matrixDet($A)  // -2</pre></details>
+
+<h3 id="matrixRandomMatrix"><a name="matrixRandomMatrix">matrixRandomMatrix</a></h3>
+<p><strong>matrixRandomMatrix(minvalue, maxvalue, rows, cols)</strong></p>
+<p>Returns a matrix with random integer entries where the integers are between the min and max values.</p>
+<p>For cases where you'll want to solve Ax=b, use <code>matrixrandinvertible</code> instead.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrixRandomMatrix(-5, 5, 3, 3)  // random 3x3 matrix, entries from -5 to 5</pre></details>
+
+<h3 id="matrixRandomSpan"><a name="matrixRandomSpan">matrixRandomSpan</a></h3>
+<p><strong>matrixRandomSpan(matrix)</strong></p>
+<p>Returns a matrix of rows that span the row space of matrix.</p>
+<p>The number of rows of the spanning matrix will either be the same or one larger than the original matrix's number of rows.</p>
+<details class="example"><summary>Examples</summary><pre>$span = matrixRandomSpan($A)</pre></details>
+
+<h3 id="matrixNumberOfRows"><a name="matrixNumberOfRows">matrixNumberOfRows</a></h3>
+<p><strong>matrixNumberOfRows(matrix)</strong></p>
+<p>Returns the number of rows of a matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4,5,6), 2, 3)
+matrixNumberOfRows($A)  // 2</pre></details>
+
+<h3 id="matrixNumberOfColumns"><a name="matrixNumberOfColumns">matrixNumberOfColumns</a></h3>
+<p><strong>matrixNumberOfColumns(matrix)</strong></p>
+<p>Returns the number of columns of a matrix.</p>
+<details class="example"><summary>Examples</summary><pre>$A = matrix(array(1,2,3,4,5,6), 2, 3)
+matrixNumberOfColumns($A)  // 3</pre></details>
+
+<h3 id="matrixParseStuans"><a name="matrixParseStuans">matrixParseStuans</a></h3>
+<p><strong>matrixParseStuans(studentanswer)</strong></p>
+<p>Converts a student's matrix answer into a single array of values.</p>
+<p>The student answer can come from <code>$stuanswers[$thisq]</code> for single-part questions, or <code>getstuans($stuanswers, $thisq, (part index))</code> for multi-part questions.</p>
+<details class="example"><summary>Examples</summary><pre>$stuvals = matrixParseStuans($stuanswers[$thisq])</pre></details>
+
+<h3 id="matrixCompare"><a name="matrixCompare">matrixCompare</a></h3>
+<p><strong>matrixCompare(testmatrix, correctmatrix, [tol])</strong></p>
+<p>Compares the test matrix to the correct matrix, and returns true if they are equivalent up to the tolerance.</p>
+<p>Set <code>tol</code> to specify the relative tolerance (defaults to .001), or prefix with <code>|</code> for an absolute tolerance.</p>
+<details class="example"><summary>Examples</summary><pre>matrixCompare($stuMatrix, $correctMatrix)  // uses default relative tolerance
+matrixCompare($stuMatrix, $correctMatrix, "|.01")  // absolute tolerance of .01</pre></details>
+</body>
+</html>

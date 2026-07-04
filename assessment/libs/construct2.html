@@ -3,26 +3,22 @@
     <title>construct2 help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library construct2</h1>
-Construct2 integration functions, Version 0.1, Dec 18, 2013
-<BR><ul>
+<p>Construct2 integration functions, Version 0.1, Dec 18, 2013</p>
+<ul>
 <li><a href="#addConstruct2">addConstruct2</a></li>
 </ul>
-<h3><a name="addConstruct2">addConstruct2</a></h3>
-addConstruct2(url,[width,height,params,qn,part]) 
-<BR>place a Construct2 HTML5 applet, using the HTML file specified in URL 
-<BR>  the applet must have the imathas postMessage shim added to the scripts
-<BR>params should be key=>value array of values to send to Construct2 via the query string, like 
-<BR>  array('a'=>3,'name'=>'Fred')
-<BR>  these will be readable in Construct2 using Browser.QueryParam("name")
-<BR>if you want to read values from Construct2 provide  
-<BR>  question number(1-indexed - usually use $thisq) 
-<BR>  and if multipart, part number (0-indexed)
-<BR>  IMathAS doesn't request values - Construct2 has to send them.
-<BR>  Use Browser.QueryParam("imathasqn") to read the imathas question number, then
-<BR>  form a returnstring text variable like: 
-<BR>      imathasqn&"::"&myvar&","&anothervar
-<BR>  to send back, use Browser -> Execute Javascript like this:
-<BR>      "parent.postMessage('"&returnstring&"','*')"
-<BR>  see http://www.imathas.com/misc/basicimathasex.capx for an example
-<BR>
+
+<h3 id="addConstruct2"><a name="addConstruct2">addConstruct2</a></h3>
+<p><strong>addConstruct2(url, [width, height, params, qn, part])</strong></p>
+<p>Places a Construct2 HTML5 applet, using the HTML file specified in <code>url</code>. The applet must have the IMathAS <code>postMessage</code> shim added to the scripts.</p>
+<ul>
+<li><strong>params</strong>: a key=&gt;value array of values to send to Construct2 via the query string, like <code>array('a'=>3,'name'=>'Fred')</code>. These will be readable in Construct2 using <code>Browser.QueryParam("name")</code>.</li>
+<li><strong>qn, part</strong>: if you want to read values from Construct2, provide the question number (1-indexed - usually use <code>$thisq</code>), and if multipart, the part number (0-indexed). IMathAS doesn't request values - Construct2 has to send them.</li>
+</ul>
+<p>Use <code>Browser.QueryParam("imathasqn")</code> to read the IMathAS question number, then form a return string text variable like <code>imathasqn&"::"&myvar&","&anothervar</code> to send back. To send it, use Browser -&gt; Execute Javascript like this: <code>"parent.postMessage('"&returnstring&"','*')"</code>.</p>
+<p>See <a href="http://www.imathas.com/misc/basicimathasex.capx">http://www.imathas.com/misc/basicimathasex.capx</a> for an example.</p>
+<details class="example"><summary>Examples</summary><pre>addConstruct2("myapplet.html", 640, 480, array('a'=>3, 'name'=>'Fred'), $thisq)</pre></details>
+</body></html>

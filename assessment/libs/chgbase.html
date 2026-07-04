@@ -5,9 +5,11 @@
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head>
     <body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library chgbase</h1>
-A library of base changing functions.  Version 1.1, Aug 2025. Version 1.0, Nov 13, 2007
-<BR><ul>
+<p>A library of base changing functions. Version 1.1, Aug 2025. Version 1.0, Nov 13, 2007</p>
+<ul>
 <li><a href="#baseconvert">baseconvert</a></li>
 <li><a href="#hexdec">hexdec</a></li>
 <li><a href="#dechex">dechex</a></li>
@@ -16,37 +18,54 @@ A library of base changing functions.  Version 1.1, Aug 2025. Version 1.0, Nov 1
 <li><a href="#draw_mayan_number">draw_mayan_number</a></li>
 <li><a href="#draw_babylonian_number">draw_babylonian_number</a></li>
 </ul>
-<h3><a name="baseconvert">baseconvert</a></h3>
-baseconvert(num,from,to)
-<BR>converts the number num from base-"from" to base-"to"
-<BR>For example, baseconvert(23,5,7) converts 23-base5 to base7
-<BR>if a base is >10, then each place should be given (or will be returned)
-<BR> separated by commas, eg. 5,12,3
 
-<h3><a name="hexdec">hexdec</a></h3>
-<p>hexdec(a): converts a hexidecimal string to a decimal number</p>
+<h3 id="baseconvert"><a name="baseconvert">baseconvert</a></h3>
+<p><strong>baseconvert(num, from, to)</strong></p>
+<p>Converts the number <code>num</code> from base-"from" to base-"to".</p>
+<p>If a base is &gt;10, then each place should be given (or will be returned) separated by commas, e.g. 5,12,3.</p>
+<details class="example"><summary>Examples</summary><pre>baseconvert(23, 5, 7)  // converts 23-base5 to base7
+baseconvert("5,12,3", 16, 10)  // converts a base-16 number with places 5,12,3 to base10</pre></details>
 
-<h3><a name="dechex">dechex</a></h3>
-<p>dechex(a): converts a decimal number to a hexidecimal string</p>
+<h3 id="hexdec"><a name="hexdec">hexdec</a></h3>
+<p><strong>hexdec(a)</strong></p>
+<p>Converts a hexadecimal string to a decimal number.</p>
+<details class="example"><summary>Examples</summary><pre>hexdec("1A")  // 26</pre></details>
 
-<BR><h3><a name="asciitodec">asciitodec</a></h3>
-asciitodec(char)
-<BR>returns the ASCII decimal code for a character
-<BR><h3><a name="dectoascii">dectoascii</a></h3>
-dectoascii(num)
-<BR>returns the ASCII character for a decimal value
-<BR>
-<h3><a name="draw_mayan_number">draw_mayan_number(number, [width, mode])</a></h3>
+<h3 id="dechex"><a name="dechex">dechex</a></h3>
+<p><strong>dechex(a)</strong></p>
+<p>Converts a decimal number to a hexadecimal string.</p>
+<details class="example"><summary>Examples</summary><pre>dechex(26)  // "1A"</pre></details>
+
+<h3 id="asciitodec"><a name="asciitodec">asciitodec</a></h3>
+<p><strong>asciitodec(char)</strong></p>
+<p>Returns the ASCII decimal code for a character.</p>
+<details class="example"><summary>Examples</summary><pre>asciitodec("A")  // 65</pre></details>
+
+<h3 id="dectoascii"><a name="dectoascii">dectoascii</a></h3>
+<p><strong>dectoascii(num)</strong></p>
+<p>Returns the ASCII character for a decimal value.</p>
+<details class="example"><summary>Examples</summary><pre>dectoascii(65)  // "A"</pre></details>
+
+<h3 id="draw_mayan_number"><a name="draw_mayan_number">draw_mayan_number</a></h3>
+<p><strong>draw_mayan_number(number, [width, mode])</strong></p>
 <p>Draws a representation of the given base-10 number as a Mayan number.</p>
 <ul>
-    <li>Number: The base-10 number to represent</li>
-    <li>Width: The width of the image (default 50). The height is auto-adjusted based on the number of positions needed.</li>
-    <li>Mode: Default "standard" for pure base-20 system. Set to "modified" for the "long count" modified vigesimal system, where the second position can only be up to 17 and the third position represents multiples of 18*20.</li>
+    <li><strong>number</strong>: the base-10 number to represent.</li>
+    <li><strong>width</strong>: the width of the image (default 50). The height is auto-adjusted based on the number of positions needed.</li>
+    <li><strong>mode</strong>: default "standard" for pure base-20 system. Set to "modified" for the "long count" modified vigesimal system, where the second position can only be up to 17 and the third position represents multiples of 18*20.</li>
 </ul>
-<h3><a name="draw_babylonian_number">draw_babylonian_number(number, [height, drawzero])</a></h3>
+<details class="example"><summary>Examples</summary><pre>$img = draw_mayan_number(429)
+$img2 = draw_mayan_number(429, 80, "modified")</pre></details>
+
+<h3 id="draw_babylonian_number"><a name="draw_babylonian_number">draw_babylonian_number</a></h3>
+<p><strong>draw_babylonian_number(number, [height, drawzero])</strong></p>
 <p>Draws a representation of the given base-10 number as a Babylonian number.</p>
 <ul>
-    <li>Number: The base-10 number to represent</li>
-    <li>Height: The height of the image (default 40). The width is auto-adjusted based on the number of positions needed.</li>
-    <li>drawzero: default false (so zero positions are left blank). Set to 1 to draw angled wedges for zeros in middle positions only, 2 to draw for zeros in all positions.</li>
+    <li><strong>number</strong>: the base-10 number to represent.</li>
+    <li><strong>height</strong>: the height of the image (default 40). The width is auto-adjusted based on the number of positions needed.</li>
+    <li><strong>drawzero</strong>: default false (so zero positions are left blank). Set to 1 to draw angled wedges for zeros in middle positions only, 2 to draw for zeros in all positions.</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$img = draw_babylonian_number(3661)
+$img2 = draw_babylonian_number(3661, 60, 1)</pre></details>
+</body>
+</html>

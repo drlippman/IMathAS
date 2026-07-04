@@ -3,9 +3,11 @@
     <title>polys2 help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library polys2</h1>
-Polynomial functions with two variables, like 2x^2+3xy+4y^2.  Version 1.0, Jan 21, 2010
-<BR><ul>
+<p>Polynomial functions with two variables, like 2x^2+3xy+4y^2. Version 1.0, Jan 21, 2010</p>
+<ul>
 <li><a href="#formpoly2">formpoly2</a></li>
 <li><a href="#writepoly2">writepoly2</a></li>
 <li><a href="#addpolys2">addpolys2</a></li>
@@ -15,39 +17,61 @@ Polynomial functions with two variables, like 2x^2+3xy+4y^2.  Version 1.0, Jan 2
 <li><a href="#polypower2">polypower2</a></li>
 <li><a href="#getcoef2">getcoef2</a></li>
 </ul>
-<h3><a name="formpoly2">formpoly2</a></h3>
-formpoly2(coefficients,powers,powers2)
-<BR>Creates a polynomial object with two variables
-<BR>Use writepoly to create a display form of the polynomial
-<BR>coefficients: list/array of coefficients
-<BR>powers : list/array of powers for first variable
-<BR>power2: list/array of power for the second variable
-<BR><h3><a name="writepoly2">writepoly2</a></h3>
-writepoly2(poly,[var,var2,showzeros])
-<BR>Creates a display form for polynomial object
-<BR>poly: polynomial object, created with formpoly
-<BR>var: first variable, defaults to x
-<BR>var2: second variable, defaults to y
-<BR>showzeros:  optional, defaults to false.  If true, shows zero coefficients
-<BR><h3><a name="addpolys2">addpolys2</a></h3>
-addpolys2(poly1,poly2)
-<BR>Adds polynomials, arranging terms from highest to lowest powers
-<BR><h3><a name="subtpolys2">subtpolys2</a></h3>
-subtpolys2(poly1,poly2)
-<BR>Subtracts polynomials: poly1-poly2, arranging terms from highest to lowest powers
-<BR><h3><a name="multpolys2">multpolys2</a></h3>
-multpolys2(poly1,poly2)
-<BR>Multiplies polynomials
-<BR><h3><a name="scalepoly2">scalepoly2</a></h3>
-scalepoly2(poly,c)
-<BR>Multiplies each term of poly by constant c
-<BR><h3><a name="polypower2">polypower2</a></h3>
-polypower2(poly,power)
-<BR>Calculates poly^power
-<BR><h3><a name="getcoef2">getcoef2</a></h3>
-getcoef2(poly,degree,degree)
-<BR>Gets the coefficient corresponding to the degree specified
-<BR>if no such term is defined, 0 is returned (since that is the coefficient!)
-<BR>poly: polynomial object, created with formpoly
-<BR>degree: degree of term to get coefficient of
-<BR>
+
+<h3 id="formpoly2"><a name="formpoly2">formpoly2</a></h3>
+<p><strong>formpoly2(coefficients, powers, powers2)</strong></p>
+<p>Creates a polynomial object with two variables. Use <code>writepoly2</code> to create a display form of the polynomial.</p>
+<ul>
+<li><strong>coefficients</strong>: list/array of coefficients.</li>
+<li><strong>powers</strong>: list/array of powers for the first variable.</li>
+<li><strong>powers2</strong>: list/array of powers for the second variable.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>// 2x^2 + 3xy + 4y^2
+$p = formpoly2(array(2,3,4), array(2,1,0), array(0,1,2))</pre></details>
+
+<h3 id="writepoly2"><a name="writepoly2">writepoly2</a></h3>
+<p><strong>writepoly2(poly, [var, var2, showzeros])</strong></p>
+<p>Creates a display form for a polynomial object.</p>
+<ul>
+<li><strong>poly</strong>: polynomial object, created with formpoly2.</li>
+<li><strong>var</strong>: first variable, defaults to x.</li>
+<li><strong>var2</strong>: second variable, defaults to y.</li>
+<li><strong>showzeros</strong>: optional, defaults to false. If true, shows zero coefficients.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$showanswer = writepoly2($p)  // "2x^2+3xy+4y^2"
+$showanswer2 = writepoly2($p, "s", "t")  // uses s and t as variables</pre></details>
+
+<h3 id="addpolys2"><a name="addpolys2">addpolys2</a></h3>
+<p><strong>addpolys2(poly1, poly2)</strong></p>
+<p>Adds polynomials, arranging terms from highest to lowest powers.</p>
+<details class="example"><summary>Examples</summary><pre>$sum = addpolys2($p1, $p2)</pre></details>
+
+<h3 id="subtpolys2"><a name="subtpolys2">subtpolys2</a></h3>
+<p><strong>subtpolys2(poly1, poly2)</strong></p>
+<p>Subtracts polynomials: <code>poly1 - poly2</code>, arranging terms from highest to lowest powers.</p>
+<details class="example"><summary>Examples</summary><pre>$diff = subtpolys2($p1, $p2)</pre></details>
+
+<h3 id="multpolys2"><a name="multpolys2">multpolys2</a></h3>
+<p><strong>multpolys2(poly1, poly2)</strong></p>
+<p>Multiplies polynomials.</p>
+<details class="example"><summary>Examples</summary><pre>$prod = multpolys2($p1, $p2)</pre></details>
+
+<h3 id="scalepoly2"><a name="scalepoly2">scalepoly2</a></h3>
+<p><strong>scalepoly2(poly, c)</strong></p>
+<p>Multiplies each term of poly by the constant <code>c</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$scaled = scalepoly2($p, 3)</pre></details>
+
+<h3 id="polypower2"><a name="polypower2">polypower2</a></h3>
+<p><strong>polypower2(poly, power)</strong></p>
+<p>Calculates <code>poly^power</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$squared = polypower2($p, 2)</pre></details>
+
+<h3 id="getcoef2"><a name="getcoef2">getcoef2</a></h3>
+<p><strong>getcoef2(poly, degree, degree2)</strong></p>
+<p>Gets the coefficient corresponding to the degrees specified. If no such term is defined, 0 is returned (since that is the coefficient!).</p>
+<ul>
+<li><strong>poly</strong>: polynomial object, created with formpoly2.</li>
+<li><strong>degree, degree2</strong>: degree of the first and second variable of the term to get the coefficient of.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$coef = getcoef2($p, 2, 0)  // coefficient of the x^2 term</pre></details>
+</body></html>

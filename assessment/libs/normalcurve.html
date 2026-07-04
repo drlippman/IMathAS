@@ -3,55 +3,52 @@
     <title>normalcurve help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library normalcurve</h1>
-normal curve functions
-<BR><ul>
+<p>Normal curve functions</p>
+<ul>
 <li><a href="#normalcurve">normalcurve</a></li>
 <li><a href="#normalcurve2">normalcurve2</a></li>
 <li><a href="#normalcurve3">normalcurve3</a></li>
 </ul>
-<h3><a name="normalcurve">normalcurve</a></h3>
-normalcurve(mu, sigma, a, b, [axislabel, x, dirx, y, diry, color, width, height])
-<BR>draws a normal curve with mean mu and standard deviation sigma
-<BR>This function is good for a basic normal curve, vertically scaled to fit
-<BR>with axis labels at multiples of sigma
-<BR>
-<BR>draws on bounds a&lt;x&lt;b, with axis markings at mu+k*sigma
-<BR>axis label gives an axis label
-<BR>optionally can shade a region based on one or two values x and y
-<BR>indiciate shade direction using dirx and diry, which can be "left" or "right"
-<BR>you set use null for y to set later values
-<BR>color indicates color of the shaded regions
-<BR>width and height are pixels for the displayed graph.  defaults to 400 by 150
-<BR><h3><a name="normalcurve2">normalcurve2</a></h3>
-normalcurve2(mu, sigma, a, b, [axisspacing, ymax, axislabel, x, dirx, y, diry, color, width, height])
-<BR>draws a normal curve with mean mu and standard deviation sigma
-<BR>This function allows for axis spacing other than multiples of sigma, and does
-<BR>not scale the graph vertically to fit.
-<BR>
-<BR>draws on bounds a&lt;x&lt;b
-<BR>specify axisspacing, or defaults to sigma
-<BR>set ymax to set max of vertical axis, or "auto" for ymax to autoscale
-<BR>axis label gives an axis label
-<BR>optionally can shade a region based on one or two values x and y
-<BR>indiciate shade direction using dirx and diry, which can be "left" or "right"
-<BR>you set use null for y to set later values
-<BR>color indicates color of the shaded regions
-<BR>width and height are pixels for the displayed graph.  defaults to 400 by 150
-<BR><h3><a name="normalcurve3">normalcurve3</a></h3>
-normalcurve3(mu, sigma, a, b, [axislabel, x, dirx, y, diry, color, q, dirw, r, dirr, color, width, height])
-<BR>draws a normal curve with mean mu and standard deviation sigma
-<BR>This function is good for a basic normal curve, vertically scaled to fit
-<BR>with axis labels at multiples of sigma.  This versions allows for the shading
-<BR>of TWO regions with different colors
-<BR>
-<BR>draws on bounds a&lt;x&lt;b, with axis markings at mu+k*sigma
-<BR>axis label gives an axis label
-<BR>optionally can shade a region based on one or two values x and y
-<BR>indiciate shade direction using dirx and diry, which can be "left" or "right"
-<BR>optionally can shade a second region based on one or two values q and r
-<BR>indiciate shade direction using dirq and dirr, which can be "left" or "right"
-<BR>you set use null for y, q, and/or r to set later values
-<BR>color indicates color of the shaded regions
-<BR>width and height are pixels for the displayed graph.  defaults to 400 by 150
-<BR>
+
+<h3 id="normalcurve"><a name="normalcurve">normalcurve</a></h3>
+<p><strong>normalcurve(mu, sigma, a, b, [axislabel, x, dirx, y, diry, color, width, height])</strong></p>
+<p>Draws a normal curve with mean <code>mu</code> and standard deviation <code>sigma</code>. This function is good for a basic normal curve, vertically scaled to fit, with axis labels at multiples of sigma.</p>
+<ul>
+<li><strong>a, b</strong>: draws on bounds a &lt; x &lt; b, with axis markings at mu+k*sigma.</li>
+<li><strong>axislabel</strong>: gives an axis label.</li>
+<li><strong>x, dirx, y, diry</strong>: optionally can shade a region based on one or two values x and y. Indicate shade direction using dirx and diry, which can be "left" or "right". You can use null for y to set later values.</li>
+<li><strong>color</strong>: indicates color of the shaded regions.</li>
+<li><strong>width, height</strong>: pixels for the displayed graph. Defaults to 400 by 150.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = normalcurve(0, 1, -3, 3)
+$img2 = normalcurve(0, 1, -3, 3, "z", -1, "left", null, null, "#ccf")</pre></details>
+
+<h3 id="normalcurve2"><a name="normalcurve2">normalcurve2</a></h3>
+<p><strong>normalcurve2(mu, sigma, a, b, [axisspacing, ymax, axislabel, x, dirx, y, diry, color, width, height])</strong></p>
+<p>Draws a normal curve with mean <code>mu</code> and standard deviation <code>sigma</code>. This function allows for axis spacing other than multiples of sigma, and does not scale the graph vertically to fit.</p>
+<ul>
+<li><strong>a, b</strong>: draws on bounds a &lt; x &lt; b.</li>
+<li><strong>axisspacing</strong>: specify axis spacing, or defaults to sigma.</li>
+<li><strong>ymax</strong>: set max of the vertical axis, or "auto" for ymax to autoscale.</li>
+<li><strong>axislabel</strong>: gives an axis label.</li>
+<li><strong>x, dirx, y, diry</strong>: optionally can shade a region based on one or two values x and y. Indicate shade direction using dirx and diry, which can be "left" or "right". You can use null for y to set later values.</li>
+<li><strong>color</strong>: indicates color of the shaded regions.</li>
+<li><strong>width, height</strong>: pixels for the displayed graph. Defaults to 400 by 150.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = normalcurve2(0, 1, -3, 3, 0.5, "auto")</pre></details>
+
+<h3 id="normalcurve3"><a name="normalcurve3">normalcurve3</a></h3>
+<p><strong>normalcurve3(mu, sigma, a, b, [axislabel, x, dirx, y, diry, color, q, dirq, r, dirr, color2, width, height])</strong></p>
+<p>Draws a normal curve with mean <code>mu</code> and standard deviation <code>sigma</code>. This function is good for a basic normal curve, vertically scaled to fit, with axis labels at multiples of sigma. This version allows for the shading of TWO regions with different colors.</p>
+<ul>
+<li><strong>a, b</strong>: draws on bounds a &lt; x &lt; b, with axis markings at mu+k*sigma.</li>
+<li><strong>axislabel</strong>: gives an axis label.</li>
+<li><strong>x, dirx, y, diry, color</strong>: optionally can shade a region based on one or two values x and y. Indicate shade direction using dirx and diry, which can be "left" or "right".</li>
+<li><strong>q, dirq, r, dirr, color2</strong>: optionally can shade a second region based on one or two values q and r. Indicate shade direction using dirq and dirr, which can be "left" or "right". You can use null for y, q, and/or r to set later values.</li>
+<li><strong>width, height</strong>: pixels for the displayed graph. Defaults to 400 by 150.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$img = normalcurve3(0, 1, -3, 3, "z", -2, "left", null, null, "#ccf", 1, "right", null, null, "#fcc")</pre></details>
+</body></html>

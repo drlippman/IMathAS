@@ -3,24 +3,32 @@
     <title>primes help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library primes</h1>
-Prime numbers, Version 1.0 Feb 11, 2009
-<BR><ul>
+<p>Prime numbers, Version 1.0 Feb 11, 2009</p>
+<ul>
 <li><a href="#getprime">getprime</a></li>
 <li><a href="#getprimes">getprimes</a></li>
 <li><a href="#isprime">isprime</a></li>
 </ul>
-<h3><a name="getprime">getprime</a></h3>
-getprime([digits])
-<BR>returns a prime number. 
-<BR>if digits is specified, returns a prime with that many digits.  1 to 6 is supported
-<BR><h3><a name="getprimes">getprimes</a></h3>
-getprimes(n,[digits])
-<BR>returns n different prime numbers. 
-<BR>if digits is specified, returns primes with that many digits.  1 to 6 is supported
-<BR>
- <h3><a name="isprime">isprime</a></h3>
-isprime(n)
-<BR>returns true or false, indicating if n is prime. 
-<BR>Only works for whole numbers less than 1,000,000.
-<br>If you need a prime number, use getprime instead.
+
+<h3 id="getprime"><a name="getprime">getprime</a></h3>
+<p><strong>getprime([digits])</strong></p>
+<p>Returns a prime number. If <code>digits</code> is specified, returns a prime with that many digits. 1 to 6 is supported.</p>
+<details class="example"><summary>Examples</summary><pre>$p = getprime()  // a random prime number, e.g. 71493611
+$p2 = getprime(3)  // a random 3-digit prime, e.g. 613</pre></details>
+
+<h3 id="getprimes"><a name="getprimes">getprimes</a></h3>
+<p><strong>getprimes(n, [digits])</strong></p>
+<p>Returns <code>n</code> different prime numbers. If <code>digits</code> is specified, returns primes with that many digits. 1 to 6 is supported.</p>
+<details class="example"><summary>Examples</summary><pre>$plist = getprimes(5)  // array of 5 different random primes
+$plist2 = getprimes(3, 2)  // array of 3 different random 2-digit primes, e.g. array(13, 47, 89)</pre></details>
+
+<h3 id="isprime"><a name="isprime">isprime</a></h3>
+<p><strong>isprime(n)</strong></p>
+<p>Returns true or false, indicating if <code>n</code> is prime. Only works for whole numbers less than 1,000,000.</p>
+<p>If you need a prime number, use <code>getprime</code> instead.</p>
+<details class="example"><summary>Examples</summary><pre>isprime(17)  // true
+isprime(20)  // false</pre></details>
+</body></html>

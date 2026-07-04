@@ -4,17 +4,22 @@
         <title>functioneval help</title>
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library functioneval</h1>
-A smattering of macros for evaluating complicated functions.  Version 1.0 Oct 4 2009
-<BR><ul>
+<p>A smattering of macros for evaluating complicated functions. Version 1.0 Oct 4 2009</p>
+<ul>
 <li><a href="#fe_lpfnc">fe_lpfnc</a></li>
 </ul>
-<h3><a name="fe_lpfnc">fe_lpfnc</a></h3>
-fe_lpfnc(x,xarray,yarray,[periodic])
-<BR>evals a linear piecewise function (connect-the-dots) from the provided
-<BR>array of x and y values at the given x value.
-<BR>requires x array to be in increasing order
-<BR>If periodic=true, then xarray values define the domain of one period, 
-<BR>and if x is outside that domain, f(x) = f(x-p) will be used
-<BR>domain: starting x <= x < last x, so make sure last x = x[0]+p
-<BR>
+
+<h3 id="fe_lpfnc"><a name="fe_lpfnc">fe_lpfnc</a></h3>
+<p><strong>fe_lpfnc(x, xarray, yarray, [periodic])</strong></p>
+<p>Evaluates a linear piecewise function (connect-the-dots) from the provided array of x and y values at the given x value. Requires the x array to be in increasing order.</p>
+<ul>
+<li><strong>x</strong>: the x value at which to evaluate the function.</li>
+<li><strong>xarray, yarray</strong>: arrays of x and y values defining the piecewise-linear function.</li>
+<li><strong>periodic</strong>: Optional - if true, then <code>xarray</code> values define the domain of one period, and if <code>x</code> is outside that domain, <code>f(x) = f(x-p)</code> will be used. The domain is <code>starting x &lt;= x &lt; last x</code>, so make sure the last x = x[0]+p.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$y = fe_lpfnc(1.5, array(0,1,2,3), array(0,2,1,3))  // 1.5 (halfway between 2 and 1)
+$yperiodic = fe_lpfnc(5, array(0,2,4), array(0,3,0), true)  // wraps using the period</pre></details>
+</body></html>

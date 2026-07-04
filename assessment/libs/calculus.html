@@ -4,22 +4,26 @@
         <title>calculus help</title>
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library calculus</h1>
-A collection of numerical calculus routines.  These are intended to do
-<BR>numerical calculations where they are specifically needed, not substitute 
-<BR>for entering symbolic derivatives or integrals.
-<BR>
-<BR>Version 1.0 Oct 19, 2009
-<BR><ul>
+<p>A collection of numerical calculus routines. These are intended to do numerical calculations where they are specifically needed, not substitute for entering symbolic derivatives or integrals.</p>
+<p>Version 1.0 Oct 19, 2009</p>
+<ul>
 <li><a href="#calculusdiffquotient">calculusdiffquotient</a></li>
 <li><a href="#calculusnumint">calculusnumint</a></li>
 </ul>
-<h3><a name="calculusdiffquotient">calculusdiffquotient</a></h3>
-calculusdiffquotient(function,variable,a,h)
-<BR>calculated the difference quotient (f(a+h)-f(a))/h
-<BR><h3><a name="calculusnumint">calculusnumint</a></h3>
-calculusnumint(func,var,a,b,n,method)
-<BR>do a numerical integral approximation on interval [a,b] with
-<BR>n subdivisions using specified method
-<BR>method = left, right, midpoint, trapezoidal, or simpsons
-<BR>
+
+<h3 id="calculusdiffquotient"><a name="calculusdiffquotient">calculusdiffquotient</a></h3>
+<p><strong>calculusdiffquotient(function, variable, a, h)</strong></p>
+<p>Calculates the difference quotient <code>(f(a+h)-f(a))/h</code>.</p>
+<details class="example"><summary>Examples</summary><pre>$dq = calculusdiffquotient("x^2", "x", 3, 0.001)  // approximately 6.001</pre></details>
+
+<h3 id="calculusnumint"><a name="calculusnumint">calculusnumint</a></h3>
+<p><strong>calculusnumint(func, var, a, b, n, method)</strong></p>
+<p>Does a numerical integral approximation on the interval [a, b] with <code>n</code> subdivisions using the specified method.</p>
+<ul>
+<li><strong>method</strong>: one of "left", "right", "midpoint", "trapezoidal", or "simpsons".</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$area = calculusnumint("x^2", "x", 0, 1, 100, "simpsons")  // approximately 0.3333</pre></details>
+</body></html>

@@ -3,26 +3,31 @@
     <title>ineq help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library ineq</h1>
-Inequality graphing functions.  Version 1.0, Oct 30, 2006
-<BR><ul>
+<p>Inequality graphing functions. Version 1.0, Oct 30, 2006</p>
+<ul>
 <li><a href="#ineqplot">ineqplot</a></li>
 <li><a href="#ineqbetweenplot">ineqbetweenplot</a></li>
 </ul>
-<h3><a name="ineqplot">ineqplot</a></h3>
-ineqplot("funcstring",[xmin,xmax,ymin,ymax,labels,grid,width,height])
-<BR>graphs a set of functions, shading above or below each graph as specified
-<BR>
-<BR>funcstring format: (function and filltype are required) - one string or array
-<BR>&nbsp;&nbsp;function of x,filltype,fillcolor,linecolor,dash,strokewidth
-<BR>&nbsp;&nbsp;
-<BR>filltypes: above, below
-<BR><h3><a name="ineqbetweenplot">ineqbetweenplot</a></h3>
-ineqbetweenplot("funcstring",[xmin,xmax,ymin,ymax,labels,grid,width,height])
-<BR>graphs a set of functions, shading the area satisfying all above or below
-<BR>&nbsp;&nbsp;specifications.
-<BR>
-<BR>funcstring format: (function and filltype are required) - one string or array
-<BR>&nbsp;&nbsp;function of x,above or below,linecolor,dash,strokewidth,fillcolor
-<BR>&nbsp;&nbsp;or x=number,right or left,linecolor,dash,strokewidth,fillcolor
-<BR>
+
+<h3 id="ineqplot"><a name="ineqplot">ineqplot</a></h3>
+<p><strong>ineqplot("funcstring", [xmin, xmax, ymin, ymax, labels, grid, width, height])</strong></p>
+<p>Graphs a set of functions, shading above or below each graph as specified.</p>
+<ul>
+<li><strong>funcstring</strong>: one string or array of strings, each with the format (function and filltype are required): <code>function of x,filltype,fillcolor,linecolor,dash,strokewidth</code></li>
+<li><strong>filltype</strong>: "above" or "below".</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>ineqplot("x^2-1,above")
+ineqplot(array("x^2-1,above,#f00", "3-x,below,#00f"), -5, 5, -5, 5)</pre></details>
+
+<h3 id="ineqbetweenplot"><a name="ineqbetweenplot">ineqbetweenplot</a></h3>
+<p><strong>ineqbetweenplot("funcstring", [xmin, xmax, ymin, ymax, labels, grid, width, height])</strong></p>
+<p>Graphs a set of functions, shading the area satisfying all above/below specifications.</p>
+<ul>
+<li><strong>funcstring</strong>: one string or array of strings, each with the format (function and filltype are required): <code>function of x,above or below,linecolor,dash,strokewidth,fillcolor</code> or <code>x=number,right or left,linecolor,dash,strokewidth,fillcolor</code></li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>ineqbetweenplot(array("x^2-1,above", "3-x,below"))
+ineqbetweenplot(array("x=2,right", "x^2,above"), -5, 5, -5, 5)</pre></details>
+</body></html>

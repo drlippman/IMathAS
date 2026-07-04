@@ -3,20 +3,28 @@
     <title>interval_ext help</title>
     <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
 </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library interval_ext</h1>
-Interval functions extension. Version 1.0 November 4, 2014
-<BR><ul>
+<p>Interval functions extension. Version 1.0 November 4, 2014</p>
+<ul>
 <li><a href="#canonicInterval">canonicInterval</a></li>
 <li><a href="#intersection">intersection</a></li>
 </ul>
-<h3><a name="canonicInterval">canonicInterval</a></h3>
-canonicInterval(IntervalString)
-<BR>Forms a canonic interval string, consisting of a union of connected intervalls sorted by order
-<BR>IntervalString: Union of intervals as string
-<BR>Example: canonicInterval("[2,2^2) U (-1,3]")="(-1,2^2)"
-<BR><h3><a name="intersection">intersection</a></h3>
-intersection(arrayOfIntervals)
-<BR>Forms the intersection of unions of intervals in an array
-<BR>arrayOfIntervals: array of strings in interval notation, ex: [2,5)
-<BR>Example: intersection(array("(-2,0) U (0,2)","[-1,1)"))="[-1,0) U (0,1)"
-<BR>
+
+<h3 id="canonicInterval"><a name="canonicInterval">canonicInterval</a></h3>
+<p><strong>canonicInterval(IntervalString)</strong></p>
+<p>Forms a canonic interval string, consisting of a union of connected intervals sorted by order.</p>
+<ul>
+<li><strong>IntervalString</strong>: union of intervals as a string.</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>canonicInterval("[2,2^2) U (-1,3]")  // "(-1,2^2)"</pre></details>
+
+<h3 id="intersection"><a name="intersection">intersection</a></h3>
+<p><strong>intersection(arrayOfIntervals)</strong></p>
+<p>Forms the intersection of unions of intervals in an array.</p>
+<ul>
+<li><strong>arrayOfIntervals</strong>: array of strings in interval notation, e.g. "[2,5)".</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>intersection(array("(-2,0) U (0,2)", "[-1,1)"))  // "[-1,0) U (0,1)"</pre></details>
+</body></html>

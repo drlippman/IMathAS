@@ -4,33 +4,27 @@
         <title>diffeq help</title>
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
 <h1>Macro Library diffeq</h1>
 <p>Differential equations functions, Jan 2023</p>
 <ul>
     <li><a href="#diffeq_slopefield">diffeq_slopefield</a></li>
     <li><a href="#diffeq_comparegensoln">diffeq_comparegensoln</a></li>
 </ul>
-<h3><a name="diffeq_slopefield">diffeq_slopefield</a></h3>
+
+<h3 id="diffeq_slopefield"><a name="diffeq_slopefield">diffeq_slopefield</a></h3>
 <p><strong>diffeq_slopefield(function, [options])</strong></p>
 <p>Draws a slopefield for the given differential equation.</p>
-<p><b>function</b>: For a first order ODE, like dy/dx=x*y^2, use a single string, like <code>"x*y^2"</code>.<br>
+<p><strong>function</strong>: For a first order ODE, like dy/dx=x*y^2, use a single string, like <code>"x*y^2"</code>.
   For an autonomous system, like x'=x+y, y'=y-2x, list both parts, like <code>"x+y,y-2x"</code></p>
-<p><b>options</b> is an optional associative array of parameters. You can define none or several of them.
-  There are two common ways to define these:</p>
-<p>Inline: <code>$g = diffeq_slopefield("xy",['dx'=>0.5, 'arrows'=>1])</code></p>
-<p>As a separate array:</p>
-<pre>
-    $ops['dx'] = 0.5
-    $ops['arrows'] = 1
-    $g = diffeq_slopefield("xy",$ops)
-</pre>
-<p>The options you can set are:</p>
+<p><strong>options</strong> is an optional associative array of parameters. You can define none or several of them. The options you can set are:</p>
 <ul>
     <li>dx: x spacing of slopes. default 1</li>
     <li>dy: y spacing of slopes. defaults to match dx</li>
     <li>vars: The variables of the diffeq. default "x,y"</li>
     <li>arrows: Set to 1 to show arrows on slopes. default 0</li>
-    <li>format: overall format. default "slopefield". Set to "vectorfield" for vectorfields which will 
+    <li>format: overall format. default "slopefield". Set to "vectorfield" for vectorfields which will
         set norm to false and arrows to 1, and output vectors in the accessible alternative.</li>
     <li>xmin: default -4</li>
     <li>xmax: default 4</li>
@@ -49,19 +43,31 @@
     <li>width: drawing width. default 300</li>
     <li>height: drawing height. default 300</li>
 </ul>
+<details class="example"><summary>Examples</summary><pre>$g = diffeq_slopefield("x*y^2")
 
-<h3><a name="diffeq_comparegensoln">diffeq_comparegensoln</a></h3>
+// setting options inline
+$g2 = diffeq_slopefield("xy", ['dx'=>0.5, 'arrows'=>1])
+
+// or building the options array separately
+$ops['dx'] = 0.5
+$ops['arrows'] = 1
+$g3 = diffeq_slopefield("xy", $ops)</pre></details>
+
+<h3 id="diffeq_comparegensoln"><a name="diffeq_comparegensoln">diffeq_comparegensoln</a></h3>
 <p><strong>diffeq_comparegensoln(expr1, expr2, vars, constants, [tolerance, domain])</strong></p>
 <p>Compares two general solutions to an ODE which contain arbitrary constants. They
-    are compared in a way that allows swapping which constant goes where, and 
-    accomodates absorbed constants.
-</p>
-<p><strong>expr1</strong>: the first general solution, like "cos(t)+c_1*e^t+c_2*e^(-t)"</p>
-<p><strong>expr2</strong>: the second general solution</p>
-<p><strong>vars</strong>: the independent variables in the expression, like "t"</p>
-<p><strong>constants</strong>: the arbitrary constants in the expression, like "c_1,c_2"</p>
-<p><strong>tolerance</strong>: the relative tolerance to compare with. Default 0.001.</p>
-<p><strong>domain</strong>: the domain to compare on. Default "-10,10".</p>
-</strong></p>
+    are compared in a way that allows swapping which constant goes where, and
+    accommodates absorbed constants.</p>
+<ul>
+<li><strong>expr1</strong>: the first general solution, like "cos(t)+c_1*e^t+c_2*e^(-t)"</li>
+<li><strong>expr2</strong>: the second general solution</li>
+<li><strong>vars</strong>: the independent variables in the expression, like "t"</li>
+<li><strong>constants</strong>: the arbitrary constants in the expression, like "c_1,c_2"</li>
+<li><strong>tolerance</strong>: the relative tolerance to compare with. Default 0.001.</li>
+<li><strong>domain</strong>: the domain to compare on. Default "-10,10".</li>
+</ul>
+<details class="example"><summary>Examples</summary><pre>$correct = "cos(t)+c_1*e^t+c_2*e^(-t)"
+$stu = $stuanswers[$thisq]
+$iscorrect = diffeq_comparegensoln($correct, $stu, "t", "c_1,c_2")</pre></details>
 </body>
 </html>
