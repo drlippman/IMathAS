@@ -31,7 +31,9 @@
 <li><strong>principal</strong>: the initial value of the account. Should be a negative value if paid into the account. Should be a positive value if withdrawn from the account.</li>
 </ul>
 <p>Returns the Future Value of the account. Returns a positive value if the investment/loan resulted in a positive return. Returns a negative value if the investment/loan resulted in an amount owed.</p>
-<details class="example"><summary>Examples</summary><pre>$fv = futureValue(7.5, 10, 4, -500, -1000)</pre></details>
+<details class="example"><summary>Examples</summary><pre>// future value of $1000 principle, $500 deposits/quarter 
+// 10 quarters at 7.5% interest
+$fv = futureValue(7.5, 10, 4, -500, -1000)</pre></details>
 
 <h3 id="presentValue"><a name="presentValue">presentValue</a></h3>
 <p><strong>presentValue(interest, bigN, littleN, payment, accruedVal)</strong></p>
@@ -44,7 +46,9 @@
 <li><strong>accruedVal</strong>: the Future Value of the investment. Should be a positive value if the investment/loan resulted in a positive return. Should be a negative value if the investment/loan resulted in an amount owed.</li>
 </ul>
 <p>Returns the Present Value of the account. Returns a positive value if the initial principal was withdrawn from the account (Loan). Returns a negative value if the initial principal was invested into the account (Savings).</p>
-<details class="example"><summary>Examples</summary><pre>$pv = presentValue(7.5, 10, 4, -500, 2000)</pre></details>
+<details class="example"><summary>Examples</summary><pre>// present value of $2000 future value, $500 deposits/month 
+// 60 months at 7.5% interest
+// $pv = presentValue(7.5, 60, 12, -500, 2000)</pre></details>
 
 <h3 id="payment"><a name="payment">payment</a></h3>
 <p><strong>payment(interest, bigN, littleN, principal, accruedVal)</strong></p>
@@ -57,7 +61,9 @@
 <li><strong>accruedVal</strong>: the Future Value of the investment. Should be a positive value if the investment/loan resulted in a positive return. Should be a negative value if the investment/loan resulted in an amount owed.</li>
 </ul>
 <p>Returns the Periodic Payment or Withdrawal for the Loan or Investment. Positive value if withdrawn from the account. Negative if deposited into the account.</p>
-<details class="example"><summary>Examples</summary><pre>$pmt = payment(7.5, 10, 4, 1000, 0)</pre></details>
+<details class="example"><summary>Examples</summary><pre>// monthly payments on a $1000 loan
+// for 48 months at 5% interest, ending with 0 owed
+$pmt = payment(5, 48, 12, 1000, 0)</pre></details>
 
 <h3 id="numberOfPeriods"><a name="numberOfPeriods">numberOfPeriods</a></h3>
 <p><strong>numberOfPeriods(interest, littleN, payment, principal, accruedVal)</strong></p>
@@ -70,7 +76,9 @@
 <li><strong>accruedVal</strong>: the Future Value of the investment. Should be a positive value if the investment/loan resulted in a positive return. Should be a negative value if the investment/loan resulted in an amount owed.</li>
 </ul>
 <p>Returns the number of Payments or Withdrawals for the Loan or Investment, rounded to two decimal places.</p>
-<details class="example"><summary>Examples</summary><pre>$n = numberOfPeriods(7.5, 4, -500, 1000, 0)</pre></details>
+<details class="example"><summary>Examples</summary><pre>// how many $10000 annual withdrawals
+// can be made from a $100000 account earning 8% interest
+$n = numberOfPeriods(8, 1, 10000, -100000, 0)</pre></details>
 
 <h3 id="interest"><a name="interest">interest</a></h3>
 <p><strong>interest(bigN, littleN, payment, principal, accruedVal)</strong></p>
@@ -83,13 +91,15 @@
 <li><strong>accruedVal</strong>: the Future Value of the investment. Should be a positive value if the investment/loan resulted in a positive return. Should be a negative value if the investment/loan resulted in an amount owed.</li>
 </ul>
 <p>Returns the Interest Rate of the Investment/Loan as a percentage, rounded to two decimal places.</p>
-<details class="example"><summary>Examples</summary><pre>$rate = interest(10, 4, -500, 1000, 0)</pre></details>
+<details class="example"><summary>Examples</summary><pre>// what rate will allow 10 quarterly payments to 
+// pay off at $1000 loan with $110 quarterly payments
+$rate = interest(10, 4, -110, 1000, 0)</pre></details>
 
 <h3 id="vmTVM"><a name="vmTVM">vmTVM</a></h3>
 <p><strong>TVM()</strong></p>
 <p>Returns an iframe for displaying a Time Value of Money Financial Calculator. Provides students with a virtual manipulative they can use to calculate various values of an investment or loan.</p>
 <p>Takes no parameters. Returns the embedded iframe code for inserting the applet into an IMathAS question.</p>
-<details class="example"><summary>Examples</summary><pre>echo TVM()</pre></details>
+<details class="example"><summary>Examples</summary><pre>$tvmcalc = TVM()</pre></details>
 
     </body>
 </html>

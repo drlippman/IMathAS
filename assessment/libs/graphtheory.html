@@ -36,8 +36,8 @@ common options - specific functions will mention other options.</p>
 <li><a href="#graphemptygraph">graphemptygraph</a></li>
 <li><a href="#graphdijkstra">graphdijkstra</a></li>
 <li><a href="#graphkruskal">graphkruskal</a></li>
-<li><a href="#graphrepeatednearestneighbor">graphrepeatednearestneighbor</a></li>
 <li><a href="#graphnearestneighbor">graphnearestneighbor</a></li>
+<li><a href="#graphrepeatednearestneighbor">graphrepeatednearestneighbor</a></li>
 <li><a href="#graphsortededges">graphsortededges</a></li>
 <li><a href="#graphsequenceeuleredgedups">graphsequenceeuleredgedups</a></li>
 <li><a href="#graphsequenceishamiltonian">graphsequenceishamiltonian</a></li>
@@ -56,6 +56,7 @@ common options - specific functions will mention other options.</p>
 <li><a href="#graphmakesymmetric">graphmakesymmetric</a></li>
 <li><a href="#graphisconnected">graphisconnected</a></li>
 <li><a href="#graphmaketable">graphmaketable</a></li>
+<li><a href="#graphcomparecircuits">graphcomparecircuits</a></li>
 <li><a href="#graphspringlayout">graphspringlayout</a></li>
 <li><a href="#graphcirclelayout">graphcirclelayout</a></li>
 <li><a href="#graphcircledstarlayout">graphcircledstarlayout</a></li>
@@ -63,7 +64,6 @@ common options - specific functions will mention other options.</p>
 <li><a href="#graphpathlayout">graphpathlayout</a></li>
 <li><a href="#graphprocessoptions">graphprocessoptions</a></li>
 <li><a href="#graphdrawit">graphdrawit</a></li>
-<li><a href="#graphcomparecircuits">graphcomparecircuits</a></li>
 <li><a href="#graphrandomgridschedule">graphrandomgridschedule</a></li>
 <li><a href="#graphdecreasingtimelist">graphdecreasingtimelist</a></li>
 <li><a href="#graphcriticaltimelist">graphcriticaltimelist</a></li>
@@ -81,69 +81,75 @@ common options - specific functions will mention other options.</p>
 <h3 id="graphcircleladder"><a name="graphcircleladder">graphcircleladder</a></h3>
 <p><strong>graphcircleladder(n, m, [options])</strong></p>
 <p>Draws a circular ladder graph, with <code>n</code> vertices around a circle and <code>m</code> concentric circles, connected around the circle and between circles.</p>
-<p>Returns <code>array(pic,g)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphcircleladder(6, 2)</pre></details>
+<p>Returns <code>array(pic,g)</code>, where <code>pic</code> is the image and <code>g</code> is the graph object you may need for other functions.</p>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphcircleladder(6, 2)</pre></details>
 
 <h3 id="graphnestedpolygons"><a name="graphnestedpolygons">graphnestedpolygons</a></h3>
 <p><strong>graphnestedpolygons(n, m, [options])</strong></p>
 <p>Draws a graph of offset nested polygons, with <code>n</code> vertices around a polygon and <code>m</code> concentric polygons. Vertices of the inner polygon touch the midpoint of the outer polygon.</p>
-<p>Returns <code>array(pic,g)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphnestedpolygons(5, 2)</pre></details>
+<p>Returns <code>array(pic,g)</code>, where <code>pic</code> is the image and <code>g</code> is the graph object you may need for other functions.</p>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphnestedpolygons(5, 2)</pre></details>
 
 <h3 id="graphcircle"><a name="graphcircle">graphcircle</a></h3>
 <p><strong>graphcircle(n, [options])</strong></p>
 <p>Draws a complete graph with a circular layout, with <code>n</code> vertices.</p>
-<p>Returns <code>array(pic,g)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphcircle(6)</pre></details>
+<p>Returns <code>array(pic,g)</code>, where <code>pic</code> is the image and <code>g</code> is the graph object you may need for other functions.</p>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphcircle(6)</pre></details>
 
 <h3 id="graphcircledstar"><a name="graphcircledstar">graphcircledstar</a></h3>
 <p><strong>graphcircledstar(n, [options])</strong></p>
 <p>Draws <code>n</code> vertices in a circle, plus 1 vertex in the middle. Vertices are connected along the circle, plus all connected to the center vertex.</p>
-<p>Returns <code>array(pic,g)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphcircledstar(6)</pre></details>
+<p>Returns <code>array(pic,g)</code>, where <code>pic</code> is the image and <code>g</code> is the graph object you may need for other functions.</p>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphcircledstar(6)</pre></details>
 
 <h3 id="graphbipartite"><a name="graphbipartite">graphbipartite</a></h3>
 <p><strong>graphbipartite(n, m, [options])</strong></p>
 <p>Draws a complete bipartite graph (every vertex on the left is connected to every vertex on the right), with <code>n</code> vertices in the first column, <code>m</code> in the second.</p>
-<p>Returns <code>array(pic,g)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphbipartite(3, 4)</pre></details>
+<p>Returns <code>array(pic,g)</code>, where <code>pic</code> is the image and <code>g</code> is the graph object you may need for other functions.</p>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphbipartite(3, 4)</pre></details>
 
 <h3 id="graphgrid"><a name="graphgrid">graphgrid</a></h3>
 <p><strong>graphgrid(n, m, [options])</strong></p>
 <p>Draws an <code>n</code> by <code>m</code> grid of vertices.</p>
-<p>Returns <code>array(pic,g)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphgrid(3, 3)</pre></details>
+<p>Returns <code>array(pic,g)</code>, where <code>pic</code> is the image and <code>g</code> is the graph object you may need for other functions.</p>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphgrid(3, 3)</pre></details>
 
 <h3 id="graphrandom"><a name="graphrandom">graphrandom</a></h3>
 <p><strong>graphrandom(n, [options])</strong></p>
 <p>Draws a randomly spring laid out graph with <code>n</code> vertices.</p>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphrandom(6, array('randedges'=>0.5))</pre></details>
+<p>Returns <code>array(pic,g)</code>, where <code>pic</code> is the image and <code>g</code> is the graph object you may need for other functions.</p>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphrandom(6, array('randedges'=>0.5))</pre></details>
 
 <h3 id="graphemptygraph"><a name="graphemptygraph">graphemptygraph</a></h3>
 <p><strong>graphemptygraph(n)</strong></p>
-<p>Creates an empty graph matrix, nxn.</p>
+<p>Returns an empty graph matrix, nxn.</p>
 <details class="example"><summary>Examples</summary><pre>$g = graphemptygraph(5)</pre></details>
 
 <h3 id="graphdijkstra"><a name="graphdijkstra">graphdijkstra</a></h3>
 <p><strong>graphdijkstra(g, [dest])</strong></p>
 <p>Computes Dijkstra's algorithm on the graph <code>g</code>. <code>g</code> is a 2-dimensional matrix; <code>g[i][j] &gt; 0</code> if vertices i and j are connected. If dest vertex is not set then the last vertex will be used as the destination vertex.</p>
-<p>Returns <code>array(dist,next)</code> where <code>dist[i]</code> is the shortest distance to end, and <code>next[i]</code> is the vertex next closest to the end.</p>
-<details class="example"><summary>Examples</summary><pre>list($dist, $next) = graphdijkstra($g)</pre></details>
+<p>Returns <code>array(dist,next)</code> where for each vertex <code>i</code>, 
+<code>dist[i]</code> is the shortest distance to end, and <code>next[i]</code> is the vertex next closest to the end.</p>
+<details class="example"><summary>Examples</summary><pre>$dist, $next = graphdijkstra($g)</pre></details>
 
 <h3 id="graphkruskal"><a name="graphkruskal">graphkruskal</a></h3>
 <p><strong>graphkruskal(g)</strong></p>
 <p>Returns a minimum cost spanning tree graph from graph <code>g</code>.</p>
 <details class="example"><summary>Examples</summary><pre>$mst = graphkruskal($g)</pre></details>
 
+<h3 id="graphnearestneighbor"><a name="graphnearestneighbor">graphnearestneighbor</a></h3>
+<p><strong>graphnearestneighbor(g, start, [getweight])</strong></p>
+<p>Returns a Hamiltonian circuit graph using nearest neighbor starting at vertex <code>start</code>.
+If <code>getweight</code> is set to <code>true</code>, this will return <code>array(circuit,total weight of circuit)</code>.</p>
+<details class="example"><summary>Examples</summary>
+<pre>$circuitg = graphnearestneighbor($g, 0)</pre></details>
+
 <h3 id="graphrepeatednearestneighbor"><a name="graphrepeatednearestneighbor">graphrepeatednearestneighbor</a></h3>
 <p><strong>graphrepeatednearestneighbor(g, [multi])</strong></p>
-<p>Returns an array <code>(graph,mincostarr)</code>, where graph is the Hamiltonian circuit graph using repeated nearest neighbor, and mincostarr is an array of starting vertex indices that gave that graph. If <code>multi</code> is set to true, an array of graphs is returned rather than just one.</p>
-<details class="example"><summary>Examples</summary><pre>list($circuit, $starts) = graphrepeatednearestneighbor($g)</pre></details>
-
-<h3 id="graphnearestneighbor"><a name="graphnearestneighbor">graphnearestneighbor</a></h3>
-<p><strong>graphnearestneighbor(g, start)</strong></p>
-<p>Returns a Hamiltonian circuit graph using nearest neighbor starting at vertex <code>start</code>.</p>
-<details class="example"><summary>Examples</summary><pre>$circuit = graphnearestneighbor($g, 0)</pre></details>
+<p>Returns an array <code>(graph,mincostarr)</code>, where graph is the Hamiltonian circuit graph using repeated nearest neighbor, and mincostarr is an array of starting vertex indices that gave circuits with the same minimum cost. 
+If <code>multi</code> is set to true, an array of graphs is returned rather than just one.</p>
+<details class="example"><summary>Examples</summary>
+<pre>$circuitg, $starts = graphrepeatednearestneighbor($g)</pre></details>
 
 <h3 id="graphsortededges"><a name="graphsortededges">graphsortededges</a></h3>
 <p><strong>graphsortededges(g)</strong></p>
@@ -170,23 +176,26 @@ common options - specific functions will mention other options.</p>
 <p><strong>graphshortestpath(g, op, start, end, [type])</strong></p>
 <p>Finds the shortest path on graph <code>g</code> from vertex <code>start</code> to <code>end</code>.</p>
 <p>Returns <code>array(shortest path,length of path)</code>. For path, <code>type=0</code> returns a labeled path, like "ABCD"; <code>type=1</code> returns an array of vertex indices.</p>
-<details class="example"><summary>Examples</summary><pre>list($path, $len) = graphshortestpath($g, array('labels'=>'letters'), 0, 3)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$path, $len = graphshortestpath($g, array('labels'=>'letters'), 0, 3)</pre></details>
 
 <h3 id="graphcircuittostringans"><a name="graphcircuittostringans">graphcircuittostringans</a></h3>
 <p><strong>graphcircuittostringans(gs, [lbl, start])</strong></p>
-<p>Converts a graph or array of graphs containing circuits to a string of labels that can be used as an <code>$answer</code>. <code>lbl</code> is an array of labels (defaults to A,B,C,etc.). <code>start</code> is the index of the vertex to start the string circuits with.</p>
-<details class="example"><summary>Examples</summary><pre>$answer = graphcircuittostringans($circuit)</pre></details>
+<p>Converts a graph or array of graphs containing circuits to a string of labels that can be used as an <code>$answer</code>. 
+<code>lbl</code> is an array of labels (defaults to A,B,C,etc.). 
+<code>start</code> is the index of the vertex to start the string circuits with (default 0).</p>
+<details class="example"><summary>Examples</summary><pre>$answer = graphcircuittostringans($circuit)  //e.g. ADECBA</pre></details>
 
 <h3 id="graphcircuittoarray"><a name="graphcircuittoarray">graphcircuittoarray</a></h3>
 <p><strong>graphcircuittoarray(g, [start])</strong></p>
 <p>Converts a graph containing a circuit to an array of vertices in circuit order.</p>
-<details class="example"><summary>Examples</summary><pre>$order = graphcircuittoarray($circuit)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$order = graphcircuittoarray($circuit) //e.g. ['A','D','B','C','A']</pre></details>
 
 <h3 id="graphgetedges"><a name="graphgetedges">graphgetedges</a></h3>
 <p><strong>graphgetedges(g, op)</strong></p>
-<p>Gets the list of edges in and not in the graph. Needs <code>op['labels']</code> set.</p>
-<p>Returns <code>(goodedges,badedges)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($good, $bad) = graphgetedges($g, array('labels'=>'letters'))</pre></details>
+<p>Gets arrays of edges in and not in the graph. Needs <code>op['labels']</code> set.</p>
+<p>Returns <code>(goodedges,badedges)</code>. Each is an array of edges, where each 
+edge is a string pair of labels, like <code>"BC"</code></p>
+<details class="example"><summary>Examples</summary><pre>$good, $bad = graphgetedges($g, array('labels'=>'letters'))</pre></details>
 
 <h3 id="graphgetedgesarray"><a name="graphgetedgesarray">graphgetedgesarray</a></h3>
 <p><strong>graphgetedgesarray(g)</strong></p>
@@ -208,18 +217,19 @@ common options - specific functions will mention other options.</p>
 <h3 id="graphprereqtable"><a name="graphprereqtable">graphprereqtable</a></h3>
 <p><strong>graphprereqtable(g, w, [op])</strong></p>
 <p>Creates an HTML table showing the tasks in <code>g</code>, the task times in <code>w</code>, and the tasks that must be completed first. Use <code>$op['labels']</code> to provide an array of labels, or = 'letters' to use letters.</p>
-<details class="example"><summary>Examples</summary><pre>echo graphprereqtable($g, array(2,3,1,4), array('labels'=>'letters'))</pre></details>
+<details class="example"><summary>Examples</summary><pre>$table = graphprereqtable($g, array(2,3,1,4), array('labels'=>'letters'))</pre></details>
 
 <h3 id="graphadjacencytoincidence"><a name="graphadjacencytoincidence">graphadjacencytoincidence</a></h3>
 <p><strong>graphadjacencytoincidence(g, [options])</strong></p>
 <p>Creates incidence lists from adjacency matrix <code>g</code>. <code>g[i][j] &gt; 0</code> if edge from i to j.</p>
-<p>Outputs a list where <code>list[i]</code> is an array of vertices that i leads to.</p>
+<p>Outputs an array where <code>list[i]</code> is an array of vertices that i leads to.</p>
 <details class="example"><summary>Examples</summary><pre>$incidence = graphadjacencytoincidence($g)</pre></details>
 
 <h3 id="graphincidencetoadjacency"><a name="graphincidencetoadjacency">graphincidencetoadjacency</a></h3>
 <p><strong>graphincidencetoadjacency(list, [options])</strong></p>
-<p>Creates adjacency matrix <code>g</code> from an incidence list. <code>list</code> is where <code>list[i]</code> is an array of vertices that i leads to.</p>
-<p>Outputs matrix <code>g[i][j]=1</code> if edge from i to j.</p>
+<p>Creates adjacency matrix <code>g</code> from an incidence list. <code>list</code> is 
+an array where <code>list[i]</code> is an array of vertices that i leads to.</p>
+<p>Outputs graph matrix <code>g[i][j]=1</code> if edge from i to j.</p>
 <details class="example"><summary>Examples</summary><pre>$g = graphincidencetoadjacency($incidence)</pre></details>
 
 <h3 id="graphgetvalence"><a name="graphgetvalence">graphgetvalence</a></h3>
@@ -240,7 +250,13 @@ common options - specific functions will mention other options.</p>
 <h3 id="graphmaketable"><a name="graphmaketable">graphmaketable</a></h3>
 <p><strong>graphmaketable(g, [op])</strong></p>
 <p>Makes a weights table based on a given graph.</p>
-<details class="example"><summary>Examples</summary><pre>echo graphmaketable($g, array('labels'=>'letters'))</pre></details>
+<details class="example"><summary>Examples</summary><pre>$table = graphmaketable($g, array('labels'=>'letters'))</pre></details>
+
+<h3 id="graphcomparecircuits"><a name="graphcomparecircuits">graphcomparecircuits</a></h3>
+<p><strong>graphcomparecircuits(A, B)</strong></p>
+<p>Compares two circuits to see if they are the same, regardless of starting vertex. So "ABCDA" would be considered equivalent to "DCBAD". Can be used with the conditional answer type to score circuits.</p>
+<p>Returns true or false.</p>
+<details class="example"><summary>Examples</summary><pre>graphcomparecircuits("ABCDA", "DCBAD")  // true</pre></details>
 
 <h3 id="graphspringlayout"><a name="graphspringlayout">graphspringlayout</a></h3>
 <p><strong>graphspringlayout(g, [options])</strong></p>
@@ -273,12 +289,6 @@ common options - specific functions will mention other options.</p>
 <h3 id="graphdrawit"><a name="graphdrawit">graphdrawit</a></h3>
 <p>Internal function, not usually used directly. Can be called with graph matrix <code>g</code>, <code>g[i][j]</code> if vertex i has an edge to j. <code>pos</code> is an array where <code>pos[i] = array(x,y)</code> positions for vertices.</p>
 
-<h3 id="graphcomparecircuits"><a name="graphcomparecircuits">graphcomparecircuits</a></h3>
-<p><strong>graphcomparecircuits(A, B)</strong></p>
-<p>Compares two circuits to see if they are the same, regardless of starting vertex. So "ABCDA" would be considered equivalent to "DCBAD". Can be used with the conditional answer type to score circuits.</p>
-<p>Returns true or false.</p>
-<details class="example"><summary>Examples</summary><pre>graphcomparecircuits("ABCDA", "DCBAD")  // true</pre></details>
-
 <h3 id="graphrandomgridschedule"><a name="graphrandomgridschedule">graphrandomgridschedule</a></h3>
 <p><strong>graphrandomgridschedule(n, m, p, [options])</strong></p>
 <p>Draws an <code>n</code> by <code>m</code> grid of vertices. Each pair of neighboring and diagonal vertices has a <code>p</code> probability (0 to 1) of being connected. An end vertex is added.</p>
@@ -287,7 +297,7 @@ common options - specific functions will mention other options.</p>
 <li><code>options['weights']</code> as a single number will randomize weights from 1 to that value.</li>
 <li>If <code>options['labels']</code> are used, "start" and "end" will be added automatically.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>list($pic, $g) = graphrandomgridschedule(3, 3, 0.6, array('weights'=>10))</pre></details>
+<details class="example"><summary>Examples</summary><pre>$pic,$g = graphrandomgridschedule(3, 3, 0.6, array('weights'=>10))</pre></details>
 
 <h3 id="graphdecreasingtimelist"><a name="graphdecreasingtimelist">graphdecreasingtimelist</a></h3>
 <p><strong>graphdecreasingtimelist(g, w)</strong></p>
@@ -303,7 +313,7 @@ common options - specific functions will mention other options.</p>
 <p><strong>graphbackflow(g, [w])</strong></p>
 <p>Computes the longest-path algorithm on the graph <code>g</code>. <code>g</code> is a 2-dimensional matrix; <code>g[i][j] &gt; 1</code> if vertex i leads to j. This might give bad/weird results if the graph has a circuit. The last vertex will be used as the destination vertex. <code>w</code> are weights for the vertices, if a scheduling digraph and tasks rather than edges have weights.</p>
 <p>Returns <code>array(dist,next)</code> where <code>dist[i]</code> is the longest distance to end, and <code>next[i]</code> is the vertex next closest to the end.</p>
-<details class="example"><summary>Examples</summary><pre>list($dist, $next) = graphbackflow($g, array(5,2,8,3))</pre></details>
+<details class="example"><summary>Examples</summary><pre>$dist, $next = graphbackflow($g, array(5,2,8,3))</pre></details>
 
 <h3 id="graphlistprocessing"><a name="graphlistprocessing">graphlistprocessing</a></h3>
 <p><strong>graphlistprocessing(g, t, L, p, [options])</strong></p>
@@ -315,7 +325,7 @@ common options - specific functions will mention other options.</p>
 <p><strong>graphscheduletaskinfo(schedule, n)</strong></p>
 <p><code>schedule</code> is the result of graphlistprocessing and <code>n</code> is the task number (0 indexed).</p>
 <p>Returns <code>array(processor assigned (0 indexed), task start, task time)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($proc, $start, $time) = graphscheduletaskinfo($schedule, 2)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$proc, $start, $time = graphscheduletaskinfo($schedule, 2)</pre></details>
 
 <h3 id="graphschedulecompletion"><a name="graphschedulecompletion">graphschedulecompletion</a></h3>
 <p><strong>graphschedulecompletion(schedule)</strong></p>

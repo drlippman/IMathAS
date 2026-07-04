@@ -16,18 +16,22 @@
 <p><strong>ineqplot("funcstring", [xmin, xmax, ymin, ymax, labels, grid, width, height])</strong></p>
 <p>Graphs a set of functions, shading above or below each graph as specified.</p>
 <ul>
-<li><strong>funcstring</strong>: one string or array of strings, each with the format (function and filltype are required): <code>function of x,filltype,fillcolor,linecolor,dash,strokewidth</code></li>
+<li><strong>funcstring</strong>: one string or array of strings, each with the format (function and filltype are required):<br>
+    <code>function of x,filltype,fillcolor,linecolor,dash,strokewidth</code></li>
 <li><strong>filltype</strong>: "above" or "below".</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>ineqplot("x^2-1,above")
-ineqplot(array("x^2-1,above,#f00", "3-x,below,#00f"), -5, 5, -5, 5)</pre></details>
+ineqplot(array("x^2-1,above,red", "3-x,below,blue,blue,dash"), -5, 5, -5, 5)</pre></details>
 
 <h3 id="ineqbetweenplot"><a name="ineqbetweenplot">ineqbetweenplot</a></h3>
 <p><strong>ineqbetweenplot("funcstring", [xmin, xmax, ymin, ymax, labels, grid, width, height])</strong></p>
 <p>Graphs a set of functions, shading the area satisfying all above/below specifications.</p>
 <ul>
-<li><strong>funcstring</strong>: one string or array of strings, each with the format (function and filltype are required): <code>function of x,above or below,linecolor,dash,strokewidth,fillcolor</code> or <code>x=number,right or left,linecolor,dash,strokewidth,fillcolor</code></li>
+<li><strong>funcstring</strong>: one string or array of strings, each with one of these cx_format2std (function and filltype are required):
+    <ul><li><code>function of x,above or below,linecolor,dash,strokewidth,fillcolor</code></li>
+        <li><code>x=number,right or left,linecolor,dash,strokewidth,fillcolor</code></li>
+    </ul></li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>ineqbetweenplot(array("x^2-1,above", "3-x,below"))
-ineqbetweenplot(array("x=2,right", "x^2,above"), -5, 5, -5, 5)</pre></details>
+<details class="example"><summary>Examples</summary><pre>ineqbetweenplot(array("x^2-1,above", "2-x,below"))
+ineqbetweenplot(array("x=-1,right", "x^2,above"), -5, 5, -5, 5)</pre></details>
 </body></html>
