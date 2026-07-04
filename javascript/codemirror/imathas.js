@@ -108,7 +108,7 @@
         + " addimageborder formatcomplex array_keys array_values comparelogic comparesetexp stuansready comparentuples"
         + " comparenumberswithunits isset atan2 keepif checkanswerformat preg_match preg_replace is_nan intval"
         + " comparesameform comparecomplex splicearray getsigfigs checksigfigs prettysigfig_instring prettyreal_instring"
-        + " round_instring setupmathquillfillin";
+        + " round_instring setupmathquillfillin simplifyexpr";
   //builtin
   imathasBuiltin += " loadlibrary importcodefrom includecodefrom setseed";
   //math
