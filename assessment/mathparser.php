@@ -1093,14 +1093,30 @@ class MathParser
    *                                (x*y -> x y, x*sin(x) -> x sin(x)) and
    *                                never merging two numbers (2*3^x stays
    *                                2*3^x).
+   * @param  int  $combineTerms  Level of "combine like terms" simplification:
+   *                              0 = none (default);
+   *                              1 = combine terms in a sum that share the
+   *                                  same variable part and have plain
+   *                                  integer/decimal coefficients, and add
+   *                                  up plain number terms
+   *                                  ((x+1)+x -> 2x+1, 2x+3y+4x -> 6x+3y,
+   *                                  3x+4+7 -> 3x+11).  Fractions and other
+   *                                  non-literal-number terms are left
+   *                                  alone (x+3+5/2 stays x+3+5/2).
+   *                              2 = also evaluates numeric powers and adds
+   *                                  fractional coefficients exactly
+   *                                  (1/2x+1/4x+1+1/2^2 -> 3/4x+5/4).
    * @return string
    */
-  public function toPrettyString($node = null, $implicitMult = false) {
+  public function toPrettyString($node = null, $implicitMult = false, $combineTerms = 0) {
     if ($node === null) {
       $node = $this->AST;
     }
     $this->prettyImplicitMult = $implicitMult;
     $simplified = $this->prettySimplifyNode($node);
+    if ($combineTerms > 0) {
+      $simplified = $this->prettyCombineNode($simplified, $combineTerms);
+    }
     return $this->prettyRenderNode($simplified);
   }
 
@@ -1235,6 +1251,263 @@ class MathParser
       return $node['left'];
     }
     return ['type'=>'operator', 'symbol'=>'~', 'left'=>$node];
+  }
+
+  /**
+   * Recursively builds a copy of the (already pretty-simplified) node with
+   * "like terms" in sums combined.  See toPrettyString for level meanings.
+   * @param  array $node
+   * @param  int $level  1 or 2
+   * @return array
+   */
+  private function prettyCombineNode($node, $level) {
+    if ($node['type'] === 'number' || $node['type'] === 'variable') {
+      return $node;
+    }
+    if ($node['type'] === 'function') {
+      $node['input'] = $this->prettyCombineNode($node['input'], $level);
+      if (!empty($node['index']) && is_array($node['index'])) {
+        $node['index'] = $this->prettyCombineNode($node['index'], $level);
+      }
+      return $node;
+    }
+
+    $symbol = $node['symbol'];
+
+    if ($symbol === '~') {
+      $node['left'] = $this->prettyCombineNode($node['left'], $level);
+      if ($node['left']['symbol'] === '~') {
+        // double negative may have appeared as a result of combining
+        return $node['left']['left'];
+      }
+      return $node;
+    }
+
+    if ($symbol === '^') {
+      $node['left'] = $this->prettyCombineNode($node['left'], $level);
+      $node['right'] = $this->prettyCombineNode($node['right'], $level);
+      if ($level >= 2 && $node['left']['type'] === 'number' && $node['right']['type'] === 'number') {
+        $val = safepow((float) $node['left']['symbol'], (float) $node['right']['symbol']);
+        if (is_numeric($val) && !is_nan($val)) {
+          return ['type'=>'number', 'symbol'=>(float) $val];
+        }
+      }
+      return $node;
+    }
+
+    if ($symbol === '*' || $symbol === '/') {
+      $node['left'] = $this->prettyCombineNode($node['left'], $level);
+      $node['right'] = $this->prettyCombineNode($node['right'], $level);
+      return $node;
+    }
+
+    if ($symbol === '+' || $symbol === '-') {
+      $terms = [];
+      $this->prettyFlattenSum($node, $terms);
+      foreach ($terms as $i => $term) {
+        $terms[$i] = $this->prettyCombineNode($term, $level);
+      }
+      return $this->prettyRebuildSum($terms, $level);
+    }
+
+    // any other operator (not, comparisons, logical): just recurse
+    if (isset($node['left'])) {
+      $node['left'] = $this->prettyCombineNode($node['left'], $level);
+    }
+    if (isset($node['right'])) {
+      $node['right'] = $this->prettyCombineNode($node['right'], $level);
+    }
+    return $node;
+  }
+
+  /**
+   * Flattens a maximal chain of +/- nodes into an ordered list of terms
+   * (each term still signed via a leading '~' where needed).  Only
+   * recurses into a compound right-hand side when it's safe to do so
+   * without redistributing a sign (i.e. joined by '+'); the right side of
+   * a '-' is taken as a single (negated) term rather than decomposed.
+   * @param  array $node
+   * @param  array $terms  (by reference) collected terms, in order
+   * @return void
+   */
+  private function prettyFlattenSum($node, &$terms) {
+    if ($node['left']['symbol'] === '+' || $node['left']['symbol'] === '-') {
+      $this->prettyFlattenSum($node['left'], $terms);
+    } else {
+      $terms[] = $node['left'];
+    }
+    if ($node['symbol'] === '+' && ($node['right']['symbol'] === '+' || $node['right']['symbol'] === '-')) {
+      $this->prettyFlattenSum($node['right'], $terms);
+    } else if ($node['symbol'] === '-') {
+      $terms[] = $this->prettyNegateNode($node['right']);
+    } else {
+      $terms[] = $node['right'];
+    }
+  }
+
+  /**
+   * Groups a flat list of sum terms by their "base" (the part of the term
+   * that isn't a plain numeric coefficient), summing coefficients for
+   * terms that share a base, then rebuilds a '+' chain in order of each
+   * base's first appearance.  Terms whose combined coefficient is 0 are
+   * dropped.
+   * @param  array $terms
+   * @param  int $level
+   * @return array
+   */
+  private function prettyRebuildSum($terms, $level) {
+    $groups = [];
+    $indexOf = [];
+    foreach ($terms as $term) {
+      list($coef, $key, $base) = $this->prettyTermParts($term, $level);
+      if (isset($indexOf[$key])) {
+        $g = $indexOf[$key];
+        $groups[$g]['coef'] = $this->prettyFracAdd($groups[$g]['coef'], $coef);
+      } else {
+        $indexOf[$key] = count($groups);
+        $groups[] = ['base'=>$base, 'coef'=>$coef];
+      }
+    }
+    $resultTerms = [];
+    foreach ($groups as $g) {
+      $coef = $this->prettyFracReduce($g['coef']);
+      if ($coef['n'] == 0) {
+        continue;
+      }
+      $resultTerms[] = $this->prettyBuildTerm($coef, $g['base']);
+    }
+    if (empty($resultTerms)) {
+      return ['type'=>'number', 'symbol'=>0.0];
+    }
+    $out = $resultTerms[0];
+    for ($i = 1; $i < count($resultTerms); $i++) {
+      $out = ['type'=>'operator', 'symbol'=>'+', 'left'=>$out, 'right'=>$resultTerms[$i]];
+    }
+    return $out;
+  }
+
+  /**
+   * Splits a sum term into a [coefficient, baseKey, baseNode] triple.
+   * baseNode is null for a pure constant term (grouped under the special
+   * '#CONST#' key).  At level 1, only plain number literals count as
+   * coefficients/constants; at level 2, a/b fractions of plain numbers do
+   * too, enabling exact fraction arithmetic.
+   * @param  array $term
+   * @param  int $level
+   * @return array  [ ['n'=>num,'d'=>den], string key, array|null baseNode ]
+   */
+  private function prettyTermParts($term, $level) {
+    $sign = 1;
+    while ($term['symbol'] === '~') {
+      $sign *= -1;
+      $term = $term['left'];
+    }
+    $asConst = $this->prettyAsFraction($term, $level);
+    if ($asConst !== null) {
+      return [['n'=>$sign * $asConst['n'], 'd'=>$asConst['d']], '#CONST#', null];
+    }
+    if ($term['symbol'] === '*') {
+      $lf = $this->prettyAsFraction($term['left'], $level);
+      if ($lf !== null) {
+        return [['n'=>$sign * $lf['n'], 'd'=>$lf['d']], $this->toString($term['right']), $term['right']];
+      }
+      $rf = $this->prettyAsFraction($term['right'], $level);
+      if ($rf !== null) {
+        return [['n'=>$sign * $rf['n'], 'd'=>$rf['d']], $this->toString($term['left']), $term['left']];
+      }
+    }
+    return [['n'=>$sign, 'd'=>1.0], $this->toString($term), $term];
+  }
+
+  /**
+   * If the node is a plain number literal (always), or (at level 2 only)
+   * a division of two plain number literals, return it as a fraction.
+   * @param  array $node
+   * @param  int $level
+   * @return array|null  ['n'=>num,'d'=>den] or null
+   */
+  private function prettyAsFraction($node, $level) {
+    if ($node['type'] === 'number') {
+      return ['n'=>(float) $node['symbol'], 'd'=>1.0];
+    }
+    if ($level >= 2 && $node['symbol'] === '/' &&
+      $node['left']['type'] === 'number' && $node['right']['type'] === 'number'
+    ) {
+      return ['n'=>(float) $node['left']['symbol'], 'd'=>(float) $node['right']['symbol']];
+    }
+    return null;
+  }
+
+  /**
+   * Rebuilds a term node from a combined coefficient and its base.
+   * @param  array $coef  ['n'=>num,'d'=>den]
+   * @param  array|null $base  null for a pure constant term
+   * @return array
+   */
+  private function prettyBuildTerm($coef, $base) {
+    $sign = ($coef['n'] < 0) ? -1 : 1;
+    $n = abs($coef['n']);
+    $d = $coef['d'];
+    $coefNode = ($d == 1.0)
+      ? ['type'=>'number', 'symbol'=>$n]
+      : ['type'=>'operator', 'symbol'=>'/', 'left'=>['type'=>'number', 'symbol'=>$n], 'right'=>['type'=>'number', 'symbol'=>$d]];
+    if ($base === null) {
+      $result = $coefNode;
+    } else if ($n == 1.0 && $d == 1.0) {
+      $result = $base;
+    } else {
+      $result = ['type'=>'operator', 'symbol'=>'*', 'left'=>$coefNode, 'right'=>$base];
+    }
+    return ($sign < 0) ? $this->prettyNegateNode($result) : $result;
+  }
+
+  /**
+   * Exact fraction addition, a/b + c/d, reduced to lowest terms.
+   * @param  array $a  ['n'=>num,'d'=>den]
+   * @param  array $b  ['n'=>num,'d'=>den]
+   * @return array
+   */
+  private function prettyFracAdd($a, $b) {
+    return $this->prettyFracReduce([
+      'n' => $a['n'] * $b['d'] + $b['n'] * $a['d'],
+      'd' => $a['d'] * $b['d']
+    ]);
+  }
+
+  /**
+   * Reduces a fraction to lowest terms with a positive denominator, when
+   * numerator and denominator are both whole numbers.
+   * @param  array $f  ['n'=>num,'d'=>den]
+   * @return array
+   */
+  private function prettyFracReduce($f) {
+    $n = $f['n'];
+    $d = $f['d'];
+    if ($d < 0) {
+      $n = -$n;
+      $d = -$d;
+    }
+    if ($d != 0 && floor($n) == $n && floor($d) == $d) {
+      $g = $this->prettyGcd((int) abs($n), (int) $d);
+      if ($g > 1) {
+        $n = $n / $g;
+        $d = $d / $g;
+      }
+    }
+    return ['n'=>$n, 'd'=>$d];
+  }
+
+  /**
+   * Greatest common divisor (non-negative integers)
+   * @param  int $a
+   * @param  int $b
+   * @return int
+   */
+  private function prettyGcd($a, $b) {
+    while ($b != 0) {
+      list($a, $b) = [$b, $a % $b];
+    }
+    return $a == 0 ? 1 : $a;
   }
 
   /**
