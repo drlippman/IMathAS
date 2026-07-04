@@ -1599,12 +1599,16 @@ class MathParser
    * exponents for factors that share a base (a bare factor counts as
    * base^1, a '/' denominator factor counts as base^-1, etc.), and
    * multiplies together all plain-number factors into a single reduced
-   * fraction.  The numeric coefficient is kept as its own self-contained
-   * fraction (e.g. 3/8) multiplied in front of the combined variable part,
-   * rather than merged into one large fraction spanning both (so
-   * 3/4x*1/2x -> 3/8x^2, not (3x^2)/8).  Any variable factors left with a
-   * negative exponent form their own denominator within that variable
-   * part (x/x^2 -> 1/x).
+   * fraction.
+   *
+   * If no variable factor ends up in the denominator, the coefficient is
+   * kept as its own clean fraction multiplied in front of the (denominator-
+   * free) variable part (3/4x*1/2x -> 3/8x^2).  But if a variable factor
+   * IS left in the denominator, the coefficient's numerator/denominator
+   * are merged directly into the overall numerator/denominator instead of
+   * being split out, so that variable keeps its constant factor with it
+   * ((6x^2y+1)/(2x) stays that way; (6y)/(8x) only reduces the constant
+   * part -> (3y)/(4x); x/x^2 -> 1/x).
    * @param  array $factors  list of ['node'=>,'sign'=>] pairs
    * @return array
    */
@@ -1660,24 +1664,35 @@ class MathParser
       }
     }
 
-    $variablePart = null;
-    if (!empty($numVarFactors) || !empty($denVarFactors)) {
-      $numNode = empty($numVarFactors) ? ['type'=>'number', 'symbol'=>1.0] : $this->prettyChainMultiply($numVarFactors);
-      $variablePart = empty($denVarFactors) ? $numNode :
-        ['type'=>'operator', 'symbol'=>'/', 'left'=>$numNode, 'right'=>$this->prettyChainMultiply($denVarFactors)];
+    if (empty($denVarFactors)) {
+      // no variable stuck in the denominator: coefficient stands alone as
+      // its own fraction, multiplied in front of the variable part
+      $coefNode = ($constFrac['d'] == 1.0)
+        ? ['type'=>'number', 'symbol'=>$constFrac['n']]
+        : ['type'=>'operator', 'symbol'=>'/', 'left'=>['type'=>'number', 'symbol'=>$constFrac['n']], 'right'=>['type'=>'number', 'symbol'=>$constFrac['d']]];
+      if (empty($numVarFactors)) {
+        return $coefNode;
+      }
+      $variablePart = $this->prettyChainMultiply($numVarFactors);
+      if ($constFrac['n'] == 1.0 && $constFrac['d'] == 1.0) {
+        return $variablePart;
+      }
+      return ['type'=>'operator', 'symbol'=>'*', 'left'=>$coefNode, 'right'=>$variablePart];
     }
 
-    $coefNode = ($constFrac['d'] == 1.0)
-      ? ['type'=>'number', 'symbol'=>$constFrac['n']]
-      : ['type'=>'operator', 'symbol'=>'/', 'left'=>['type'=>'number', 'symbol'=>$constFrac['n']], 'right'=>['type'=>'number', 'symbol'=>$constFrac['d']]];
-
-    if ($variablePart === null) {
-      return $coefNode;
+    // a variable is left in the denominator: merge the coefficient's
+    // numerator/denominator into the overall fraction instead of
+    // splitting it out, so the constant stays with that variable
+    $numFactors = $numVarFactors;
+    $denFactors = $denVarFactors;
+    if ($constFrac['d'] != 1.0) {
+      array_unshift($denFactors, ['type'=>'number', 'symbol'=>$constFrac['d']]);
     }
-    if ($constFrac['n'] == 1.0 && $constFrac['d'] == 1.0) {
-      return $variablePart;
+    if ($constFrac['n'] != 1.0 || empty($numFactors)) {
+      array_unshift($numFactors, ['type'=>'number', 'symbol'=>$constFrac['n']]);
     }
-    return ['type'=>'operator', 'symbol'=>'*', 'left'=>$coefNode, 'right'=>$variablePart];
+    $numNode = $this->prettyChainMultiply($numFactors);
+    return ['type'=>'operator', 'symbol'=>'/', 'left'=>$numNode, 'right'=>$this->prettyChainMultiply($denFactors)];
   }
 
   /**
@@ -1819,7 +1834,12 @@ class MathParser
       $left = $node['left'];
       $right = $node['right'];
       $leftStr = $this->prettyRenderNode($left);
-      if ($this->prettyPrecedence($left) < 2) {
+      // parens aren't mathematically required around a product used as a
+      // division's numerator (a*b/c == (a*b)/c), but they read more
+      // clearly as "one fraction" rather than "a times a fraction"
+      $leftNeedsParens = ($this->prettyPrecedence($left) < 2) ||
+        ($symbol === '/' && $left['symbol'] === '*');
+      if ($leftNeedsParens) {
         $leftStr = '(' . $leftStr . ')';
       }
       $rightStr = $this->prettyRenderNode($right);
