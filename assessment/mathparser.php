@@ -116,6 +116,7 @@ class MathParser
   private $origstr = '';
   private $docomplex = false;
   private $allowEscinot = true;
+  private $prettyImplicitMult = false;
 
   /**
    * Construct the parser
@@ -1070,6 +1071,339 @@ class MathParser
         $node['symbol'] .
         $this->toOutputString($node['right']).')';
     }
+  }
+
+  /**
+   * Produces a mathematically-correct, cleaned-up ("pretty") string
+   * representation of an AST node.  Unlike toOutputString, this:
+   *  - drops parentheses that aren't needed to preserve meaning (parens
+   *    around function inputs are always kept)
+   *  - drops 1* terms (1*x -> x)
+   *  - drops 0* terms (x^2+0x -> x^2)
+   *  - drops ^0 (3^0 -> 1, 5x^0 -> 5)
+   *  - drops ^1 (3x^1 -> 3x)
+   *  - cleans up +/- signs (3+(-4) -> 3-4, 5-(-x) -> 5+x)
+   * Does not modify the underlying AST.
+   * @param  array|null $node  AST node (defaults to the full parsed tree)
+   * @param  boolean $implicitMult  If true, drop the '*' between a
+   *                                multiplication's factors when it can be
+   *                                done unambiguously (4*x -> 4x,
+   *                                x*(x+1) -> x(x+1)), keeping a space
+   *                                between two "word-like" factors
+   *                                (x*y -> x y, x*sin(x) -> x sin(x)) and
+   *                                never merging two numbers (2*3^x stays
+   *                                2*3^x).
+   * @return string
+   */
+  public function toPrettyString($node = null, $implicitMult = false) {
+    if ($node === null) {
+      $node = $this->AST;
+    }
+    $this->prettyImplicitMult = $implicitMult;
+    $simplified = $this->prettySimplifyNode($node);
+    return $this->prettyRenderNode($simplified);
+  }
+
+  /**
+   * Recursively builds a simplified copy of the given node for
+   * pretty-printing: removes 1* and 0* terms and ^0 / ^1, and normalizes
+   * negation so it is always represented via a '~' node (never a
+   * negative number literal), which keeps sign handling in the renderer
+   * simple and avoids e.g. turning (-2)^x into the wrong "-2^x".
+   * @param  array $node  AST node
+   * @return array  simplified copy of the node
+   */
+  private function prettySimplifyNode($node) {
+    if ($node['type'] === 'number') {
+      $val = (float) $node['symbol'];
+      if ($val < 0) {
+        return ['type'=>'operator', 'symbol'=>'~', 'left'=>['type'=>'number', 'symbol'=>-$val]];
+      }
+      return ['type'=>'number', 'symbol'=>$val];
+    }
+    if ($node['type'] === 'variable') {
+      return $node;
+    }
+    if ($node['type'] === 'function') {
+      $node['input'] = $this->prettySimplifyNode($node['input']);
+      if (!empty($node['index']) && is_array($node['index'])) {
+        $node['index'] = $this->prettySimplifyNode($node['index']);
+      }
+      return $node;
+    }
+
+    $symbol = $node['symbol'];
+
+    if ($symbol === '~') {
+      $left = $this->prettySimplifyNode($node['left']);
+      if ($left['symbol'] === '~') {
+        // double negative cancels
+        return $left['left'];
+      }
+      return ['type'=>'operator', 'symbol'=>'~', 'left'=>$left];
+    }
+
+    if ($symbol === '+' || $symbol === '-') {
+      $left = $this->prettySimplifyNode($node['left']);
+      $right = $this->prettySimplifyNode($node['right']);
+      $leftIsZero = ($left['type'] === 'number' && (float) $left['symbol'] === 0.0);
+      $rightIsZero = ($right['type'] === 'number' && (float) $right['symbol'] === 0.0);
+      if ($leftIsZero && $rightIsZero) {
+        return ['type'=>'number', 'symbol'=>0.0];
+      }
+      if ($rightIsZero) {
+        return $left;
+      }
+      if ($leftIsZero) {
+        return ($symbol === '-') ? $this->prettyNegateNode($right) : $right;
+      }
+      return ['type'=>'operator', 'symbol'=>$symbol, 'left'=>$left, 'right'=>$right];
+    }
+
+    if ($symbol === '*' || $symbol === '/') {
+      $left = $this->prettySimplifyNode($node['left']);
+      $right = $this->prettySimplifyNode($node['right']);
+      $neg = false;
+      if ($left['symbol'] === '~') {
+        $neg = !$neg;
+        $left = $left['left'];
+      }
+      if ($right['symbol'] === '~') {
+        $neg = !$neg;
+        $right = $right['left'];
+      }
+      $leftIsZero = ($left['type'] === 'number' && (float) $left['symbol'] === 0.0);
+      $rightIsZero = ($right['type'] === 'number' && (float) $right['symbol'] === 0.0);
+      $leftIsOne = ($left['type'] === 'number' && (float) $left['symbol'] === 1.0);
+      $rightIsOne = ($right['type'] === 'number' && (float) $right['symbol'] === 1.0);
+
+      if ($symbol === '*' && ($leftIsZero || $rightIsZero)) {
+        return ['type'=>'number', 'symbol'=>0.0];
+      }
+      if ($symbol === '/' && $leftIsZero) {
+        return ['type'=>'number', 'symbol'=>0.0];
+      }
+
+      if ($symbol === '*' && $leftIsOne) {
+        $result = $right;
+      } else if ($rightIsOne) {
+        // covers x*1 -> x and x/1 -> x
+        $result = $left;
+      } else {
+        $result = ['type'=>'operator', 'symbol'=>$symbol, 'left'=>$left, 'right'=>$right];
+      }
+      return $neg ? $this->prettyNegateNode($result) : $result;
+    }
+
+    if ($symbol === '^') {
+      $left = $this->prettySimplifyNode($node['left']);
+      $right = $this->prettySimplifyNode($node['right']);
+      if ($right['type'] === 'number' && (float) $right['symbol'] === 0.0) {
+        return ['type'=>'number', 'symbol'=>1.0];
+      }
+      if ($right['type'] === 'number' && (float) $right['symbol'] === 1.0) {
+        return $left;
+      }
+      if ($left['type'] === 'number' && (float) $left['symbol'] === 0.0 &&
+        $right['type'] === 'number' && (float) $right['symbol'] > 0.0
+      ) {
+        // 0 to a positive power is 0 (0^0 and negative powers are left alone above/below)
+        return ['type'=>'number', 'symbol'=>0.0];
+      }
+      return ['type'=>'operator', 'symbol'=>'^', 'left'=>$left, 'right'=>$right];
+    }
+
+    // any other operator (not, comparisons, logical): just recurse
+    if (isset($node['left'])) {
+      $node['left'] = $this->prettySimplifyNode($node['left']);
+    }
+    if (isset($node['right'])) {
+      $node['right'] = $this->prettySimplifyNode($node['right']);
+    }
+    return $node;
+  }
+
+  /**
+   * Additive inverse of an already pretty-simplified node, for display
+   * purposes.  Always represents negation via a '~' node so double
+   * negatives can cancel cleanly.
+   * @param  array $node
+   * @return array
+   */
+  private function prettyNegateNode($node) {
+    if ($node['symbol'] === '~') {
+      return $node['left'];
+    }
+    return ['type'=>'operator', 'symbol'=>'~', 'left'=>$node];
+  }
+
+  /**
+   * True if the (pretty-simplified) node represents a negated quantity
+   * @param  array $node
+   * @return boolean
+   */
+  private function prettyIsNegative($node) {
+    return $node['symbol'] === '~';
+  }
+
+  /**
+   * Precedence used purely for deciding parentheses when pretty-printing.
+   * Higher binds tighter.  Atomic items (numbers, variables, functions)
+   * are always self-delimited so they get the highest value.
+   * @param  array $node
+   * @return float
+   */
+  private function prettyPrecedence($node) {
+    if ($node['type'] !== 'operator') {
+      return 100;
+    }
+    switch ($node['symbol']) {
+      case '||': case '#o': case '#i': case '#b':
+        return -6;
+      case '#x':
+        return -5;
+      case '&&': case '#a': case '#m':
+        return -4;
+      case 'not':
+        return 100; // self-delimited, prints as not(...)
+      case '<': case '>': case '<=': case '>=':
+        return -2;
+      case '+': case '-':
+        return 1;
+      case '~':
+        return 1.5;
+      case '*': case '/':
+        return 2;
+      case '^':
+        return 4;
+      default:
+        return 1;
+    }
+  }
+
+  /**
+   * Decides how two multiplied factors should be joined when rendering
+   * with implicit multiplication enabled, based on the boundary
+   * characters between the two rendered pieces:
+   *  - two numbers never get merged (2*3 stays 2*3, not 23)
+   *  - two "word-like" pieces (variable/function names) get a space
+   *    between them so they don't read as one longer identifier
+   *    (x*y -> x y, x*sin(x) -> x sin(x))
+   *  - everything else (e.g. a number or variable next to a
+   *    parenthesized group) is simply juxtaposed (4x, x(x+1), 4(x+1),
+   *    (x+1)(x-1))
+   * @param  string $leftStr
+   * @param  string $rightStr
+   * @return string  '*', ' ', or ''
+   */
+  private function prettyImplicitJoiner($leftStr, $rightStr) {
+    $lastChar = substr($leftStr, -1);
+    $firstChar = substr($rightStr, 0, 1);
+    $isNumBoundary = function($c) { return $c !== '' && (ctype_digit($c) || $c === '.'); };
+    $isLetterBoundary = function($c) { return $c !== '' && ctype_alpha($c); };
+    if ($firstChar === '-' || ($isNumBoundary($lastChar) && $isNumBoundary($firstChar))) {
+      return '*';
+    }
+    if ($isLetterBoundary($lastChar) && $isLetterBoundary($firstChar)) {
+      return ' ';
+    }
+    return '';
+  }
+
+  /**
+   * Renders an already pretty-simplified node as a string with minimal
+   * parentheses.
+   * @param  array $node
+   * @return string
+   */
+  private function prettyRenderNode($node) {
+    if ($node['type'] === 'number' || $node['type'] === 'variable') {
+      return (string) $node['symbol'];
+    }
+    if ($node['type'] === 'function') {
+      return $node['symbol'] . '(' . $this->prettyRenderNode($node['input']) . ')';
+    }
+
+    $symbol = $node['symbol'];
+
+    if ($symbol === '~') {
+      $inner = $this->prettyRenderNode($node['left']);
+      if ($this->prettyPrecedence($node['left']) < 2) {
+        $inner = '(' . $inner . ')';
+      }
+      return '-' . $inner;
+    }
+
+    if ($symbol === 'not') {
+      return 'not(' . $this->prettyRenderNode($node['left']) . ')';
+    }
+
+    if ($symbol === '+' || $symbol === '-') {
+      $left = $node['left'];
+      $right = $node['right'];
+      $dispSymbol = $symbol;
+      if ($this->prettyIsNegative($right)) {
+        $dispSymbol = ($symbol === '+') ? '-' : '+';
+        $right = $right['left'];
+      }
+      $leftStr = $this->prettyRenderNode($left);
+      if ($this->prettyPrecedence($left) < 1) {
+        $leftStr = '(' . $leftStr . ')';
+      }
+      $rightStr = $this->prettyRenderNode($right);
+      $rightPrec = $this->prettyPrecedence($right);
+      $rightNeedsParens = ($dispSymbol === '-') ? ($rightPrec <= 1) : ($rightPrec < 1);
+      if ($rightNeedsParens) {
+        $rightStr = '(' . $rightStr . ')';
+      }
+      return $leftStr . $dispSymbol . $rightStr;
+    }
+
+    if ($symbol === '*' || $symbol === '/') {
+      $left = $node['left'];
+      $right = $node['right'];
+      $leftStr = $this->prettyRenderNode($left);
+      if ($this->prettyPrecedence($left) < 2) {
+        $leftStr = '(' . $leftStr . ')';
+      }
+      $rightStr = $this->prettyRenderNode($right);
+      $rightPrec = $this->prettyPrecedence($right);
+      $rightNeedsParens = ($symbol === '/') ? ($rightPrec <= 2) : ($rightPrec < 2);
+      if ($rightNeedsParens) {
+        $rightStr = '(' . $rightStr . ')';
+      }
+      $joiner = $symbol;
+      if ($symbol === '*' && $this->prettyImplicitMult) {
+        $joiner = $this->prettyImplicitJoiner($leftStr, $rightStr);
+      }
+      return $leftStr . $joiner . $rightStr;
+    }
+
+    if ($symbol === '^') {
+      $left = $node['left'];
+      $right = $node['right'];
+      $leftStr = $this->prettyRenderNode($left);
+      if ($this->prettyPrecedence($left) <= 4) {
+        $leftStr = '(' . $leftStr . ')';
+      }
+      $rightStr = $this->prettyRenderNode($right);
+      if ($this->prettyPrecedence($right) < 4) {
+        $rightStr = '(' . $rightStr . ')';
+      }
+      return $leftStr . '^' . $rightStr;
+    }
+
+    // fallback: comparisons / logical operators
+    $prec = $this->prettyPrecedence($node);
+    $leftStr = $this->prettyRenderNode($node['left']);
+    if ($this->prettyPrecedence($node['left']) < $prec) {
+      $leftStr = '(' . $leftStr . ')';
+    }
+    $rightStr = $this->prettyRenderNode($node['right']);
+    if ($this->prettyPrecedence($node['right']) < $prec) {
+      $rightStr = '(' . $rightStr . ')';
+    }
+    return $leftStr . $symbol . $rightStr;
   }
 
   public function removeOneTimes() {

@@ -224,3 +224,61 @@ foreach ($matrixtests as $test) {
 $t = microtime(true) - $st;
 $tp = $t/count($matrixtests);
 echo "Matrix tests done in $t, $tp per<br><br>";
+
+
+$prettytests = [
+  ['3+0+4','3+4'],
+  ['3-0-4','3-4'],
+  ['4x+x^0','4x+1','x'],
+  ['x^0','1','x'],
+  ['5(x+3)^0','5','x'],
+  ['4+h-2','4+h-2','h'],
+  ['3+0x-2+0(x-3)^2-4-(x+4)0-1','3-2-4-1','x'],
+/*  ['3x=0','3x = 0','x'],
+  ['3x=0x','3x = 0','x'],
+  ['3x=-0','3x = 0','x'],
+  ['0=3x','0 = 3x','x'],
+  ['0x=3x','0 = 3x','x'],
+  ['-0=3x','0 = 3x','x'],
+  ['3x=', '3x =','x'],*/
+  ['0^3+1x-1x+1/x+1x/y','x-x+1/x+x/y','x,y'],
+  ['x^0y+x^0*y','y+y','x,y'],
+  ['3x^1+x/1+x/12','3x+x+x/12','x'],
+  ['(x+3)/1+x^1','x+3+x','x'],
+  ['1-(x)','1-x','x'],
+  ['1-(cos(x))','1-cos(x)','x'],
+  ['3(cos(x))','3cos(x)','x'],
+  ['(xy)+1','x y+1','x,y'],
+  ['(2^x)-6','2^x-6','x'],
+  ['6+(2^x)','6+2^x','x'],
+  ['6*(2^x)','6*2^x','x'],
+  ['(6)(2^x)','6*2^x','x'],
+  ['(x^2)(6)','x^2*6','x'],   
+  ['3(xy)','3x y','x,y'],
+  ['(xy)3','x y3','x,y'],
+//  ['3+0<1x<0x+5','3 < x <  5','x'],
+//  ['x+1 leq 3', 'x+1 leq 3','x'],
+	['2(x)(x+3)', '2x(x+3)','x'],
+	['1-(x)', '1-x','x'],
+	['1-(x+3)', '1-(x+3)','x'],
+	['2^(x)', '2^x','x'],
+//	['(2,3)+(4,5)', '(2 , 3)+(4 , 5)']
+];
+$st = microtime(true);
+foreach ($prettytests as $test) {
+    $p = new MathParser($test[2] ?? '');
+    $out = 0;
+    try {
+      $p->parse($test[0]);
+      $out = $p->toPrettyString(null, true);
+      if ($test[1] != $out) {
+        echo "pretty Test failed on {$test[0]}: {$test[1]} vs $out<br>";
+      }
+    } catch (Throwable $t) {
+      echo "Pretty Test crashed on {$test[0]}<br>";
+      echo $t->getMessage();
+    }
+}
+$t = microtime(true) - $st;
+$tp = $t/count($prettytests);
+echo "Pretty tests done in $t, $tp per<br><br>";
