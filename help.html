@@ -2742,6 +2742,40 @@ $disp = polymakeprettydisp($poly); // backtick-wrapped math display version</pre
   <details class="example"><summary>Example</summary><pre>$expr = "1*x^2+0*x^1+1*x^0"
 $nice = makexxpretty($expr)     // "x^2+1"
 $disp = makexxprettydisp($expr) // math display version</pre></details></li>
+
+<li><strong>simplifyexpr(expr,[vars,level,implicit])</strong>
+  Cleans up an expression and can do some simplification.
+  <details class="example"><summary>Parameters</summary>
+  <ul>
+	<li><strong>expr</strong>: the expression to simplify</li>
+	<li><strong>vars</strong>: (default "x") comma-separated list of variables.</li>
+	<li><strong>level</strong>: (default 0) the level of simplification: 
+		<ul>
+			<li>0 (default): Basic cleanup. 
+				Removes 1*, 0*, ^0, ^1, /1, cleans up +-.
+				Also removes un-needed parens.
+				(e.g. <code>(1)(x^1)sin(x) -> x sin(x)</code>)
+			</li>
+			<li>1: Combine like terms with integer/decimal coefficients 
+				(e.g. <code>3x+x+3+5/2 -> 4x+3+5/2</code>)</li>
+			<li>2: Combine like terms, evaluating powers and adding fractional coefficients.
+				(e.g. <code>3x+x+3+5/2 -> 4x+11/2</code>)
+			</li>
+			<li>3: Also simplifies products/quotients with the same base. 
+				(e.g. <code>5x^2*2x^5 -> 10x^7, x/x^2 -> 1/x</code>)
+			</li>
+		</ul>
+	</li>
+	<li><strong>implicit</strong>: (default true) whether to use implicit multiplication.
+		Set <code>false</code> to add explicit *.</li>
+  </ul>
+  </details>
+  <details class="example"><summary>Example</summary><pre>simplifyexpr("1x^2+0x+(3)")              // "x^2+3"
+simplifyexpr("2x+5+3y+(4x-1)","x,y",1)   // "6x+4+3y"
+simplifyexpr("1/2x+1/4x+1+1/2^2","x",2)  // "3/4x+5/4"
+simplifyexpr("(6xy)/(8y^3)","x,y",3)     // "(3x)/(4y^2)"
+</pre></details>
+</li></o>
 <li><strong>makepretynegative(string)</strong>: Wraps negative terms in parentheses — e.g. "3+-4" → "3+(-4)" and "3--4" → "3-(-4)". Note: "3-+4" becomes "3-4".
   <details class="example"><summary>Example</summary><pre>$b = rand(-5,-1)  // a negative number
 $expr = "3+$b"      // like "3+-4"
