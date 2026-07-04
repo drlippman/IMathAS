@@ -1123,6 +1123,9 @@ class MathParser
     if ($node === null) {
       $node = $this->AST;
     }
+    if (empty($node)) {
+      return '';
+    }
     $this->prettyImplicitMult = $implicitMult;
     $simplified = $this->prettySimplifyNode($node);
     if ($combineTerms > 0) {

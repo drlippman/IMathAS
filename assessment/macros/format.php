@@ -32,7 +32,8 @@ array_push(
     'today',
     'numtoroman',
     'htmldisp',
-    'formatcomplex'
+    'formatcomplex',
+    'simplifyexpr'
 );
 
 function makepretty($exp) {
@@ -1370,5 +1371,91 @@ function makeprettyarray($a) {
 function makeprettydisparray($a) {
     for ($i = 0; $i < count($a); $i++) {
         $a = "`" . makepretty($a) . "`";
+    }
+}
+
+function simplifyexpr($str,$vars="x",$simplevel=0,$implicit=true,$complex=false) {
+    if (empty($str)) { return $str; }
+    $fv = [];
+    if (!is_array($vars)) {
+        $vars = array_map('trim',explode(',', $vars));
+    }
+    foreach ($vars as $k=>$v) {
+        if (strpos($v,'()')!==false) {
+            $fv[] = str_replace('()','',$v);
+            unset($vars[$k]);
+        }
+    }
+    $vars = implode(',',$vars);
+    $fvlist = implode(',',$fv);
+
+    $nestlevel = 0;
+    $levelstart = [];
+    $lastcomma = [];
+    $segmentstart = 0;
+    $outstr = '';
+    for ($i=0;$i<strlen($str);$i++) {
+        $c = $str[$i];
+        if ($c == '(') {
+            $nestlevel++;
+            $levelstart[$nestlevel] = $i+1;
+        } else if ($c == ')') {
+            if (!empty($lastcomma[$nestlevel])) { // had a comma in here
+                $outstr .= int_simplifyexpr(substr($str,$lastcomma[$nestlevel],$i-$lastcomma[$nestlevel]),$vars,$fvlist,$implicit, $simplevel,$complex);
+                $outstr .= ')';
+                $segmentstart = $i+1;
+            }
+            unset($lastcomma[$nestlevel]);
+            $nestlevel--;
+        } else if ($c == '=' || $c == '!' || $c == '<' || $c == '>') {
+            if ($c == '!' && ($str[$i+1] ?? '') !== '=') { continue; }
+            $outstr .= int_simplifyexpr(substr($str,$segmentstart,$i-$segmentstart),$vars,$fvlist,$implicit, $simplevel,$complex);
+            $outstr .= ' '.$c;
+            if (($c == '!' || $c == '<' || $c == '>') && ($str[$i+1] ?? '') == '=') {
+                $outstr .= '=';
+                $i++;
+            }
+            $outstr .= ' ';
+            $segmentstart = $i+1;
+        } else if ($c == ',') {
+            if ($nestlevel == 0) {
+                $thisstart = $segmentstart;
+                $segmentstart = $i+1;
+            } else if (!empty($lastcomma[$nestlevel])) {
+                $thisstart = $lastcomma[$nestlevel];
+                $lastcomma[$nestlevel] = $i+1;
+            } else {
+                $outstr .= '(';
+                $thisstart = $levelstart[$nestlevel];
+                $lastcomma[$nestlevel] = $i+1;
+            }
+            $toconv = substr($str,$thisstart,$i-$thisstart);
+            $outstr .= int_simplifyexpr($toconv,$vars,$fvlist,$implicit, $simplevel,$complex);
+            $outstr .= ',';
+        }
+    }
+    if ($segmentstart < strlen($str)-1) {
+        if ($nestlevel > 0 && !empty($lastcomma[$nestlevel])) {
+            $thislevel = $lastcomma[$nestlevel];
+        } else {
+            $thislevel = $segmentstart;
+        }
+        $outstr .= int_simplifyexpr(substr($str,$thislevel),$vars,$fvlist,$implicit, $simplevel,$complex);
+    }
+    return $outstr;
+}
+
+function int_simplifyexpr($str,$vars,$fvlist,$implicit,$simplevel,$complex) {
+    if (trim($str)=='') { return ''; }
+    $parser = new MathParser($vars, [], $fvlist, $complex);
+    try {
+        $parser->parse($str);
+        return $parser->toPrettyString(null, $implicit, $simplevel);
+    } catch (Throwable $t) {
+        if (!empty($GLOBALS['inQuestionTesting'])) {
+            echo "simplifyexpr parse error on $str: ";
+            echo $t->getMessage();
+        }
+        return $str;
     }
 }

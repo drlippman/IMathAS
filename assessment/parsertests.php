@@ -266,7 +266,11 @@ $prettytests = [
   ['x*y*x^2*y', 'x^3y^2', 'x,y',3],
   ['(6x^2y)/(8x)', '3/4x y', 'x,y', 3],
   ['(6x^2y+1)/(2x)', '(6x^2y+1)/(2x)', 'x,y', 3],
-  ['(6y)/(8x)', '(3y)/(4x)', 'x,y', 3]
+  ['(6y)/(8x)', '(3y)/(4x)', 'x,y', 3],
+  ['y/x*x^3/y^4', 'x^2/y^3', 'x,y', 3],
+  ['((x+1)(x+3)^2)/(x+3)', '(x+1)(x+3)', 'x,y', 3],
+  ["3x^2+0x+4+1(x+5)", "3x^2+9+x", "x", 1],
+  ["", "", "x", 1]
 /* these are makexxpretty tests that are 
    stuff the parser can't handle, since it 
    was only intended for algebraic expressions,
