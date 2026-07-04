@@ -234,13 +234,6 @@ $prettytests = [
   ['5(x+3)^0','5','x'],
   ['4+h_0-2','4+h_0-2','h_0'],
   ['3+0x-2+0(x-3)^2-4-(x+4)0-1','3-2-4-1','x'],
-/*  ['3x=0','3x = 0','x'],
-  ['3x=0x','3x = 0','x'],
-  ['3x=-0','3x = 0','x'],
-  ['0=3x','0 = 3x','x'],
-  ['0x=3x','0 = 3x','x'],
-  ['-0=3x','0 = 3x','x'],
-  ['3x=', '3x =','x'],*/
   ['0^3+1x-1x+1/x+1x/y','x-x+1/x+x/y','x,y'],
   ['x^0y+x^0*y','y+y','x,y'],
   ['3x^1+x/1+x/12','3x+x+x/12','x'],
@@ -257,8 +250,6 @@ $prettytests = [
   ['(x^2)(6)','x^2*6','x'],   
   ['3(xy)','3x y','x,y'],
   ['(xy)3','x y3','x,y'],
-//  ['3+0<1x<0x+5','3 < x <  5','x'],
-//  ['x+1 leq 3', 'x+1 leq 3','x'],
 	['2(x)(x+3)', '2x(x+3)','x'],
 	['1-(x)', '1-x','x'],
 	['1-(x+3)', '1-(x+3)','x'],
@@ -266,8 +257,32 @@ $prettytests = [
   ['(x+1)+x', '2x+1', 'x', 1],
   ['2x+5+3y+4x-1', '6x+4+3y', 'x,y', 1],
   ['3x+2+x+1/2', '4x+2+1/2', 'x', 1],
-  ['1/2x+1/4x+1+1/2^2', '3/4x+5/4','x',2]
-//	['(2,3)+(4,5)', '(2 , 3)+(4 , 5)']
+  ['1/2x+1/4x+1+1/2^2', '3/4x+5/4','x',2],
+  ['2x*5x', '2x5x','x',2],
+  ['2x*5x', '10x^2','x',3],
+  ['x*x*(x+3)', 'x^2(x+3)','x',3],
+  ['x/x^2+2*3/2', '1/x+3','x',3],
+  ['3/4*x*1/2*x + 6/8', '3/8x^2+3/4', 'x',3]
+/* these are makexxpretty tests that are 
+   stuff the parser can't handle, since it 
+   was only intended for algebraic expressions,
+   not equations, inequalities, or ntuples.
+   For equations/inequalities, it should be 
+   possible to write a wrapper function that
+   explodes by separators, parses each section 
+   separately, then recombines.
+  ['3x=0','3x = 0','x'],
+  ['3x=0x','3x = 0','x'],
+  ['3x=-0','3x = 0','x'],
+  ['0=3x','0 = 3x','x'],
+  ['0x=3x','0 = 3x','x'],
+  ['-0=3x','0 = 3x','x'],
+  ['3x=', '3x =','x'],
+  ['3+0<1x<0x+5','3 < x <  5','x'],
+  ['x+1 leq 3', 'x+1 leq 3','x'],
+  ['(2,3)+(4,5)', '(2 , 3)+(4 , 5)']
+*/
+	
 ];
 $st = microtime(true);
 foreach ($prettytests as $test) {

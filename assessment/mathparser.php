@@ -1106,6 +1106,17 @@ class MathParser
    *                              2 = also evaluates numeric powers and adds
    *                                  fractional coefficients exactly
    *                                  (1/2x+1/4x+1+1/2^2 -> 3/4x+5/4).
+   *                              3 = also combines factors within a
+   *                                  multiplication/division chain that
+   *                                  share the same base by adding their
+   *                                  exponents, multiplies/reduces plain
+   *                                  number factors, and moves any
+   *                                  resulting negative-exponent factors
+   *                                  into a denominator.  No distribution
+   *                                  over sums (x*(x+3) is unchanged), but
+   *                                  2x*x+3 -> 2x^2+3, 5x^2*2x^5 -> 10x^7,
+   *                                  x/x^2 -> 1/x, 2*1/2 -> 1, 6/3 -> 2,
+   *                                  6/8 -> 3/4.
    * @return string
    */
   public function toPrettyString($node = null, $implicitMult = false, $combineTerms = 0) {
@@ -1296,6 +1307,14 @@ class MathParser
     }
 
     if ($symbol === '*' || $symbol === '/') {
+      if ($level >= 3) {
+        $factors = [];
+        $this->prettyFlattenProduct($node, 1, $factors);
+        foreach ($factors as $i => $f) {
+          $factors[$i]['node'] = $this->prettyCombineNode($f['node'], $level);
+        }
+        return $this->prettyRebuildProduct($factors);
+      }
       $node['left'] = $this->prettyCombineNode($node['left'], $level);
       $node['right'] = $this->prettyCombineNode($node['right'], $level);
       return $node;
@@ -1508,6 +1527,170 @@ class MathParser
       list($a, $b) = [$b, $a % $b];
     }
     return $a == 0 ? 1 : $a;
+  }
+
+  /**
+   * Exact fraction multiplication, (a/b) * (c/d), reduced to lowest terms.
+   * @param  array $a  ['n'=>num,'d'=>den]
+   * @param  array $b  ['n'=>num,'d'=>den]
+   * @return array
+   */
+  private function prettyFracMultiply($a, $b) {
+    return $this->prettyFracReduce([
+      'n' => $a['n'] * $b['n'],
+      'd' => $a['d'] * $b['d']
+    ]);
+  }
+
+  /**
+   * If the node is a number literal, possibly negated via a '~' wrapper
+   * (e.g. an exponent like the -2 in x^-2), returns its numeric value.
+   * @param  array $node
+   * @return float|null
+   */
+  private function prettyNumericValue($node) {
+    $sign = 1;
+    while ($node['symbol'] === '~') {
+      $sign *= -1;
+      $node = $node['left'];
+    }
+    if ($node['type'] === 'number') {
+      return $sign * (float) $node['symbol'];
+    }
+    return null;
+  }
+
+  /**
+   * Flattens a maximal chain of '*'/'/' nodes into an ordered list of
+   * factors, each tagged with a sign of +1 (multiplied / numerator) or -1
+   * (divided / denominator), by walking the chain and flipping the sign
+   * whenever it descends into the right-hand side of a '/'.
+   * @param  array $node
+   * @param  int $sign  ambient sign for this node's factors
+   * @param  array $factors  (by reference) collected ['node'=>,'sign'=>] pairs
+   * @return void
+   */
+  private function prettyFlattenProduct($node, $sign, &$factors) {
+    if ($node['symbol'] === '*') {
+      $this->prettyFlattenProductSide($node['left'], $sign, $factors);
+      $this->prettyFlattenProductSide($node['right'], $sign, $factors);
+    } else if ($node['symbol'] === '/') {
+      $this->prettyFlattenProductSide($node['left'], $sign, $factors);
+      $this->prettyFlattenProductSide($node['right'], -$sign, $factors);
+    }
+  }
+
+  /**
+   * @param  array $node
+   * @param  int $sign
+   * @param  array $factors  (by reference)
+   * @return void
+   */
+  private function prettyFlattenProductSide($node, $sign, &$factors) {
+    if ($node['symbol'] === '*' || $node['symbol'] === '/') {
+      $this->prettyFlattenProduct($node, $sign, $factors);
+    } else {
+      $factors[] = ['node'=>$node, 'sign'=>$sign];
+    }
+  }
+
+  /**
+   * Groups a flat list of signed product factors by base, adding
+   * exponents for factors that share a base (a bare factor counts as
+   * base^1, a '/' denominator factor counts as base^-1, etc.), and
+   * multiplies together all plain-number factors into a single reduced
+   * fraction.  The numeric coefficient is kept as its own self-contained
+   * fraction (e.g. 3/8) multiplied in front of the combined variable part,
+   * rather than merged into one large fraction spanning both (so
+   * 3/4x*1/2x -> 3/8x^2, not (3x^2)/8).  Any variable factors left with a
+   * negative exponent form their own denominator within that variable
+   * part (x/x^2 -> 1/x).
+   * @param  array $factors  list of ['node'=>,'sign'=>] pairs
+   * @return array
+   */
+  private function prettyRebuildProduct($factors) {
+    $constFrac = ['n'=>1.0, 'd'=>1.0];
+    $groups = [];
+    $indexOf = [];
+    foreach ($factors as $f) {
+      $leaf = $f['node'];
+      $sign = $f['sign'];
+      if ($leaf['type'] === 'number') {
+        $val = (float) $leaf['symbol'];
+        $constFrac = ($sign > 0)
+          ? $this->prettyFracMultiply($constFrac, ['n'=>$val, 'd'=>1.0])
+          : $this->prettyFracMultiply($constFrac, ['n'=>1.0, 'd'=>$val]);
+        continue;
+      }
+      $base = $leaf;
+      $exp = 1.0 * $sign;
+      if ($leaf['symbol'] === '^') {
+        $expVal = $this->prettyNumericValue($leaf['right']);
+        if ($expVal !== null) {
+          $base = $leaf['left'];
+          $exp = $expVal * $sign;
+        }
+      }
+      $key = $this->toString($base);
+      if (isset($indexOf[$key])) {
+        $groups[$indexOf[$key]]['exponent'] += $exp;
+      } else {
+        $indexOf[$key] = count($groups);
+        $groups[] = ['base'=>$base, 'exponent'=>$exp];
+      }
+    }
+    $constFrac = $this->prettyFracReduce($constFrac);
+    if ($constFrac['n'] == 0.0) {
+      return ['type'=>'number', 'symbol'=>0.0];
+    }
+
+    $numVarFactors = [];
+    $denVarFactors = [];
+    foreach ($groups as $g) {
+      if ($g['exponent'] == 0.0) {
+        continue;
+      }
+      if ($g['exponent'] > 0) {
+        $numVarFactors[] = ($g['exponent'] == 1.0) ? $g['base'] :
+          ['type'=>'operator', 'symbol'=>'^', 'left'=>$g['base'], 'right'=>['type'=>'number', 'symbol'=>$g['exponent']]];
+      } else {
+        $e = -$g['exponent'];
+        $denVarFactors[] = ($e == 1.0) ? $g['base'] :
+          ['type'=>'operator', 'symbol'=>'^', 'left'=>$g['base'], 'right'=>['type'=>'number', 'symbol'=>$e]];
+      }
+    }
+
+    $variablePart = null;
+    if (!empty($numVarFactors) || !empty($denVarFactors)) {
+      $numNode = empty($numVarFactors) ? ['type'=>'number', 'symbol'=>1.0] : $this->prettyChainMultiply($numVarFactors);
+      $variablePart = empty($denVarFactors) ? $numNode :
+        ['type'=>'operator', 'symbol'=>'/', 'left'=>$numNode, 'right'=>$this->prettyChainMultiply($denVarFactors)];
+    }
+
+    $coefNode = ($constFrac['d'] == 1.0)
+      ? ['type'=>'number', 'symbol'=>$constFrac['n']]
+      : ['type'=>'operator', 'symbol'=>'/', 'left'=>['type'=>'number', 'symbol'=>$constFrac['n']], 'right'=>['type'=>'number', 'symbol'=>$constFrac['d']]];
+
+    if ($variablePart === null) {
+      return $coefNode;
+    }
+    if ($constFrac['n'] == 1.0 && $constFrac['d'] == 1.0) {
+      return $variablePart;
+    }
+    return ['type'=>'operator', 'symbol'=>'*', 'left'=>$coefNode, 'right'=>$variablePart];
+  }
+
+  /**
+   * Combines a list of nodes into a single left-associative '*' chain.
+   * @param  array $nodes  non-empty list of AST nodes
+   * @return array
+   */
+  private function prettyChainMultiply($nodes) {
+    $out = $nodes[0];
+    for ($i = 1; $i < count($nodes); $i++) {
+      $out = ['type'=>'operator', 'symbol'=>'*', 'left'=>$out, 'right'=>$nodes[$i]];
+    }
+    return $out;
   }
 
   /**
