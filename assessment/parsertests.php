@@ -291,6 +291,8 @@ foreach ($prettytests as $test) {
     try {
       $p->parse($test[0]);
       $simplevel = $test[3] ?? 0;
+      // call it with "implicitMultiplication" option set to true
+      // and the simplification level from test[3] 
       $out = $p->toPrettyString(null, true, $simplevel);
       if ($test[1] != $out) {
         echo "pretty Test failed on {$test[0]}: {$test[1]} vs $out<br>";
