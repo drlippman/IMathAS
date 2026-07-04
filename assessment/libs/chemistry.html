@@ -40,12 +40,14 @@
 <h3 id="chem_disp"><a name="chem_disp">chem_disp</a></h3>
 <p><strong>chem_disp(compound)</strong></p>
 <p>Formats a compound for display as HTML.</p>
-<details class="example"><summary>Examples</summary><pre>echo chem_disp("H2O")  // "H<sub>2</sub>O"</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$a = chem_disp("H2O")    // "H&lt;sub&gt;2&lt;/sub&gt;O"</pre></details>
 
 <h3 id="chem_mathdisp"><a name="chem_mathdisp">chem_mathdisp</a></h3>
 <p><strong>chem_mathdisp(compound)</strong></p>
 <p>Formats a compound for better display in math mode.</p>
-<details class="example"><summary>Examples</summary><pre>$showanswer = chem_mathdisp("H2O")</pre></details>
+<details class="example"><summary>Examples</summary>
+    <pre>$a = chem_mathdisp("H2O")    // "`H_2 O`</pre></details>
 
 <h3 id="chem_eqndisp"><a name="chem_eqndisp">chem_eqndisp</a></h3>
 <p><strong>chem_eqndisp(reactants, products, coefficients, [arrow, phases])</strong></p>
@@ -58,14 +60,17 @@
     <li><strong>arrow</strong>: optional, a string for the arrow in the reaction. Defaults to <code>-&gt;</code></li>
     <li><strong>phases</strong>: optional, an array of phases for both reactants and products.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$coeffs = chem_balancereaction(array("H2","O2"), array("H2O"))
-$showanswer = chem_eqndisp(array("H2","O2"), array("H2O"), $coeffs)</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$coeffs = chem_balancereaction(array("H_2","O_2"), array("H_2 O"))
+$eqn = chem_eqndisp(array("H_2","O_2"), array("H_2 O"), $coeffs)
+// returns "2 H_2 + O_2 -> 2 H_2 O"</pre></details>
 
 <h3 id="chem_isotopedisp"><a name="chem_isotopedisp">chem_isotopedisp</a></h3>
 <p><strong>chem_isotopedisp(element, super, sub, [noitalic])</strong></p>
 <p>Formats a math display string for an isotope with the given element,
   superscript, and subscript. Set <code>noitalic</code> to true to un-italicize the element.</p>
-<details class="example"><summary>Examples</summary><pre>$showanswer = chem_isotopedisp("C", 14, 6)  // carbon-14</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$a = chem_isotopedisp("C", 14, 6)  // "{::}_{\ \ 6}^{14}C"</pre></details>
 
 <h3 id="chem_getsymbol"><a name="chem_getsymbol">chem_getsymbol</a></h3>
 <p><strong>chem_getsymbol(atomic number)</strong></p>
@@ -91,13 +96,15 @@ $showanswer = chem_eqndisp(array("H2","O2"), array("H2O"), $coeffs)</pre></detai
 <p><strong>chem_getmeltingpoint(atomic number)</strong></p>
 <p>Returns the melting point given the atomic number.</p>
 <p>Beware: some elements return weird non-numeric values.</p>
-<details class="example"><summary>Examples</summary><pre>chem_getmeltingpoint(29)  // melting point of copper</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>chem_getmeltingpoint(29)  // 1083, melting point of copper</pre></details>
 
 <h3 id="chem_getboilingpoint"><a name="chem_getboilingpoint">chem_getboilingpoint</a></h3>
 <p><strong>chem_getboilingpoint(atomic number)</strong></p>
 <p>Returns the boiling point given the atomic number.</p>
 <p>Beware: some elements return weird non-numeric values.</p>
-<details class="example"><summary>Examples</summary><pre>chem_getboilingpoint(29)  // boiling point of copper</pre></details>
+<details class="example"><summary>Examples</summary>
+    <pre>chem_getboilingpoint(29)  // 2567, boiling point of copper</pre></details>
 
 <h3 id="chem_getfamily"><a name="chem_getfamily">chem_getfamily</a></h3>
 <p><strong>chem_getfamily(atomic number)</strong></p>

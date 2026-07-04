@@ -35,7 +35,10 @@ your changes and run to make sure that nothing is broken.</p>
 <h3 id="dates_adddays"><a name="dates_adddays">dates_adddays</a></h3>
 <p><strong>dates_adddays(date, days, format)</strong></p>
 <p>Adds days to the given date. Input and output dates are formatted with the given format.</p>
-<details class="example"><summary>Examples</summary><pre>$due = dates_adddays("4-Mar-2020", 14, "d-M-Y")  // "18-Mar-2020"</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$due = dates_adddays("4-Mar-2020", 14, "d-M-Y")  // "18-Mar-2020"
+$due = dates_adddays("6/25/2025", 14, 'n/j/Y')  // "7/9/2025"
+</pre></details>
 
 <h3 id="dates_addweeks"><a name="dates_addweeks">dates_addweeks</a></h3>
 <p><strong>dates_addweeks(date, weeks, format)</strong></p>
@@ -79,7 +82,7 @@ your changes and run to make sure that nothing is broken.</p>
 <p>Returns a date formatted with a new format. A reference to the available formatting codes can be found
     <a href="https://www.php.net/manual/en/datetime.format.php">here</a>.</p>
 <details class="example"><summary>Examples</summary><pre>$today = today('d-M-Y')
-$weekday = dates_dateformat($today, "l", "d-M-Y")  // e.g. "Tuesday"
-$month = dates_dateformat($today, "F", "d-M-Y")  // e.g. "March"</pre></details>
+$month = dates_dateformat($today, "F", "d-M-Y")  // e.g. "March"
+$weekday = dates_dateformat("3-Jun-2025", "l", "d-M-Y")  // e.g. "Tuesday"</pre></details>
 </body>
 </html>

@@ -17,7 +17,8 @@
 <h3 id="calculusdiffquotient"><a name="calculusdiffquotient">calculusdiffquotient</a></h3>
 <p><strong>calculusdiffquotient(function, variable, a, h)</strong></p>
 <p>Calculates the difference quotient <code>(f(a+h)-f(a))/h</code>.</p>
-<details class="example"><summary>Examples</summary><pre>$dq = calculusdiffquotient("x^2", "x", 3, 0.001)  // approximately 6.001</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>calculusdiffquotient("x^2", "x", 3, 0.1)  // 6.1</pre></details>
 
 <h3 id="calculusnumint"><a name="calculusnumint">calculusnumint</a></h3>
 <p><strong>calculusnumint(func, var, a, b, n, method)</strong></p>
@@ -25,5 +26,5 @@
 <ul>
 <li><strong>method</strong>: one of "left", "right", "midpoint", "trapezoidal", or "simpsons".</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$area = calculusnumint("x^2", "x", 0, 1, 100, "simpsons")  // approximately 0.3333</pre></details>
+<details class="example"><summary>Examples</summary><pre>calculusnumint("x^3", "x", 0, 1, 4, "simpsons")   // .25</pre></details>
 </body></html>

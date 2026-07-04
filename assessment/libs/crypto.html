@@ -52,7 +52,7 @@ $phrase3 = randmilphrase(true, 6)  // padded to a multiple of 6 characters</pre>
 </ul>
 <details class="example"><summary>Examples</summary><pre>shiftcipher("ATTACK", 3)  // "DWWDFN"
 shiftcipher("ATTACK", "D")  // "DWWDFN" (D is what A shifts to)
-shiftcipher("ATTACK", 1, "alpha", true)  // rotating shift, e.g. "BVVEGQ"</pre></details>
+shiftcipher("ATTACK", 1, "alpha", true)  // rotating shift, e.g. "BVWEHQ"</pre></details>
 
 <h3 id="randsubmap"><a name="randsubmap">randsubmap</a></h3>
 <p><strong>randsubmap([charset])</strong></p>
@@ -93,6 +93,7 @@ transcipher("ATTACKATDAWN", 3, "day")  // columns read in alphabetic order of "d
 <h3 id="cryptorsakeys"><a name="cryptorsakeys">cryptorsakeys</a></h3>
 <p><strong>cryptorsakeys(p, q)</strong></p>
 <p>Given two primes, <code>p</code> and <code>q</code>, returns <code>array(n, e, d)</code> where <code>n</code> and <code>e</code> form the public key, and <code>d</code> is the private key.</p>
-<details class="example"><summary>Examples</summary><pre>list($n, $e, $d) = cryptorsakeys(61, 53)
-// $n, $e is the public key; $d is the private key</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$n, $e, $d = cryptorsakeys(61, 53) // [3233, 7, 1783]
+// $n=3233, $e=7 is the public key; $d=1783 is the private key</pre></details>
 </body></html>

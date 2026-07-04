@@ -4,7 +4,7 @@
         <title>complex help</title>
         <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
     </head>
-    <body style="margin:30px;padding:0;font-size: 17px;font-family:Calibri, sans-serif">
+    <body>
     <a name="top" id="top"></a>
     <p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
     <h1>Macro Library complex</h1>
@@ -130,7 +130,8 @@ $thetaDeg = cx_arg([1,1], "deg")  // 45</pre></details>
     <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
   </ul>
 <p><em>Returns:</em> the real and imaginary parts of the sum as a paired value in an array: [Re, Im].</p>
-<details class="example"><summary>Examples</summary><pre>$sum = cx_add(array([2,-3], [0,-5], [sqrt(2),-1]))  // [2+sqrt(2), -9]</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$sum = cx_add(array([2,-3], [0,-5], [2,-1]))  // [4, -9]</pre></details>
 
 <h3 id="sub"><a name="sub">cx_sub</a></h3>
 <p><strong>cx_sub(num, [roundto = 12])</strong></p>
@@ -140,7 +141,8 @@ $thetaDeg = cx_arg([1,1], "deg")  // 45</pre></details>
     <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
   </ul>
 <p><em>Returns:</em> the real and imaginary parts of the difference as a paired value in an array: [Re, Im].</p>
-<details class="example"><summary>Examples</summary><pre>$diff = cx_sub(array([2,-3], [0,-5], [sqrt(2),-1]))  // (2-3i) - (-5i) - (sqrt(2)-i)</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$diff = cx_sub(array([8,6], [0,2], [2,2]))  // [6,2], from  (8+6i) - (2i) - (2+2i)</pre></details>
 
 <h3 id="div"><a name="div">cx_div</a></h3>
 <p><strong>cx_div(num, [roundto = 12])</strong></p>
@@ -150,7 +152,8 @@ $thetaDeg = cx_arg([1,1], "deg")  // 45</pre></details>
   <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
 </ul>
 <p><em>Returns:</em> the quotient of two complex numbers in standard form as a paired values in an array: [Re, Im].</p>
-<details class="example"><summary>Examples</summary><pre>$quot = cx_div(array([2,-3], [sqrt(2),-1]))  // (2-3i) / (sqrt(2)-i)</pre></details>
+<details class="example"><summary>Examples</summary>
+<pre>$quot = cx_div(array([2,-3], [1,-1]), 5)  // [2.5, -0.5],  (2-3i)/(1-i)</pre></details>
 
 <h3 id="mul"><a name="mul">cx_mul</a></h3>
 <p><strong>cx_mul(num, [roundto = 12])</strong></p>

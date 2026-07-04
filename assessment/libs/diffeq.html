@@ -43,7 +43,8 @@
     <li>width: drawing width. default 300</li>
     <li>height: drawing height. default 300</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$g = diffeq_slopefield("x*y^2")
+<details class="example"><summary>Examples</summary><pre>// using defaults 
+$g = diffeq_slopefield("x*y^2")
 
 // setting options inline
 $g2 = diffeq_slopefield("xy", ['dx'=>0.5, 'arrows'=>1])
@@ -51,7 +52,11 @@ $g2 = diffeq_slopefield("xy", ['dx'=>0.5, 'arrows'=>1])
 // or building the options array separately
 $ops['dx'] = 0.5
 $ops['arrows'] = 1
-$g3 = diffeq_slopefield("xy", $ops)</pre></details>
+$g3 = diffeq_slopefield("xy", $ops)
+
+// system x'=x+y, y'=y-2x, as vector field
+$g = diffeq_slopefield("x+y,y-2x", ['format'=>'vectorfield'])
+</pre></details>
 
 <h3 id="diffeq_comparegensoln"><a name="diffeq_comparegensoln">diffeq_comparegensoln</a></h3>
 <p><strong>diffeq_comparegensoln(expr1, expr2, vars, constants, [tolerance, domain])</strong></p>
@@ -66,8 +71,12 @@ $g3 = diffeq_slopefield("xy", $ops)</pre></details>
 <li><strong>tolerance</strong>: the relative tolerance to compare with. Default 0.001.</li>
 <li><strong>domain</strong>: the domain to compare on. Default "-10,10".</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$correct = "cos(t)+c_1*e^t+c_2*e^(-t)"
-$stu = $stuanswers[$thisq]
-$iscorrect = diffeq_comparegensoln($correct, $stu, "t", "c_1,c_2")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$answer = "cos(t)+c_1*e^t+c_2*e^(-t)"
+if (stuansready($stuanswers,$thisq)) {
+  $stu = $stuanswers[$thisq]
+  if (diffeq_comparegensoln($correct, $stu, "t", "c_1,c_2")) {
+    $answer = $stu    // set stuans as answer if equivalent
+  }
+}</pre></details>
 </body>
 </html>
