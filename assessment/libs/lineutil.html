@@ -17,9 +17,15 @@
 <ul>
 <li><strong>xmin, xmax, ymin, ymax</strong>: the graph boundaries.</li>
 <li><strong>m, b</strong>: the slope and y-intercept of the line.</li>
-<li><strong>order</strong>: Optional - an array of "right", "top", "left", "bottom" indicating the order of search.</li>
+<li><strong>order</strong>: Optional - an array of "right", "top", "left", "bottom" indicating the order of search.
+    Default: ["right","top","left","bottom"]</li>
 </ul>
 <p>Returns <code>array(x, y, loc)</code>, where <code>loc</code> is a best guess for where it would be good to put the label.</p>
-<details class="example"><summary>Examples</summary><pre>list($x, $y, $loc) = lineboundarycoord(-10, 10, -10, 10, 2, 1)
-list($x, $y, $loc) = lineboundarycoord(-10, 10, -10, 10, 2, 1, array("right","top","left","bottom"))</pre></details>
+<details class="example"><summary>Examples</summary><pre>// find where 2x+1 intersects window
+$x, $y, $loc = lineboundarycoord(-10, 10, -10, 10, 2, 1) // [4.5, 10, 'belowright']
+// use it to place a label with the graph
+$graph = showplot(["2x+1","text,$x,$y,f(x),black,$loc"],-10,10,-10,10,2,2)
+
+// change order to check sides
+$x, $y, $loc = lineboundarycoord(-10, 10, -10, 10, 2, 1, array("left","bottom","right","top"))</pre></details>
 </body></html>

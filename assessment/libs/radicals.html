@@ -34,7 +34,8 @@ reduceradical(80, 2, "parts")  // array(4,5)</pre></details>
 <li><strong>root</strong>: root of radical. Default is 2 (sqrt).</li>
 <li><strong>format</strong>: default is "string", which returns "4sqrt(5)/2"; "disp" returns the string wrapped in backticks for display; "parts" returns an array of the parts: array(4,5,2).</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>reduceradicalfrac(1, 80, 2)  // "4sqrt(5)/2"</pre></details>
+<details class="example"><summary>Examples</summary><pre>// simplify 3sqrt(80)/2
+reduceradicalfrac(3, 80, 2)  // "6sqrt(5)"</pre></details>
 
 <h3 id="reduceradicalfrac2"><a name="reduceradicalfrac2">reduceradicalfrac2</a></h3>
 <p><strong>reduceradicalfrac2(num, wholedenom, rootdenom, [rationalize, root, format])</strong></p>
@@ -44,8 +45,9 @@ reduceradical(80, 2, "parts")  // array(4,5)</pre></details>
 <li><strong>root</strong>: root of radical. Default is 2 (sqrt).</li>
 <li><strong>format</strong>: default is "string", which returns "2/(3sqrt(5))"; "disp" returns the string wrapped in backticks for display; "parts" returns an array of the parts: array(2,3,5).</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>reduceradicalfrac2(2, 3, 20)  // "2/(3sqrt(20))" reduced, e.g. "1/(3sqrt(5))"
-reduceradicalfrac2(2, 3, 20, true)  // with a rationalized denominator</pre></details>
+<details class="example"><summary>Examples</summary><pre>// simplify 2/(3sqrt(20))
+reduceradicalfrac2(2, 3, 20)  // "1/(3sqrt(5))"
+reduceradicalfrac2(2, 3, 20, true)  // rationalized, "(sqrt(5))/15"</pre></details>
 
 <h3 id="reduceradicalfrac3"><a name="reduceradicalfrac3">reduceradicalfrac3</a></h3>
 <p><strong>reduceradicalfrac3(wholenum, rootnum, wholedenom, rootdenom, [rationalize, rootn, rootd, format])</strong></p>
@@ -56,7 +58,8 @@ reduceradicalfrac2(2, 3, 20, true)  // with a rationalized denominator</pre></de
     <li><strong>rootd</strong>: root of denominator radical. Default is 2 (sqrt).</li>
     <li><strong>format</strong>: default is "string", which returns something like "(2sqrt(3))/5" or "2/3 sqrt(1/2)" or "3/(2 sqrt(5))"; "disp" returns the string wrapped in backticks for display; "parts" returns an array of the reduced parts [wholenum,rootnum,wholedenom,rootdenom,root].</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>reduceradicalfrac3(2, 12, 5, 20)  // reduces both radicals then the fraction</pre></details>
+<details class="example"><summary>Examples</summary><pre>// simplify (2sqrt(3))/(5sqrt(20))
+reduceradicalfrac3(2, 3, 5, 20)  // "1/5sqrt(3/5)"</pre></details>
 
 <h3 id="reducequadraticform"><a name="reducequadraticform">reducequadraticform</a></h3>
 <p><strong>reducequadraticform(a, b, c, d, [format])</strong></p>
@@ -64,5 +67,6 @@ reduceradicalfrac2(2, 3, 20, true)  // with a rationalized denominator</pre></de
 <ul>
 <li><strong>format</strong>: default is "string", which returns "(1+4sqrt(5))/2"; "disp" returns the string wrapped in backticks for display; "parts" returns an array of the parts: array(1,4,5,2).</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>reducequadraticform(1, 2, 20, 4)  // reduces (1+2sqrt(20))/4</pre></details>
+<details class="example"><summary>Examples</summary><pre>// simplify (4+2sqrt(20))/4 
+reducequadraticform(4, 2, 20, 4)  // "1+sqrt(5)"</pre></details>
 </body></html>

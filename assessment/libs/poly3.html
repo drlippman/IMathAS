@@ -31,7 +31,7 @@ corresponds to the power of the variable. Each element is stored in the form of 
 <li><strong>IsFraction</strong>: optional - a boolean that stores the coefficients as fraction arrays.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>$dividend = formpoly3fromstring("x", "3x^4+2x^2+1", false)
-// $dividend = array("1,0,2,0,3")</pre></details>
+// array(1,0,2,0,3)</pre></details>
 
 <h3 id="formpoly3fromresults"><a name="formpoly3fromresults">formpoly3fromresults</a></h3>
 <p><strong>formpoly3fromresults(results, [IsFraction=true])</strong></p>
@@ -53,7 +53,7 @@ corresponds to the power of the variable. Each element is stored in the form of 
 <li><strong>HideZero</strong>: optional - a boolean that stores a flag to hide zero coefficients.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>$dividend = writepoly3(array("1,0,2,0,3"), "x", false)
-// $dividend = "3x^4+2x^2+1"</pre></details>
+// "3x^4+2x^2+1"</pre></details>
 
 <h3 id="dividepoly3"><a name="dividepoly3">dividepoly3</a></h3>
 <p><strong>dividepoly3(dividend, divisor, [IsFraction=true])</strong></p>
@@ -87,6 +87,7 @@ corresponds to the power of the variable. Each element is stored in the form of 
 <li><strong>ShowAsSubtraction</strong>: optional - a boolean that when set to true shows the subtraction.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>$result = longdivisionpoly3($dividend, $divisor)
-// $result will contain a string of HTML table code that can be displayed in the answer.</pre></details>
+// $result will contain a string of HTML table code 
+// that can be displayed in the answer.</pre></details>
 </body>
 </html>

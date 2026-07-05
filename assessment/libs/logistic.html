@@ -24,21 +24,21 @@
       by other technology.</p>
     <details class="example"><summary>Examples</summary><pre>$x = array(0,1,2,3,4,5)
 $y = array(1,2,4,7,9,9.7)
-$coeffs = logisticregression($x, $y)  // array($a, $b, $c)</pre></details>
+$coeffs = logisticregression($x, $y)  // ~[12.48, 1.07, 10.45]</pre></details>
 
     <h3 id="logisticpredict"><a name="logisticpredict">logisticpredict</a></h3>
     <p><strong>logisticpredict(coefficients, x)</strong></p>
     <p>Uses an array of coefficients, returned by logisticregression, to predict the
       output for the given x value.</p>
     <details class="example"><summary>Examples</summary><pre>$coeffs = logisticregression($x, $y)
-$predicted = logisticpredict($coeffs, 6)</pre></details>
+$predicted = logisticpredict($coeffs, 6) // ~10.197</pre></details>
 
     <h3 id="logisticsolve"><a name="logisticsolve">logisticsolve</a></h3>
     <p><strong>logisticsolve(coefficients, y)</strong></p>
     <p>Uses an array of coefficients, returned by logisticregression, to solve for
       an input given a y value.</p>
     <details class="example"><summary>Examples</summary><pre>$coeffs = logisticregression($x, $y)
-$xval = logisticsolve($coeffs, 8)</pre></details>
+$xval = logisticsolve($coeffs, 8)  // ~3.487</pre></details>
 
   </body>
 </html>

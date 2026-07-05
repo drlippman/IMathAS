@@ -28,6 +28,7 @@
 <p>Creates a line graph.</p>
 <ul>
 <li><strong>intervals</strong>: string or array of strings in interval notation, e.g. "[2,5)".</li>
+<li><strong>xscl</strong>: can be a number, or "labelscl:tickscl" to have labels and tick marks at different spacing.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>linegraph("[2,5)")
 linegraph(array("(-oo,-1]", "[2,5)"), -10, 10)</pre></details>
@@ -49,5 +50,5 @@ linegraphbrackets("[2,5)", -10, 10, "2:1")  // labels every 2, ticks every 1</pr
 <li><strong>xmin, xmax</strong>: the min and max of the drawing grid, if different than the default -5 to 5.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>$answers = intervalstodraw("(-oo,4]U(3,5]")
-$answers2 = intervalstodraw("[-8,8]", -10, 10)</pre></details>
+$answers = intervalstodraw("[-8,8]", -10, 10)</pre></details>
 </body></html>

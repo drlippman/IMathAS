@@ -38,8 +38,8 @@ $p = formpoly2(array(2,3,4), array(2,1,0), array(0,1,2))</pre></details>
 <li><strong>var2</strong>: second variable, defaults to y.</li>
 <li><strong>showzeros</strong>: optional, defaults to false. If true, shows zero coefficients.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$showanswer = writepoly2($p)  // "2x^2+3xy+4y^2"
-$showanswer2 = writepoly2($p, "s", "t")  // uses s and t as variables</pre></details>
+<details class="example"><summary>Examples</summary><pre>$out = writepoly2($p)  // "2x^2+3xy+4y^2"
+$out = writepoly2($p, "s", "t")  // uses s and t as variables</pre></details>
 
 <h3 id="addpolys2"><a name="addpolys2">addpolys2</a></h3>
 <p><strong>addpolys2(poly1, poly2)</strong></p>
@@ -73,5 +73,5 @@ $showanswer2 = writepoly2($p, "s", "t")  // uses s and t as variables</pre></det
 <li><strong>poly</strong>: polynomial object, created with formpoly2.</li>
 <li><strong>degree, degree2</strong>: degree of the first and second variable of the term to get the coefficient of.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$coef = getcoef2($p, 2, 0)  // coefficient of the x^2 term</pre></details>
+<details class="example"><summary>Examples</summary><pre>$coef = getcoef2($p, 2, 1)  // coefficient of the x^2*y term</pre></details>
 </body></html>

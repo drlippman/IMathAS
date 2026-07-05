@@ -35,6 +35,8 @@
     <li><strong>vars</strong>: An array/list of variables.</li>
 </ul>
 <p><em>Returns:</em> 1 (TRUE) if <code>exp1</code> is logically equivalent to <code>exp2</code>. 0 (FALSE) otherwise.</p>
+<details class="example"><summary>Examples</summary>
+<pre>logicallyequivalent("not(p and q)","not p or not q","p,q") // 1 (true)</pre></details>
 
 <h3 id="logicallyimplies"><a name="logicallyimplies">logicallyimplies</a></h3>
 <p><strong>logicallyimplies(exp1, exp2, vars)</strong></p>
@@ -44,6 +46,8 @@
     <li><strong>vars</strong>: An array/list of variables.</li>
 </ul>
 <p><em>Returns:</em> 1 (TRUE) if <code>exp1</code> logically implies <code>exp2</code>. 0 (FALSE) otherwise.</p>
+<details class="example"><summary>Examples</summary>
+<pre>logicallyimplies("p and q","p","p,q")  // 1 (true)</pre></details>
 
 <h3 id="logicevaluate"><a name="logicevaluate">logicevaluate</a></h3>
 <p><strong>logicevaluate(exp, vars, truths)</strong></p>

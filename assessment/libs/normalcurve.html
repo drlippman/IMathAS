@@ -23,8 +23,8 @@
 <li><strong>color</strong>: indicates color of the shaded regions.</li>
 <li><strong>width, height</strong>: pixels for the displayed graph. Defaults to 400 by 150.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$img = normalcurve(0, 1, -3, 3)
-$img2 = normalcurve(0, 1, -3, 3, "z", -1, "left", null, null, "#ccf")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$img = normalcurve(0, 1, -3, 3) // standard normal from -3 to 3
+$img2 = normalcurve(0, 1, -3, 3, "z", -1, "left") // shaded left of -1</pre></details>
 
 <h3 id="normalcurve2"><a name="normalcurve2">normalcurve2</a></h3>
 <p><strong>normalcurve2(mu, sigma, a, b, [axisspacing, ymax, axislabel, x, dirx, y, diry, color, width, height])</strong></p>
@@ -50,5 +50,8 @@ $img2 = normalcurve(0, 1, -3, 3, "z", -1, "left", null, null, "#ccf")</pre></det
 <li><strong>q, dirq, r, dirr, color2</strong>: optionally can shade a second region based on one or two values q and r. Indicate shade direction using dirq and dirr, which can be "left" or "right". You can use null for y, q, and/or r to set later values.</li>
 <li><strong>width, height</strong>: pixels for the displayed graph. Defaults to 400 by 150.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$img = normalcurve3(0, 1, -3, 3, "z", -2, "left", null, null, "#ccf", 1, "right", null, null, "#fcc")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$img = normalcurve3(0, 1, -3, 3, "z", -1, "left", null, null, "blue", -1.5, "left", null, null, "red")
+// shades blue left of -1, red left of -1.5
+// like for showing critical region and p-value region
+</pre></details>
 </body></html>

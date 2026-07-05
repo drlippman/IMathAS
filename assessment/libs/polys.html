@@ -34,8 +34,8 @@
 <li><strong>powers or degree</strong>: list/array of powers, or highest degree. Highest degree assumes coefficients correspond to consecutively decreasing powers.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>// 3x^2+1
-$p = formpoly(array(3,1), array(2,0))
-$p2 = formpoly(array(3,0,1), 2)  // same polynomial, using degree</pre></details>
+$p = formpoly([3,1], [2,0])  // coefficients and powers
+$p2 = formpoly([3,0,1], 2)  // same, w/ coeffs for all powers and max degree</pre></details>
 
 <h3 id="formpolyfromroots"><a name="formpolyfromroots">formpolyfromroots</a></h3>
 <p><strong>formpolyfromroots(stretch, roots, [multiplicities])</strong></p>
@@ -57,8 +57,8 @@ $p2 = formpolyfromroots(1, array(0,2), array(1,2))  // x(x-2)^2</pre></details>
 <li><strong>showzeros</strong>: optional, defaults to <code>false</code>. If <code>true</code>, shows zero coefficients.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>$p = formpoly(array(3,1), array(2,0))
-$showanswer = writepoly($p)  // "3x^2+1"
-$showanswer2 = writepoly($p, "t")  // "3t^2+1"</pre></details>
+$out = writepoly($p)  // "3x^2+1"
+$out = writepoly($p, "t", true)  // "3t^2+0t+1"</pre></details>
 
 <h3 id="writepolyfrac"><a name="writepolyfrac">writepolyfrac</a></h3>
 <p><strong>writepolyfrac(poly, [var, showzeros])</strong></p>
@@ -69,7 +69,7 @@ $showanswer2 = writepoly($p, "t")  // "3t^2+1"</pre></details>
 <li><strong>showzeros</strong>: optional, defaults to <code>false</code>. If <code>true</code>, shows zero coefficients.</li>
 </ul>
 <details class="example"><summary>Examples</summary><pre>$p = formpoly(array(0.5,0.25), array(2,0))
-$showanswer = writepolyfrac($p)  // "1/2x^2+1/4"</pre></details>
+$out = writepolyfrac($p)  // "1/2x^2+1/4"</pre></details>
 
 <h3 id="addpolys"><a name="addpolys">addpolys</a></h3>
 <p><strong>addpolys(poly1, poly2)</strong></p>
@@ -106,7 +106,7 @@ $showanswer = writepolyfrac($p)  // "1/2x^2+1/4"</pre></details>
 <li><strong>poly1</strong>: dividend polynomial.</li>
 <li><strong>poly2</strong>: divisor polynomial.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>list($quotient, $remainder) = divpolys($p1, $p2)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$quotient, $remainder = divpolys($p1, $p2)</pre></details>
 
 <h3 id="scalepoly"><a name="scalepoly">scalepoly</a></h3>
 <p><strong>scalepoly(poly, c)</strong></p>
