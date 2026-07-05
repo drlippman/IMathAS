@@ -194,7 +194,7 @@ If all the values have the same frequency it returns DNE.</p>
 mode, the data array will be altered to only have one mode. Because this
 function can alter the given array, be sure to call it before any functions that
 use the array.</p>
-<details class="example"><summary>Examples</summary><pre>$mode = forceonemode($a)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$a = forceonemode($a)</pre></details>
 
 <h3 id="freqdist"><a name="freqdist">freqdist</a></h3>
 <p><strong>freqdist(array, label, start, classwidth)</strong></p>
@@ -206,7 +206,7 @@ the data.</p>
 <li><strong>start</strong>: first lower class limit.</li>
 <li><strong>classwidth</strong>: width of the classes.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>echo freqdist($a, "Height", 60, 5)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$t = freqdist($a, "Height", 60, 5)</pre></details>
 
 <h3 id="frequency"><a name="frequency">frequency</a></h3>
 <p><strong>frequency(array, start, classwidth, [end])</strong></p>
@@ -440,14 +440,14 @@ to dec decimal places (default 4).</p>
 <p>Computes the linear correlation coefficient, and slope and intercept of the
 regression line, based on array/list of x-values and array/list of y-values.</p>
 <p>Returns as array: <code>r,slope,intercept</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($r, $slope, $intercept) = linreg($xarray, $yarray)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$r, $slope, $intercept = linreg($xarray, $yarray)</pre></details>
 
 <h3 id="expreg"><a name="expreg">expreg</a></h3>
 <p><strong>expreg(xarray, yarray)</strong></p>
 <p>Computes the exponential correlation coefficient, and base and intercept of the
 regression exponential, based on array/list of x-values and array/list of y-values.</p>
 <p>Returns as array: <code>r,base,intercept</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($r, $base, $intercept) = expreg($xarray, $yarray)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$r, $base, $intercept = expreg($xarray, $yarray)</pre></details>
 
 <h3 id="checklineagainstdata"><a name="checklineagainstdata">checklineagainstdata</a></h3>
 <p><strong>checklineagainstdata(xarray, yarray, student answer, [variable, alpha])</strong></p>
@@ -460,7 +460,9 @@ if the student answer is within the confidence bounds for the regression equatio
 <li><strong>alpha</strong>: for confidence bound. Defaults to .05.</li>
 </ul>
 <p>Returns <code>array(answer, showanswer)</code> to be used to set <code>$answer</code> and <code>$showanswer</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($answer, $showanswer) = checklineagainstdata($xarray, $yarray, $stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>if (stuansready($stuanswers,$thisq,null,'numfunc')) {
+  $answer, $showanswer = checklineagainstdata($xarray, $yarray, $stuanswers[$thisq])
+}</pre></details>
 
 <h3 id="checkdrawnlineagainstdata"><a name="checkdrawnlineagainstdata">checkdrawnlineagainstdata</a></h3>
 <p><strong>checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid, snaptogrid])</strong></p>
@@ -474,8 +476,10 @@ if the student answer is within the confidence bounds for the regression equatio
 <li><strong>grid</strong>: if you've modified the grid, include it here.</li>
 <li><strong>snaptogrid</strong>: if you're using snaptogrid, include it here.</li>
 </ul>
-<p>Returns <code>array(answer, showanswer)</code> to be used to set <code>$answer</code> and <code>$showanswer</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($answer, $showanswer) = checkdrawnlineagainstdata($xarray, $yarray, $stuanswers[$thisq])</pre></details>
+<p>Returns <code>array(answer, showanswer)</code> to be used to set <code>$answers</code> and <code>$showanswer</code>.</p>
+<details class="example"><summary>Examples</summary><pre>if (stuansready($stuanswers,$thisq,null,'draw')) {
+  $answers, $showanswer = checkdrawnlineagainstdata($xarray, $yarray, $stuanswers[$thisq])
+}</pre></details>
 
 <h3 id="binomialpdf"><a name="binomialpdf">binomialpdf</a></h3>
 <p><strong>binomialpdf(N, p, x)</strong></p>
@@ -602,7 +606,7 @@ with degrees of freedom df1 and df2.</p>
 <p>Creates a link that downloads the specified data in CSV format. For each column
   provide a string header and an array of values. A filename (without the .csv) can
   optionally be provided as a first argument.</p>
-<details class="example"><summary>Examples</summary><pre>echo csvdownloadlink("data", "Height", $heights, "Weight", $weights)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$link = csvdownloadlink("data", "Height", $heights, "Weight", $weights)</pre></details>
 
 <h3 id="dotplot"><a name="dotplot">dotplot</a></h3>
 <p><strong>dotplot(array, label, [dotspacing, labelspacing, width, height])</strong></p>
@@ -635,7 +639,7 @@ with degrees of freedom df1 and df2.</p>
     <li><strong>arr1, arr2, ...</strong>: Arrays in the form [2,3,4,5,...]; it also accepts unequal sample sizes.</li>
 </ul>
 <p><em>Returns:</em> F ratio and the corresponding P value as an array in the form <code>[F ratio, P value]</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($F, $P) = anova1way_f(array(4,5,6), array(7,9,8), array(10,12,11))</pre></details>
+<details class="example"><summary>Examples</summary><pre>$F, $P = anova1way_f(array(4,5,6), array(7,9,8), array(10,12,11))</pre></details>
 
 <h3 id="anova2way"><a name="anova2way">anova2way</a></h3>
 <p><strong>anova2way(arr, [replication = false])</strong></p>
@@ -690,7 +694,7 @@ with degrees of freedom df1 and df2.</p>
 </ul>
 <p><em>Returns:</em> ANOVA table for displaying data.</p>
 <details class="example"><summary>Examples</summary><pre>$result = anova1way(array(4,5,6), array(7,9,8), array(10,12,11))
-echo anova_table($result)</pre></details>
+$t = anova_table($result)</pre></details>
 
 <h3 id="student_t"><a name="student_t">student_t</a></h3>
 <p><strong>student_t(arr1, arr2, [equalVar = False, paired = False, roundto = 12])</strong></p>
@@ -702,5 +706,5 @@ echo anova_table($result)</pre></details>
     <li><strong>roundto</strong>: Optional - number of decimal places to which data should be rounded off; default is 12 decimal places.</li>
 </ul>
 <p><em>Returns:</em> t statistic, corresponding P-value (area to the right of the t-value - one-tail), and degrees of freedom for the two sample student t-test as an array in the form <code>[t, P-value, df]</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($t, $p, $df) = student_t(array(4,5,6,7), array(7,9,8,12))</pre></details>
+<details class="example"><summary>Examples</summary><pre>$t, $p, $df = student_t(array(4,5,6,7), array(7,9,8,12))</pre></details>
 </body></html>

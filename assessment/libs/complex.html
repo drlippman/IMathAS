@@ -163,7 +163,7 @@ $thetaDeg = cx_arg([1,1], "deg")  // 45</pre></details>
   <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
 </ul>
 <p><em>Returns:</em> the real and imaginary parts of the product as a paired value in an array: [Re, Im].</p>
-<details class="example"><summary>Examples</summary><pre>$prod = cx_mul(array([2,-3], [0,-5]))  // (2-3i) * (-5i)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$prod = cx_mul(array([2,-3], [0,-5]))  // [-15,-10], (2-3i)*(-5i)</pre></details>
 
 <h3 id="pow"><a name="pow">cx_pow</a></h3>
 <p><strong>cx_pow(num, exp, [roundto = 12])</strong></p>
@@ -185,7 +185,7 @@ $thetaDeg = cx_arg([1,1], "deg")  // 45</pre></details>
   <li><strong>roundto</strong>: Optional - number of decimal places to which values should be rounded off; default is 12 decimal places. </li>
 </ul>
 <p><em>Returns:</em> an array of a paired value of real and imaginary parts of the nth roots: array([Re1, Im1], [Re2, Im2], ...)</p>
-<details class="example"><summary>Examples</summary><pre>$roots = cx_root([1,0], 3)  // the three cube roots of 1</pre></details>
+<details class="example"><summary>Examples</summary><pre>$roots = cx_root([1,0], 3)  // the three cube roots of 1 [[1,0],[-.5,.866],[.5,-.866]] </pre></details>
 
 <h3 id="quad"><a name="quad">cx_quadRoot</a></h3>
 <p><strong>cx_quadRoot(a, b, c, [roundto = 12])</strong></p>

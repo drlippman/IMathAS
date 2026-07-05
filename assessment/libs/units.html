@@ -50,7 +50,7 @@ loadlibrary("units")
 $correct = parseunits("10 cm")
 if (stuansready($stuanswers,$thisq,[0])) {
   $stu = parseunits($stuanswers[$thisq][0])
-  if ($correct[1] === $stu[1] && $stu[0] >= $correct[0]) {
+  if (is_array($stu) && $correct[1] === $stu[1] && $stu[0] >= $correct[0]) {
     $answer = true
   }
 }</pre></details>

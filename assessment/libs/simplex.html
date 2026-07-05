@@ -102,7 +102,7 @@ $sm = simplex("max", $objective, $constraints)</pre></details>
 <li><strong>tablestyle</strong>: any additional styles for the table that you may want, like "color:#40B3DF;". Default none.</li>
 </ul>
 <p><em>Returns:</em> valid HTML table syntax for displaying answerboxes.</p>
-<details class="example"><summary>Examples</summary><pre>echo simplexcreateanswerboxentrytable(3, 5, 0, "", 2, "x1,x2,x3,s1,s2")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$t = simplexcreateanswerboxentrytable(3, 5, 0, "", 2, "x1,x2,x3,s1,s2")</pre></details>
 
 <h3 id="simplexcreateinequalities"><a name="simplexcreateinequalities">simplexcreateinequalities</a></h3>
 <p><strong>simplexcreateinequalities(type, objectivevariable, objective, constraints, [headers, displayASCIIticks, showfractions, includeinequalities])</strong></p>
@@ -186,7 +186,7 @@ numerator | denominator.</p>
 <li><strong>tabletextcolor</strong>: text color for the table. Default black.</li>
 </ul>
 <p><em>Returns:</em> a string that is a valid HTML table syntax for display.</p>
-<details class="example"><summary>Examples</summary><pre>echo simplexdisplaycolortable($sm, "", 1, 2, 1, array(0,1,"blue","black"))</pre></details>
+<details class="example"><summary>Examples</summary><pre>$t = simplexdisplaycolortable($sm, "", 1, 2, 1, array(0,1,"blue","black"))</pre></details>
 
 <h3 id="simplexdisplaylatex"><a name="simplexdisplaylatex">simplexdisplaylatex</a></h3>
 <p><strong>simplexdisplaylatex(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1)])</strong></p>
@@ -246,7 +246,7 @@ a &amp;nbsp; for displaying in a browser.</p>
 <li><strong>condition</strong>: -1 means No Solution; 0 found pivot point(s); 1 means no pivot points found; 2 found possible multiple solution pivot point(s).</li>
 <li><strong>pivotpoints</strong>: an array where the entries are the row, column where the pivot point was found. Both row and column are ZERO based. <code>$pivotpoints[0] = (0,1)</code>, <code>$pivotpoints[1] = (1,2)</code></li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>list($condition, $pivotpoints) = simplexfindpivotpoint($sm)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$condition, $pivotpoints = simplexfindpivotpoint($sm)</pre></details>
 
 <h3 id="simplexfindpivotpointmixed"><a name="simplexfindpivotpointmixed">simplexfindpivotpointmixed</a></h3>
 <p><strong>simplexfindpivotpointmixed(simplexmatrix)</strong></p>
@@ -258,7 +258,7 @@ a &amp;nbsp; for displaying in a browser.</p>
 <li><strong>condition</strong>: -2 means not a mixed constraint; -1 means No Solution; 0 found pivot point(s); 1 means no pivot points found; 2 found possible multiple solution pivot point(s).</li>
 <li><strong>pivotpoints</strong>: an array where the entries are the row, column where the pivot point was found. Both row and column are ZERO based. <code>$pivotpoints[0] = (0,1)</code>, <code>$pivotpoints[1] = (1,2)</code></li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>list($condition, $pivotpoints) = simplexfindpivotpointmixed($sm)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$condition, $pivotpoints = simplexfindpivotpointmixed($sm)</pre></details>
 
 <h3 id="simplexgetentry"><a name="simplexgetentry">simplexgetentry</a></h3>
 <p><strong>simplexgetentry(simplexmatrix, row, col)</strong></p>
@@ -363,7 +363,7 @@ where g contains the minimum value and IsOptimized contains either a Yes or a No
 <ul>
 <li><strong>simplexsets[][]</strong> = a 2 dimensional array used to build an output for the various paths that could be used to solve the simplex, where columns are: parent column number (column of the parent simplex, zero based), pivot point condition, pivot point (point that will be pivoted on), pivot points (array of all possible pivots), simplexmatrix (simplex matrix to pivot on), solution (the solution to the simplex matrix).</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>list($simplexsets, $reachedlist, $runtime) = simplexsolve2($sm, "min")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$simplexsets, $reachedlist, $runtime = simplexsolve2($sm, "min")</pre></details>
 
 <h3 id="simplexver"><a name="simplexver">simplexver</a></h3>
 <p><strong>simplexver()</strong></p>
@@ -436,7 +436,7 @@ verified, then the program-supplied default value.</p>
 <li><strong>tablestyle</strong>: any additional styles for the table that you may want, like "color:#40B3DF;". Default none.</li>
 </ul>
 <p><em>Returns:</em> a string that is a valid HTML table syntax for display.</p>
-<details class="example"><summary>Examples</summary><pre>echo simplexdisplaytable($sm)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$t = simplexdisplaytable($sm)</pre></details>
 
 <h3 id="simplexnumberofsolutions"><a name="simplexnumberofsolutions">simplexnumberofsolutions</a></h3>
 <p>***** DEPRECATED *****</p>
@@ -466,5 +466,5 @@ verified, then the program-supplied default value.</p>
 <li><strong>smlist</strong>: an array of simplex matrices, with <code>sma[0]</code> = initial simplex matrix, <code>sma[1]</code> = the result of the first pivot, <code>sma[2]</code> = the result of the second pivot, <code>sma[3]</code> = the result of the third pivot, etc.</li>
 <li><strong>pivotlist</strong>: an array of pivot points, with <code>pivotlist[0][0]</code> = the pivot used for the first pivot, <code>pivotlist[0][1]</code> = if exists, another possible pivot point for this step, <code>pivotlist[1][0]</code> = the pivot used for the second pivot, <code>pivotlist[2][0]</code> = the pivot used for the third pivot, etc.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>list($solutionlist, $smlist, $pivotlist) = simplexsolve($sm, "max")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$solutionlist, $smlist, $pivotlist = simplexsolve($sm, "max")</pre></details>
 </body></html>

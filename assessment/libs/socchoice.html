@@ -23,7 +23,7 @@
 <li><strong>seats</strong>: number of seats to apportion.</li>
 <li><strong>method</strong>: method to use: "hamilton", "jefferson", "adams", "webster", "huntington", "lowndes".</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$seats = apportion(array(150,300,550), 20, "hamilton")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$seats = apportion(array(150,300,550), 21, "hamilton") // [3,6,12]</pre></details>
 
 <h3 id="apportion_info"><a name="apportion_info">apportion_info</a></h3>
 <p><strong>apportion_info(populations, seats, method)</strong></p>
@@ -40,7 +40,13 @@
 <li>3) an array of geometric means (huntington); an array of decimal/whole ratios (lowndes); an array of decimal remainders (hamilton); nothing (others)</li>
 <li>4) valid modified divisors, in interval notation (jefferson, adams, webster)</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>list($divisor, $quotas, $initial, $extra, $moddivisors) = apportion_info(array(150,300,550), 20, "hamilton")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$divisor, $quotas, $initial, $extra, $moddiv = apportion_info(array(150,300,550), 21, "jefferson")
+// $divisor = 47.619
+// $quotas = [3.15, 6.3, 11.55]
+// $initial (lower quotas) = [3,6,11]
+// $extra = [] nothing for jeffersons
+// $moddiv = "(42.857,45.8333]" divisors that would work
+</pre></details>
 
 <h3 id="banzhafpower"><a name="banzhafpower">banzhafpower</a></h3>
 <p><strong>banzhafpower(weights, quota, [format])</strong></p>
@@ -51,8 +57,8 @@
 <li><strong>format</strong>: defaults to decimal power index values. "counts": power counts, "frac": power index as fraction strings.</li>
 </ul>
 <p>Based on <a href="http://www.hippasus.com/resources/socialsoftware/banzhaf.py">http://www.hippasus.com/resources/socialsoftware/banzhaf.py</a> (CC-BY)</p>
-<details class="example"><summary>Examples</summary><pre>$power = banzhafpower(array(6,3,2), 7)
-$counts = banzhafpower(array(6,3,2), 7, "counts")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$power = banzhafpower(array(6,3,2), 7) // [.6,.2,.2]
+$counts = banzhafpower(array(6,3,2), 7, "counts") // [3,1,1]</pre></details>
 
 <h3 id="shapleyshubikpower"><a name="shapleyshubikpower">shapleyshubikpower</a></h3>
 <p><strong>shapleyshubikpower(weights, quota, [format])</strong></p>
@@ -62,5 +68,5 @@ $counts = banzhafpower(array(6,3,2), 7, "counts")</pre></details>
 <li><strong>quota</strong>: voting system quota.</li>
 <li><strong>format</strong>: defaults to decimal power index values. "counts": power counts, "frac": power index as fraction strings.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$power = shapleyshubikpower(array(6,3,2), 7)</pre></details>
+<details class="example"><summary>Examples</summary><pre>$power = shapleyshubikpower(array(6,3,2), 7) // ~[.667,.127,.167]</pre></details>
 </body></html>

@@ -131,7 +131,7 @@ $eqn = chem_eqndisp(array("H_2","O_2"), array("H_2 O"), $coeffs)
 <p><strong>chem_getrandcompound(type)</strong></p>
 <p>Returns an array of (compound name, compound formula).</p>
 <p>Valid types are: twobasic, twosub, threeplus, parens. If type is not supplied, compound is chosen randomly from all.</p>
-<details class="example"><summary>Examples</summary><pre>list($name, $formula) = chem_getrandcompound("twobasic")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$name, $formula = chem_getrandcompound("twobasic") // eg "Lithium bromide", "Li Br"</pre></details>
 
 <h3 id="chem_getdiffrandcompounds"><a name="chem_getdiffrandcompounds">chem_getdiffrandcompounds</a></h3>
 <p><strong>chem_getdiffrandcompounds(n, type)</strong></p>
@@ -142,7 +142,7 @@ $eqn = chem_eqndisp(array("H_2","O_2"), array("H_2 O"), $coeffs)
 <h3 id="chem_decomposecompound"><a name="chem_decomposecompound">chem_decomposecompound</a></h3>
 <p><strong>chem_decomposecompound(compound)</strong></p>
 <p>Breaks a compound into an array of elements and an array of atom counts.</p>
-<details class="example"><summary>Examples</summary><pre>list($elements, $counts) = chem_decomposecompound("H2O")
+<details class="example"><summary>Examples</summary><pre>$elements, $counts = chem_decomposecompound("H2O")
 // $elements = array("H","O"); $counts = array(2,1)</pre></details>
 
 <h3 id="chem_getcompoundmolmass"><a name="chem_getcompoundmolmass">chem_getcompoundmolmass</a></h3>
@@ -161,7 +161,7 @@ $eqn = chem_eqndisp(array("H_2","O_2"), array("H_2 O"), $coeffs)
 <li><strong>include uncommon</strong>: set true to include francium, radium, cadmium, etc.</li>
 </ul>
 <p>Returns <code>array(symbol, charge, name)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($symbol, $charge, $name) = chem_randcation("basic")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$symbol, $charge, $name = chem_randcation("basic")</pre></details>
 
 <h3 id="chem_randanion"><a name="chem_randanion">chem_randanion</a></h3>
 <p><strong>chem_randanion([group, name type, include uncommon])</strong></p>
@@ -171,7 +171,7 @@ $eqn = chem_eqndisp(array("H_2","O_2"), array("H_2 O"), $coeffs)
 <li><strong>include uncommon</strong>: set true to include selenide, peroxide.</li>
 </ul>
 <p>Returns <code>array(symbol, charge, name)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($symbol, $charge, $name) = chem_randanion("polyatomic")</pre></details>
+<details class="example"><summary>Examples</summary><pre>$symbol, $charge, $name = chem_randanion("polyatomic")</pre></details>
 
 <h3 id="chem_makeioniccompound"><a name="chem_makeioniccompound">chem_makeioniccompound</a></h3>
 <p><strong>chem_makeioniccompound(cation, anion)</strong></p>
@@ -179,7 +179,8 @@ $eqn = chem_eqndisp(array("H_2","O_2"), array("H_2 O"), $coeffs)
 <p>Returns <code>array(formula, name)</code>.</p>
 <details class="example"><summary>Examples</summary><pre>$cation = chem_randcation("basic")
 $anion = chem_randanion("simple")
-list($formula, $name) = chem_makeioniccompound($cation, $anion)</pre></details>
+$formula, $name = chem_makeioniccompound($cation, $anion)
+// e.g. "Ag Cl", "silver chloride"</pre></details>
 
 <h3 id="chem_getsolubility"><a name="chem_getsolubility">chem_getsolubility</a></h3>
 <p><strong>chem_getsolubility(cation, anion)</strong></p>
@@ -193,7 +194,7 @@ list($formula, $name) = chem_makeioniccompound($cation, $anion)</pre></details>
 <p>Returns <code>array(stateName, abbreviation)</code>.</p>
 <details class="example"><summary>Examples</summary><pre>$cation = chem_randcation("basic")
 $anion = chem_randanion("simple")
-list($state, $abbr) = chem_getsolubility($cation, $anion)</pre></details>
+$state, $abbr = chem_getsolubility($cation, $anion)</pre></details>
 
 <h3 id="chem_balancereaction"><a name="chem_balancereaction">chem_balancereaction</a></h3>
 <p><strong>chem_balancereaction(reactants, products)</strong></p>
@@ -229,6 +230,6 @@ list($state, $abbr) = chem_getsolubility($cation, $anion)</pre></details>
     <li>Polarity (assuming equal electronegativity)</li>
     <li>Hybridization of central atom</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>chem_vsepr(3, 2)  // array('Bent', 'Trigonal Planar', '&#60;120', 'Polar', 'sp^2')</pre></details>
+<details class="example"><summary>Examples</summary><pre>chem_vsepr(3, 1)  // array('Bent', 'Trigonal Planar', '&lt;120', 'Polar', 'sp^2')</pre></details>
 </body>
 </html>

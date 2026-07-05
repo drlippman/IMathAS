@@ -62,7 +62,9 @@ if ($stua != null) {
 
 <h3 id="vmsetup"><a name="vmsetup">vmsetup</a></h3>
 <p><strong>vmsetup(vm name, parameters, width, height, question number, [part number])</strong></p>
-<p>Sets up a virtual manipulative iframe.</p>
+<p>Sets up a virtual manipulative iframe. This function is only needed for custom manipulatives; for 
+  existing ones using the specific setup functions described later in the help.
+</p>
 <ul>
   <li><strong>vm name</strong> is the name of a VM on the OERVM AWS site, or a URL to another VM.</li>
   <li><strong>parameters</strong> is an associative array of parameters to be passed to the VM in the query string.</li>
@@ -70,7 +72,6 @@ if ($stua != null) {
   <li><strong>qn</strong>: use $thisq.</li>
   <li><strong>part</strong>: if a multipart or conditional question, put the part index.</li>
 </ul>
-<details class="example"><summary>Examples</summary><pre>$vm = vmsetup("numberline", array('min'=>-10,'max'=>10), 500, 100, $thisq)</pre></details>
 
 <h3 id="vmgetparam"><a name="vmgetparam">vmgetparam</a></h3>
 <p><strong>vmgetparam(parameter string, parameter name)</strong></p>
@@ -113,7 +114,7 @@ questions, or <code>1000*$thisq + (part index)</code> for multi-part.</p>
 <p><strong>vmchipmodelgetcount(stuans)</strong></p>
 <p>Returns an array <code>array(poscount,negcount)</code> of the count of positive and
 negative chips in the drop region.</p>
-<details class="example"><summary>Examples</summary><pre>list($pos, $neg) = vmchipmodelgetcount($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$pos, $neg = vmchipmodelgetcount($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmsetupnumbertiles"><a name="vmsetupnumbertiles">vmsetupnumbertiles</a></h3>
 <p><strong>vmsetupnumbertiles(stuans, qn, [part])</strong></p>
@@ -124,7 +125,7 @@ negative chips in the drop region.</p>
 <p><strong>vmnumbertilesgetcount(stuans)</strong></p>
 <p>Returns an array <code>array(hundredcount,tencount,onecount)</code> of the count of
 hundred blocks, ten blocks, and ones blocks in the drop area.</p>
-<details class="example"><summary>Examples</summary><pre>list($hun, $ten, $ones) = vmnumbertilesgetcount($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$hun, $ten, $ones = vmnumbertilesgetcount($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmsetupitemsort"><a name="vmsetupitemsort">vmsetupitemsort</a></h3>
 <p><strong>vmsetupitemsort(tosort, cats, stuans, qn, [part, width])</strong></p>
@@ -154,7 +155,7 @@ hundred blocks, ten blocks, and ones blocks in the drop area.</p>
 <h3 id="vmnumberlineadditiongetvals"><a name="vmnumberlineadditiongetvals">vmnumberlineadditiongetvals</a></h3>
 <p><strong>vmnumberlineadditiongetvals(stuans)</strong></p>
 <p>Returns <code>array(value of first dot, value of sum)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($first, $sum) = vmnumberlineadditiongetvals($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$first, $sum = vmnumberlineadditiongetvals($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmsetupnumberline"><a name="vmsetupnumberline">vmsetupnumberline</a></h3>
 <p><strong>vmsetupnumberline(stuans, qn, [part, snap])</strong></p>
@@ -169,7 +170,7 @@ $vm2 = vmsetupnumberline($stuanswers[$thisq], $thisq, null, "false")</pre></deta
 <h3 id="vmnumberlinegetvals"><a name="vmnumberlinegetvals">vmnumberlinegetvals</a></h3>
 <p><strong>vmnumberlinegetvals(stuans)</strong></p>
 <p>Returns <code>array(scale, value of dot)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($scale, $val) = vmnumberlinegetvals($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$scale, $val = vmnumberlinegetvals($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmsetupnumberlineinterval"><a name="vmsetupnumberlineinterval">vmsetupnumberlineinterval</a></h3>
 <p><strong>vmsetupnumberlineinterval(stuans, qn, [part])</strong></p>
@@ -180,7 +181,7 @@ $vm2 = vmsetupnumberline($stuanswers[$thisq], $thisq, null, "false")</pre></deta
 <p><strong>vmnumberlineintervalgetvals(stuans)</strong></p>
 <p>Returns <code>array(scale, left endpoint value, right endpoint value, left type, right type)</code>.</p>
 <p>Types are 1 = arrow, 2 = paren, 3 = square bracket, 4 = none.</p>
-<details class="example"><summary>Examples</summary><pre>list($scale, $left, $right, $ltype, $rtype) = vmnumberlineintervalgetvals($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$scale, $left, $right, $ltype, $rtype = vmnumberlineintervalgetvals($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmsetupfractionline"><a name="vmsetupfractionline">vmsetupfractionline</a></h3>
 <p><strong>vmsetupfractionline([stuans, qn, part])</strong></p>
@@ -190,7 +191,7 @@ $vm2 = vmsetupnumberline($stuanswers[$thisq], $thisq, null, "false")</pre></deta
 <h3 id="vmgetfractionlinevals"><a name="vmgetfractionlinevals">vmgetfractionlinevals</a></h3>
 <p><strong>vmgetfractionlinevals(stuans)</strong></p>
 <p>Returns <code>array(numerator, denominator)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($num, $denom) = vmgetfractionlinevals($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$num, $denom = vmgetfractionlinevals($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmsetupfractioncompare"><a name="vmsetupfractioncompare">vmsetupfractioncompare</a></h3>
 <p><strong>vmsetupfractioncompare([stuans, qn, part])</strong></p>
@@ -200,7 +201,7 @@ $vm2 = vmsetupnumberline($stuanswers[$thisq], $thisq, null, "false")</pre></deta
 <h3 id="vmgetfractioncompareval"><a name="vmgetfractioncompareval">vmgetfractioncompareval</a></h3>
 <p><strong>vmgetfractioncompareval(stuans)</strong></p>
 <p>Returns <code>array(numerator, denominator)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($num, $denom) = vmgetfractioncompareval($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$num, $denom = vmgetfractioncompareval($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmsetupfractionmult"><a name="vmsetupfractionmult">vmsetupfractionmult</a></h3>
 <p><strong>vmsetupfractionmult([stuans, qn, part])</strong></p>
@@ -210,7 +211,7 @@ $vm2 = vmsetupnumberline($stuanswers[$thisq], $thisq, null, "false")</pre></deta
 <h3 id="vmgetfractionmultvals"><a name="vmgetfractionmultvals">vmgetfractionmultvals</a></h3>
 <p><strong>vmgetfractionmultvals(stuans)</strong></p>
 <p>Returns <code>array(horiz numerator, horiz denominator, vert num, vert denom)</code>.</p>
-<details class="example"><summary>Examples</summary><pre>list($hnum, $hdenom, $vnum, $vdenom) = vmgetfractionmultvals($stuanswers[$thisq])</pre></details>
+<details class="example"><summary>Examples</summary><pre>$hnum, $hdenom, $vnum, $vdenom = vmgetfractionmultvals($stuanswers[$thisq])</pre></details>
 
 <h3 id="vmdrawinchruler"><a name="vmdrawinchruler">vmdrawinchruler</a></h3>
 <p><strong>vmdrawinchruler([max, val, width, height])</strong></p>

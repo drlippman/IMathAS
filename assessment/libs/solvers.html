@@ -15,11 +15,11 @@
 <h3 id="bisectionsolve"><a name="bisectionsolve">bisectionsolve</a></h3>
 <p><strong>bisectionsolve(function, xmin, xmax)</strong></p>
 <p>Applies bisection to find a root of the function on the interval [xmin, xmax]. This function only works if there is exactly one root in the interval.</p>
-<details class="example"><summary>Examples</summary><pre>$root = bisectionsolve("x^2-2", 0, 2)  // approximately 1.41421356</pre></details>
+<details class="example"><summary>Examples</summary><pre>$root = bisectionsolve("e^x-x^2", -3, 0)  // ~ -0.703467</pre></details>
 
 <h3 id="discretenewtons"><a name="discretenewtons">discretenewtons</a></h3>
 <p><strong>discretenewtons(function, xmin, xmax, [guess])</strong></p>
 <p>Applies a discrete form of Newton's method to find a root of the function on the interval [xmin, xmax]. Starts at the midpoint of the interval, or at <code>guess</code> if provided. If the method fails to converge, or converges outside the interval, the method returns null. Make sure the function uses the variable <code>x</code>.</p>
-<details class="example"><summary>Examples</summary><pre>$root = discretenewtons("x^3-x-2", 1, 2)
+<details class="example"><summary>Examples</summary><pre>$root = discretenewtons("x^3-x-2", 1, 2) // 1.521379
 $root2 = discretenewtons("x^3-x-2", 1, 2, 1.5)  // starting from guess of 1.5</pre></details>
 </body></html>
