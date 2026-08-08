@@ -2332,6 +2332,8 @@ $n = randfrom("2,4,6,8")             // might return 4
 
 $arr = [10,20,30]
 $val = randfrom($arr)                // might return 20</pre></details></li>
+<li><strong>randkeyfrom(array)</strong>: Return a random key from the array.
+  <details class="example"><summary>Example</summary><pre>$x = randkeyfrom(["a"=>"A", "b"=>"B", "c"=>"C"])  // e.g. $x="b"</pre></details></li>
 <li><strong>randname(),randmalename(),randfemalename()</strong>:  Returns a random first name
   <details class="example"><summary>Example</summary><pre>$name = randname()       // might return "Sofia"
 $name = randmalename()   // might return "Carlos"
@@ -2369,6 +2371,9 @@ $a,$b = nonzerorands(-3,3,2,'inc')  // sorted: -1, 2</pre></details></li>
   <details class="example"><summary>Example</summary><pre>$a,$b = randsfrom("red,green,blue,yellow", 2)  // e.g. "blue", "red"
 $arr = [2,4,6,8]
 $a,$b = randsfrom($arr, 2, 'inc');         // sorted ascending, e.g. 2, 6</pre></details></li>
+<li><strong>randkeysfrom(array,n)</strong>: Return n random keys from the array.
+  <details class="example"><summary>Example</summary><pre>$arr = [0=>'x_0', 1=>'x_1', 2=>'x_2', 3=>'x_3']
+$a,$b = randkeysfrom($arr, 2);  // e.g., $a=2, $b=0</pre></details></li>
 <li><strong>jointrandfrom(list/array,list/array,[list/array,...])</strong>:  Returns one element from each list, where the location used in each list is the same
   <details class="example"><summary>Example</summary><pre>$first,$last = jointrandfrom("Alice,Bob,Carlos", "Smith,Jones,Rivera")
 // picks the same index from each list, so names stay paired:
