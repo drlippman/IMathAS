@@ -1458,9 +1458,9 @@ function roundForDisp(val) {
         return val.map(roundForDisp);
     } else if (typeof val == 'number') {
         if (Math.abs(val) < 1) {
-            return val.toPrecision(4).replace(/\.?0+$/,'');
+            return val.toPrecision(4).replace(/\.?0+(?=[eE]|$)/,'');
         } else {
-            return val.toFixed(4).replace(/\.?0+$/,'');
+            return val.toFixed(4).replace(/\.0+$/,'').replace(/(\.\d*[1-9])0+$/,'$1');
         }
     } else {
         return val;
