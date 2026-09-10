@@ -168,7 +168,8 @@ if ($myrights<20) {
       'scorenonzero' => array(($qn+1) => -1),
       'scoreiscorrect' => array(($qn+1) => -1),
       'partattemptn' => array($qn => array()),
-      'rawscores' => array($qn => array())
+      'rawscores' => array($qn => array()),
+	  'useda11yalt' => array($qn => false)
     );
   }
   $a2->setState($state);
@@ -554,6 +555,11 @@ if ($overwriteBody==1) {
     'showallparts' => ($hasSeqParts && !empty($_GET['showallparts'])),
     'showteachernotes' => true
   ]);
+  //update useda11yalt if changed
+  if ($disp['useda11yalt'] != $state['useda11yalt'][$qn]) {
+	$state['useda11yalt'][$qn] = $disp['useda11yalt'];
+	$a2->setState($state);
+  }
   $gentime = microtime(true) - $starttime;
   if (isset($_SESSION['userprefs']['useeqed']) && $_SESSION['userprefs']['useeqed'] == 0) {
       $disp['jsparams']['noMQ'] = true;
