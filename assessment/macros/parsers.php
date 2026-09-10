@@ -7,7 +7,8 @@
 
 array_push(
     $GLOBALS['allowedmacros'],
-    'parseNtuple'
+    'parseNtuple',
+    'parseInterval'
 );
 
 /*

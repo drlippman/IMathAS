@@ -11,6 +11,7 @@ array_push(
     'comparelogic',
     'comparesetexp',
     'comparentuples',
+    'compareintervals',
     'comparenumberswithunits',
     'comparesameform',
     'comparecomplex',
@@ -644,6 +645,105 @@ function comparentuples() {
     }
     if ($correct == $dim) {
         return true;
+    }
+}
+
+function compareintervals() {
+    $list = false;
+    $args = func_get_args();
+    if (in_array("list", $args)) {
+        $list = true;
+        unset($args[array_search("list", $args)]);
+        $args = array_values($args);
+    }
+
+    $inta = $args[0];
+    $intb= $args[1];
+
+    if (count($args)<2) {
+        echo 'Eek! compareintervals needs two intervals to compare.';
+        return false;
+    }
+    $abstolerance = false;
+    if (!isset($args[2])) {
+        $args[2] = '0.001';
+    }
+    $tol = $args[2];
+    if ($tol[0] === '|') {
+        $abstolerance = true;
+        $tol = substr($tol,1);
+    }
+    $parseda = parseInterval($inta, $list);
+    $parsedb = parseInterval($intb, $list);
+
+    if (empty($parseda) || empty($parsedb)) {
+        return false;
+    }
+    $pairScored = array();
+    foreach ($parsedb as $j=>$ansint) {
+        $pairScored[$j] = array();
+        foreach ($parseda as $k=>$gansint) {
+            $pairScored[$j][$k] = 0;
+            // check brackets
+            if ($ansint['lb']!=$gansint['lb']) {
+                continue;
+            }
+            if ($ansint['rb']!=$gansint['rb']) {
+                continue;
+            }
+            list($anssn, $ansen) = $ansint['vals'];
+            list($ganssn, $gansen) = $gansint['vals'];
+            if (!is_numeric($anssn) || !is_numeric($ganssn)) {
+                if ($anssn !== $ganssn) {
+                    continue;
+                }
+            } else if ($abstolerance !== false) {
+                if (abs($anssn-$ganssn) > $tol + 1E-12) {
+                    continue;
+                }
+            } else {
+                if (abs($anssn - $ganssn)/(abs($anssn)+.0001) > $tol + 1E-12) {
+                    continue;
+                }
+            }
+            if (!is_numeric($ansen) || !is_numeric($gansen)) {
+                if ($ansen !== $gansen) {
+                    continue;
+                }
+            } else if ($abstolerance !== false) {
+                if (abs($ansen-$gansen) > $tol + 1E-12) {
+                    continue;
+                }
+            } else {
+                if (abs($ansen - $gansen)/(abs($ansen)+.0001) > $tol + 1E-12) {
+                    continue;
+                }
+            }
+            $pairScored[$j][$k] = 1;
+        }
+    }
+    for ($i=0;$i<count($pairScored);$i++) {
+        arsort($pairScored[$i]);
+    }
+    uasort($pairScored, function($a,$b) {
+        return (reset($a) < reset($b));
+    });
+    $thisScore = 0;
+    $matchedGiven = array();
+    foreach ($pairScored as $j=>$arr) { // foreach ans
+        foreach ($arr as $k=>$v) { // look at pairwise score with given
+            if ($v == 0) { break; }  // sorted, so if we hit 0 abort
+            if (!in_array($k, $matchedGiven)) { // found a score, use it
+                $matchedGiven[] = $k;
+                $thisScore += $v;
+                break;
+            }
+        }
+    }
+    if ($thisScore == count($parseda) && $thisScore == count($parsedb)) {
+        return true;
+    } else {
+        return false;
     }
 }
 
