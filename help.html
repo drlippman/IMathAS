@@ -2358,6 +2358,20 @@ $a = ($b==0 ? 5 : 2)</pre></details></li>
 for ($i=0; $i &lt; 5; $i++) { // do stuff }</pre></details></li>
 <li><strong>+=, -=, *=, /=</strong>:  Assignment with calculation
   <details class="example"><summary>Example</summary><pre>$a += 2   // Increases $a by 2</pre></details></li>
+<li><strong>[]</strong>: Define array, add to array, access array element, access string element
+  <details class="example"><summary>Example</summary><pre>$a = [3,4,5]   // defines an array
+$a[] = 7  // Adds element to array, now [3,4,5,7]
+$a[1]     // 4.  Accesses element index 1
+$b = "abcd"
+$b[2]     // "c". Character index 2 in string
+</pre></details></li>
+<li><strong>[][]</strong>: Multidimensional array 
+<details class="example"><summary>Example</summary><pre>$a = [[1,2],[3,4]]   // defines a multidimentional array 
+$a[2] = [5,6]  // adds a new row 
+$a[0]          // [1,2].  returns array of row index 0
+$a[0][1]       // 2. accesses row index 0, column index 1
+$a[2][1]       // 6. accesses row index 2, column index 1
+</pre></details></li>
 </ul>
 
 </div> <!-- h2 -->
