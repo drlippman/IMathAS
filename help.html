@@ -123,6 +123,7 @@
 		<li><a href="#arrassign">Array assignment</a></li>
 		<li><a href="#conditionals">Conditionals</a></li>
 		<li><a href="#loops">Loops</a></li>
+		<li><a href="#operators">Operators</a></li>
 	</ul></li>
 	<li><a href="#randomizers">Randomizers</a></li>
 	<li><a href="#graphtablemacros">Graph/Table Macros</a></li>
@@ -2245,6 +2246,15 @@ for ($i=0..4) {
 }
 </pre>
 
+<p>There is a second format available:</p>
+<pre>for (expr1; expr2; expr3) { action }</pre>
+<p>In this format, expr1 is evaluated at the beginning of the loop, to initialize things. 
+	In each loop, expr2 is a condition that is evaluated and the loop continues if it's true. 
+	At the end of each loop expr3 is evaluated to increment things. A typical example would be:</p>
+<pre>for ($i=0; $i &lt; 5; $i++) { action }</pre>
+<p>This initializes $i at 0, increments it by 1 each loop, and continues as long as $i is less than 5.</p>
+
+
 <h4>foreach</h4>
 <p>For associative arrays (arrays with non-numeric or non-consecutive keys) you can use a "foreach" loop:</p>
 
@@ -2303,6 +2313,52 @@ for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
    any further code in the block.
 </p>
 
+<h3 id="operators">Operators</h3>
+<p>Many of these operators are described in more detail in the "Working with Strings", "Conditionals", 
+	and "Math Entry" sections of the documentation, but here is a summary.</p>
+<ul>
+<li><strong>=</strong>:  Assignment 
+  <details class="example"><summary>Example</summary><pre>$a = 6        // assigns 6 to the variable $a</pre></details></li>
+<li><strong>+-*/^</strong>:  Math operators
+  <details class="example"><summary>Example</summary><pre>$a = 3*2^2        // 12</pre></details></li>
+<li><strong>%</strong>:  Modulus
+  <details class="example"><summary>Example</summary><pre>$a = 23%4        // 3</pre></details></li>
+<li><strong>!</strong>:  Factorial, or logical "not"
+  <details class="example"><summary>Example</summary><pre>$a = 3!        // factorial
+$a = $a && !$b   // logical "a and not b"</pre></details></li>
+<li><strong>&&</strong>:  Logical "and"
+  <details class="example"><summary>Example</summary><pre>$a = ($b%2==0 && $b>4)</pre></details></li>
+<li><strong>||</strong>:  Logical "or"
+  <details class="example"><summary>Example</summary><pre>$a = ($b%2==0 || $b==3)</pre></details></li>
+<li><strong>==</strong>:  Comparison equivalent
+  <details class="example"><summary>Example</summary><pre>3 == 6/2  // true
+3 == "3" // true, == doesn't consider type
+0 == false  // true</pre></details></li>
+<li><strong>===</strong>:  Comparison identical
+  <details class="example"><summary>Example</summary><pre>3 === 3  // true
+3 === "3" // false, not same type
+0 === false  // false, not same type</pre></details></li>
+<li><strong>!=</strong>:  Comparison not equivalent</li>
+<li><strong>!==</strong>:  Comparison not identical</li>
+<li><strong>&lt;, &le;, &gt;, &ge;</strong>:  Comparison operators</li>
+<li><strong>.</strong>:  String concatenation
+  <details class="example"><summary>Example</summary><pre>$a = "hi" . "there"   // "hithere"</pre></details></li>
+<li><strong>.=</strong>:  Assignment with string concatenation
+  <details class="example"><summary>Example</summary><pre>$a = "hi"
+$a .= "there"  // "hithere"</pre></details></li>
+<li><strong>??</strong>:  Null coalescing (alternate if undefined)
+  <details class="example"><summary>Example</summary><pre>// this will assign the $stuanswers[$thisq] value if defined, or 3 if not defined
+$a = $stuanswers[$thisq] ?? 3 </pre></details></li>
+<li><strong>? :</strong>:  Ternary (if-then)
+  <details class="example"><summary>Example</summary><pre>// assigns 5 if $b==0, 2 otherwise 
+$a = ($b==0 ? 5 : 2)</pre></details></li>
+<li><strong>++, --</strong>:  Increment/decrement
+  <details class="example"><summary>Example</summary><pre>$a--     // decreases value of $a by 1 
+// often used in three-part "for" loops
+for ($i=0; $i &lt; 5; $i++) { // do stuff }</pre></details></li>
+<li><strong>+=, -=, *=, /=</strong>:  Assignment with calculation
+  <details class="example"><summary>Example</summary><pre>$a += 2   // Increases $a by 2</pre></details></li>
+</ul>
 
 </div> <!-- h2 -->
 <div class=h2>
