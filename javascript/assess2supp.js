@@ -46,8 +46,37 @@ function submitq(qn) {
         $("#state").val(data.state);
         showerrors(data.errors);
         if (msg.disp) {
-            $("#results"+qn).html(_("Score: ")+data.score);
-            showandinit(qn, msg.disp);
+          if (msg.disp.hidescoreval != 1) {
+            if (msg.disp.hidescoreval == 2) {
+              let resmsg = '';
+              if (data.score > .99) {
+                resmsg = window.correctmsg ?? _('Correct');
+              } else {
+                if (data.score > .01) {
+                  resmsg = window.partcorrectmsg ??_('Partially Correct');
+                } else {
+                  resmsg = window.incorrectmsg ??_('Incorrect');
+                }
+                let cantryagain = true;
+                if (msg.disp.jsparams?.partatt) {
+                  cantryagain = false;
+                  for (let i=0; i<msg.disp.jsparams.partatt.length; i++) {
+                    if (msg.disp.jsparams.partatt[i] < msg.disp.jsparams.maxtries) {
+                      cantryagain = true;
+                      break;
+                    }
+                  }
+                }
+                if (cantryagain) {
+                  resmsg += ' - ' + _('Try Again');
+                }
+              }
+              $("#results"+qn).text(resmsg);
+            } else {
+              $("#results"+qn).html(_("Score: ")+data.score);
+            }
+          }
+          showandinit(qn, msg.disp);
         } else {
             $("#results"+qn).html(_('Question Submitted'));
             $("#questionwrap"+qn).empty();

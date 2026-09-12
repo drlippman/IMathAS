@@ -1,5 +1,4 @@
 <?php
-
 // embedq2.php: Embed one question via an iframe
 // Operates without requiring login
 // Can passback results to embedding page
@@ -214,6 +213,21 @@ if (isset($QS['hidescoreval'])) {
 } else {
     $state['hidescoreval'] = 0;
 }
+if (isset($QS['correctmsg'])) {
+    $state['correctmsg'] = $QS['correctmsg'];
+} else {
+    $state['correctmsg'] = false;
+}
+if (isset($QS['incorrectmsg'])) {
+    $state['incorrectmsg'] = $QS['incorrectmsg'];
+} else {
+    $state['incorrectmsg'] = false;
+}
+if (isset($QS['partcorrectmsg'])) {
+    $state['partcorrectmsg'] = $QS['partcorrectmsg'];
+} else {
+    $state['partcorrectmsg'] = false;
+}
 if (!empty($QS['scroll'])) {
     $state['scroll'] = ($QS['scroll'] ? 1 : 0);
 } else {
@@ -264,8 +278,10 @@ if (isset($_POST['toscoreqn'])) {
 
     if ($state['showscoredonsubmit'] || (!$res['allans'] && $state['autoseq'])) {
         $disp = $a2->displayQuestion($qn, $overrides);
+        $disp['hidescoreval'] = $state['hidescoreval'];
         $out['disp'] = $disp;
     }
+
     echo json_encode($out);
     exit;
 }
@@ -282,6 +298,8 @@ if ($disp['useda11yalt'] != $state['useda11yalt'][$qn]) {
 if ($state['submitall']) {
     $disp['jsparams']['submitall'] = 1;
 }
+
+$disp['hidescoreval'] = $state['hidescoreval'];
 
 // if ajax load of question, return values now
 if (isset($_POST['ajax'])) {
@@ -317,7 +335,7 @@ if (!empty($CFG['assess2-use-vue-dev'])) {
     $placeinhead .= '<script src="' . $staticroot . '/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
 }
 
-$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=092224" type="text/javascript"></script>';
+$placeinhead .= '<script src="' . $staticroot . '/javascript/assess2supp.js?v=091126" type="text/javascript"></script>';
 $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mathquill-basic.css?v=070726">
   <link rel="stylesheet" type="text/css" href="' . $staticroot . '/mathquill/mqeditor.css?v=020226">';
 
@@ -325,7 +343,19 @@ $placeinhead .= '<link rel="stylesheet" type="text/css" href="' . $staticroot . 
 $placeinhead .= '<script type="text/javascript">
   var frame_id = "' . $frameid . '";
   var qsid = '.$qsid.';
-  var thisqn = '.$qn.';
+  var thisqn = '.$qn.';';
+  
+if ($state['correctmsg'] !== false) {
+    $placeinhead .= 'var correctmsg = "' . Sanitize::encodeStringForJavascript($state['correctmsg']) . '";';
+}
+if ($state['incorrectmsg'] !== false) {
+    $placeinhead .= 'var incorrectmsg = "' . Sanitize::encodeStringForJavascript($state['incorrectmsg']) . '";';  
+} 
+if ($state['partcorrectmsg'] !== false) {
+    $placeinhead .= 'var partcorrectmsg = "' . Sanitize::encodeStringForJavascript($state['partcorrectmsg']) . '";';
+}
+
+$placeinhead .= '
   function sendresizemsg() {
    if(inIframe()){
       var default_height = Math.max(
@@ -360,15 +390,6 @@ $placeinhead .= '<script type="text/javascript">
     });
   if (mathRenderer == "Katex") {
      window.katexDoneCallback = sendresizemsg;
-  } else if (typeof MathJax != "undefined") {
-    if (MathJax.startup) {
-        MathJax.startup.promise = MathJax.startup.promise.then(sendresizemsg);
-    } else if (MathJax.Hub) {
-        MathJax.Hub.Queue(function () {
-            sendresizemsg();
-        });
-        MathJax.Hub.Register.MessageHook("End Process", sendresizemsg);
-    } 
   } else {
       $(function() {
           sendresizemsg();
@@ -423,7 +444,7 @@ require_once "./header.php";
 echo '<a href="embedq2prefs.php" target="_blank" class="sr-only">'._('Edit display preferences').'</a>';
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 echo '<div class="questionwrap">';
-if (!$state['jssubmit'] && !$state['hidescoreval']) {
+if (!$state['jssubmit'] && $state['hidescoreval'] != 1) {
     echo '<div id="results'.$qn.'"></div>';
 }
 echo '<div class="questionpane">';
