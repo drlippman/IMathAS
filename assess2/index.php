@@ -78,11 +78,11 @@ if (preg_match('/Chrome\/(\d+)/', $_SERVER['HTTP_USER_AGENT'] ?? '', $matches)) 
     $isOldChrome = $chromeVersion < 105;
 }
 if ($isOldChrome) {
-  echo '<script defer="defer" src="'.$staticroot.'/assess2/vue/js/index-legacy.js?v=CUzKmQZU"></script>';
+  echo '<script defer="defer" src="'.$staticroot.'/assess2/vue/js/index-legacy.js?v=B6yw7Wxm"></script>';
 } else {
 ?>
-<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=NNp_aZuU"></script>
-<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/index-legacy.js?v=CUzKmQZU"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=cG0D8iuv"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/index-legacy.js?v=B6yw7Wxm"></script>
 <?php
 }
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">

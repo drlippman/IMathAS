@@ -37,7 +37,7 @@
 <script>
 export default {
   name: 'GbAllTries',
-  props: ['tries', 'qn', 'type', 'submitby'],
+  props: ['tries', 'qn', 'type', 'submitby', 'partcnt'],
   data: function () {
     return {
       rendered: false,
@@ -48,7 +48,11 @@ export default {
     processedTries () {
       const out = [];
       let pn, tn;
-      for (pn in this.tries) {
+      for (pn=0; pn < this.partcnt; pn++) {
+        if (!this.tries.hasOwnProperty(pn)) {
+          out[pn] = [];
+          continue;
+        }
         const partout = [];
         for (tn in this.tries[pn]) {
           if (typeof this.tries[pn][tn] === 'object' && this.tries[pn][tn][0] === 'draw') {

@@ -121,6 +121,7 @@
       :tries="qdata.other_tries"
       type="tries"
       :qn="qn"
+      :partcnt="qdata.answeights.length"
     />
     <gb-penalties
       v-if="showPenalties"
@@ -133,6 +134,7 @@
       type="autosave"
       :submitby="submitby"
       :qn="qn"
+      :partcnt="qdata.answeights.length"
     />
     <div v-if="showfull && qHelps.length > 0">
       {{ $t('gradebook-had_help') }}:
