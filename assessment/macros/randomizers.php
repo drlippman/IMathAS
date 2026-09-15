@@ -195,6 +195,9 @@ function randkeysfrom($lst, $n = 1) {
     if ($n <= 0) {
         echo "randkeysfrom: need n &gt; 0";
     }
+    if ($n > count($lst)) {
+        echo "randskeyfrom: need n &le; number of elements in array";
+    }
     if (count($lst) == 0) {
         echo 'cannot pick randkeysfrom empty array';
         return '';
