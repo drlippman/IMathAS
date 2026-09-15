@@ -13,10 +13,13 @@
 <li><a href="#baseconvert">baseconvert</a></li>
 <li><a href="#hexdec">hexdec</a></li>
 <li><a href="#dechex">dechex</a></li>
+<li><a href="#bindec">bindec</a></li>
+<li><a href="#decbin">decbin</a></li>
 <li><a href="#asciitodec">asciitodec</a></li>
 <li><a href="#dectoascii">dectoascii</a></li>
 <li><a href="#draw_mayan_number">draw_mayan_number</a></li>
 <li><a href="#draw_babylonian_number">draw_babylonian_number</a></li>
+<li><a href="#bitwise_xor">bitwise_xor</a></li>
 </ul>
 
 <h3 id="baseconvert"><a name="baseconvert">baseconvert</a></h3>
@@ -35,6 +38,16 @@ baseconvert("5,12,3", 16, 10)  // 1475. converts a base-16 number with places 5,
 <p><strong>dechex(a)</strong></p>
 <p>Converts a decimal number to a hexadecimal string.</p>
 <details class="example"><summary>Examples</summary><pre>dechex(26)  // "1A"</pre></details>
+
+<h3 id="bindec"><a name="bindec">bindec</a></h3>
+<p><strong>bindec(a)</strong></p>
+<p>Converts a binary string to a decimal number.</p>
+<details class="example"><summary>Examples</summary><pre>bindec("101")  // 5</pre></details>
+
+<h3 id="decbin"><a name="decbin">decbin</a></h3>
+<p><strong>decbin(a)</strong></p>
+<p>Converts a decimal number to a binary string.</p>
+<details class="example"><summary>Examples</summary><pre>decbin(5)  // "101"</pre></details>
 
 <h3 id="asciitodec"><a name="asciitodec">asciitodec</a></h3>
 <p><strong>asciitodec(char)</strong></p>
@@ -67,5 +80,13 @@ $img2 = draw_mayan_number(429, 80, "modified")</pre></details>
 </ul>
 <details class="example"><summary>Examples</summary><pre>$img = draw_babylonian_number(3661)
 $img2 = draw_babylonian_number(3661, 60, 1)</pre></details>
+
+<h3 id="bitwise_xor"><a name="bitwise_xor">bitwise_xor</a></h3>
+<p><strong>bitwise_xor(a,b)</strong></p>
+<p>Calculates the bitwise XOR of two decimal numbers. Complements the built-in bitwise "and" (&amp;) and "or" (|)</p>
+<details class="example"><summary>Examples</summary><pre>bitwise_xor(3,5)  // 6
+3 &amp; 5             // 1
+3 | 5             // 7
+</pre></details>
 </body>
 </html>

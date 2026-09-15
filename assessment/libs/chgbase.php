@@ -1,10 +1,11 @@
 <?php
 //A library of base changing functions.  
+// Version 1.2, Sept 2026, add decbin/bindec/bitwise_xor
 // Version 1.1, Aug 2025
 // Version 1.0, Nov 13, 2007
 
 global $allowedmacros;
-array_push($allowedmacros,"baseconvert","asciitodec","dectoascii","draw_mayan_number","draw_babylonian_number");
+array_push($allowedmacros,"baseconvert","asciitodec","dectoascii","draw_mayan_number","draw_babylonian_number","decbin","bindec","bitwise_xor");
 
 //baseconvert(num,from,to)
 //converts the number num from base-"from" to base-"to"
@@ -245,6 +246,10 @@ function gen_babylonian_ten($x,$y,$h) {
 	$ybh = $y - $h/2;
 	$yth = $y + $h/2;
 	return "path([[$xr,$yt],[$x,$y],[$xr,$yb]]);line([$xh,$yth],[$xh,$ybh]);";
+}
+
+function bitwise_xor($a,$b) {
+	return $a ^ $b;
 }
 
 ?>
