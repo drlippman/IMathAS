@@ -9,7 +9,9 @@ array_push(
     'rands',
     'rrands',
     'randfrom',
+    'randkeyfrom',
     'randsfrom',
+    'randkeysfrom',
     'jointrandfrom',
     'diffrandsfrom',
     'nonzerorand',
@@ -138,6 +140,23 @@ function randfrom($lst) {
 }
 
 
+function randkeyfrom($lst) {
+    if (func_num_args() != 1) {
+        echo "randkeyfrom expects 1 argument";
+        return 1;
+    }
+    if (!is_array($lst)) {
+        echo "randkeyfrom expects an array";
+        return 1;
+    }
+    if (count($lst) == 0) {
+        echo 'cannot pick randkeyfrom empty array';
+        return '';
+    }
+    return $GLOBALS['RND']->array_rand($lst, 1);
+}
+
+
 function randsfrom($lst, $n, $ord = 'def') {
     if (func_num_args() < 2) {
         echo "randsfrom expects 2 arguments";
@@ -160,6 +179,27 @@ function randsfrom($lst, $n, $ord = 'def') {
         rsort($r);
     }
     return $r;
+}
+
+
+function randkeysfrom($lst, $n = 1) {
+    if (func_num_args() < 1) {
+        echo "randkeysfrom expects at least 1 argument";
+        return 1;
+    }
+    if (!is_array($lst)) {
+        echo "randkeysfrom expects an array";
+        return 1;
+    }
+    $n = floor($n);
+    if ($n <= 0) {
+        echo "randkeysfrom: need n &gt; 0";
+    }
+    if (count($lst) == 0) {
+        echo 'cannot pick randkeysfrom empty array';
+        return '';
+    }
+    return $GLOBALS['RND']->array_rand($lst, $n);
 }
 
 
