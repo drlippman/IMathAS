@@ -227,8 +227,40 @@ if (!(isset($teacherid))) {
 
                 $stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
 				$stm->execute(array(':id'=>$cid));
-				$row = $stm->fetch(PDO::FETCH_NUM);
-				if ($row[0] != '') {
+				$oldoutcomes = $stm->fetchColumn(0);
+				$outcomesarr = unserialize($oldoutcomes);
+				if (!is_array($outcomesarr)) {
+					$outcomesarr = array();
+				}
+				$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$ctc));
+				$inoutcomes = $stm->fetchColumn(0);
+				$inoutcomesarr = unserialize($inoutcomes);
+				if (is_array($inoutcomesarr)) {
+					function mapoutcomes($arr, $outcomes, $newoutcomes) {
+						$out = [];
+						foreach ($arr as $k=>$v) {
+							if (is_array($v)) {
+								$mappedinner = mapoutcomes($arr[$k]['outcomes'], $outcomes, $newoutcomes);
+								if (!empty($mappedinner)) {
+									$outel = $v;
+									$outel['outcomes'] = $mappedinner;
+									$out[] = $outel;
+								}
+							} else if (in_array($outcomes[$v], $newoutcomes)) { // only add outcome if new
+								$out[] = $outcomes[$v];
+							}
+						}
+						return $out;
+					}
+					$mappedinoutcomes = mapoutcomes($inoutcomesarr, $outcomes, $newoutcomes);
+					if (!empty($mappedinoutcomes)) {
+						foreach ($mappedinoutcomes as $v) {
+							$outcomesarr[] = $v;
+						}
+					}
+				}
+				/*if ($row[0] != '') {
 					//already has outcomes, so we'll just add to the end of the existing list new outcomes
 					$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
 					$stm->execute(array(':id'=>$cid));
@@ -261,6 +293,7 @@ if (!(isset($teacherid))) {
 					}
 					updateoutcomes($outcomesarr);
 				}
+				*/
 				$newoutcomearr = serialize($outcomesarr);
 				$stm = $DBH->prepare("UPDATE imas_courses SET outcomes=:outcomes WHERE id=:id");
 				$stm->execute(array(':outcomes'=>$newoutcomearr, ':id'=>$cid));
