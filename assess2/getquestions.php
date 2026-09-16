@@ -76,7 +76,7 @@ getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
 
 // get single work
 if ($assess_info->getSetting('singleshowwork')) {
-  $assessInfoOut['swgen'] = $assess_record->getGenShowwork();
+  [$assessInfoOut['swgen'], $assessInfoOut['swgentime']] = $assess_record->getGenShowwork();
 }
 
 //prep date display
