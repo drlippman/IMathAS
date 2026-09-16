@@ -246,6 +246,9 @@ require_once "includes/sanitize.php";
 				echo '<input type="hidden" name="pw2" value="'.Sanitize::encodeStringForDisplay($_POST['pw2']).'" />';
 				echo '<input type="hidden" name="courseid" value="'.Sanitize::encodeStringForDisplay($_POST['courseid']).'" />';
 				echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_POST['ekey']).'" />';
+				if (!empty($_POST['fromGoogle'])) {
+					echo '<input type="hidden" name="fromGoogle" value="1" />';
+				}
 				$_SESSION['challenge'] = uniqid();
 				echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
 				if (isset($_POST['agree'])) {
@@ -282,6 +285,18 @@ require_once "includes/sanitize.php";
             ':jsondata'=>json_encode($jsondata)
         ));
 		$newuserid = $DBH->lastInsertId();
+
+		if (!empty($_POST['fromGoogle']) && !empty($_SESSION['google_pending_profile'])) {
+			require_once __DIR__ . '/includes/googleoauth.php';
+			$googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
+			try {
+				$googleMgr->linkUser($newuserid, $_SESSION['google_pending_profile']['sub'], $_SESSION['google_pending_profile']['email']);
+			} catch (Exception $e) {
+				// account creation should still succeed even if the Google link fails
+				// (e.g. that Google identity got linked elsewhere in the meantime)
+			}
+			unset($_SESSION['google_pending_profile']);
+		}
 
 		if ($emailconfirmation) {
 			$id = $newuserid;
@@ -1124,6 +1139,14 @@ require_once "includes/sanitize.php";
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
+        exit;
+    } else if (isset($_POST['action']) && $_POST['action'] == 'disconnectGoogle') {
+        require_once __DIR__ . '/includes/googleoauth.php';
+        header('Content-Type: application/json');
+
+        $googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
+        $googleMgr->unlinkUser($userid);
+        echo json_encode(['success' => true]);
         exit;
     } else if (isset($_GET['action']) && $_GET['action']=="forumwidgetsettings") {
 		if (empty($_POST['checked'])) {

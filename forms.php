@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 require_once "includes/newusercommon.php";
 if (!isset($_GET['action'])) { exit; }
-if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername") {
+if ($_GET['action']!="newuser" && $_GET['action']!="resetpw" && $_GET['action']!="lookupusername" && $_GET['action']!="googlelink") {
 	require_once "init.php";
 } else {
 	$init_session_start = true;
@@ -45,14 +45,21 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('New Student Signup'),"</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('New Student Signup'),'</h1></div>';
+		$googlePending = !empty($_SESSION['google_pending_profile']) ? $_SESSION['google_pending_profile'] : null;
+		if ($googlePending) {
+			echo '<p>'._('You signed in with Google. Finish creating your account below - your name and email have been filled in for you.')."</p>\n";
+		}
 		echo "<form id=\"newuserform\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
 		echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
         echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form pii-username\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">",_('Choose a password:'),"</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">",_('Confirm password:'),"</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"firstname\">",_('Enter First Name:'),"</label></span> <input class=\"form pii-first-name\" type=\"text\" size=20 id=firstname name=firstname autocomplete=\"given-name\"><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form pii-last-name\" type=\"text\" size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form pii-email\" type=\"text\" size=60 id=email name=email autocomplete=\"email\"><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"firstname\">",_('Enter First Name:'),"</label></span> <input class=\"form pii-first-name\" type=\"text\" size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".($googlePending ? Sanitize::encodeStringForDisplay($googlePending['given_name']) : '')."\"><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form pii-last-name\" type=\"text\" size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".($googlePending ? Sanitize::encodeStringForDisplay($googlePending['family_name']) : '')."\"><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form pii-email\" type=\"text\" size=60 id=email name=email autocomplete=\"email\" value=\"".($googlePending ? Sanitize::encodeStringForDisplay($googlePending['email']) : '')."\"><BR class=\"form\">\n";
+		if ($googlePending) {
+			echo '<input type="hidden" name="fromGoogle" value="1">'."\n";
+		}
 		echo "<span class=form>",_('Notifications:'),"</span><span class=formright><label><input type=checkbox id=msgnot name=msgnot checked=\"checked\" /> ",_('Notify me by email when I receive a new message:'),"</label></span><BR class=form>\n";
         if (isset($CFG['GEN']['COPPA'])) {
 			echo "<span class=form><label for=\"over13\">",_('I am 13 years old or older'),"</label></span><span class=formright><input type=checkbox name=over13 id=over13 onchange=\"toggleOver13()\"></span><br class=form />\n";
@@ -145,6 +152,56 @@ switch($_GET['action']) {
 		if (isset($studentTOS)) {
 			require_once $studentTOS;
 		}
+		break;
+	case "googlelink":
+		if (empty($_SESSION['google_pending_profile'])) {
+			header('Location: ' . $imasroot . '/index.php');
+			exit;
+		}
+		$googlePending = $_SESSION['google_pending_profile'];
+		require_once __DIR__ . '/includes/googleoauth.php';
+		$googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
+		$matchingUsernames = $googleMgr->findUsernamesByEmail($googlePending['email']);
+
+		echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Sign in with Google'),"</div>\n";
+		echo '<div id="headerforms" class="pagetitle"><h1>',_('Sign in with Google'),'</h1></div>';
+		echo '<p>'.sprintf(_('We don\'t have a "Sign in with Google" connection yet for %s.'), '<b>'.Sanitize::encodeStringForDisplay($googlePending['email']).'</b>').'</p>';
+
+		if (count($matchingUsernames) > 0) {
+			echo '<p>'._('The following existing username(s) use this email address:').'</p><ul>';
+			foreach ($matchingUsernames as $mu) {
+				echo '<li>'.Sanitize::encodeStringForDisplay($mu).'</li>';
+			}
+			echo '</ul>';
+		} else {
+			echo '<p>'._('No existing accounts use this email address.').'</p><ul>';
+		}
+		echo '<p class="noticetext">'._('Note: any account using any email can be connected to Sign in with Google, but only one account can be connected.').'</p>';
+			
+		echo '<p>'._('To connect your "Sign in with Google" with an existing account, log in below to connect it:').'</p>';
+		$_SESSION['challenge'] = base64_encode(microtime() . rand(0,9999));
+		echo '<form method="post" action="'.$GLOBALS['basesiteurl'].'/index.php">';
+		echo '<span class=form><label for="glusername">'.$loginprompt.':</label></span> <input class=form type="text" size=15 id=glusername name=username autocomplete="username"><br class=form>';
+		echo '<span class=form><label for="glpassword">'._('Password:').'</label></span> <input class=form type="password" size=15 id=glpassword name=password><br class=form>';
+		echo '<input type=hidden id=gltzoffset name=tzoffset value="">';
+		echo '<input type=hidden id=gltzname name=tzname value="">';
+		echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'">';
+		echo '<div class=submit><input type=submit value="'._('Log In and Connect').'"></div>';
+		echo '</form>';
+		echo '<script type="text/javascript" src="'.$staticroot.'/javascript/jstz_min.js"></script>';
+		echo '<script type="text/javascript">
+		$(function() {
+			var thedate = new Date();
+			document.getElementById("gltzoffset").value = thedate.getTimezoneOffset();
+			var tz = jstz.determine();
+			document.getElementById("gltzname").value = tz.name();
+		});
+		</script>';
+		
+
+		echo '<p>'._('If you do not have an existing account, you can create a new one:').'</p>';
+		echo '<p><a href="forms.php?action=newuser">'._('Sign up as a new student').'</a></p>';
+		echo '<p><a href="newinstructor.php">'._('Request a new instructor account').'</a></p>';
 		break;
 	case "forcechgpwd":
 	case "chgpwd":
@@ -255,7 +312,27 @@ switch($_GET['action']) {
                     alert("'._('Error deleting passkey').'");
                 });
             }
-            
+
+            // Google account management
+            $(function() {
+                $("#disconnectGoogleBtn").click(function() {
+                    if (confirm("'._('Are you sure you want to disconnect your Google account?').'")) {
+                        $.post("actions.php", {action: "disconnectGoogle"})
+                         .done(function(response) {
+                             var data = (typeof response === "string") ? JSON.parse(response) : response;
+                             if (data.success) {
+                                 location.reload();
+                             } else {
+                                 alert("'._('Error disconnecting Google account').'");
+                             }
+                         })
+                         .fail(function() {
+                             alert("'._('Error disconnecting Google account').'");
+                         });
+                    }
+                });
+            });
+
         </script>';
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Modify User Profile'),"</div>\n";
@@ -346,6 +423,28 @@ switch($_GET['action']) {
 				echo '<p>'._('No passkeys registered yet.').'</p>';
 			}
 			echo '<a href="forms.php?action=addpasskey' . $gb . '" target="_blank">' . _('Add Passkey') . '</a>';
+			echo '</span><br class=form>';
+		}
+
+		// Google account management
+		if (!empty($CFG['allow_google_login'])) {
+			require_once __DIR__ . '/includes/googleoauth.php';
+			$googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
+			$linkedGoogle = $googleMgr->getLinkedAccount($userid);
+
+			echo '<span class=form><label for="googleSection">'._('Sign in with Google').'</label></span>';
+			echo '<span class="formright">';
+			if (!empty($_GET['googlelinked'])) {
+				echo '<p class="noticetext">'._('Your Google account has been connected.').'</p>';
+			} else if (!empty($_GET['googlelinkerror'])) {
+				echo '<p class="noticetext">'.Sanitize::encodeStringForDisplay($_GET['googlelinkerror']).'</p>';
+			}
+			if ($linkedGoogle) {
+				echo '<p>'.sprintf(_('Connected to %s'), '<span class="pii-email">'.Sanitize::encodeStringForDisplay($linkedGoogle['google_email']).'</span>').'</p>';
+				echo '<button type="button" id="disconnectGoogleBtn">'._('Disconnect').'</button>';
+			} else {
+				echo '<p>'._('Not connected. To connect a Google account, sign out and use "Sign in with Google" on the login page.').'</p>';
+			}
 			echo '</span><br class=form>';
 		}
 

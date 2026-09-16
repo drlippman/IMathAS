@@ -82,6 +82,7 @@ the same as the 5.x default after upgrade.  If on a new install, it's better to 
 -  `$CFG['use_csrfp']`: Set this to true to enable cross-site request forgery protection.
 - `$CFG['reqadminmfa']`: Require admins to enable two-factor authentication.
 - `$CFG['allow_passkeys']`: Set to true to enable passkey registration. You'll also need to modify your login page to include a passkey option.
+- `$CFG['allow_google_login']`: Set to true to enable "Sign in with Google". Also requires `$CFG['GOOGLE']['client_id']` and `$CFG['GOOGLE']['client_secret']`, an OAuth 2.0 Client ID/secret from the Google Cloud Console. You must register `<basesiteurl>/googlecallback.php` as an authorized redirect URI in the Google Cloud Console - one entry per hostname your site is reachable under (www vs bare domain, staging vs production, etc), since Google matches the redirect URI exactly.
 - `$CFG['GEN']['embedsecret']`: A hashing salt used on public embed pages for signatures.
 
 ### System Defaults

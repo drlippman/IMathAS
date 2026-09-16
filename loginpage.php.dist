@@ -9,6 +9,9 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 	if (!empty($CFG['allow_passkeys'])) {
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/passkey-login.js\" ></script>";
 	}
+	if (!empty($CFG['allow_google_login'])) {
+		require_once __DIR__ . '/includes/googleoauth.php';
+	}
 	$nologo = true;
 	require("header.php");
 	if (!empty($_SERVER['QUERY_STRING'])) {
@@ -70,6 +73,14 @@ if (!empty($CFG['allow_passkeys'])) {
 <input type="hidden" id="passkeySignature" name="passkeySignature" value="">
 <input type="hidden" id="passkeyAuthenticatorData" name="passkeyAuthenticatorData" value="">
 </div>
+<?php
+}
+if (!empty($CFG['allow_google_login'])) {
+	$googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
+	$googleAuthUrl = $googleMgr->getAuthorizationUrl($loginFormAction);
+?>
+<div class="separator"><span>or</span></div>
+<div class=textright><button type=button onclick="location.href='<?php echo Sanitize::encodeStringForDisplay($googleAuthUrl); ?>'"><?php echo _('Sign in with Google'); ?></button></div>
 <?php
 }
 ?>

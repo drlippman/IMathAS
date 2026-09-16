@@ -386,6 +386,9 @@ span.formright {
 	margin-bottom: 10px;
 	text-align: left;
 }
+span.formright > p:first-of-type {
+	padding-top: 0px;
+}
 span.form + span.left {
 	width: 650px;
 }

@@ -68,7 +68,7 @@ if (!empty($_SESSION['userid'])) { // logged in
 }
 
 $hasusername = isset($userid);
-$haslogin = (isset($_POST['password']) && isset($_POST['username'])) || !empty($_POST['passkeyCredentialId']);
+$haslogin = (isset($_POST['password']) && isset($_POST['username'])) || !empty($_POST['passkeyCredentialId']) || !empty($_POST['googleLoginToken']);
 
 if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
     if (empty($_SERVER['HTTP_REFERER'])) {
@@ -172,7 +172,7 @@ if ($haslogin && !$hasusername) {
         $line['password'] = password_hash('temp', PASSWORD_DEFAULT);
 
         $_POST['usedetected'] = true;
-    } else if (empty($_POST['passkeyCredentialId'])) {
+    } else if (empty($_POST['passkeyCredentialId']) && empty($_POST['googleLoginToken'])) {
         $query = "SELECT id,password,rights,groupid,jsondata,mfa FROM imas_users WHERE SID=:SID";
         $stm = $DBH->prepare($query);
         $stm->execute(array(':SID' => $_POST['username']));
@@ -255,6 +255,51 @@ if ($haslogin && !$hasusername) {
         }
     }
 
+    // Check for Google sign-in login next
+    $googleApproved = false;
+
+    if (!empty($_POST['googleLoginToken'])) {
+        $googleToken = $_POST['googleLoginToken'];
+        if (isset($_POST['mfatoken']) && !empty($_SESSION['google_login_verified'][$googleToken])) {
+            // MFA follow-up submission for a Google login that was already verified below.
+            // The googleLoginToken is single-use and already consumed, so reuse the userid
+            // we already proved instead of re-verifying it.
+            $userid = $_SESSION['google_login_verified'][$googleToken];
+            $stm = $DBH->prepare("SELECT id, password, rights, groupid, jsondata, mfa, SID FROM imas_users WHERE id=:id");
+            $stm->execute([':id' => $userid]);
+            $line = $stm->fetch(PDO::FETCH_ASSOC);
+            if ($line) {
+                $_POST['username'] = $line['SID'];
+                $json_data = json_decode($line['jsondata'], true);
+                $googleApproved = true;
+            }
+        } else if (!empty($_SESSION['google_login_pending'][$googleToken])) {
+            $userid = $_SESSION['google_login_pending'][$googleToken];
+            unset($_SESSION['google_login_pending'][$googleToken]); // consume - single use
+
+            $stm = $DBH->prepare("SELECT id, password, rights, groupid, jsondata, mfa, SID FROM imas_users WHERE id=:id");
+            $stm->execute([':id' => $userid]);
+            $line = $stm->fetch(PDO::FETCH_ASSOC);
+
+            if ($line) {
+                $_POST['username'] = $line['SID'];
+                $json_data = json_decode($line['jsondata'], true);
+                $googleApproved = true;
+                // Remember this verified login so a follow-up MFA submission
+                // (which resends the same, now-spent, googleLoginToken) doesn't
+                // need a still-valid pending token to succeed.
+                $_SESSION['google_login_verified'] = [$googleToken => $userid];
+            }
+        }
+        if (!$googleApproved) {
+            require_once __DIR__ . "/header.php";
+            echo '<p class="noticetext">' . _('Your Google sign-in has expired or was already used. Please try signing in with Google again.') . '</p>';
+            echo '<p><a href="' . $GLOBALS['basesiteurl'] . '/index.php">' . _('Return to login') . '</a></p>';
+            require_once __DIR__ . '/footer.php';
+            exit;
+        }
+    }
+
     if (!empty($line['mfa'])) {
         require_once __DIR__.'/includes/mfa.php';
         $mfadata = json_decode($line['mfa'], true);
@@ -266,7 +311,7 @@ if ($haslogin && !$hasusername) {
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);    
     }
 
-    if ($line != false && (password_verify($_POST['password'], $line['password']) || $passkeyApproved)) {
+    if ($line != false && (password_verify($_POST['password'] ?? '', $line['password']) || $passkeyApproved || $googleApproved)) {
         if (empty($_POST['tzname']) && (!isset($_POST['tzoffset']) || $_POST['tzoffset'] == '') && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
             echo _('Uh oh, something went wrong.  Please go back and try again');
             exit;
@@ -347,6 +392,22 @@ if ($haslogin && !$hasusername) {
         unset($loginmfaverified);
         unset($_SESSION['challenge']); //challenge is used up - forget it.
         unset($_SESSION['passkey_login_verified']);
+        unset($_SESSION['google_login_verified']);
+
+        // If this login was reached via the "Sign in with Google" link-existing-account
+        // flow, this ordinary (rate-limited, MFA-gated) successful login is the trigger
+        // to actually link the verified Google identity to this account.
+        if (!empty($_SESSION['google_pending_profile'])) {
+            require_once __DIR__ . '/includes/googleoauth.php';
+            $googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
+            try {
+                $googleMgr->linkUser($userid, $_SESSION['google_pending_profile']['sub'], $_SESSION['google_pending_profile']['email']);
+            } catch (Exception $e) {
+                // e.g. this Google identity or account is already linked elsewhere - skip
+                // the link silently rather than blocking an otherwise-successful login.
+            }
+            unset($_SESSION['google_pending_profile']);
+        }
 
         if (isset($CFG['cloudwatch_loginlog'])) {
             require_once __DIR__.'/includes/CloudWatchLogger.php';
@@ -364,7 +425,7 @@ if ($haslogin && !$hasusername) {
         }
 
         $needToForcePasswordReset = false;
-        if (!$passkeyApproved && $_POST['username'] != 'guest') {
+        if (!$passkeyApproved && !$googleApproved && $_POST['username'] != 'guest') {
             if (isset($CFG['acct']['passwordMinlength']) && strlen($_POST['password']) < $CFG['acct']['passwordMinlength']) {
                 $needToForcePasswordReset = true;
             } else if (isset($CFG['acct']['passwordFormat'])) {
