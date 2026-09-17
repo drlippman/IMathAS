@@ -51,6 +51,7 @@ if ($cid==0) {
 	}
 	$wikiname = $row['name'];
 	$pagetitle = $wikiname;
+	$isgroup = false;
 	$now = time();
 	if (!isset($teacherid) && ($row['avail']==0 || ($row['avail']==1 && ($now<$row['startdate'] || $now>$row['enddate'])))) {
 		$overwriteBody=1;

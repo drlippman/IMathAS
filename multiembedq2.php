@@ -30,6 +30,10 @@ if (isset($_POST['state'])) {
     $QS = $_GET;
 }
 
+if (!isset($QS['id'])) {
+    echo 'Need to supply id';
+    exit;
+}
 if (!is_array($QS['id'])) {
     $QS['id'] = explode('-', $QS['id']);
 }
