@@ -53,6 +53,11 @@
       >
         {{ $t('livepoll-waiting') }}
       </div>
+      <inter-question-text-skiplist
+        v-if = "curqn >= 0 && ((isTeacher && curstate>0) || (!isTeacher && curstate>1))"
+        pos = "before"
+        :qn = "curqn"
+      />
       <question
         v-if = "curqn >= 0 && ((isTeacher && curstate>0) || (!isTeacher && curstate>1))"
         v-show = "showQuestion"
@@ -80,6 +85,7 @@ import LivepollNav from '@/components/LivepollNav.vue';
 import LivepollSettings from '@/components/LivepollSettings.vue';
 import LivepollResults from '@/components/LivepollResults.vue';
 import Question from '@/components/question/Question.vue';
+import InterQuestionTextSkiplist from '@/components/InterQuestionTextSkiplist.vue';
 import Timer from '@/components/Timer.vue';
 import { store, actions } from '@/basicstore';
 
@@ -91,6 +97,7 @@ export default {
     LivepollSettings,
     LivepollResults,
     AssessHeader,
+    InterQuestionTextSkiplist,
     Timer
   },
   data: function () {

@@ -49,12 +49,9 @@
         :aria-hidden = "curqn != qn"
         :class="{inactive: curqn != qn}"
       >
-        <inter-question-text-list
+        <inter-question-text-skiplist
           pos = "before"
           :qn = "curqn"
-          :active="curqn == qn"
-          :textlist = "textList"
-          :lastq = "lastQ"
         />
         <full-question-header
           v-show = "curqn == qn"
@@ -69,12 +66,9 @@
           showheader="true"
           v-if="showSingleShowwork && curqn == qn && qn == lastQ" 
         />
-        <inter-question-text-list
+        <inter-question-text-skiplist
           pos = "after"
           :qn = "curqn"
-          :active="curqn == qn"
-          :textlist = "textList"
-          :lastq = "lastQ"
         />
       </div>
     </div>
@@ -101,7 +95,7 @@ Will need to rebuild ytapi.js in the Vue code.
 import AssessHeader from '@/components/AssessHeader.vue';
 import VideocuedNav from '@/components/VideocuedNav.vue';
 import FullQuestionHeader from '@/components/FullQuestionHeader.vue';
-import InterQuestionTextList from '@/components/InterQuestionTextList.vue';
+import InterQuestionTextSkiplist from '@/components/InterQuestionTextSkiplist.vue';
 import VideocuedResultNav from '@/components/VideocuedResultNav.vue';
 import Question from '@/components/question/Question.vue';
 import IntroText from '@/components/IntroText.vue';
@@ -115,7 +109,7 @@ export default {
     VideocuedNav,
     Question,
     VideocuedResultNav,
-    InterQuestionTextList,
+    InterQuestionTextSkiplist,
     AssessHeader,
     IntroText,
     ShowworkSingle
@@ -185,13 +179,6 @@ export default {
     },
     lastQ () {
       return store.assessInfo.questions.length - 1;
-    },
-    textList () {
-      if (!store.assessInfo.hasOwnProperty('interquestion_text')) {
-        return [];
-      } else {
-        return store.assessInfo.interquestion_text;
-      }
     },
     showSingleShowwork () {
       return ((store.assessInfo.singleshowwork & 8) &&  // single showwork
