@@ -851,10 +851,35 @@ class AssessInfo
       if ($this->assessData['shuffle']&4) { //all students same seed
         $seeds = array_fill(0, count($qout), $ispractice?$this->curAid+100:$this->curAid);
       } else {
-        do {
-          $newseed = rand(1,9999);
-        } while ($oldseeds !== false && $newseed == $oldseeds[$oldquestions[0]]);
-
+        $fixedseeds = false;
+        // if there are fixedseeds, pick one from the intersection
+        // if no intersection, pick randomly and ignore them
+        foreach ($qout as $i=>$qid) {
+          if (!empty($this->questionData[$qid]['fixedseeds'])) {
+            if ($fixedseeds === false) {
+              $fixedseeds = $this->questionData[$qid]['fixedseeds'];
+            } else {
+              $fixedseeds = array_intersect($fixedseeds, $this->questionData[$qid]['fixedseeds']);
+            }
+            if (count($fixedseeds)==0) {
+              break;
+            }
+          }
+        }
+        if ($fixedseeds !== false && count($fixedseeds) > 0) {
+          if (count($fixedseeds)==1) {
+            $newseed = $fixedseeds[0];
+          } else {
+            shuffle($fixedseeds);
+            do {
+              $newseed = array_pop($fixedseeds);
+            } while ($oldseeds !== false && $newseed == $oldseeds[$oldquestions[0]]);
+          }
+        } else {
+          do {
+            $newseed = rand(1,9999);
+          } while ($oldseeds !== false && $newseed == $oldseeds[$oldquestions[0]]);
+        }
         $seeds = array_fill(0, count($qout), $newseed);
       }
     } else {
