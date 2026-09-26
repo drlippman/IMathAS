@@ -1060,7 +1060,7 @@ function setseed($ns,$ref=0) {
 		if (isset($GLOBALS['teacherid']) && isset($GLOBALS['teacherreview'])) { //reviewing in gradebook
 			$RND->srand($GLOBALS['teacherreview']);
 		} else { //in assessment
-			$RND->srand($GLOBALS['userid']);
+			$RND->srand($GLOBALS['userid'] ?? 0);
 		}
 	} else if ($ns=="from") {
 		if (isset($GLOBALS['seeds']) && isset($GLOBALS['seeds'][$ref-1])) {

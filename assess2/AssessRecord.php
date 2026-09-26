@@ -821,10 +821,32 @@ class AssessRecord
       return 0;
     }
     $workcutoff = $this->assess_info->getSetting('workcutoff');
-    if ($workcutoff == 0) {
-        return 0;
+    if ($workcutoff == 0 || $this->assessRecord['lastchange'] == 0) {
+      return 0;
     } else {
-        return $this->assessRecord['lastchange'] + $workcutoff*60;
+      $lastaver = $this->getAssessVer('last');
+      $enddate = $this->assess_info->getSetting('enddate');
+      // need to see if we're in "after" period.
+      // for by_assessment, we'll only get here after submission, so only first
+      // condition will apply, but we keep the rest in the chain as fallback
+      // and for by_question
+      if ($this->assess_info->getSetting('submitby') == 'by_assessment' &&
+        $lastaver['status'] == 1
+      ) {
+        // quiz-style submitted; set cutoff based on lastchange
+        return $lastaver['lastchange'] + $workcutoff*60;
+      } else if (!empty($lastaver['timelimit_end'])) {
+        // had timelimit; set cutoff based on timelimit expiration
+        $grace = $this->getTimeLimitGrace();
+        if (!empty($grace)) {
+          return $grace + $workcutoff*60;
+        } else {
+          return $this->getTimeLimitExpires() + $workcutoff*60;
+        }
+      } else if ($enddate < 2000000000) {
+        // set cutoff based on enddate
+        return $enddate + $workcutoff*60;
+      }
     }
   }
 
