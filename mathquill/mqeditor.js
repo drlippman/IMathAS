@@ -424,7 +424,8 @@ var MQeditor = (function($) {
           editorLeft = document.documentElement.clientWidth - editorWidth-5;
         }
       }
-      if (inIframe()) {
+      // OSK not visible in tall iframes, so position under
+      if (inIframe() && config.curlayoutstyle == 'OSK') {
         $("#mqeditor").css("top", offset.top + height + 3).css("left", 0);
       } else {
         $("#mqeditor").css("top", offset.top + height + 3).css("left", editorLeft);
