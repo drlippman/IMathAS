@@ -322,6 +322,7 @@
             <gb-showwork
               :work = "aData.assess_versions[curAver].swgen"
               :worktime = "aData.assess_versions[curAver].swgentime"
+              :showwork = "1"
               :showall = "showAllWork"
               :previewfiles = "op_previewFiles"
             />
@@ -412,6 +413,7 @@
                     v-if="!sidebysideon"
                     :work = "qdata[curQver[qn]].work"
                     :worktime = "qdata[curQver[qn]].worktime"
+                    :showwork = "qdata[curQver[qn]].showwork"
                     :showall = "showAllWork"
                     :previewfiles = "op_previewFiles"
                   />
@@ -423,6 +425,7 @@
                     v-if="sidebysideon"
                     :work = "qdata[curQver[qn]].work"
                     :worktime = "qdata[curQver[qn]].worktime"
+                    :showwork = "qdata[curQver[qn]].showwork"
                     :showall = "showAllWork"
                     :previewfiles = "op_previewFiles"
                   />

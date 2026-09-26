@@ -1,25 +1,32 @@
 <template>
-  <div class = "questionpane viewworkwrap" v-if="!!work" ref="wrap">
-    <div>
-      <button type="button" class="slim"
-        @click = "show = !show"
-      >
-        {{ btnLabel }}
-      </button>
-      <span class="small" v-if="show && worktime !== '0'">
-        {{ $t('gradebook-lastchange')}} {{ worktime }}
-      </span>
+  <div v-if="showwork > 0">
+    <div v-if="!!work" class = "questionpane viewworkwrap" ref="wrap">
+      <div>
+        <button type="button" class="slim"
+          @click = "show = !show"
+        >
+          {{ btnLabel }}
+        </button>
+        <span class="small" v-if="show && worktime !== '0'">
+          {{ $t('gradebook-lastchange')}} {{ worktime }}
+        </span>
+      </div>
+      <transition name="fade">
+        <div class="introtext" ref="workbox" v-show="show" v-html="work" />
+      </transition>
     </div>
-    <transition name="fade">
-      <div class="introtext" ref="workbox" v-show="show" v-html="work" />
-    </transition>
+    <div class = "questionpane" v-else>
+      <div class="introtext">
+        {{ $t('gradebook-nowork') }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'GbShowwork',
-  props: ['work', 'worktime', 'showall', 'previewfiles'],
+  props: ['work', 'worktime', 'showwork', 'showall', 'previewfiles'],
   data: function () {
     return {
       show: false,
@@ -33,7 +40,7 @@ export default {
   },
   methods: {
     renderInit () {
-      if (this.rendered || !this.work) {
+      if (this.rendered || !this.work || this.showwork === 0) {
         return;
       }
       setTimeout(window.drawPics, 100);

@@ -91,6 +91,9 @@
         {{ $t('gradebook-lastchange') }}
         {{ qdata.lastchange }}.
       </span>
+      <span v-if="qdata.showwork > 0">
+        {{ $t('gradebook-workon') }}.
+      </span>
       <button
         v-if="maxTry > 1"
         type="button"
