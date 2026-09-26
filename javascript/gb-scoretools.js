@@ -414,9 +414,10 @@ function updatescoreboxscroll() {
     var objtop, scoredet, objbot;
     for (var i=0; i<wraps.length; i++) {
         if (wraps[i].style.display == "none") { continue; }
+		if (!wraps[i].querySelector(".scrollpane")) { continue; }
         var rect = wraps[i].querySelector(".scrollpane").getBoundingClientRect();
         objtop = rect.top + scroll; 
-        scoredet = wraps[i].childNodes[2];
+        scoredet = wraps[i].querySelector(".scoredetails");
         objbot = objtop + wraps[i].querySelector(".scrollpane").offsetHeight + scoredet.offsetHeight ;
         if (viewbot > objtop + scoredet.offsetHeight + 20 && 
             viewbot < objbot && 
