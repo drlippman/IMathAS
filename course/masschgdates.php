@@ -311,6 +311,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail)";
 			$stm = $DBH->prepare($query);
 			$stm->execute($inlinetoupdate);
+			// fix oncal for avail=2
+			$stm = $DBH->prepare("UPDATE imas_inlinetext SET oncal=1 WHERE avail=2 AND startdate>0 AND courseid=?");
+			$stm->execute([$cid]);
+			$stm = $DBH->prepare("UPDATE imas_inlinetext SET oncal=0 WHERE avail=2 AND startdate=0 AND courseid=?");
+			$stm->execute([$cid]);
 		}
 		if (count($linktoupdate)>0) {
 			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($linktoupdate, 4);
@@ -318,6 +323,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "ON DUPLICATE KEY UPDATE startdate=VALUES(startdate),enddate=VALUES(enddate),avail=VALUES(avail)";
 			$stm = $DBH->prepare($query);
 			$stm->execute($linktoupdate);
+			// fix oncal for avail=2
+			$stm = $DBH->prepare("UPDATE imas_linkedtext SET oncal=1 WHERE avail=2 AND startdate>0 AND courseid=?");
+			$stm->execute([$cid]);
+			$stm = $DBH->prepare("UPDATE imas_linkedtext SET oncal=0 WHERE avail=2 AND startdate=0 AND courseid=?");
+			$stm->execute([$cid]);
 		}
 		if (count($wikitoupdate)>0) {
 			$placeholders = Sanitize::generateQueryPlaceholdersGrouped($wikitoupdate, 4);

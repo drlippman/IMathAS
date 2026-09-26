@@ -335,7 +335,7 @@ if (isset($teacherid)) {
 } else {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ";
 	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
-	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid=:courseid";
+	$query .= "(avail=2 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid=:courseid";
 	$stm = $DBH->prepare($query); //times were calcualated in flow - safe
 	$stm->execute(array(':courseid'=>$cid));
 }
@@ -415,7 +415,7 @@ if (isset($teacherid)) {
 } else {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ";
 	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
-	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid=:courseid ORDER BY title";
+	$query .= "(avail=2 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid=:courseid ORDER BY title";
 }
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
