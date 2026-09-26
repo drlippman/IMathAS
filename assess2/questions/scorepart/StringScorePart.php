@@ -221,6 +221,9 @@ class StringScorePart implements ScorePart
                             if (empty($flags['all_words'])) {
                                 $foundloc = $j;
                                 break 2;
+                            } else {
+                                // if there are multiple 'or' answers, don't want to check all; move to next $answer
+                                continue 2;
                             }
                         }
                     } else if (isset($flags['regex'])) {
