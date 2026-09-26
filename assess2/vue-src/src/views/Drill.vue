@@ -59,6 +59,23 @@
           <button type="button" class="primary" @click="startDrill">
             {{ $t('drill-restart') }}
           </button>
+          <router-link
+            v-if="showNextQ" 
+            :to="'/drill/'+ (this.qn + 2)"
+            custom
+            v-slot="{ navigate }"
+          >
+            <button
+              type="button"
+              @click="navigate"
+              @keypress.enter="navigate"
+              role="link"
+              class="secondarybtn"
+            >
+              <icons name="right" />
+              {{ $t('question-next') }}
+            </button>
+          </router-link>
         </div>
         
         <div v-if="questionData.drillstatus !== 1 && !questionData.drillcomplete" class="submitbtnwrap">
@@ -78,6 +95,7 @@ import DrillNavHeader from '@/components/DrillNavHeader.vue';
 import Question from '@/components/question/Question.vue';
 import IntroText from '@/components/IntroText.vue';
 import Feedback from '@/components/Feedback.vue';
+import Icons from '@/components/widgets/Icons.vue';
 import { drillGoalMixin } from '@/mixins/drillGoalMixin';
 
 import { store, actions } from '@/basicstore';
@@ -89,12 +107,16 @@ export default {
     Question,
     IntroText,
     Feedback,
-    AssessHeader
+    AssessHeader,
+    Icons
   },
   mixins: [drillGoalMixin],
   computed: {
     qn () {
       return parseInt(this.$route.params.qn) - 1;
+    },
+    showNextQ () {
+      return this.qn < store.assessInfo.questions.length - 1;
     },
     drillsettings () {
       return store.assessInfo.drillsettings;
