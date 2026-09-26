@@ -98,6 +98,7 @@ export default {
           });
         }
       }
+      out.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true }));
       return out;
     },
     showMax () {
