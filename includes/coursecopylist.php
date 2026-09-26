@@ -17,12 +17,14 @@ function getCourseTree($order, $data, &$printed, &$out, $skipcopyright=2) {
 			//course grouping
 			$sub = [];
 			getCourseTree($item['courses'], $data, $printed, $sub);
-			$out[] = [
-				'id'=>'grp'.$grpcnt, 
-				'label'=>$item['name'],
-				'children'=>$sub
-			];
-			$grpcnt++;
+			if (count($sub)>0) {
+				$out[] = [
+					'id'=>'grp'.$grpcnt, 
+					'label'=>$item['name'],
+					'children'=>$sub
+				];
+				$grpcnt++;
+			}
 		} else if (isset($data[$item])) {
 			$out[] = getCourseTreeitem($data[$item], $skipcopyright);
 			$printed[] = $item;
@@ -143,7 +145,7 @@ if (isset($_POST['cidlookup'])) {
 	$stm->execute(array(':id'=>$userid));
 	$userjson = json_decode($stm->fetchColumn(0), true);
 
-	$myCourseResult = $DBH->prepare("SELECT ic.id,ic.name,ic.termsurl,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid=:userid and ic.id<>:cid AND ic.available<4 ORDER BY ic.name");
+	$myCourseResult = $DBH->prepare("SELECT ic.id,ic.name,ic.termsurl,ic.copyrights,imas_teachers.hidefromcourselist FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid=:userid and ic.id<>:cid AND ic.available<4 ORDER BY ic.name");
 	$myCourseResult->execute(array(':userid'=>$userid, ':cid'=>$cid));
 	$myCourses = array();
 	$myCoursesDefaultOrder = array();
@@ -177,15 +179,19 @@ if (isset($_POST['cidlookup'])) {
 		$printed = [];
 		getCourseTree($userjson['courseListOrder']['teach'], $myCourses, $printed, $mycoursetree, -1);
 		$notlisted = array_diff(array_keys($myCourses), $printed);
-		$notlistedtree = [];
+		$hiddentree = [];
 		foreach ($notlisted as $course) {
-			$notlistedtree[] = getCourseTreeitem($myCourses[$course], -1);
+			if ($myCourses[$course]['hidefromcourselist']) {
+				$hiddentree[] = getCourseTreeitem($myCourses[$course], -1);
+			} else {
+				$mycoursetree[] = getCourseTreeitem($myCourses[$course], -1);
+			}
 		}
-		if (count($notlistedtree) > 0) {
+		if (count($hiddentree) > 0) {
 			$mycoursetree[] = [
 				'id' => 'mynotlisted',
 				'label' => _('Hidden Courses'),
-				'children' => $notlistedtree
+				'children' => $hiddentree
 			];
 		}
 	} else {
