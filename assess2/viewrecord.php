@@ -19,16 +19,17 @@ if (isset($_GET['retotal'])) {
   echo "retotaled";
 }
 if (isset($_GET['uid']) && isset($_GET['aid'])) {
-  $stm = $DBH->prepare("SELECT scoreddata,practicedata FROM imas_assessment_records WHERE userid=? AND assessmentid=? ORDER BY lastchange DESC LIMIT 1");
+  $stm = $DBH->prepare("SELECT scoreddata,practicedata,lti_sourcedid FROM imas_assessment_records WHERE userid=? AND assessmentid=? ORDER BY lastchange DESC LIMIT 1");
   $stm->execute(array($_GET['uid'], $_GET['aid']));
 } else if (isset($_GET['uid'])) {
-  $stm = $DBH->prepare("SELECT scoreddata,practicedata FROM imas_assessment_records WHERE userid=? ORDER BY lastchange DESC LIMIT 1");
+  $stm = $DBH->prepare("SELECT scoreddata,practicedata,lti_sourcedid FROM imas_assessment_records WHERE userid=? ORDER BY lastchange DESC LIMIT 1");
   $stm->execute(array($_GET['uid']));
 } else {
-  $stm = $DBH->query("SELECT scoreddata,practicedata FROM imas_assessment_records ORDER BY lastchange DESC LIMIT 1");
+  $stm = $DBH->query("SELECT scoreddata,practicedata,lti_sourcedid FROM imas_assessment_records ORDER BY lastchange DESC LIMIT 1");
 }
 
 $row = $stm->fetch(PDO::FETCH_ASSOC);
+echo "lti_sourcedid:" . $row['lti_sourcedid']." ;\n";
 print_r(Sanitize::gzexpand($row['scoreddata']));
 echo "\n";
 print_r(json_decode(Sanitize::gzexpand($row['scoreddata']), true));
