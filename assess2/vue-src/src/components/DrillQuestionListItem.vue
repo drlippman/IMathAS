@@ -20,6 +20,16 @@ export default {
     showIcon () {
       return !!this.option && this.option.hasOwnProperty('drillstatus');
     },
+    hasCorrect () {
+      if (this.option.drillresults) {
+        for (let j=0; j<this.option.drillresults.length; j++) {
+          if (this.option.drillresults[j].correct > 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
     statusIcon () {
       // option.status reflects the current (possibly just-regenerated)
       // question version's own try, which resets on every auto-regen and
@@ -28,7 +38,11 @@ export default {
       if (!this.showIcon) {
         return 'none';
       } else if (this.option.drillcomplete) {
-        return 'correct';
+        if (this.hasCorrect) {
+          return 'correct';
+        } else {
+          return 'partattempted';
+        }
       } else if (this.option.drillstatus === 1) {
         return 'partattempted';
       } else {

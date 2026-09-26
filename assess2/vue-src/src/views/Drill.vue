@@ -49,7 +49,7 @@
           </button>
         </div>
 
-        <div v-if="questionData.drillcomplete" class="scoreresult correct" tabindex="-1">
+        <div v-if="questionData.drillcomplete && lastResult.correct > 0" class="scoreresult correct" tabindex="-1">
           <h3>{{ $t('drill-complete') }}</h3>
           <p v-if="lastResult">
             {{ resultSummary }}

@@ -3054,6 +3054,7 @@ class AssessRecord
   public function reTotalAssess($rescoreQs = 'all') {
     $by_question = ($this->assess_info->getSetting('submitby') == 'by_question');
     $keepscore = $this->assess_info->getSetting('keepscore');
+    $is_drill = ($this->assess_info->getSetting('displaymethod') === 'drill');
 
     $points = $this->assess_info->getAllQuestionPoints();
     $this->parseData();
@@ -3125,12 +3126,22 @@ class AssessRecord
         if ($by_question) {
           $curAver['questions'][$qn]['scored_version'] = $qScoredVer;
         }
-        if (!empty($curAver['questions'][$qn]['drillcomplete'])) {
-          // drill was completed - full credit regardless of the underlying
-          // per-part grading of the final try (distinct from scoreoverride,
-          // which is reserved for manual teacher grade overrides)
-          $curAver['questions'][$qn]['score'] = round($points[$curQver['qid']] + 1e-8, 2);
-          $curAver['questions'][$qn]['rawscore'] = 1;
+        if ($is_drill) {
+          $curAver['questions'][$qn]['score'] = 0;
+          $curAver['questions'][$qn]['rawscore'] = 0;
+          if (!empty($curAver['questions'][$qn]['drillresults'])) {
+            // drill was completed - full credit regardless of the underlying
+            // per-part grading of the final try (distinct from scoreoverride,
+            // which is reserved for manual teacher grade overrides)
+            foreach ($curAver['questions'][$qn]['drillresults'] as $dres) {
+              // make sure at least one correct
+              if ($dres['correct'] > 0) {
+                $curAver['questions'][$qn]['score'] = round($points[$curQver['qid']] + 1e-8, 2);
+                $curAver['questions'][$qn]['rawscore'] = 1;
+                break;
+              }
+            }
+          }
         } else {
           $curAver['questions'][$qn]['score'] = round($maxQscore + 1e-8,2);
           $curAver['questions'][$qn]['rawscore'] = round($maxQrawscore + 1e-8,4);

@@ -205,7 +205,12 @@ export default {
         if (this.ainfo.questions[i].drillresults &&
           this.ainfo.questions[i].drillresults.length > 0
         ) {
-          cnt++;
+          for (let j=0; j<this.ainfo.questions[i].drillresults.length; j++) {
+            if (this.ainfo.questions[i].drillresults[j].correct > 0) {
+              cnt++;
+              break;
+            }
+          }
         }
       }
       return cnt;
