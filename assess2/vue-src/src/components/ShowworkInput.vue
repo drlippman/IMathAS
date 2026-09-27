@@ -21,7 +21,10 @@
         </li>
         <li>
           <input type="file" ref="fileinput" @change="uploadFile" />
-          <span class="noticetext" v-if="uploading">
+          <span class="noticetext" v-if="uploading === 2">
+            {{ $t('question-prep-upload') }}
+          </span>
+          <span class="noticetext" v-if="uploading === 1">
             {{ $t('question-uploading') }}
           </span>
         </li>
@@ -54,7 +57,7 @@ export default {
     return {
       objTinymce: null,
       filelist: [],
-      uploading: false
+      uploading: 0
     };
   },
   computed: {
@@ -140,6 +143,7 @@ export default {
       this.objTinymce.focus();
     },
     uploadFile: function () {
+      this.uploading = 2;
       window.doImageUploadResize(this.$refs.fileinput, (el) => {
         if (!el.files || el.files.length === 0) {
           actions.handleError('file_error_cant_read');
@@ -155,7 +159,7 @@ export default {
         const data = new FormData();
         data.append('type', 'attach');
         data.append('file', el.files[0]);
-        this.uploading = true;
+        this.uploading = 1;
         window.$.ajax({
           url: store.APIbase.replace(/\/\w+\/$/, '') + '/tinymce8/upload_handler.php',
           type: 'POST',
@@ -181,7 +185,7 @@ export default {
           })
           .always(() => {
             this.$refs.fileinput.value = null;
-            this.uploading = false;
+            this.uploading = 0;
           });
       });
     },

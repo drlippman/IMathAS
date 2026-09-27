@@ -2105,7 +2105,7 @@ function doImageUploadResize(el, callback) {
 	let inputtype;
 	let originalFile;
 	let that;
-	if (el instanceof HTMLElement) {
+	if (el instanceof HTMLElement && el.files) {
 		that = el; // input node
     	originalFile = el.files[0];
 		inputtype = 'file';
@@ -2125,7 +2125,10 @@ function doImageUploadResize(el, callback) {
         var img = document.createElement('img');
         var canvas = document.createElement('canvas');
 
-        img.src = e.target.result
+        img.src = e.target.result;
+		img.onerror = function () {
+			callback(el, false);
+		};
         img.onload = function () {
             var ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
@@ -2150,6 +2153,10 @@ function doImageUploadResize(el, callback) {
             ctx.drawImage(img, 0, 0, width, height);
 
             canvas.toBlob(function (blob) {
+				if (!blob) {
+					callback(el, false);
+					return;
+				}
 				if (inputtype === 'blob') {
 					if (typeof callback === 'function') {
 						callback(blob, true);
@@ -2173,6 +2180,9 @@ function doImageUploadResize(el, callback) {
             }, 'image/jpeg', .95);
         }
     }
+	reader.onerror = function () {
+		callback(el, false);
+	};
     reader.readAsDataURL(originalFile);
 }
 

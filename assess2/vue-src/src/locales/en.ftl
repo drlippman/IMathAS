@@ -205,6 +205,7 @@ question-jump_warn = This will use up your remaining tries at this version of th
 question-showwork = Show work here by typing it or attaching a file or picture
 question-showwork_n = Work for question {$n}
 question-uploadwork = Show work here by attaching a file or picture
+question-prep-upload = Preparing upload...
 question-uploading = Uploading...
 question-intronext = To begin, navigate to a question using the selector or > Next button above.
 question-firstq = First Question
