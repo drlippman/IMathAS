@@ -54,7 +54,9 @@ if (isset($_GET['seed'])) {
 }
 
 foreach ($qsetlist as $qn=>$qsetid) {
-	mbxproc($qn,$qsetid,$seed);
+	if (!empty($qsetid)) {
+		mbxproc($qn,$qsetid,$seed);
+	}
 }
 
 function mbxproc($qn,$qsetid,$seed) {
