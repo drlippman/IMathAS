@@ -1082,6 +1082,7 @@ class DrawingScorePart implements ScorePart
             $defpttol = 5;
 
             $usedline = [];
+            $linedups = [];
             foreach ($anslines as $key=>$ansline) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($lines); $i++) {
@@ -1112,13 +1113,21 @@ class DrawingScorePart implements ScorePart
                             continue;
                         }
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedline[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) { 
+                        $linedups[] = $i;
+                        $dupstoignore++; 
+                    } else { 
+                        $usedline[$i] = 1; 
+                        if (in_array($i, $linedups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
 
             $usedcirc = [];
+            $circdups = [];
             foreach ($anscircs as $key=>$anscirc) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($circs); $i++) {
@@ -1132,13 +1141,21 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscirc[2]-$circs[$i][2])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedcirc[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $circdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedcirc[$i] = 1;
+                        if (in_array($i, $circdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
 
             $usedellipse = [];
+            $ellipsedups = [];
             foreach ($ansellipses as $key=>$ansellipse) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($ellipses); $i++) {
@@ -1155,13 +1172,21 @@ class DrawingScorePart implements ScorePart
                     if (abs($ansellipse[3]-$ellipses[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedellipse[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $ellipsedups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedellipse[$i] = 1;
+                        if (in_array($i, $ellipsedups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
 
             $usedrect = [];
+            $rectdups = [];
             foreach ($ansrects as $key=>$ansrect) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($rects); $i++) {
@@ -1178,13 +1203,21 @@ class DrawingScorePart implements ScorePart
                     if (abs($ansrect[3]-$rects[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedrect[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $rectdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedrect[$i] = 1;
+                        if (in_array($i, $rectdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
 
             $usedhyperbola = [];
+            $hyperboladups = [];
             foreach ($anshyperbolas as $key=>$anshyperbola) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($hyperbolas); $i++) {
@@ -1202,8 +1235,15 @@ class DrawingScorePart implements ScorePart
                     if (abs($anshyperbola[3]-$hyperbolas[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedhyperbola[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $hyperboladups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedhyperbola[$i] = 1;
+                        if (in_array($i, $hyperboladups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
@@ -1378,6 +1418,7 @@ class DrawingScorePart implements ScorePart
             }
 
             $usedparab = [];
+            $parabdups = [];
             foreach ($ansparabs as $key=>$ansparab) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($parabs); $i++) {
@@ -1400,13 +1441,21 @@ class DrawingScorePart implements ScorePart
                             continue;
                         }
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedparab[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $parabdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedparab[$i] = 1;
+                        if (in_array($i, $parabdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
 
             $usedhparab = [];
+            $hparabdups = [];
             foreach ($anshparabs as $key=>$ansparab) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($hparabs); $i++) {
@@ -1426,12 +1475,20 @@ class DrawingScorePart implements ScorePart
                             continue;
                         }
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedhparab[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $hparabdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedhparab[$i] = 1;
+                        if (in_array($i, $hparabdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
             $usedcubic = [];
+            $cubicdups = [];
             foreach ($anscubics as $key=>$anscubic) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($cubics); $i++) {
@@ -1445,14 +1502,22 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscubic[2]-$cubics[$i][2])/abs($anscubic[2]) > $deftol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedcubic[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $cubicdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedcubic[$i] = 1;
+                        if (in_array($i, $cubicdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
             //print_r($anscuberoots);
             //print_r($cuberoots);
             $usedcuberoot = [];
+            $cuberootdups = [];
             foreach ($anscuberoots as $key=>$anscuberoot) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($cuberoots); $i++) {
@@ -1466,12 +1531,20 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscuberoot[2]-$cuberoots[$i][2])/abs($anscuberoot[2]) > $deftol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedcuberoot[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $cuberootdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedcuberoot[$i] = 1;
+                        if (in_array($i, $cuberootdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
             $usedsqrt = [];
+            $sqrtdups = [];
             foreach ($anssqrts as $key=>$anssqrt) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($sqrts); $i++) {
@@ -1488,12 +1561,20 @@ class DrawingScorePart implements ScorePart
                     if (abs($anssqrt[2]-$sqrts[$i][2])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedsqrt[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $sqrtdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedsqrt[$i] = 1;
+                        if (in_array($i, $sqrtdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
             $usedrat = [];
+            $ratdups = [];
             foreach ($ansrats as $key=>$ansrat) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($rats); $i++) {
@@ -1507,12 +1588,20 @@ class DrawingScorePart implements ScorePart
                     if (sqrt(2)*abs($ansrat[2]-$rats[$i][2])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedrat[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $ratdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedrat[$i] = 1;
+                        if (in_array($i, $ratdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
             $usedexp = [];
+            $expdups = [];
 
             foreach ($ansexps as $key=>$ansexp) {
                 $scores[$scoretype[$key]][$key] = 0;
@@ -1537,12 +1626,20 @@ class DrawingScorePart implements ScorePart
                     if ($ansexp[1]<=1 && abs($ansexp[0]*safepow($ansexp[1],$exps[$i][2]) - $exps[$i][3]) >$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedexp[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $expdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedexp[$i] = 1;
+                        if (in_array($i, $expdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
             $usedlogs = [];
+            $logsdups = [];
             foreach ($anslogs as $key=>$anslog) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($logs); $i++) {
@@ -1563,12 +1660,20 @@ class DrawingScorePart implements ScorePart
                     if ($anslog[1]<=1 && abs($anslog[0]*safepow($anslog[1],$logs[$i][2]) - $logs[$i][3]) >$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
-                    $usedlogs[$i] = 1;
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $logsdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedlogs[$i] = 1;
+                        if (in_array($i, $logsdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
                 }
             }
             $usedcos = [];
+            $cosdups = [];
             foreach ($anscoss as $key=>$anscos) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($coss); $i++) {
@@ -1591,12 +1696,20 @@ class DrawingScorePart implements ScorePart
                     if (abs($anscos[3]-$coss[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $cosdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedcos[$i] = 1;
+                        if (in_array($i, $cosdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
-                    $usedcos[$i] = 1;
                 }
             }
             $usedsec = [];
+            $secdups = [];
             foreach ($anssecs as $key=>$anssec) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($secs); $i++) {
@@ -1619,12 +1732,20 @@ class DrawingScorePart implements ScorePart
                     if (abs($anssec[3]-$secs[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $secdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedsec[$i] = 1;
+                        if (in_array($i, $secdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
-                    $usedsec[$i] = 1;
                 }
             }
             $usedtan = [];
+            $tandups = [];
             foreach ($anstans as $key=>$atan) {
                 $period = 4*($atan[2]-$atan[0]);
                 $scores[$scoretype[$key]][$key] = 0;
@@ -1648,12 +1769,20 @@ class DrawingScorePart implements ScorePart
                     if (abs($atan[3]-$tans[$i][3])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $tandups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedtan[$i] = 1;
+                        if (in_array($i, $tandups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
-                    $usedtan[$i] = 1;
                 }
             }
             $usedabs = [];
+            $absdups = [];
             foreach ($ansabs as $key=>$aabs) {
                 $scores[$scoretype[$key]][$key] = 0;
                 for ($i=0; $i<count($abs); $i++) {
@@ -1669,9 +1798,16 @@ class DrawingScorePart implements ScorePart
                     if (abs($aabs[2]-$abs[$i][2])/(abs($aabs[2])+$toladj)>$deftol*$reltolerance) {
                         continue;
                     }
-                    if ($scores[$scoretype[$key]][$key] == 1) { $dupstoignore++; }
+                    if ($scores[$scoretype[$key]][$key] == 1) {
+                        $absdups[] = $i;
+                        $dupstoignore++;
+                    } else {
+                        $usedabs[$i] = 1;
+                        if (in_array($i, $absdups)) {
+                            $dupstoignore--;
+                        }
+                    }
                     $scores[$scoretype[$key]][$key] = 1;
-                    $usedabs[$i] = 1;
                 }
             }
             //extra stuff is total count of drawn items - # of scored items - # of correct optional items
