@@ -606,13 +606,7 @@ export const actions = {
           this.updateTreeReader();
         }
 
-        let hasShowWorkAfter = false;
-        for (let k = 0; k < store.assessInfo.questions.length; k++) {
-          if (store.assessInfo.questions[k].showwork & 2) {
-            hasShowWorkAfter = true;
-            break;
-          }
-        }
+        const hasShowWorkAfter = this.getHasShowworkAfter();
 
         if (endattempt) {
           store.inProgress = false;
@@ -658,18 +652,7 @@ export const actions = {
       });
   },
   gotoSummary () {
-    let hasShowWorkAfter = false;
-    for (let k = 0; k < store.assessInfo.questions.length; k++) {
-      if (store.assessInfo.questions[k].showwork & 2) {
-        hasShowWorkAfter = true;
-        store.assessInfo.showwork_after = true;
-        break;
-      }
-    }
-    if ((store.assessInfo.singleshowwork & 8) &&  // single showwork after
-        (store.assessInfo.singleshowwork & 2)) {
-        hasShowWorkAfter = true;
-    }
+    const hasShowWorkAfter = this.getHasShowworkAfter();
 
     if (store.assessInfo.submitby === 'by_question') {
       if (hasShowWorkAfter && !store.assessInfo.in_practice) {
@@ -1082,6 +1065,21 @@ export const actions = {
       };
     }
     return out;
+  },
+  getHasShowworkAfter () {
+    let hasShowWorkAfter = false;
+    for (let k = 0; k < store.assessInfo.questions.length; k++) {
+      if (store.assessInfo.questions[k].showwork & 2) {
+        hasShowWorkAfter = true;
+        store.assessInfo.showwork_after = true;
+        break;
+      }
+    }
+    if ((store.assessInfo.singleshowwork & 8) &&  // single showwork after
+        (store.assessInfo.singleshowwork & 2)) {
+        hasShowWorkAfter = true;
+    }
+    return hasShowWorkAfter;
   },
   setInitValue (qn, fieldname, val) {
     if (!store.initValues.hasOwnProperty(qn)) {

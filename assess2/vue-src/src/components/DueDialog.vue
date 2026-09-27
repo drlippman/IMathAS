@@ -37,6 +37,17 @@
               {{ $t('duedialog-submitnow') }}
             </button>
           </p>
+          <p v-else-if="showAddWork">
+            <br/>
+            {{ $t('work-add_prev') }}<br/>
+            <button
+              type="button"
+              class="primary"
+              @click="$router.push('/showwork'); closeDialog();"
+            >
+              {{ $t('work-add') }}
+            </button>
+          </p>
           <p>
             <button
               :class="{primary: exitPrimary, secondary: !exitPrimary}"
@@ -87,8 +98,11 @@ export default {
         return this.$t('duedialog-bya_unsubmitted');
       }
     },
+    showAddWork () {
+      return actions.getHasShowworkAfter();
+    },
     exitPrimary () {
-      return (!this.hasUnsubmitted && !this.canUseLatePass);
+      return (!this.hasUnsubmitted && !this.showAddWork && !this.canUseLatePass);
     }
   },
   methods: {
