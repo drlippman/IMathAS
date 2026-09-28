@@ -485,7 +485,11 @@ function _mf_format($num, $den, $pi, $double) {
  * The result uses '//' when every division in expr is '//', otherwise '/'.
  */
 function makefraction($expr) {
-    $r = _mf_core($expr);
+    // try regex parse, use parser only if needed
+    $r = _mf_regexparse($expr);
+    if (!$r['ok']) {
+        $r = _mf_core($expr);
+    }
     if (!$r['ok']) {
         _mf_warn($r['msg']);
         return 'DNE';
@@ -497,9 +501,62 @@ function dispmakefraction($expr) {
     return ' `' . makefraction($expr) . '`';
 }
 
+function _mf_regexparse($expr) {
+    $pattern = '~
+        ^\s*
+        (?:(?P<neg>[+-])\s*(?=\())?\s*       # optional outer sign, only if a "(" follows
+        (?P<lp1>\()?\s*                      # optional "(" around numerator
+        (?=[+-]?(?:\d|pi))\s*                # numerator needs a digit or pi
+        (?P<coef>[+-]?\d*)\s*                # sign and/or digits
+        (?P<pi>pi)?\s*                       # optional pi
+        (?(<lp1>)\))\s*                      # ")" only if "(" was opened
+        (?:                                  # --- optional denominator ---
+            \s*(?P<div>//?)\s*               # division symbol / or //
+            (?P<lp2>\()?\s*                  # optional "(" around denominator
+            (?P<den>[+-]?\d+)\s*             # denominator with optional sign
+            (?(<lp2>)\))                     # ")" only if "(" was opened
+        )?
+        \s*$
+    ~xi';
+    if (preg_match($pattern, $expr, $m)) {
+        $hasPi = !empty($m['pi']);
+        $coef  = $m['coef'];
+        $doubleslash = !empty($m['div']) && $m['div'] === '//';
+
+        $negs = 0;
+        $hasonecoef = false;
+        if ($hasPi && ($coef === '' || $coef === '+')) {
+            $coef = 1;
+        } elseif ($hasPi && $coef === '-') {
+            $coef = -1;
+        } else {
+            $coef = (int)$coef;
+            $hasonecoef = $hasPi && abs($coef) == 1;
+        }
+        if ($coef < 0) {
+            $negs++;
+        }
+
+        if (($m['neg'] ?? '') === '-') {
+            $coef = -$coef;
+            $negs++;
+        }
+
+        // denominator defaults to 1 when there is no "/..." part
+        $hasonecoef |= ($m['den'] ?? 0) == 1;
+        $den = (($m['den'] ?? '') !== '') ? (int)$m['den'] : 1;
+        if ($den < 0) {
+            $negs++;
+        }
+        return ['ok' => true, 'num' => $coef, 'den' => $den, 'pi' => $hasPi, 
+            'double' => $doubleslash, 'negs' => $negs, 'hasonecoef' => $hasonecoef];
+    } 
+    return ['ok' => false];
+}
+
 /* Numerator of makefraction(expr); for a pi fraction, the coefficient of pi. */
 function fractionnumerator($expr) {
-    $r = _mf_core($expr);
+    $r = _mf_regexparse($expr); //_mf_core($expr);
     if (!$r['ok']) {
         _mf_warn($r['msg']);
         return 'DNE';
@@ -509,7 +566,7 @@ function fractionnumerator($expr) {
 
 /* Denominator of makefraction(expr), always positive. */
 function fractiondenominator($expr) {
-    $r = _mf_core($expr);
+    $r = _mf_regexparse($expr); //_mf_core($expr);
     if (!$r['ok']) {
         _mf_warn($r['msg']);
         return 'DNE';
@@ -527,12 +584,16 @@ function fractiondenominator($expr) {
  * --4 and 1pi/2 are not.
  */
 function isreducedfraction($expr) {
-    $r = _mf_core($expr);
+    $r = _mf_regexparse($expr); // _mf_core($expr);
     if (!$r['ok']) {
         _mf_warn($r['msg']);
         return false;
     }
-    $negs = 0;
+    if ($r['negs'] > 1 || $r['hasonecoef']) {
+        return false;
+    }
+    return _mf_gcd($r['num'], $r['den']) == 1;
+    /*$negs = 0;
     $d = _mf_desc($r['ast'], $negs);
     if ($d === null || $negs > 1) {
         return false;
@@ -541,6 +602,7 @@ function isreducedfraction($expr) {
         return $d[1] == 1 && $d[2] == 0 && $negs == 0;
     }
     return _mf_gcd($d[0], $d[1]) == 1;
+    */
 }
 
 function _mf_strip($n, &$negs) {
@@ -813,8 +875,8 @@ function _mf_randfinish($list, $S, $order) {
 }
 
 function _mf_checkn($n) {
-    if (!is_numeric($n) || floor($n) != $n || $n < 0) {
-        _mf_warn('n must be a nonnegative integer');
+    if (!is_numeric($n) || floor($n) != $n || $n <= 0 || $n > 100) {
+        _mf_warn('n must be a positive integer less than 100');
         return null;
     }
     return (int)$n;
@@ -859,14 +921,14 @@ function diffrandfractions($denoms, $min, $max, $n, $symbol = '/', $order = '') 
         return array('DNE');
     }
 
-    /* When the pool is small enough, list it, so "not enough" is detected
-       exactly and a shortfall after sampling can be filled from it. */
     $total = 0;
     foreach ($S['feas'] as $f) {
         $total += $f[2] - $f[1] + 1;
     }
     $pool = null;
-    if ($total <= 100000) {
+    /* When the total is very small, or when n is fairly big relative to total but
+       total is still reasonable, generate pool and pick from it */
+    if ($total <= 100 || ($n > .2*$total && $total <=1000)) {
         $pool = array();
         foreach ($S['feas'] as $f) {
             for ($k = $f[1]; $k <= $f[2]; $k++) {
@@ -880,11 +942,16 @@ function diffrandfractions($denoms, $min, $max, $n, $symbol = '/', $order = '') 
         if (count($pool) < $n) {
             return array('DNE');
         }
+        // shuffle pool and return first n values
+        $GLOBALS['RND']->shuffle($pool);
+        return _mf_randfinish(array_slice($pool, $n), $S, $order); 
     }
+
+    // total too big, so do sampling
 
     $picked = array();
     $tries = 0;
-    $limit = 200 * $n + 1000;
+    $limit = min(200 * $n, 10000);
     while (count($picked) < $n && $tries < $limit) {
         $q = _mf_drawone($S);
         $key = $q[0] . '/' . $q[1];
@@ -894,19 +961,7 @@ function diffrandfractions($denoms, $min, $max, $n, $symbol = '/', $order = '') 
         $tries++;
     }
     if (count($picked) < $n) {
-        if ($pool === null) {
-            return array('DNE');
-        }
-        $rest = array_values(array_diff_key($pool, $picked));
-        for ($i = count($rest) - 1; $i > 0; $i--) {
-            $j = _mf_randint(0, $i);
-            $tmp = $rest[$i];
-            $rest[$i] = $rest[$j];
-            $rest[$j] = $tmp;
-        }
-        for ($i = 0; count($picked) < $n; $i++) {
-            $picked[$rest[$i][0] . '/' . $rest[$i][1]] = $rest[$i];
-        }
+        return array('DNE');
     }
     return _mf_randfinish(array_values($picked), $S, $order);
 }
