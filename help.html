@@ -6052,6 +6052,13 @@ $answerboxsize = 3
 		answers. Set in general, or indexed for specific parts. Generally not necessary, but may be useful 
 		in certain cases where later answers depend on earlier ones.
 	</dd>
+<dt>$scoreformat = "points" </dt>
+	<dd>Only affects the "Score on last answer" line shown when previewing the question, and only
+	when $answeights is set.  By default that line shows scores as fractions of 1, like
+	1/1 (0.5/0.5, 0.1667/0.1667, 0.3333/0.3333).  With $scoreformat = "points", the answer weights
+	are treated as points, so with $answeights = array(3,1,2) the same result shows as
+	6/6 (3/3, 1/1, 2/2).  This makes it easier to see how many points are lost for particular errors
+	when setting up partial credit.  Student-facing scores are not affected.</dd>	
 <dt>$showanswer </dt>
 	<dd>You can either define $showanswer for individual question parts (ie, $showanswer[1]="`x^2`"), or you can set one
 	$showanswer, which will be the only answer shown for the problem (ie, $showanswer = "x=$answer[0], y=$answer[1]")</dd>

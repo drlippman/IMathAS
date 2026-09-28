@@ -418,6 +418,7 @@ class AssessStandalone {
         'scores'=>$scores,
         'raw'=>$rawparts,
         'answeights'=>$scoreResult['answeights'],
+        'scoreformat'=>$scoreResult['scoreformat'] ?? '',
         'errors'=>$scoreResult['errors'],
         'allans'=>$allPartsAns
     ];

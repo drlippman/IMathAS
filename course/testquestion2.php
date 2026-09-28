@@ -184,17 +184,28 @@ if ($myrights<20) {
     }
     $res = $a2->scoreQuestion($qn, $parts_to_score);
 
-	$scoretot = round(array_sum($res['scores']), 2);
-	$score = $scoretot . '/1';
-	if (count($res['scores'])>1) {
-		$weightTot = array_sum($res['answeights']);
-		$scaledWeights = array_map(function($w) use ($weightTot) {
-			return $weightTot>0 ? round($w/$weightTot,4) : 0;
-		}, $res['answeights']);
-		$score .= ' (' . implode(', ', array_map(function($score, $weight) {
-			return "$score/$weight";
-		}, $res['scores'], $scaledWeights)) . ')';
-	} 
+	$weightTot = array_sum($res['answeights']);
+	if (($res['scoreformat'] ?? '') === 'points' && $weightTot > 0) {
+		// Points format: multiply each fraction's top and bottom by the total points
+		$scoretot = round(array_sum($res['scores']) * $weightTot, 2);
+		$score = $scoretot . '/' . round($weightTot, 4);
+		if (count($res['scores'])>1) {
+			$score .= ' (' . implode(', ', array_map(function($score, $weight) use ($weightTot) {
+				return round($score * $weightTot, 2) . '/' . round($weight, 4);
+			}, $res['scores'], $res['answeights'])) . ')';
+		}
+	} else {
+		$scoretot = round(array_sum($res['scores']), 2);
+		$score = $scoretot . '/1';
+		if (count($res['scores'])>1) {
+			$scaledWeights = array_map(function($w) use ($weightTot) {
+				return $weightTot>0 ? round($w/$weightTot,4) : 0;
+			}, $res['answeights']);
+			$score .= ' (' . implode(', ', array_map(function($score, $weight) {
+				return "$score/$weight";
+			}, $res['scores'], $scaledWeights)) . ')';
+		}
+	}
 	$page_scoreMsg =  "<p>"._("Score on last answer: ").Sanitize::encodeStringForDisplay($score)."</p>\n";
 
     if (!empty($res['errors'])) {
