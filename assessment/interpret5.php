@@ -47,7 +47,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
 		if ($r === 'error;') { 
 			return $r;
 		}
-        $r = '$wherecount[0]=0;$whilecount[0]=0;' . $r;
+        $r = '$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;' . $r;
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
         }
@@ -196,15 +196,18 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
                 if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
-						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && \$forloopcnt[{$countcnt}]<1000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++) {".$todo.";};
+						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && \$forloopcnt[{$countcnt}]<1000 && \$forloopcnt[0]<12000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++, \$forloopcnt[0]++) {".$todo.";};
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}}");
 				} else if (preg_match('/^\s*\(\s*([^;]*?);\s*([^;]*?);\s*([^;]*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
-					$bits = array( "for ({$forcond[0]},\$forloopcnt[{$countcnt}]=0;({$forcond[1]}) && \$forloopcnt[{$countcnt}]<1000; ({$forcond[2]}), \$forloopcnt[{$countcnt}]++) {".$todo.";};
+					$bits = array( "for ({$forcond[0]},\$forloopcnt[{$countcnt}]=0;({$forcond[1]}) && \$forloopcnt[{$countcnt}]<1000 && \$forloopcnt[0]<12000; ({$forcond[2]}), \$forloopcnt[{$countcnt}]++, \$forloopcnt[0]++) {".$todo.";};
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';
+				}
+				if ($countcnt == 1) {
+					$bits[0] = '$forloopcnt[0]=0;' . $bits[0] . ' if ($forloopcnt[0]>=12000) {echo "nested for loops exceeded 10000 iterations - giving up";}';
 				}
 			} else if ($foreachloc===0) {
 				//convert foreach($arr AS $k=>$v) {todo}
@@ -231,11 +234,14 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					$bits = array("if (!is_array({$foreachcond[0]})) {echo 'input of foreach must be an array';} else {
                         \$forloopcnt[{$countcnt}]=0; 
                         foreach ({$foreachcond[0]} as {$foreachcond[1]}=>{$foreachcond[2]}) { 
-                            \$forloopcnt[{$countcnt}]++;
-                            if (\$forloopcnt[{$countcnt}]==1000) { break; }
+                            \$forloopcnt[{$countcnt}]++;\$forloopcnt[0]++;
+                            if (\$forloopcnt[{$countcnt}]==1000 || \$forloopcnt[0]>=12000) { break; }
                             { $todo ;}
                         }; 
                         if (\$forloopcnt[{$countcnt}]>=1000) {echo \"foreach loop exceeded 1000 iterations - giving up\";}}");
+					if ($countcnt == 1) {
+						$bits[0] = '$forloopcnt[0]=0;' . $bits[0] . ' if ($forloopcnt[0]>=12000) {echo "nested foreach exceeded 10000 iterations - giving up";}';
+					}
 				} else {
 					echo _('error with foreach code.. must be "foreach ($arr as $a=>$b) {todo}" where $arr, $a and $b are variables only');
 					return 'error';
