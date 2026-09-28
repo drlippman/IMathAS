@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <title>makefraction help</title>
+    <link rel="stylesheet" href="help.css?v=112325" type="text/css" />
+</head><body>
+<a name="top" id="top"></a>
+<p id="libhelpback"><a href="libhelp.php">&laquo; Back to Macro Library list</a> <a id="floating-top-btn" href="#top">&uarr; Top</a></p>
+<h1>Macro Library makefraction</h1>
+<p>Operations on fractions. If an expression expr can simplify to a fraction, makefraction(expr) returns the reduced fraction. Version 1, Sept. 14, 2026, Dale Myers</p>
+<ul>
+<li><a href="#makefraction">makefraction</a></li>
+<li><a href="#dispmakefraction">dispmakefraction</a></li>
+<li><a href="#fractionnumerator">fractionnumerator</a></li>
+<li><a href="#fractiondenominator">fractiondenominator</a></li>
+<li><a href="#isreducedfraction">isreducedfraction</a></li>
+<li><a href="#makerepeatingdecimal">makerepeatingdecimal</a></li>
+<li><a href="#repeatingdecimal2fraction">repeatingdecimal2fraction</a></li>
+<li><a href="#randfraction">randfraction</a></li>
+<li><a href="#randfractions">randfractions</a></li>
+<li><a href="#diffrandfractions">diffrandfractions</a></li>
+</ul>
+
+<p>An expression expr may use 0-9, pi, + - * / // ^ ( ) [ ] { }, unary minus and implicit multiplication,
+with ^ limited to the powers -2, -1, 0, 1, 2. When expr does not simplify to a fraction n/m or (n pi)/m,
+makefraction, dispmakefraction, fractionnumerator, fractiondenominator and makerepeatingdecimal return "DNE",
+and isreducedfraction returns false. Each echoes one of these warnings:</p>
+<ul>
+<li>"division by zero"</li>
+<li>"powers other than -2,-1,0,1,2 are not accepted"</li>
+<li>"% is not an accepted character", for the first character not accepted (here %)</li>
+<li>"numbers are too large"</li>
+<li>"this doesn't make a fraction", otherwise</li>
+</ul>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="makefraction"><a name="makefraction">makefraction</a></h3>
+<strong>makefraction(expr)</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns the reduced fraction which is equivalent to expr, or "DNE" if none.
+Negative fractions are written -1/2, not (-1)/2 or 1/(-2). A denominator of 1 and a coefficient 1 on pi are dropped.
+<br/>If every division in expr is //, the result uses //; otherwise it uses /.
+With /, a multiple of pi is put in parentheses, (3pi)/4, so that `(3pi)/4` renders as a single fraction.
+<details class="example"><summary>Examples</summary>
+<pre>makefraction("6/3") = "2"
+makefraction("1/(-2)") = "-1/2"
+makefraction("6/4") = "3/2"
+makefraction("6//4") = "3//2"
+makefraction("1/2-1/3") = "1/6"
+makefraction("1/2-1//3") = "1/6"
+makefraction("1//2-1//3") = "1//6"
+makefraction("6pi/4") = "(3pi)/2"
+makefraction("-6pi/4") = "-(3pi)/2"
+makefraction("6pi//4") = "3pi//2"
+makefraction("1pi/4") = "pi/4"
+makefraction("pi/4+6pi//4") = "(7pi)/4"
+makefraction("1/[1/2-1/3]") = "6"
+makefraction("1/{1/2-1/3}") = "6"
+makefraction("1/(3/(1-4))^2") = "1"
+makefraction("6/0") = "DNE" with the warning "division by zero"
+makefraction("6^3") = "DNE" with the warning "powers other than -2,-1,0,1,2 are not accepted"
+makefraction("6x/3") = "DNE" with the warning "x is not an accepted character"
+makefraction("6)((3") = "DNE" with the warning "this doesn't make a fraction"
+makefraction("0^0") = "DNE" with the warning "this doesn't make a fraction"</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="dispmakefraction"><a name="dispmakefraction">dispmakefraction</a></h3>
+<strong>dispmakefraction(expr)</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns " `makefraction(expr)`", a space followed by makefraction(expr) in backticks, so it is rendered by AsciiMath.
+<details class="example"><summary>Examples</summary>
+<pre>dispmakefraction("6/4") = " `3/2`"
+dispmakefraction("-6pi/4") = " `-(3pi)/2`"
+dispmakefraction("1//2-1//3") = " `1//6`"</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="fractionnumerator"><a name="fractionnumerator">fractionnumerator</a></h3>
+<strong>fractionnumerator(expr)</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns the numerator of makefraction(expr). If pi is involved, it is the coefficient of pi in the numerator.
+<details class="example"><summary>Examples</summary>
+<pre>fractionnumerator("6/4") = 3
+fractionnumerator("3/(-12)") = -1
+fractionnumerator("3pi/2") = 3</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="fractiondenominator"><a name="fractiondenominator">fractiondenominator</a></h3>
+<strong>fractiondenominator(expr)</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns the denominator of makefraction(expr), which is always positive.
+<details class="example"><summary>Examples</summary>
+<pre>fractiondenominator("4/2") = 1
+fractiondenominator("4/(-12)") = 3
+fractiondenominator("3pi/6") = 2</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="isreducedfraction"><a name="isreducedfraction">isreducedfraction</a></h3>
+<strong>isreducedfraction(expr)</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns true iff expr is a reduced fraction simplified as much as possible.
+-(1/2), (-1)/2 and 1/(-2) are considered reduced fractions; (-1)/(-2) is not.
+<details class="example"><summary>Examples</summary>
+<pre>isreducedfraction("4") = true
+isreducedfraction("4/5") = true
+isreducedfraction("4/(-5)") = true
+isreducedfraction("-pi") = true
+isreducedfraction("(4pi)/3") = true
+isreducedfraction("4(pi/3)") = true
+isreducedfraction("(-4)/(-5)") = false
+isreducedfraction("4/6") = false
+isreducedfraction("6/1") = false
+isreducedfraction("2*3") = false
+isreducedfraction("--4") = false
+isreducedfraction("1pi/2") = false
+isreducedfraction("1+pi") = false with the warning "this doesn't make a fraction"
+isreducedfraction("2x/3") = false with the warning "x is not an accepted character"</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="makerepeatingdecimal"><a name="makerepeatingdecimal">makerepeatingdecimal</a></h3>
+<strong>makerepeatingdecimal(expr)</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns the repeating decimal of the fraction produced by makefraction(expr), in AsciiMath notation without a leading 0, e.g., 1.0bar(35) or .25.
+<details class="example"><summary>Examples</summary>
+<pre>makerepeatingdecimal("1/4") = ".25"
+makerepeatingdecimal("1/3") = ".bar(3)"
+makerepeatingdecimal("-13/3") = "-4.bar(3)"
+makerepeatingdecimal("301/300") = "1.00bar(3)"
+makerepeatingdecimal("15/7") = "2.bar(142857)"
+makerepeatingdecimal("pi/2") = "DNE" with the warning "pi fractions do not have repeating decimals"</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="repeatingdecimal2fraction"><a name="repeatingdecimal2fraction">repeatingdecimal2fraction</a></h3>
+<strong>repeatingdecimal2fraction(repeatdec)</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns the fraction with the same value as repeatdec, a decimal written in AsciiMath notation such as "-4.bar(3)" or "4.33".
+<br/>Any other input returns "DNE" and echoes the input followed by "should be like -2.33 or 2.1bar(33)".
+<details class="example"><summary>Examples</summary>
+<pre>repeatingdecimal2fraction("-.33") = "-33/100"
+repeatingdecimal2fraction("4.33") = "433/100"
+repeatingdecimal2fraction(".bar(3)") = "1/3"
+repeatingdecimal2fraction("-4.bar(3)") = "-13/3"
+repeatingdecimal2fraction("1/3") = "DNE" with the warning "1/3 should be like -2.33 or 2.1bar(33)"</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="randfraction"><a name="randfraction">randfraction</a></h3>
+<strong>randfraction(denoms, min, max, [symbol])</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns a random reduced fraction between min and max whose denominator is in the array denoms, or "DNE" if there is none.
+<br/>&nbsp; &nbsp; denoms = an array of possible denominators, e.g., [2,3,5,7].
+<br/>&nbsp; &nbsp; min = a real or integer.
+<br/>&nbsp; &nbsp; max = a real or integer.
+<br/>&nbsp; &nbsp; optional symbol can be '/', '//', 'pi/' or 'pi//', with default '/'. These give fractions like '2/5', '2//5', '(2pi)/5', '2pi//5'. The symbol may not appear in a result like '0'.
+<br/>Randomness is determined by randomly picking a real in [min, max], then randomly selecting a denominator from denoms,
+then picking the reduced fraction with that denominator closest to the real. If there are two such fractions, one is randomly picked.
+<br/>The denominator of the result is always one of denoms. To include integers, add 1 to denoms.
+<details class="example"><summary>Examples</summary>
+<pre>randfraction([2,3,5,7], 0, 1) could be '2/5' but not '0' or '1'
+randfraction([1,2,3,5,7], 0, 1) could be '2/5', '0' or '1'
+randfraction([4], 1, 9) could be '23/4' but not '9/2'
+randfraction([2,3,5,7], 0, 1, '//') could be '2//5'
+randfraction([2,3,5,7], 0, 1, 'pi/') could be '(2pi)/5'
+randfraction([2,3,5,7], 0, 1, 'pi//') could be '2pi//5'
+randfraction([1], .3, .6) = "DNE"
+randfraction([1,2,3,4], 0, -1) = "DNE"
+randfraction([4], .3, .6) = "DNE"</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="randfractions"><a name="randfractions">randfractions</a></h3>
+<strong>randfractions(denoms, min, max, n, [symbol], [order])</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns an array of n random reduced fractions, chosen as in randfraction, or ["DNE"] if the conditions cannot be met.
+<br/>&nbsp; &nbsp; denoms, min, max and symbol are as in randfraction.
+<br/>&nbsp; &nbsp; n = the number of fractions.
+<br/>&nbsp; &nbsp; optional order can be '', 'inc' or 'dec', with default '' (no ordering). Values may repeat, so 'inc' and 'dec' are not always strict.
+<details class="example"><summary>Examples</summary>
+<pre>randfractions([2,3,5,7], 0, 1, 3, 'pi/') could be ['(3pi)/5', '(2pi)/7', 'pi/2']
+randfractions([2,3,5,7], 0, 1, 3, 'pi//') could be ['3pi//5', '2pi//7', 'pi//2']
+randfractions([2,3,5,7], -1, 1, 4, '/', 'inc') could be ['-6/7', '2/7', '1/2', '3/5']
+randfractions([2,3,5,7], -.999, .999, 4, '/', 'dec') could be ['3/5', '1/2', '2/7', '-6/7']
+randfractions([2,3,5,7], 1, 0, 2) = ["DNE"]</pre></details></div>
+
+<div style="font-family:'Arial', 'Helvetica', sans-serif;">
+<h3 id="diffrandfractions"><a name="diffrandfractions">diffrandfractions</a></h3>
+<strong>diffrandfractions(denoms, min, max, n, [symbol], [order])</strong></div>
+<div style="font-family:'Times New Roman', Times, serif">
+Returns an array of n different random reduced fractions, or ["DNE"] if there are fewer than n. Otherwise the same as randfractions.
+<details class="example"><summary>Examples</summary>
+<pre>diffrandfractions([2,3,5,7], 0, 1, 3, 'pi//') could be ['3pi//5', '2pi//7', 'pi//2']
+diffrandfractions([2,3,5,7], 0, 1, 3, '/', 'inc') could be ['2/7', '1/2', '3/5']
+diffrandfractions([2], 0, 1, 4) = ["DNE"]</pre></details></div>
+<br/>
+</body></html>
