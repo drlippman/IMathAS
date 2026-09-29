@@ -5237,9 +5237,10 @@ $answer = "$a + $b i"
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "list" or "allowjcomplex" </dt>
-	<dd>"list" Specifies that the answer will be a list of complex numbers.
-		"allowjcomplex" allows 2+3j instead of 2+3i
+<dt>$answerformat = "list", "allowjcomplex", "nosoln", "nosolninf" </dt>
+	<dd>"list" Specifies that the answer will be a list of complex numbers.<br/>
+		"allowjcomplex" allows 2+3j instead of 2+3i<br/>
+		"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
 	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
@@ -5359,11 +5360,13 @@ $answer = "[(1,2,3),(4,5,6)]"
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult" or "ref" or "rowequiv" or "anyroworder"</dt>
+<dt>$answerformat = "scalarmult" or "ref" or "rowequiv" or "anyroworder"; "nosoln", "nosolninf"</dt>
 	<dd>If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
 	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
     If "rowequiv" is used, any matrix that is row equivalent will be accepted.<br/>
-    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
+    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.<br/>
+	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
+	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -5431,14 +5434,16 @@ $answerformat = "fraction" // require entries be fractions
 	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
 	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
 	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
-<dt>$answerformat = "scalarmult","ref","rowequiv","anyroworder",fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" </dt>
+<dt>$answerformat = "scalarmult","ref","rowequiv","anyroworder",fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf"</dt>
 	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
 	If "scalarmult" used, any scalar multiple of the correct matrix will be accepted.<br/>
 	If "ref" is used, any row echelon form matrix that is row equivalent will be accepted.<br/>
     If "rowequiv" is used, any matrix that is row equivalent will be accepted.<br/>
-    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.</dd>
+    If "anyroworder" is used, any matrix equivalent up to row interchanges will be accepted.<br/>
+	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
+	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
@@ -5730,13 +5735,16 @@ $answer = "(2,3) or [2,3]"
 	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
 	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
-<dt>$answerformat = "normalcurve" or "list" or "allowsloppyintervals"</dt>
+<dt>$answerformat = "normalcurve" or "list" or "allowsloppyintervals", "nosoln", "nosolninf"</dt>
 	<dd>"normalcurve" Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the open interval that should be
     shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.
     <br/>
     "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)"
     <br/>
-    "allowsloppyintervals" will accept unsimplified unions, so will count [2,5)U(3,7) as equivalent to [2,7)</dd>
+    "allowsloppyintervals" will accept unsimplified unions, so will count [2,5)U(3,7) as equivalent to [2,7)
+	<br/>
+	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
+	</dd>
 <dt>$scoremethod = "partialcredit"</dt>
   <dd>By default, interval answers will be marked all right or all wrong.  Setting $scoremethod = "partialcredit"
 		will changing the scoring mode to give partial credit. (new assessment system only).</dd>
@@ -5791,7 +5799,7 @@ $answer = "[2,oo)"
 
 <p><strong>Optional Variables</strong></p>
 <dl>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", "allowsloppyintervals", or "inequality" </dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "list", "allowsloppyintervals", "inequality", "nosoln", "nosolninf" </dt>
 	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
@@ -5800,7 +5808,10 @@ $answer = "[2,oo)"
     <br/>
     "list" will accept a list of comma-separated intervals like $answer="[2,3),(5,7)".  Does not work with "inequality".
 	<br/>
-    "allowsloppyintervals" will accept unsimplified unions, so will count [2,5)U(3,7) as equivalent to [2,7)</dd>
+    "allowsloppyintervals" will accept unsimplified unions, so will count [2,5)U(3,7) as equivalent to [2,7)
+	<br/>
+	"nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this: $ansprompt = "One value, x=;No values;Many values"
+	</dd>
 <dt>$reltolerance = a decimal value </dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
