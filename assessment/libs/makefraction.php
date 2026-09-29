@@ -36,7 +36,7 @@ if (!isset($allowedmacros) || !is_array($allowedmacros)) {
     $allowedmacros = array();
 }
 array_push($allowedmacros, 'makefraction', 'dispmakefraction', 'fractionnumerator',
-    'fractiondenominator', 'isreducedfraction', 'makerepeatingdecimal',
+    'fractiondenominator', 'isreducedfraction', 'makerepeatingdecimal','randdifffractions',
     'repeatingdecimal2fraction', 'randfraction', 'randfractions', 'diffrandfractions');
 
 if (!defined('MF_DIV0')) {
@@ -944,7 +944,7 @@ function diffrandfractions($denoms, $min, $max, $n, $symbol = '/', $order = '') 
         }
         // shuffle pool and return first n values
         $GLOBALS['RND']->shuffle($pool);
-        return _mf_randfinish(array_slice($pool, $n), $S, $order); 
+        return _mf_randfinish(array_slice($pool, 0, $n), $S, $order); 
     }
 
     // total too big, so do sampling
@@ -964,4 +964,140 @@ function diffrandfractions($denoms, $min, $max, $n, $symbol = '/', $order = '') 
         return array('DNE');
     }
     return _mf_randfinish(array_values($picked), $S, $order);
+}
+
+/* An alternate implementation of diffrandfractions.  Seems to be ~2x faster. */
+function randdifffractions($denoms, $min, $max, $n = 0, $ord = 'def', $diffdenom = false, $symbol = '/') {
+    if (func_num_args() < 4) {
+        echo "randdifffractions expects at least 4 arguments";
+        return [];
+    }
+    if (!is_array($denoms)) {
+        $denoms = listtoarray($denoms);
+    }
+    $denoms = array_values(array_unique(array_filter(array_map('intval', $denoms), function ($v) {
+        return $v > 0;
+    })));
+    if (count($denoms) == 0) {
+        echo "randdifffractions: need at least one positive denominator";
+        return [];
+    }
+    if (!in_array($symbol, array('/', '//', 'pi/', 'pi//'), true)) {
+        _mf_warn("Invalid symbol '$symbol'. Allowed: '/', '//', 'pi/', 'pi//'.");
+        return [];
+    }
+    // min and max apply to the fraction itself; for pi symbols that is the
+    // coefficient of pi, as in randfractions
+    $pi = (substr($symbol, 0, 2) === 'pi');
+    $double = (substr($symbol, -2) === '//');
+    list($min, $max) = checkMinMax($min, $max, false, 'randdifffractions');
+    $n = floor($n);
+    if ($n <= 0) {
+        echo "randdifffractions: need n &gt; 0";
+        return [];
+    }
+    if ($n > 1e4) {
+        echo 'Error with randdifffractions: $n too large';
+        return [];
+    }
+
+    $used = [];  // "num/den" => true
+    $pools = []; // den => remaining valid numerators (built lazily for small ranges)
+    $out = [];   // [value, string]
+    $avail = $denoms;  // denominators that may still have unused numerators
+    $queue = [];       // for diffdenom: denominators not yet used this round
+    while (count($out) < $n && count($avail) > 0) {
+        if ($diffdenom) {
+            if (count($queue) == 0) {
+                $queue = $avail;
+            }
+            $qi = $GLOBALS['RND']->rand(0, count($queue) - 1);
+            $d = $queue[$qi];
+            array_splice($queue, $qi, 1);
+        } else {
+            $d = $avail[$GLOBALS['RND']->rand(0, count($avail) - 1)];
+        }
+        $num = randdifffractions_picknum($d, $min, $max, $used, $pools);
+        if ($num === null) {
+            // this denominator is exhausted
+            $avail = array_values(array_diff($avail, [$d]));
+            $queue = array_values(array_diff($queue, [$d]));
+            continue;
+        }
+        $out[] = [$num / $d, _mf_format($num, $d, $pi, $double)];
+    }
+    if (count($out) < $n) {
+        return array('DNE');
+        //echo "randdifffractions: not able to find enough valid fractions";
+    }
+    if ($ord == 'inc') {
+        usort($out, function ($a, $b) {
+            return $a[0] <=> $b[0];
+        });
+    } else if ($ord == 'dec') {
+        usort($out, function ($a, $b) {
+            return $b[0] <=> $a[0];
+        });
+    }
+    return array_column($out, 1);
+}
+
+// helper for randdifffractions: pick a random numerator n for denominator $d
+// with min <= n/d <= max, gcd(n,d)=1, and "n/d" not already in $used.
+// Returns null if none exist.
+// $pools caches (per denominator, for the duration of one randdifffractions
+// call) the remaining valid numerators for small ranges, or once random
+// sampling has failed, so the enumeration happens at most once per denominator.
+function randdifffractions_picknum($d, $min, $max, &$used, &$pools) {
+    $rnd = $GLOBALS['RND'];
+    if (isset($pools[$d])) {
+        // already enumerated; draw and remove in O(1)
+        $cnt = count($pools[$d]);
+        if ($cnt == 0) {
+            return null;
+        }
+        $i = $rnd->rand(0, $cnt - 1);
+        $num = $pools[$d][$i];
+        $pools[$d][$i] = $pools[$d][$cnt - 1];
+        array_pop($pools[$d]);
+        $used[$num . '/' . $d] = true;
+        return $num;
+    }
+    $lo = (int) ceil($min * $d - 1e-9);
+    $hi = (int) floor($max * $d + 1e-9);
+    if ($hi < $lo) {
+        $pools[$d] = [];
+        return null;
+    }
+    $isok = function ($num) use ($d, $used) {
+        $a = abs($num);
+        $b = $d;
+        while ($b != 0) {
+            list($a, $b) = [$b, $a % $b];
+        }
+        return ($a == 1 && !isset($used[$num . '/' . $d]));
+    };
+    // random sampling first when the range is large enough for it to pay off;
+    // small ranges skip straight to the enumerated pool
+    if ($hi - $lo > 50) {
+        for ($t = 0; $t < 25; $t++) {
+            $num = $rnd->rand($lo, $hi);
+            if ($isok($num)) {
+                $used[$num . '/' . $d] = true;
+                return $num;
+            }
+        }
+    }
+    // enumerate once, then cache
+    if ($hi - $lo > 1e4) {
+        return null;
+    }
+    $opts = [];
+    for ($num = $lo; $num <= $hi; $num++) {
+        if ($isok($num)) {
+            $opts[] = $num;
+        }
+    }
+    $pools[$d] = $opts;
+    return randdifffractions_picknum($d, $min, $max, $used, $pools);
 }
