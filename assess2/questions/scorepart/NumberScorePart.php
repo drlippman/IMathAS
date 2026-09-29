@@ -56,6 +56,7 @@ class NumberScorePart implements ScorePart
         if ($hasUnits) {
             require_once __DIR__.'/../../../assessment/libs/units.php';
         }
+        $isListAnswer = (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats));
         
         $givenans = normalizemathunicode($givenans);
 
@@ -65,13 +66,30 @@ class NumberScorePart implements ScorePart
 
         $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
+        if (!$hasUnits) {
+            if ($isListAnswer || in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
+                $possiblenumvals = explode(',', str_replace(['{','}','$',' '],'', $givenans));
+            } else {
+                $possiblenumvals = [str_replace(['$',' '],'',$givenans)];
+                if (empty($GLOBALS['CFG']['nocommathousandsseparator'])) {
+                    $possiblenumvals[0] = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$possiblenumvals[0]);
+                }
+            }
+            foreach ($possiblenumvals as $k=>$v) {
+                if ($v!='DNE' && $v!='oo' && $v!='+oo' && $v!='-oo') {
+                    if (!is_numeric($v)) {
+                        $possiblenumvals[$k] = '';
+                    }
+                } 
+            }
+            $scorePartResult->setLastAnswerAsNumber(implode(',', array_map('trim', $possiblenumvals)));
+        }
 
         if ($answer==='' && $givenans==='') {
             $scorePartResult->setRawScore(1);
             return $scorePartResult;
         }
 
-        $isListAnswer = (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats));
         if ($isListAnswer && !empty($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
             $scorePartResult->setRawScore(0);
             return $scorePartResult;

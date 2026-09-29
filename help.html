@@ -3412,7 +3412,8 @@ $ans = getstuans($stuanswersval, $thisq, 2)  // numerical part index 2 of a calc
 	<li>answerformat: Pass $answerformat to check the student answer meets the answerformat 
 		(currently only checks Calculated and Calculated N-tuple questions, and no lists). 
 		Pass 'checknumeric' to also verify the answer is numeric 
-		(use $stuanswersval for the first argument for calculated/calcntuple types).</li>
+		(use $stuanswersval for the first argument for calculated/calcntuple types, or the 
+		 single number type if it may contain commas).</li>
   </ul>
   </details>
   <details class="example"><summary>Example</summary><pre>// Single-part question:
