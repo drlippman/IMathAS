@@ -3735,7 +3735,7 @@ class AssessRecord
         $aver['score'],
         $this->assess_info->getSetting('points_possible')
       );
-      if ($this->assess_info->getSetting('singleshowwork')) {
+      if ($this->assess_info->getSetting('singleshowwork') & 8) {
         [$out['swgen'], $out['swgentime']] = $this->getGenShowwork($av);
       }
     }

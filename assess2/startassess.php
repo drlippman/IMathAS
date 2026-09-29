@@ -405,7 +405,7 @@ if ($showscores) {
 }
 
 // get single work
-if ($assess_info->getSetting('singleshowwork')) {
+if ($assess_info->getSetting('singleshowwork') & 8) {
   [$assessInfoOut['swgen'], $assessInfoOut['swgentime']] = $assess_record->getGenShowwork();
 }
 

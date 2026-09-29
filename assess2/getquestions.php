@@ -75,7 +75,7 @@ $assessInfoOut['questions'] = $assess_record->getAllQuestionObjects($showscores,
 getShowWorkAfter($assessInfoOut, $assess_record, $assess_info);
 
 // get single work
-if ($assess_info->getSetting('singleshowwork')) {
+if ($assess_info->getSetting('singleshowwork') & 8) {
   [$assessInfoOut['swgen'], $assessInfoOut['swgentime']] = $assess_record->getGenShowwork();
 }
 
