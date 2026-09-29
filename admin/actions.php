@@ -313,8 +313,19 @@ switch($_POST['action']) {
 			$stm->execute(array(':id'=>$deluid));
 		}
 		if ($stm->rowCount()==0) { break;}
+		//content_track only has student activity, and lacks a userid-only index,
+		//so delete using the (courseid,userid) index. courseid 0 is for msgs outside a course.
+		//Must be done before the imas_students rows are deleted.
+		$stm = $DBH->prepare("SELECT courseid FROM imas_students WHERE userid=?");
+		$stm->execute(array($deluid));
+		$trackcourseids = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+		$trackcourseids[] = 0;
+		$ph = Sanitize::generateQueryPlaceholders($trackcourseids);
+		$stm = $DBH->prepare("DELETE FROM imas_content_track WHERE courseid IN ($ph) AND userid=?");
+		$stm->execute(array_merge($trackcourseids, array($deluid)));
+
 		$toDelTable = array('user_prefs', 'students', 'teachers', 'tutors',
-			'assessment_sessions', 'assessment_records', 'exceptions', 'bookmarks', 'content_track',
+			'assessment_sessions', 'assessment_records', 'exceptions', 'bookmarks',
 			'forum_views', 'forum_subscriptions', 'grades', 'ltiusers', 'stugroupmembers');
 		foreach ($toDelTable as $table) {
 			$stm = $DBH->prepare("DELETE FROM imas_$table WHERE userid=:userid");
