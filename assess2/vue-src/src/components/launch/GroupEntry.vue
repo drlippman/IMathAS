@@ -102,11 +102,11 @@ export default {
       return out;
     },
     showMax () {
-      return (store.assessInfo.isgroup === 2);
+      return (store.assessInfo.isgroup === 2 || store.assessInfo.isgroup === 4);
     },
     canAddMembers () {
       return (!this.canViewAll &&
-        store.assessInfo.isgroup === 2 &&
+        (store.assessInfo.isgroup === 2 || store.assessInfo.isgroup === 4) &&
         this.groupMembers.length < store.assessInfo.groupmax
       );
     },

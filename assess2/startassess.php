@@ -144,7 +144,7 @@ if (!$in_practice &&
 }
 
 // add any new group members, if allowed
-if (!$canViewAll && $assess_info->getSetting('isgroup') == 2) {
+if (!$canViewAll && ($assess_info->getSetting('isgroup') == 2 || $assess_info->getSetting('isgroup') == 4)) {
   $groupsetid = $assess_info->getSetting('groupsetid');
   // get current group and members
   list($stugroupid, $current_members) = AssessUtils::getGroupMembers($uid, $groupsetid);

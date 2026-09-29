@@ -833,6 +833,7 @@ $vueData = array(
 				<select id="isgroup" name="isgroup" v-model="isgroup">
 					<option value="0"><?php echo _('Not a group assessment');?></option>
 					<option value="2"><?php echo _('Students create their own groups');?></option>
+					<option value="4"><?php echo _('Students create their own groups, same section');?></option>
 					<option value="3"><?php echo _('Instructor created groups');?></option>
 				</select>
 			</span><br class="form" />

@@ -218,7 +218,7 @@ if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
   list ($stugroupid, $groupmembers) = AssessUtils::getGroupMembers($uid, $assess_info->getSetting('groupsetid'));
   $assessInfoOut['group_members'] = array_values($groupmembers);
   $assessInfoOut['stugroupid'] = $stugroupid;
-  if ($assessInfoOut['isgroup'] == 2) {
+  if ($assessInfoOut['isgroup'] == 2 || $assessInfoOut['isgroup'] == 4) {
     if (count($assessInfoOut['group_members']) === 0) {
       // no group members yet - add self
       $assessInfoOut['group_members'][] = $userfullname;
@@ -228,9 +228,17 @@ if ($assessInfoOut['isgroup'] > 0 && !$canViewAll) {
     $query .= 'JOIN imas_students AS istu ON istu.userid=iu.id AND istu.courseid=? ';
     $query .= 'WHERE iu.id NOT IN (SELECT isgm.userid FROM imas_stugroupmembers AS isgm ';
     $query .= 'JOIN imas_stugroups as isg ON isg.id=isgm.stugroupid AND ';
-    $query .= 'isg.groupsetid=?) AND iu.id<>? ORDER BY iu.FirstName, iu.LastName';
+    $query .= 'isg.groupsetid=?) AND iu.id<>? ';
+    if ($assessInfoOut['isgroup'] == 4) {
+      $query .= 'AND istu.section=? ';
+    }
+    $query .= 'ORDER BY iu.FirstName, iu.LastName';
     $stm = $DBH->prepare($query);
-    $stm->execute(array($cid, $assess_info->getSetting('groupsetid'), $uid));
+    if ($assessInfoOut['isgroup'] == 4) {
+      $stm->execute(array($cid, $assess_info->getSetting('groupsetid'), $uid, $studentinfo['section']));
+    } else {
+      $stm->execute(array($cid, $assess_info->getSetting('groupsetid'), $uid));
+    }
     $assessInfoOut['group_avail'] = array();
     while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
       $assessInfoOut['group_avail'][$row['id']] = $row['FirstName'] . ' ' . $row['LastName'];
