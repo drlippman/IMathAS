@@ -1402,6 +1402,19 @@ class MathParser
         $leftVal = $this->prettyNumericValue($node['left']);
         $rightVal = $this->prettyNumericValue($node['right']);
         if ($leftVal !== null && $rightVal !== null) {
+          if ($leftVal != 0 && $rightVal < 0 &&
+            $leftVal == floor($leftVal) && $rightVal == floor($rightVal)
+          ) {
+            // integer to a negative integer power: give a fraction, not a
+            // decimal, e.g. 2^-3 -> 1/8, (-2)^-3 -> -(1/8)
+            $denom = safepow($leftVal, -$rightVal);
+            if (is_numeric($denom) && !is_nan($denom) && abs($denom) < 1e15) {
+              $frac = ['type'=>'operator', 'symbol'=>'/',
+                'left'=>['type'=>'number', 'symbol'=>1],
+                'right'=>['type'=>'number', 'symbol'=>abs($denom)]];
+              return ($denom < 0) ? $this->prettyNegateNode($frac) : $frac;
+            }
+          }
           $val = safepow($leftVal, $rightVal);
           if (is_numeric($val) && !is_nan($val)) {
             return $this->prettySignedNumber((float) $val);

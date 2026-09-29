@@ -306,6 +306,8 @@ $prettytests = [
   ["(-x+4)/(-x+5)","(-x+4)/(-x+5)","x",3],
   ["(3x+2)/(-1)","-3x-2","x",3],
   ["(3x+2)/(1)","3x+2","x",3],
+  ["4*2^-3","1/2","x",3],
+  ["x/2^-3","8x","x",3],
 
 /* these are makexxpretty tests that are 
    stuff the parser can't handle, since it 
