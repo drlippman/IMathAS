@@ -378,8 +378,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         }
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
-        $stm = $DBH->prepare("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($llist) AND courseid=?");
-        $stm->execute([$cid]);
+        $stm = $DBH->prepare("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($llist) AND (courseid=? OR courseid IN (SELECT courseid FROM imas_teachers WHERE userid=?))");
+        $stm->execute([$cid, $userid]);
         $aidnames = [];
         $qidmap = [];
         while ($row = $stm->fetch(PDO::FETCH_NUM)) {
