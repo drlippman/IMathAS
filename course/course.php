@@ -453,6 +453,10 @@ if ($overwriteBody==1) {
 				window.location = toopen;
 			}
 		}
+		function copyToDialog(item) {
+			GB_show(_("Copy to..."), imasroot+"/course/copytocourse.php?cid="+cid+"&item="+item, 600, "auto", true);
+			return false;
+		}
 		function chgInlineToggler(el,id) {
 			var toopen = '<?php echo $jsAddress2 ?>course.php?inlinetoggle='+id+'&val='+el.value+'&cid=<?php echo $cid; ?>';
 			window.location = toopen;

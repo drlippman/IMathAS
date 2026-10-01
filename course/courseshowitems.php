@@ -143,6 +143,7 @@ function getAssessDD($i, $typeid, $parent, $itemid, $thisaddassess, $ver, $name)
     $out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" . _('Move') . '</a></li>';
     $out .= " <li><a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" . _('Delete') . "</a></li>";
     $out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" . _('Copy') . "</a></li>";
+    $out .= " <li><a href=\"#\" onclick=\"return copyToDialog('$itemid');\">" . _('Copy to...') . "</a></li>";
     if ($ver > 1) {
         $out .= " <li><a href=\"gb-itemanalysis2.php?cid=$cid&aid=$typeid\">" . _('Grades') . "</a></li>";
     } else {
@@ -165,6 +166,7 @@ function getDrillDD($i, $typeid, $parent, $itemid, $name)
     $out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','$itemid');\">" . _('Move') . '</a></li>';
     $out .= " <li><a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">" . _('Delete') . "</a></li>";
     $out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" . _('Copy') . "</a></li>";
+    $out .= " <li><a href=\"#\" onclick=\"return copyToDialog('$itemid');\">" . _('Copy to...') . "</a></li>";
     $out .= " <li><a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">" . _('Scores') . '</a></li>';
     $out .= " <li><a href=\"contentstats.php?cid=$cid&type=D&id=$typeid\">" . _('Stats') . '</a></li>';
     $out .= '</ul>';
@@ -187,6 +189,7 @@ function getBasicDD($i, $typeid, $parent, $itemid, $typename, $statsletter, $sho
     } else {
         $out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$itemid&backref=$itemid\">" . _('Copy') . "</a></li>";
     }
+    $out .= " <li><a href=\"#\" onclick=\"return copyToDialog('$itemid');\">" . _('Copy to...') . "</a></li>";
     if ($showstats) {
         $out .= " <li><a href=\"contentstats.php?cid=$cid&type=$statsletter&id=$typeid\">" . _('Stats') . '</a></li>';
     }
