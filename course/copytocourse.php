@@ -149,8 +149,8 @@ $stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=?");
 $stm->execute([$userid]);
 $userjson = json_decode($stm->fetchColumn(0), true);
 
-$stm = $DBH->prepare("SELECT ic.id,ic.name,it.hidefromcourselist FROM imas_courses AS ic JOIN imas_teachers AS it ON it.courseid=ic.id WHERE it.userid=? AND ic.available<4 ORDER BY ic.name");
-$stm->execute([$userid]);
+$stm = $DBH->prepare("SELECT ic.id,ic.name,it.hidefromcourselist FROM imas_courses AS ic JOIN imas_teachers AS it ON it.courseid=ic.id WHERE it.userid=? AND ic.available<4 AND ic.id<>? ORDER BY ic.name");
+$stm->execute([$userid, $srccid]);
 $myCourses = [];
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
     if (!$row['hidefromcourselist']) {
@@ -166,7 +166,7 @@ function printCourseOrder($order, $myCourses, &$printed, $level = 0) {
             printCourseOrder($item['courses'] ?? [], $myCourses, $printed, $level + 1);
             $sub = ob_get_clean();
             if ($sub != '') {
-                echo '<option value="" disabled>' . str_repeat('&nbsp;&nbsp;&nbsp;', $level);
+                echo '<option value="" disabled>' . str_repeat('&nbsp;&nbsp;', $level);
                 echo Sanitize::encodeStringForDisplay($item['name']) . '</option>' . $sub;
             }
         } else if (isset($myCourses[$item]) && !in_array($item, $printed)) {
@@ -177,7 +177,7 @@ function printCourseOrder($order, $myCourses, &$printed, $level = 0) {
 }
 function printCourseOption($course, $level = 0) {
     echo '<option value="' . Sanitize::onlyInt($course['id']) . '">';
-    echo str_repeat('&nbsp;&nbsp;&nbsp;', $level);
+    echo str_repeat('&nbsp;&nbsp;', $level);
     echo Sanitize::encodeStringForDisplay($course['name']) . '</option>';
 }
 
@@ -193,6 +193,8 @@ require_once "../header.php";
 <label for="destcourse"><?php echo _('Copy to course:'); ?></label><br/>
 <select id="destcourse">
  <option value=""><?php echo _('Select a course...'); ?></option>
+ <option value="<?php echo intval($srccid);?>"><?php echo _('This Course'); ?></option>
+ <option disabled>-------------</option>
 <?php
 if (isset($userjson['courseListOrder']['teach'])) {
     printCourseOrder($userjson['courseListOrder']['teach'], $myCourses, $printed);
