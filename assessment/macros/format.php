@@ -893,18 +893,7 @@ function cleanbytoken($str, $funcs = array()) {
         return $str;
     } //avoid errors by just skipping this if called with an array somehow
     $str = str_replace(['`', '\\'], '', $str);
-    $instr = 0;
-    $primeoff = 0;
-    while (($p = strpos($str, "'", $primeoff)) !== false) {
-        if ($instr == 0) {  //if not a match for an earlier quote
-            if ($p > 0 && (ctype_alpha($str[$p - 1]) || $str[$p - 1] == '`')) {
-                $str[$p] = '`';
-            } else {
-                $instr = 1 - $instr;
-            }
-        }
-        $primeoff = $p + 1;
-    }
+
     $str = preg_replace('/&(gt|lt|ge|le|ne);/', ' $1 ', $str);
     $finalout = array();
     if (trim($str) == '') {
@@ -1102,7 +1091,7 @@ function cleanbytoken($str, $funcs = array()) {
         $finalout[] = implode('', array_column($out, 0));
     }
 
-    return str_replace('`', "'", implode(' ', $finalout));
+    return implode(' ', $finalout);
 }
 
 
@@ -1167,7 +1156,7 @@ function cleantokenize($str, $funcs) {
                     break;
                 }
                 $c = $str[$i];
-            } while ($c >= "a" && $c <= "z" || $c >= "A" && $c <= "Z"); // took out : || $c>='0' && $c<='9'  don't need sin3 type function names for cleaning
+            } while ($c >= "a" && $c <= "z" || $c >= "A" && $c <= "Z" || $c == "'"); // took out : || $c>='0' && $c<='9'  don't need sin3 type function names for cleaning
             //check if it's a special word
             if ($out == 'e') {
                 $intype = 3;
@@ -1282,7 +1271,7 @@ function cleantokenize($str, $funcs) {
                         $inq = false;
                     }
                 } else {
-                    if ($d == '"' || $d == "'") {
+                    if ($d == '"') { 
                         $inq = true; //entering quotes
                         $qtype = $d;
                     } else if ($d == $leftb) {
@@ -1321,7 +1310,7 @@ function cleantokenize($str, $funcs) {
             } else if ($i < $len) {
                 $c = $str[$i];
             }
-        } else if ($c == '"' || $c == "'") { //string
+        } else if ($c == '"') { //string 
             $intype = 6;
             $qtype = $c;
             do {
