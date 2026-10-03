@@ -1549,6 +1549,7 @@ class AssessRecord
     $is_available = ($this->assess_info->getSetting('available') === 'yes');
     $by_assessment = ($this->assess_info->getSetting('submitby') === 'by_assessment');
     $showscores = $this->assess_info->getSetting('showscores');
+    $scoresInGb = $this->assess_info->getSetting('scoresingb');
 
     foreach ($this->data['assess_versions'] as $k=>$ver) {
       // if it's a submitted version or an active one no longer available
@@ -1562,10 +1563,12 @@ class AssessRecord
         }
         // show score if forced, or
         // if by_question and not available and showscores is allowed, or
-        // if by_assessment and submitted and showscores is allowed
+        // if by_assessment and submitted and showscores is allowed and (not manual or released)
         if ($force_scores ||
           (!$by_assessment && !$is_available && $showscores === 'during') ||
-          ($by_assessment && $ver['status'] == 1 && $showscores !== 'none')
+          ($by_assessment && $ver['status'] == 1 && $showscores !== 'none' &&
+            ($scoresInGb !== 'manual' || ($this->assessRecord['status2']&1) === 1)
+          )
         ) {
           $out[$k]['score'] = $ver['score'];
         }
