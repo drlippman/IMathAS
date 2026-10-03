@@ -556,7 +556,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 	var cssmode = css || false;
 	var inlinemode = inline || false;
 	var selectorstr = '';
-	var usertype = usertype || 0;
+	var usertype = window.usertype || 0;
 	if (edmode=="exact") { //list of IDs
 		selectorstr = '#'+edids.split(/,/).join(",#");
 	} else if (edmode=="textareas") { //class-based selection
@@ -711,7 +711,6 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 			setupfunction.call(this, editor);
 		}
 	}
-	
     if (extendsetup) {
         edsetup = Object.assign(edsetup, extendsetup);
     }
