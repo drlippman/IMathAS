@@ -15,37 +15,44 @@
     </menu-button>
     <div v-if="canedit || (qdata.hasOwnProperty('score') && qdata.score !== 'N/A')">
       {{ $t('gradebook-score') }}:
-      <span
-        v-for="(poss,i) in partPoss"
-        :key="i"
-      >
-        <input
-          v-if="canedit && !isPractice"
-          type="text"
-          size="4"
-          :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
-          pattern="N\/A|\d*\.?\d*"
-          v-model="curScores[i]"
-          :aria-label="$t('gradebook-score') + (partPoss.length > 1 ? ' ' + $t('gradebook-part_n', {n:i+1}) : '')"
-          @input="updateScore(i, $event)"
-          @keyup.enter="$emit('submitform')"
-        /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
-        <button
-          v-if="canedit && !isPractice && qdata.rubric > 0"
-          class="plain nopad"
-          @click="showRubric(i)"
+      <span v-if="!canedit">
+        {{ qdata.score }}/{{ qdata.points_possible }}
+      </span>
+      <span v-if="canedit || partPoss.length > 1">
+        <span v-if="!canedit"> ( </span>
+        <span
+          v-for="(poss,i) in partPoss"
+          :key="i"
         >
-          <icons name="clipboard" alt="icons-rubric" size="small" />
-        </button>
-        <button
-          v-if="canedit && !isPractice && qdata.rubric > 0"
-          style="display:none"
-          class="plain nopad rubriclink"
-          @click="showRubric(i)"
-          :id="'rublink-scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
-        >
-          <icons name="clipboard" alt="icons-rubric" size="small" />
-        </button>
+          <input
+            v-if="canedit && !isPractice"
+            type="text"
+            size="4"
+            :id="'scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
+            pattern="N\/A|\d*\.?\d*"
+            v-model="curScores[i]"
+            :aria-label="$t('gradebook-score') + (partPoss.length > 1 ? ' ' + $t('gradebook-part_n', {n:i+1}) : '')"
+            @input="updateScore(i, $event)"
+            @keyup.enter="$emit('submitform')"
+          /><span v-else>{{ curScores[i] }}</span>/{{ poss }}
+          <button
+            v-if="canedit && !isPractice && qdata.rubric > 0"
+            class="plain nopad"
+            @click="showRubric(i)"
+          >
+            <icons name="clipboard" alt="icons-rubric" size="small" />
+          </button>
+          <button
+            v-if="canedit && !isPractice && qdata.rubric > 0"
+            style="display:none"
+            class="plain nopad rubriclink"
+            @click="showRubric(i)"
+            :id="'rublink-scorebox' + qn + (partPoss.length > 1 ? '-' + i : '')"
+          >
+            <icons name="clipboard" alt="icons-rubric" size="small" />
+          </button>
+        </span>
+        <span v-if="!canedit">)</span>
       </span>
       <button
         v-if="canedit && !isPractice"
@@ -209,6 +216,7 @@ export default {
       for (let i = 0; i < this.answeights.length; i++) {
         out[i] = Math.round(1000 * this.qdata.points_possible * this.answeights[i]) / 1000;
       }
+      console.log(out);
       return out;
     },
     fullCreditLabel () {
