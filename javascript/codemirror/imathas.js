@@ -140,6 +140,8 @@
     imathasBuiltin += " finderiv_payout finderiv_fwdprice finderiv_fwdpricediv finderiv_fwdcontract finderiv_bsm finderiv_immdate finderiv_equityfutdate finderiv_convertrate finderiv_fairforwardrate finderiv_fra finderiv_checkpayout";
     // fractions
     imathasBuiltin += " fractionrand fractiondiffdrands fractiondiffdrandsfrom fractionparse fractiontomixed fractiontodecimal fractionadd fractionsubtract fractionmultiply fractiondivide fractionreduce fractionneg fractionpower fractionroot";
+    // fractions2
+    imathasBuiltin += " diffrandfractions randfractions randfraction simplifyfraction dispsimplifyfraction fractionnumerator fractiondenominator isreducedfraction makerepeatingdecimal repeatingdecimal2fraction";
     // functioneval
     imathasBuiltin += " fe_lpfnc";
     // geogebra
