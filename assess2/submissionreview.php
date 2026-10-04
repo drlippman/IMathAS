@@ -66,7 +66,7 @@ if (isset($studentid)) {
         ($viewInGb == 'after_lp' && $now < $assessInfoOut['latepass_enddate']) ||
         ($now < $assessInfoOut['enddate'] && $assess_info->getSetting('timeext')>0)
     ) {
-        echo _('Your submission cannot be viewed at this time.');
+        echo _('Your submission cannot be viewed at this time. If you are wanting to continue working on the assignment, access it from the course main page, modules list, or assignments list, not through the gradebook.');
         exit;
     }
     if ($assessInfoOut['can_use_latepass'] > 0) {
