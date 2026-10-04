@@ -338,6 +338,17 @@ class ScoreEngine
             }
         }
 
+        /*
+         * Optional display format for the preview score line.
+         * Only honored for multipart questions where the question writer
+         * explicitly set $answeights and $scoreformat = 'points'.
+         */
+        if ($quesData['qtype'] == "multipart" && isset($answeights) &&
+            isset($scoreformat) && $scoreformat === 'points'
+        ) {
+            $scoreResult['scoreformat'] = 'points';
+        }
+
         if (function_exists('onScoreQuestionResult')) {
             $scoreResult = onScoreQuestionResult($scoreResult, $varsForScorepart, $additionalVarsForScoring);
         }
