@@ -136,11 +136,17 @@ if (!(isset($teacherid))) {
 		}
 
 		$upd = $DBH->prepare("UPDATE imas_forum_posts SET postdate=?,replyby=? WHERE id=?");
-		$stm = $DBH->prepare("SELECT ifp.id,ifp.postdate,ifp.replyby FROM imas_forum_posts AS ifp JOIN imas_forums AS ifs ON ifs.id=ifp.forumid WHERE ifp.posttype>0 AND ifs.courseid=?");
+		$upd2 = $DBH->prepare("UPDATE imas_forum_threads SET lastposttime=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT ifp.id,ifp.postdate,ifp.replyby,ifp.threadid FROM imas_forum_posts AS ifp JOIN imas_forums AS ifs ON ifs.id=ifp.forumid WHERE ifp.posttype>0 AND ifs.courseid=?");
 		$stm->execute(array($cid));
 		while ($row=$stm->fetch(PDO::FETCH_ASSOC)) {
+			if ($row['threadid'] !== $row['id']) {
+				// not at top level; skip it
+				continue;
+			}
 			if ($row['postdate']>0) {
 				$row['postdate'] = strtotime($shiftstring, $row['postdate']);
+				$upd2->execute([$row['postdate'], $row['threadid']]);
 			}
 			if (is_numeric($row['replyby']) && $row['replyby']>0 && $row['replyby']<2000000000) {
 				$row['replyby'] = strtotime($shiftstring, $row['replyby']);
