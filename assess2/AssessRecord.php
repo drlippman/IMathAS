@@ -577,7 +577,7 @@ class AssessRecord
     $timedOut = ($style === 'time_maxcorrect' && !empty($qdata['drillend']) && $this->now >= $qdata['drillend']);
 
     foreach ($qobj['parts'] as $qpart) {
-      if ($qpart['rawscore'] < 1) {
+      if (($qpart['rawscore'] ?? 0) < 1) {
         $isCorrect = false;
         if ($qpart['try'] < $qobj['tries_max']) {
           $triesExhausted = false;
