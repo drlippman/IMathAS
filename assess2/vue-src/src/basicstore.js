@@ -1215,8 +1215,7 @@ export const actions = {
     return changed;
   },
   handleError (error) {
-    if (store.assessInfo.hasOwnProperty('is_lti') &&
-      store.assessInfo.is_lti &&
+    if (store.assessInfo?.is_lti &&
       error === 'no_session'
     ) {
       error = 'lti_no_session';
