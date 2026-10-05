@@ -449,6 +449,14 @@
             :textlist = "textList"
           />
         </div>
+        <div v-if="canEdit">
+          <strong>
+            {{ $t('gradebook-attempt_score') }}: {{ curAttemptScore }}.
+          </strong>
+          <span v-if="scoreDirty">
+            {{ $t('gradebook-scoredirty' )}}.
+          </span>
+        </div>
         <gb-feedback
           qn="gen"
           :username="aData.userfullname"
@@ -493,7 +501,7 @@
             {{ $t('gradebook-savenext') }}
           </button>
           <span v-if="savedMsg !== ''" class="noticetext">
-            {{ savedMsg }}
+            {{ savedMsg }}&nbsp;
           </span>
           <button
             v-if="hasExit"
@@ -866,6 +874,13 @@ export default {
     },
     hasSingleShowwork () {
       return (this.aData.assess_versions[store.curAver].hasOwnProperty('swgen'));   // during
+    },
+    curAttemptScore () {
+      const aver = this.aData.assess_versions[store.curAver];
+      return aver.score + '/' + this.aData.points_possible;
+    },
+    scoreDirty () {
+      return store.scoreDirty;
     }
   },
   methods: {

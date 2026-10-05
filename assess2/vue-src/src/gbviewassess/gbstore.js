@@ -12,6 +12,7 @@ export const store = reactive({
   exitUrl: '',
   inTransit: false,
   saving: '',
+  scoreDirty: false,
   errorMsg: null,
   confirmObj: null,
   curAver: 0,
@@ -253,6 +254,7 @@ export const actions = {
       !releaseonsave
     ) {
       store.saving = 'saved';
+      store.scoreDirty = false;
       if (exit) {
         window.location = window.exiturl;
       } else if (nextstu) {
@@ -289,6 +291,7 @@ export const actions = {
           return;
         }
         store.saving = 'saved';
+        store.scoreDirty = false;
 
         if (exit || nextstu) {
           store.scoreOverrides = {};
@@ -424,6 +427,7 @@ export const actions = {
           return;
         }
         store.saving = 'saved';
+        store.scoreDirty = false;
         store.assessInfo.manual_released = val;
       })
       .fail(response => {
@@ -639,6 +643,7 @@ export const actions = {
       }
     }
     store.saving = '';
+    store.scoreDirty = true;
   },
   setFeedback (qn, feedback) {
     // get current assess and question versions

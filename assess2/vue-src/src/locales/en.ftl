@@ -705,6 +705,8 @@ gradebook-manualbutton0 = Release grade
 gradebook-manualstatus1 = Grade has been released to the student
 gradebook-manualbutton1 = Un-Release grade
 gradebook-release_on_save = Release grade to student on Save
+gradebook-attempt_score = Score on this attempt
+gradebook-scoredirty = Score does not reflect unsaved changes
 
 # Work
 work-add = Add Work
