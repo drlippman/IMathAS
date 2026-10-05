@@ -374,7 +374,7 @@
 
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=101025"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/rubric_min.js?v=100526"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gb-scoretools.js?v=060724"></script>';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/vue/css/style.css?v='.$lastvueupdate.'" />';
 	$placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/assess2/print.css?v='.$lastvueupdate.'" media="print">';

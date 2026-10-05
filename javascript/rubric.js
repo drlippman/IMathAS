@@ -222,7 +222,7 @@ function quickgrade(qn,type,prefix,todo,vals) {
 	}
 }
 function quicksetscore(el,score,clickel) {
-	if (document.getElementById(el).value < score) {
+	if (document.getElementById(el).value == 'N/A' || document.getElementById(el).value < score) {
 		document.getElementById(el).value = score;
 	}
 	if (clickel != null) {
