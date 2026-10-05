@@ -392,7 +392,7 @@ function rewritePlusMinus($str) {
 }
 
 function numfuncPrepShowanswer($string, $variables) {
-    $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega');
+    $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega', 'tau');
 
     for ($i = 0; $i < count($variables); $i++) {
         if (strlen($variables[$i]) > 1) {
@@ -415,6 +415,16 @@ function numfuncPrepShowanswer($string, $variables) {
                 if ($chg) {
                     $string = str_replace($matches[0], $matches[1] . '_' . $matches[2], $string);
                 }
+            } else if (!$isgreek && preg_match('/^[a-zA-Z]\w*( [a-zA-Z]\w*)+$/', $variables[$i])) {
+                // space-separated compound variable like "d theta".
+                // Single letters and greek names stay bare; other words get quoted
+                $parts = explode(' ', $variables[$i]);
+                foreach ($parts as $k => $part) {
+                    if (strlen($part) > 1 && !in_array(strtolower($part), $greekletters)) {
+                        $parts[$k] = '"' . $part . '"';
+                    }
+                }
+                $string = str_replace($variables[$i], '{:' . implode(' ', $parts) . ':}', $string);
             } else if (!$isgreek && preg_match('/^(hat|bar|vec)\(([^\(]*?)\)$/', $variables[$i], $matches)) {
 				$chg = false;
 				if (strlen($matches[2]) > 1 && ctype_alnum($matches[2]) && !in_array(strtolower($matches[2]), $greekletters)) {

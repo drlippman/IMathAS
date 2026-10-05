@@ -370,6 +370,18 @@ function numfuncPrepForEval($expr, $variables) {
         if ($variables[$i] == 'lambda') { //correct lamda/lambda
             $expr = str_replace('lamda', 'lambda', $expr);
         }
+        // compound variable like "d x": accept "dx" too, unless all parts
+        // are also variables, in which case it would be ambiguous
+        if (preg_match('/^[a-zA-Z]\w*( [a-zA-Z]\w*)+$/', $variables[$i])) {
+            $parts = explode(' ', $variables[$i]);
+            if (count(array_diff($parts, $variables)) > 0) {
+                $expr = preg_replace(
+                    '/(?<![a-zA-Z])' . implode('\s*', array_map('preg_quote', $parts)) . '(?![a-zA-Z])/',
+                    $variables[$i],
+                    $expr
+                );
+            }
+        }
         // front end will submit p_(left) rather than p_left; strip parens
         if (preg_match('/^(\w+)_(\w+)$/', $variables[$i], $m)) {
             $expr = preg_replace('/' . $m[1] . '_\(' . $m[2] . '\)/', $m[0], $expr);

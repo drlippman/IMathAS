@@ -1329,6 +1329,21 @@ function AMnumfuncPrepVar(qn,str) {
   	  str = str.replace(/lamda/, 'lambda');
   }
 
+  // normalize compound variables like "d x" so "dx" is accepted, unless
+  // all the parts are also variables, in which case "dx" would be ambiguous
+  for (var i=0; i<vars.length; i++) {
+    if (vars[i].match(/^[a-zA-Z]\w*( [a-zA-Z]\w*)+$/)) {
+      var cvparts = vars[i].split(' ');
+      if (cvparts.every(function(p) { return vars.indexOf(p) != -1; })) {
+        continue;
+      }
+      str = str.replace(
+        new RegExp('(?<![a-zA-Z])' + cvparts.map(escapeRegExp).join('\\s*') + '(?![a-zA-Z])', 'g'),
+        vars[i]
+      );
+    }
+  }
+
   var foundaltcap = [];
   var dispstr = str;
 
@@ -1416,6 +1431,16 @@ function AMnumfuncPrepVar(qn,str) {
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(new RegExp(varpts[0],"g"), " repvars"+i);
 		  	vars[i] = "repvars"+i;
+		  } else if (!isgreek && vars[i].match(/^[a-zA-Z]\w*( [a-zA-Z]\w*)+$/)) {
+        // space-separated compound variable like "d theta".
+        // Single letters and greek names stay bare; other words get quoted
+        var cparts = vars[i].split(' ').map(function(part) {
+          if (part.length>1 && greekletters.indexOf(part.toLowerCase())==-1) {
+            return '"'+part+'"';
+          }
+          return part;
+        });
+        dispstr = dispstr.split(vars[i]).join('{:'+cparts.join(' ')+':}');
 		  } else if (!isgreek && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
