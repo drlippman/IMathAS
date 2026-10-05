@@ -476,6 +476,12 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 5.9;}
                         $out .= ' alt="Rectangle"/>';
                     }
+                    if (in_array('trapapprox', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tpsvg/tptrapa.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"5.8\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'trapapprox') {$out .= 'class="sel" ';
+                            $def = 5.8;}
+                        $out .= ' alt="Trapezoid"/>';
+                    }
                     if (in_array('trig', $answerformat)) {
                         $out .= "<img src=\"$staticroot/img/tpsvg/tpcos.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"9\" ";
                         if (count($answerformat) > 1 && $answerformat[1] == 'trig') {$out .= 'class="sel" ';
@@ -687,6 +693,13 @@ class DrawingAnswerBox implements AnswerBox
                         $ry2 = evalbasic($function[4], true);
                         $rectcmds[] = 'stroke="' . $defcolor . '";strokewidth=2;fillopacity=0.2;fill="trans' . $defcolor .'";rect([' . $rx1 . ',' . $ry1 . '],[' . $rx2 . ',' . ($ry2 + ($ry1==$ry2 ? (($settings[3] - $settings[2])/1000) : 0)) . ']);fill="none";';
                         $recttext[] = sprintf(_('Rectangle with opposite corners (%s,%s) and (%s,%s), color %s.'), $rx1, $ry1, $rx2, $ry2, $defcolor);
+                    } else if ($function[0] == 'trapapprox') { // form "rect,x1,y1,x2,y2"
+                        $rx1 = evalbasic($function[1], true);
+                        $ry1 = evalbasic($function[2], true);
+                        $rx2 = evalbasic($function[3], true);
+                        $ry2 = evalbasic($function[4], true);
+                        $rectcmds[] = 'stroke="' . $defcolor . '";strokewidth=2;fillopacity=0.2;fill="trans' . $defcolor .'";path([[' . $rx1 . ',' . $ry1 . '],[' . $rx2 . ',' . ($ry2 + ($ry1==$ry2 ? (($settings[3] - $settings[2])/1000) : 0)) . '],[' . $rx2 . ',0],[' . $rx1 . ',0],[' . $rx1 . ',' . $ry1 . ']]);fill="none";';
+                        $recttext[] = sprintf(_('Trapezoid with one side on the x-axis and other side with corners (%s,%s) and (%s,%s), color %s.'), $rx1, $ry1, $rx2, $ry2, $defcolor);
                     } else if ($function[0] == 'verthyperbola') {
                         //(y-yc)^2/a^2 -  (x-xc)^2/b^2 = 1
                         $saarr[$k] = "sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2],$defcolor,,,,,2";

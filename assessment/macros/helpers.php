@@ -155,6 +155,8 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
         $code = 7.2;
     } else if ($type == 'rect' || $type == 'rectdim') {
         $code = 5.9;
+    } else if ($type == 'trapapprox') {
+        $code = 5.8;
     } else if ($type == 'sin') {
         $code = 9.1;
     } else if ($type == 'cos') {

@@ -40,6 +40,7 @@
 	5.3:  line segment
 	5.4:  vector
 	5.9:  rectangle
+	5.8:  trapezoidal-approx
 	6: parabola
 	6.1: horiz parabola
 	6.2: half parabola
@@ -104,7 +105,7 @@ var clickmightbenewcurve = false;
 var hasTouchTimer = null;
 var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 var tpModeN = {
-	"5": 2, "5.1": 2, "5.2": 2, "5.3": 2, "5.4": 2, "5.9": 2,
+	"5": 2, "5.1": 2, "5.2": 2, "5.3": 2, "5.4": 2, "5.8": 2, "5.9": 2,
 	"6": 2, "6.1": 2, "6.2": 2, "6.3": 2, "6.5": 2, "6.6": 2, "6.7": 3,
 	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
 	"8": 2, "8.2": 2, "8.3": 2, "8.4": 2, "8.5": 3, "8.6": 3,
@@ -277,6 +278,7 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 			"tan": [{"mode":9.2, "descr":_("Tangent"), inN: 3, "input":_("Enter the inflection point of the tangent, then a point on a vertical asymptote, then a point on the graph")}],
 			"sec": [{"mode":9.3, "descr":_("Secant"), inN: 2, "input":_("Enter a point at a peak of the secant and a point at the trough of the next segment")}],
 			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
+			"trapapprox": [{"mode":5.8, "descr":_("Trapezoid"), inN: 2, "input":_("Two corners of the trapezoid will be on the x-axis. Enter the other two corners")}],
 			"rect": [{"mode":5.9, "descr":_("Rectangle"), inN: 2, "input":_("Enter two opposite corners of the rectangle")}],
 		},
 		"basic": {
@@ -1030,6 +1032,30 @@ function drawTarget(x,y,skipencode) {
 				ctx.lineTo(x2,y1);
 				ctx.lineTo(x2,y2);
 				ctx.lineTo(x1,y2);
+				ctx.closePath();
+				ctx.save();
+				ctx.fillStyle = "rgba(0,0,255,0.2)"; // 20% opacity fill matching the rgb(0,0,255) stroke used for tplines
+				ctx.fill();
+				ctx.restore();
+			}
+		} else if (tptypes[curTarget][i]==5.8) { //if a tp trapezoid
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			if (x2 != null) {
+				var x1 = tplines[curTarget][i][0][0];
+				var y1 = tplines[curTarget][i][0][1];
+				var originy = targets[curTarget].ymax*targets[curTarget].pixpery + targets[curTarget].imgborder;
+				ctx.moveTo(x1,originy);
+				ctx.lineTo(x1,y1);
+				ctx.lineTo(x2,y2);
+				ctx.lineTo(x2,originy);
 				ctx.closePath();
 				ctx.save();
 				ctx.fillStyle = "rgba(0,0,255,0.2)"; // 20% opacity fill matching the rgb(0,0,255) stroke used for tplines
