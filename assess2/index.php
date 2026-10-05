@@ -53,11 +53,20 @@ if ((!$isltilimited || $_SESSION['ltirole']!='learner') && !$inTreeReader && !$i
   echo "<div class=breadcrumb>";
   if ((!isset($usernameinheader) || $usernameinheader==false) && $userfullname != ' ') {
     echo '<span class="floatright hideinmobile">';
+    if ($isltilimited && (isset($tutorid) || isset($teacherid))) {
+      // is teacher. See if they have new messages 
+      $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND viewed=0 AND deleted<2");
+      $stm->execute(array(':msgto'=>$userid));
+      $msgcnt = $stm->fetchColumn(0);
+      if ($msgcnt > 0) {
+        echo '<a href="../msgs/newmsglist.php?cid=0" class="noticetext" target="_blank">', sprintf(_('New Messages (%d)'), Sanitize::onlyFloat($msgcnt)), '</a> ';
+      }
+    }
     echo "<span id=\"myname\">".Sanitize::encodeStringForDisplay($userfullname)."</span> ";
     echo '</span>';
   }
   if ($isltilimited) {
-    echo "$breadcrumbbase ", _('Assessment'), "</div>";
+    echo "$breadcrumbbase ", _('Assessment'),"</div>";
   } else {
     echo $breadcrumbbase . ' <a href="../course/course.php?cid='.$cid.'">';
     echo Sanitize::encodeStringForDisplay($coursename);
