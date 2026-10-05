@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import legacy from "@vitejs/plugin-legacy";
-import checker from 'vite-plugin-checker'
+import checker from 'vite-plugin-checker';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -47,7 +47,7 @@ function stripHashes() {
       });
       console.log('✓ Query string hashes stripped from files');
     }
-  }
+  };
 }
 
 function updatePhpFiles() {
@@ -73,11 +73,11 @@ function updatePhpFiles() {
       let cssFile = manifest['style.css'].file;
 
       // Update your PHP file
-      let phpPath = path.resolve(__dirname, '../index.php');
+      let phpPath = path.resolve(__dirname, '../index.php');npm
       let phpContent = fs.readFileSync(phpPath, 'utf-8');
-      phpContent = phpContent.replace(/js\/(index\.js\?v=[\w\-]+|index-[\w\-]{8}\.js)/g, jsFile)
-                            .replace(/js\/(index-legacy\.js\?v=[\w\-]+|index-legacy-[\w\-]{8}\.js)/g, legacyJsFile)
-                            .replace(/css\/(style\.css\?v=[\w\-]+|style-[\w\-]{8}\.css)/g, cssFile);
+      phpContent = phpContent.replace(/js\/(index\.js\?v=[\w-]+|index-[\w-]{8}\.js)/g, jsFile)
+                            .replace(/js\/(index-legacy\.js\?v=[\w-]+|index-legacy-[\w-]{8}\.js)/g, legacyJsFile)
+                            .replace(/css\/(style\.css\?v=[\w-]+|style-[\w-]{8}\.css)/g, cssFile);
       fs.writeFileSync(phpPath, phpContent);
 
       // gbviewassess
@@ -88,9 +88,9 @@ function updatePhpFiles() {
       // Update your PHP file
       phpPath = path.resolve(__dirname, '../gbviewassess.php');
       phpContent = fs.readFileSync(phpPath, 'utf-8');
-      phpContent = phpContent.replace(/js\/(gbviewassess\.js\?v=[\w\-]+|gbviewassess-[\w\-]{8}\.js)/g, jsFile)
-                            .replace(/js\/(gbviewassess-legacy\.js\?v=[\w\-]+|gbviewassess-legacy-[\w\-]{8}\.js)/g, legacyJsFile)
-                            .replace(/css\/(style\.js\?v=[\w\-]+|style-[\w\-]{8}\.css)/g, cssFile);
+      phpContent = phpContent.replace(/js\/(gbviewassess\.js\?v=[\w-]+|gbviewassess-[\w-]{8}\.js)/g, jsFile)
+                            .replace(/js\/(gbviewassess-legacy\.js\?v=[\w-]+|gbviewassess-legacy-[\w-]{8}\.js)/g, legacyJsFile)
+                            .replace(/css\/(style\.js\?v=[\w-]+|style-[\w-]{8}\.css)/g, cssFile);
       fs.writeFileSync(phpPath, phpContent);
 
       // Delete the .html files copied into /vue/

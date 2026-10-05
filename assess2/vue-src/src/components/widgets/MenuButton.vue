@@ -89,10 +89,6 @@ import TooltipSpan from '@/components/widgets/TooltipSpan.vue';
 
 export default {
   name: 'MenuButton',
-  model: {
-    prop: 'selected',
-    event: 'change'
-  },
   props: ['options', 'selected', 'id', 'header', 'nobutton', 'noarrow', 'position', 'searchby'],
   components: {
     Icons,
