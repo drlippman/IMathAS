@@ -96,7 +96,7 @@
 	<li><a href="#jsx_getCoords">jsx_getCoords</li>
 	<li><a href="#jsx_getXCoord">jsx_getXCoord</a></li>
 	<li><a href="#jsx_getYCoord">jsx_getYCoord</a></li>
-
+	<li><a href="#jsx_a11y">Accessibility</a></li>
   </ul>
 
   <h3 id="jsxBoard"><a name="jsxBoard">jsxBoard</a></h3>
@@ -882,5 +882,54 @@ Move the point into the circle for credit.
 $board
 // Note: you can hide the answerbox with a line like below, but remove the extra spaces after the < and the \
 < p hidden>$answerbox<\ p></pre></details>
+
+<h3 id="jsx_a11y"><a name="jsx_a11y">Accessibility</a></h3>
+<p>While jsxgraph has some accessibility features, it is not automatically fully accessible, and will require 
+effort to make it accessible.</p>
+<h4>One option: Full replacement</h4>
+<p>If your jsxgraph iteractive does not store anything into answerboxes, one option is to completely replace the 
+jsxgraph with a text description.  You can do that in the question text using graphdispmode or drawentrymode for conditionals:</p>
+<pre>
+[if graphdispmode==0]
+A text description of the interactive and what you want students to notice from it
+[/if]
+[if graphdispmode>0]
+$board
+[/if]
+</pre>
+
+<h4>Automatic accessibility</h4>
+<p>The jsxgraph macro will provide a few accessibility features automatically, which can be overridden (see below)</p>
+<ul>
+	<li>Sliders will automatically announce their value as they change to screenreaders: "Slider (name) at (value)", so be sure to define 
+		the name option, even if you also define label as something more complex.
+	</li>
+	<li>Points that aren't fixed will automatically announce their position as they change to screenreaders: "Point (label) at (x) (y)".</li>
+	<li>Text entries will automatically annouce their text if the content changes.</li>
+</ul>
+
+<h4>Manual accessibility</h4>
+<p>For sliders, points, functions, and text, you can specify the option <code>arialabel</code> to add text that gets read when the
+	value changes, or to override the default label.  For points, <code>keyboardstepx, keyboardstepy</code> can be used to specify 
+	step amounts for keyboard interaction when <code>xsnapsize,ysnapsize</code> aren't used.</p>
+<p>In this example, the board is given a <code>title</code> describing the interactive. The red point has keyboard step sizes of 1 set, 
+	and a custom <code>arialabel</code> since the point doesn't have a <code>label</code> and it would otherwise be unclear which point was moving.
+	The blue point gets an <code>arialabel</code> as well for the same reason, and since there is no default arialabel for fixed points.</p>
+<pre>
+$board = jsxBoard("rectangular",['zoom'=>false,'pan'=>false,'title'=>'A graph showing two points. Moving the red point will also move the blue point.'])
+$red = jsxPoint($board,[-1,2],["color"=>"red",'keyboardstepx'=>1,'keyboardstepy'=>1,'arialabel'=>"'red point at ' + this.X().toFixed(0) + ' ' + this.Y().toFixed(0)"])
+$blue = jsxPoint($board,["$red.X()-3","2*$red.Y()"],["color"=>"blue",'fixed'=>true,'arialabel'=>"'blue point at ' + this.X().toFixed(0) + ' ' + this.Y().toFixed(0)"])
+</pre>
+
+<p>In this example, the slider's automatic accessibility is used, but the function is given an <code>arialabel</code> describing the 
+	graph.  When the slider is changed, the slider value is announced, then the function description is announced.</p>
+<pre>
+$board = jsxBoard("rectangular",['zoom'=>false,'pan'=>false,'title'=>'A graph of x squared with a slider h that horizontally shifts the graph.'])
+$h = jsxSlider($board,[-4,4,1,0],['position'=>[[1,-4],[3,-4]],'name'=>'h','answerbox' => [$thisq]])
+$f = jsxFunction($board, "(x-($h))^2", ['arialabel'=>"'Graph of x squared shifted to the ' + ($h.Value()&lt;0 ? 'left' : 'right') + ' by ' + (Math.abs($h.Value().toFixed(0)))"])
+</pre>
+
+</pre>
+</p>
 </body>
 </html>

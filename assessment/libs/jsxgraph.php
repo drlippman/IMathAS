@@ -416,6 +416,14 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		$fixedx = isset($ops['xsnapsize']) ? jsx_getdecimalplaces($snapSizeX) : 4;
 		$fixedy = isset($ops['ysnapsize']) ? jsx_getdecimalplaces($snapSizeY) : 4;
 
+		if (isset($ops['arialabel'])) {
+			$arialabel = str_replace('this.','self.',$ops['arialabel']);
+		} else if (strpos($label, 'this.') !== false) {
+			$arialabel = str_replace('this.','self.',$label);
+		} else {
+			$arialabel = "'Glider {$label} at ' + Math.round(Math.pow(10, {$fixedx}) * self.X()) / Math.pow(10, {$fixedx}) + ', ' + Math.round(Math.pow(10, {$fixedy}) * self.Y()) / Math.pow(10, {$fixedy})";
+		}
+
 		// Begin object creation
 		$out = "window.{$id} = board_{$boardID}.create('glider', [";
 		$out .= jsx_valueToJS($param[0][0]).", ";
@@ -436,7 +444,19 @@ function jsxGlider (&$board, $param, $ops=array()) {
 			snapSizeX: {$snapSizeX},
 			snapSizeY: {$snapSizeY},
 			snapToGrid: {$snapToGrid},
-			tabindex: {$tabindex}
+			tabindex: {$tabindex},
+			aria: {
+				enabled: true,
+				live: 'polite',
+				label: function (self) { return {$arialabel}}
+			},";
+		if (isset($ops['keyboardstepx'])) {
+			$out .= " keyboardStepX: {$ops['keyboardstepx']},";
+		}
+		if (isset($ops['keyboardstepy'])) {
+			$out .= " keyboardStepY: {$ops['keyboardstepy']},";
+		}
+		$out .= "
         })";
 		
 		if (isset($ops['attributes'])) { 
