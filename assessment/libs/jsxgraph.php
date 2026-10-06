@@ -49,7 +49,7 @@ $allowedmacros[] = "jsxUnsuspendUpdate";
 $allowedmacros[] = "jsxSetChild";
 
 function jsx_getlibrarylink() {
-	return $GLOBALS['staticroot'] . '/assessment/libs/jsxgraphcore.js';
+	return $GLOBALS['staticroot'] . '/assessment/libs/jsxgraphcore.js?v=100626';
 	//return "https://cdn.jsdelivr.net/npm/jsxgraph@1.12.2/distrib/jsxgraphcore.js";
 }
 function jsx_getcsslink() {
@@ -323,13 +323,19 @@ function jsxPoint(&$board, $param, $ops=array()) {
 			snapSizeY: {$snapSizeY},
 			snapToGrid: {$snapToGrid},
 			tabindex: {$tabindex},";
-		if ($fixed === 'false') {
+		if ($fixed === 'false' || isset($ops['arialabel'])) {
 			$out .= "
 			aria: {
 				enabled: true,
 				live: 'polite',
 				label: function (self) { return {$arialabel}}
-			}";
+			},";
+		}
+		if (isset($ops['keyboardstepx'])) {
+			$out .= " keyboardStepX: {$ops['keyboardstepx']},";
+		}
+		if (isset($ops['keyboardstepy'])) {
+			$out .= " keyboardStepY: {$ops['keyboardstepy']},";
 		}
 		$out .= "
 		})";

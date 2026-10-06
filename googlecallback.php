@@ -16,7 +16,7 @@ unset($_SESSION['google_oauth_state']);
 unset($_SESSION['google_oauth_returnto']);
 
 function googlecallback_error(string $message) {
-    global $imasroot, $staticroot;
+    global $imasroot, $staticroot, $installname;
     require_once __DIR__ . '/header.php';
     echo '<p class="noticetext">' . Sanitize::encodeStringForDisplay($message) . '</p>';
     echo '<p><a href="' . $GLOBALS['basesiteurl'] . '/index.php">' . _('Return to login') . '</a></p>';
