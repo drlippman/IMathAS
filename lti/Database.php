@@ -878,7 +878,7 @@ class Imathas_LTI_Database implements LTI\Database
     }
 
     /**
-     * Make sure use is a teacher on course to associate
+     * Make sure user is a teacher on course to associate
      * @param  int  $destcid imas_courses.id
      * @param  int  $userid
      * @return bool if user is a teacher

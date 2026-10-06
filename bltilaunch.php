@@ -910,6 +910,12 @@ if ($placementrow === false) {
 
 				if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="useother" && !empty($_POST['useothercoursecid'])) {
 					$destcid = $_POST['useothercoursecid'];
+					// verify teacher on course
+					$stm = $DBH->prepare('SELECT id FROM imas_teachers WHERE courseid=? AND userid=?');
+					$stm->execute([$destcid, $userid]);
+					if ($stm->fetchColumn(0) === false) {
+						reporterror(_("Invalid course."));
+					}
 					$copycourse = "no";
 					$ltilog = ['copy'=>'useother', 'cid'=>$destcid];
 				} else if (isset($_POST['docoursecopy']) && $_POST['docoursecopy']=="makecopy") {
