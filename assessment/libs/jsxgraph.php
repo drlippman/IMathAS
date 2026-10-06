@@ -450,11 +450,8 @@ function jsxGlider (&$board, $param, $ops=array()) {
 				live: 'polite',
 				label: function (self) { return {$arialabel}}
 			},";
-		if (isset($ops['keyboardstepx'])) {
-			$out .= " keyboardStepX: {$ops['keyboardstepx']},";
-		}
-		if (isset($ops['keyboardstepy'])) {
-			$out .= " keyboardStepY: {$ops['keyboardstepy']},";
+		if (isset($ops['keyboardstep'])) {
+			$out .= " keyboardStep: {$ops['keyboardstep']},";
 		}
 		$out .= "
         })";
