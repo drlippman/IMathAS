@@ -174,7 +174,8 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		$fontcolor = !empty($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 		$name = !empty($ops['name']) ? $ops['name'] : '';
 		$decimals = !empty($ops['decimals']) ? $ops['decimals'] : $fixedout;
-		
+		$arialabel = isset($ops['arialabel']) ? str_replace('this.','self.',$ops['arialabel']) : "'Slider {$name} at ' + Math.round(Math.pow(10, {$decimals}) * self.Value()) / Math.pow(10, {$decimals})";
+
 		if (!isset($ops['position'])) {
 			
 			$relpos = true;
@@ -210,6 +211,7 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		$out .= " [{$min},{$defaultval},{$max}]],
 			{
 				snapWidth: {$step},
+				keyboardStep: {$step},
 				precision: {$decimals},
 				baseline: { fixed: true, highlight: false },
 				ticks: { fixed: true, highlight: false} ,
@@ -217,7 +219,12 @@ function jsxSlider (&$board, $param, $ops=array()) {
 				strokeColor: '{$color}',
 				name: '{$name}',
 				label: { color:'{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
-				tabindex: 0
+				tabindex: 0,
+				aria: {
+					enabled: true,
+					live: 'polite',
+					label: function (self) { return {$arialabel}}
+				}
 			})";
 			
 		// Set any remaining paramenters specified by user
@@ -278,7 +285,7 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		$snapSizeY = isset($ops['ysnapsize']) ? $ops['ysnapsize'] : 1;
 		$trace = isset($ops['trace']) ? jsx_getbool($ops['trace']) : 'false';
 		$tabindex = ($fixed === 'false') ? 0 : -1;
-
+		
 		if ((isset($ops['xsnapsize'])) || (isset($ops['ysnapsize']))) {
 			$snapToGrid = 'true';
 		} else {
@@ -287,6 +294,14 @@ function jsxPoint(&$board, $param, $ops=array()) {
 
 		$fixedx = isset($ops['xsnapsize']) ? jsx_getdecimalplaces($snapSizeX) : 4;
 		$fixedy = isset($ops['ysnapsize']) ? jsx_getdecimalplaces($snapSizeY) : 4;
+
+		if (isset($ops['arialabel'])) {
+			$arialabel = str_replace('this.','self.',$ops['arialabel']);
+		} else if (strpos($label, 'this.') !== false) {
+			$arialabel = str_replace('this.','self.',$label);
+		} else {
+			$arialabel = "'Point {$label} at ' + Math.round(Math.pow(10, {$fixedx}) * self.X()) / Math.pow(10, {$fixedx}) + ', ' + Math.round(Math.pow(10, {$fixedy}) * self.Y()) / Math.pow(10, {$fixedy})";
+		}
 			
 		// Start making the point
 		$out = "window.{$id} = board_{$boardID}.create('point', ".jsx_pointToJS($param).",";
@@ -307,7 +322,16 @@ function jsxPoint(&$board, $param, $ops=array()) {
 			snapSizeX: {$snapSizeX},
 			snapSizeY: {$snapSizeY},
 			snapToGrid: {$snapToGrid},
-			tabindex: {$tabindex}
+			tabindex: {$tabindex},";
+		if ($fixed === 'false') {
+			$out .= "
+			aria: {
+				enabled: true,
+				live: 'polite',
+				label: function (self) { return {$arialabel}}
+			}";
+		}
+		$out .= "
 		})";
 		
 		// Set any remaining paramenters specified by user
@@ -1313,7 +1337,16 @@ function jsxText (&$board, $param, $ops=array()) {
 		$anchor = isset($ops['anchor']) ? $ops['anchor'] : false;
 		$anchorX = isset($ops['anchorX']) ? $ops['anchorX'] : false;
 		$anchorY = isset($ops['anchorY']) ? $ops['anchorY'] : false;
-		
+		$arialabel = isset($ops['arialabel']) ? $ops['arialabel'] : '';
+
+		if ($arialabel !== '') {
+			if (count(jsx_getobjectreferences($arialabel)) > 0) {
+				$arialabel = "function() { return {$arialabel}; }";
+			} else {
+				$arialabel = "'{$arialabel}'";
+			}
+		}
+
 		// Begin object creation
 
 		$out = "window.{$id} = board_{$boardID}.create('text', [";
@@ -1393,6 +1426,12 @@ function jsxText (&$board, $param, $ops=array()) {
             $anchorY = preg_replace('/[^\w\-]/','',$anchorY);
 			$out .= "anchorY: '{$anchorY}',"; 
 		}
+		if ($arialabel !== '') {
+			$out .= "aria: {enabled: true, live: 'polite', label: {$arialabel}},";
+		} else {
+			$out .= "aria: {enabled: true, live: 'polite'},";
+		}
+		
         $out .= "})";
 		
 		if (isset($ops['attributes'])) { 
@@ -1506,7 +1545,16 @@ function jsxFunction(&$board, $f, $ops=array()) {
 	$fontsize = isset($ops['fontsize']) ? $ops['fontsize'] : '16';
 	$isBounds = (isset($ops['domain']) && count($ops['domain']) == 2) ? true : false;
 	$visible = isset($ops['visible']) ? jsx_getbool($ops['visible']) : 'true';
-  
+	$arialabel = isset($ops['arialabel']) ? $ops['arialabel'] : $label;
+
+	if ($arialabel !== '') {
+		if (count(jsx_getobjectreferences($arialabel)) > 0) {
+			$arialabel = "function() { return {$arialabel}; }";
+		} else {
+			$arialabel = "'{$arialabel}'";
+		}
+	}
+
 	$objects = jsx_getobjectreferences($f);
   
 	// Here we preserve the text of the function so it can be used in other objects
@@ -1534,7 +1582,17 @@ function jsxFunction(&$board, $f, $ops=array()) {
 		highlight: false,
 		visible: {$visible},
 		label: { color: '{$fontcolor}', fontSize: {$fontsize}, useMathJax: true, highlight: false },
-		withLabel: {$haslabel}
+		withLabel: {$haslabel},";
+
+	if ($label !== '' || $arialabel !== '') {
+		$out .= "
+		aria: {
+			enabled: true,
+			live: 'polite',
+			label: {$arialabel}
+		}";
+	}
+	$out .= "
 	})";
   
 	if (isset($ops['attributes'])) {
@@ -1882,6 +1940,8 @@ function jsx_creategeometryboard($label, $ops) {
         axis: false,
         showCopyright: false,
         showNavigation: {$navBar},
+		role: 'application',
+		announcer: { enabled: true, delay: 400 },
         zoom: {
 			enabled: {$zoom},
             factorX: 1.25,
@@ -1950,6 +2010,8 @@ function jsx_createrectangularboard ($label, $ops = array()) {
              axis: false,
              showCopyright: false,
              showNavigation: {$navBar},
+			 role: 'application',
+			 announcer: { enabled: true, delay: 400 },
              zoom: {
 				enabled: {$zoom},
 				factorX: 1.25,
@@ -2076,6 +2138,8 @@ function jsx_createpolarboard ($label, $ops=array()) {
 			axis: false,
 			showCopyright: false,
 			showNavigation: {$navBar},
+			role: 'application',
+			announcer: { enabled: true, delay: 400 },
 			zoom: {
 				enabled: {$zoom},
 				factorX: 1.25,

@@ -178,6 +178,7 @@ $board = jsxBoard('polar', $ops)</pre></details>
 		a value such as rbga(45, 45, 45, 28)</li>
     <li><i>fontsize</i> (integer) - Affects the font size of the label text.</li>
 	<li><i>fontcolor</i> (string) - The color for the label text</li>
+	<li><i>arialabel</i> (string) - To override the default message read to screen readers</li>
 	<li><i>answerbox</i> [$thisq, (optional) partNumber] - Places the value the a slider in an answerbox. This will look like: [$thisq] or [$thisq, n] for a multipart question
 		where n is the box number to use.</li>
 	<li><i>attributes</i> (json) - A json object encoded as a string that contains the value of any additional attributes you can modify from the jsxgraph API.</li>
@@ -220,6 +221,8 @@ $f = jsxFunction($board, "($a) * (x-3)*(x+1)")</pre></details>
     <li><i>face</i> (string) - sets the face of the point, defaults to "circle". Options are: cross, circle, square, plus, diamond, triangleup,
 		triangledown, triangleleft, triangleright</li>
     <li><i>label</i> (string) - attaches a text label to a point, ASCIIMath can be used.</li>
+	<li><i>arialabel</i> (string) - A message to read to screen readers. <i>label</i> will be read if it is defined and this is not.</li>
+	<li><i>arialabel</i> (string) - To override the default message read to screen readers</li>
 	<li><i>fontsize</i> (integer) - Affects the font size of the label text.</li>
 	<li><i>fontcolor</i> (string) - The color for the label text</li>
 	<li><i>visible</i> (boolean) - makes the point visible or invisible, useful in creating other objects</li>
@@ -687,6 +690,7 @@ $angle = jsxAngle($board, [$p1, $p2, $p3], $ops)</pre></details>
 		declared.</li>
    	<li><i>fontcolor</i> (string) - The color of the label</li>
 	<li><i>fontsize</i> (int) - The size of the label text</li>
+	<li><i>arialabel</i> (string) - To read something to screen readers different than the main text.</li>
 	<li><i>attributes</i> (json) - A json object encoded as a string that contains the value of any additional attributes you can modify from the jsxgraph API.</li>
   </ul>
   <details class="example"><summary>Examples</summary><pre>loadlibrary("jsxgraph")
