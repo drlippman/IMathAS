@@ -174,7 +174,7 @@ function jsxSlider (&$board, $param, $ops=array()) {
 		$fontcolor = !empty($ops['fontcolor']) ? $ops['fontcolor'] : $color;
 		$name = !empty($ops['name']) ? $ops['name'] : '';
 		$decimals = !empty($ops['decimals']) ? $ops['decimals'] : $fixedout;
-		$arialabel = isset($ops['arialabel']) ? str_replace('this.','self.',$ops['arialabel']) : "'Slider {$name} at ' + Math.round(Math.pow(10, {$decimals}) * self.Value()) / Math.pow(10, {$decimals})";
+		$arialabel = isset($ops['arialabel']) ? str_replace('this.','self.',$ops['arialabel']) : "'Slider {$name} value ' + Math.round(Math.pow(10, {$decimals}) * self.Value()) / Math.pow(10, {$decimals})";
 
 		if (!isset($ops['position'])) {
 			
@@ -300,7 +300,7 @@ function jsxPoint(&$board, $param, $ops=array()) {
 		} else if (strpos($label, 'this.') !== false) {
 			$arialabel = str_replace('this.','self.',$label);
 		} else {
-			$arialabel = "'Point {$label} at ' + Math.round(Math.pow(10, {$fixedx}) * self.X()) / Math.pow(10, {$fixedx}) + ', ' + Math.round(Math.pow(10, {$fixedy}) * self.Y()) / Math.pow(10, {$fixedy})";
+			$arialabel = "'Point {$label} at ' + Math.round(Math.pow(10, {$fixedx}) * self.X()) / Math.pow(10, {$fixedx}) + ' comma ' + Math.round(Math.pow(10, {$fixedy}) * self.Y()) / Math.pow(10, {$fixedy})";
 		}
 			
 		// Start making the point
@@ -421,7 +421,7 @@ function jsxGlider (&$board, $param, $ops=array()) {
 		} else if (strpos($label, 'this.') !== false) {
 			$arialabel = str_replace('this.','self.',$label);
 		} else {
-			$arialabel = "'Glider {$label} at ' + Math.round(Math.pow(10, {$fixedx}) * self.X()) / Math.pow(10, {$fixedx}) + ', ' + Math.round(Math.pow(10, {$fixedy}) * self.Y()) / Math.pow(10, {$fixedy})";
+			$arialabel = "'Glider {$label} at ' + Math.round(Math.pow(10, {$fixedx}) * self.X()) / Math.pow(10, {$fixedx}) + ' comma ' + Math.round(Math.pow(10, {$fixedy}) * self.Y()) / Math.pow(10, {$fixedy})";
 		}
 
 		// Begin object creation
@@ -1902,7 +1902,7 @@ function jsx_getscript () {
 }
 
 // Set up a board. Auxillary functions
-function jsx_setupboard ($label, $width, $height, $centered) {
+function jsx_setupboard ($label, $width, $height, $centered, $description = '') {
 	
 	$cntrd = $centered === 'true' ? "margin:auto;" : "";
 	$ratio = 100 * ($height / $width);
@@ -1912,6 +1912,10 @@ function jsx_setupboard ($label, $width, $height, $centered) {
   
 	// make board
 	$out .= "<div class='jxgboardwrapper' style='max-width:{$width}px; max-height:{$height}px; {$cntrd}'>";
+	if ($description !== '') {
+		// sibling of the role=application board so it stays navigable in browse mode
+		$out .= '<div class="sr-only">' . Sanitize::encodeStringForDisplay($description) . '</div>';
+	}
 	$out .= "<div id='jxgboard_{$label}' style='background-color:#FFF; width:100%; height:0px; padding-bottom:{$ratio}%;'></div>";
 	$out .= "</div>";
   
@@ -1949,7 +1953,6 @@ function jsx_creategeometryboard($label, $ops) {
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
     $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
-    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
   
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
@@ -1977,10 +1980,10 @@ function jsx_creategeometryboard($label, $ops) {
             enabled: {$pan},
             needshift: false
         },
-        title: '$title $description'
+        title: '$title'
     });";
 
-	$boardinit = jsx_setupboard($label, $width, $height, $centered);
+	$boardinit = jsx_setupboard($label, $width, $height, $centered, $ops['description'] ?? '');
 	return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
 }
 
@@ -1996,7 +1999,6 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'true';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
     $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
-    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
 
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$xmin = isset($ops['bounds'][0]) ? $ops['bounds'][0] : -5;
@@ -2047,7 +2049,7 @@ function jsx_createrectangularboard ($label, $ops = array()) {
 				enabled: {$pan},
 				needshift: false
 			 },
-             title: '$title $description'
+             title: '$title'
            });";
 
 	$out .= "var xTicks{$label}, yTicks{$label};";
@@ -2114,7 +2116,7 @@ function jsx_createrectangularboard ($label, $ops = array()) {
              });
 			 yaxis{$label}.setLabel('{$yaxis_label}');";
 	  
-	$boardinit = jsx_setupboard($label, $width, $height, $centered);
+	$boardinit = jsx_setupboard($label, $width, $height, $centered, $ops['description'] ?? '');
     return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
 
 }
@@ -2129,7 +2131,6 @@ function jsx_createpolarboard ($label, $ops=array()) {
 	$pan = isset($ops['pan']) ? jsx_getbool($ops['pan']) : 'false';
 	$centered = isset($ops['centered']) ? jsx_getbool($ops['centered']) : 'false';
     $title = Sanitize::encodeStringForJavascript($ops['title'] ?? '');
-    $description = Sanitize::encodeStringForJavascript($ops['description'] ?? '');
 
 	//set the min and max x-values if provided, else default to [-5, 5]
 	$rmax = isset($ops['r'][0]) ? (float) $ops['r'][0] : 5;
@@ -2175,7 +2176,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 				enabled: {$pan},
 				needshift: false
 			},
-            title: '$title $description'
+            title: '$title'
 		});
 	";
 
@@ -2320,7 +2321,7 @@ function jsx_createpolarboard ($label, $ops=array()) {
 	}
     
 	// Get initial board, add this output string to it.
-    $boardinit = jsx_setupboard($label, $size, $boardHeight, $centered);
+    $boardinit = jsx_setupboard($label, $size, $boardHeight, $centered, $ops['description'] ?? '');
     return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"), 0);
 }
 
