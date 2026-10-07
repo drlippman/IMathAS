@@ -724,7 +724,7 @@ if (isset($_GET['launch'])) {
 	//if there was a mixup and multiple records were created, use the first one
 	$query .= "ORDER BY iu.rights, lti.id";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':org'=>"$shortorg:%", ':ltiuserid'=>$ltiuserid));
+	$stm->execute(array(':org'=>addcslashes($shortorg, "%_\\").":%", ':ltiuserid'=>$ltiuserid));
 	$userrow = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($userrow !== false) { //yup, we know them
 		$userid = $userrow['userid'];
@@ -868,7 +868,7 @@ $shortorg = $orgparts[0];
 $query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
 $query .= "contextid=:contextid AND linkid=:linkid AND typeid>0 AND org LIKE :org";
 $stm = $DBH->prepare($query);
-$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>"$shortorg:%"));
+$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>addcslashes($shortorg, "%_\\").":%"));
 $placementrow = $stm->fetch(PDO::FETCH_NUM);
 if ($placementrow === false) {
 	if (isset($_SESSION['place_aid'])) {
@@ -884,7 +884,7 @@ if ($placementrow === false) {
 
 		//look to see if we've already linked this context_id with a course
 		$stm = $DBH->prepare('SELECT courseid,copiedfrom FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org');
-		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+		$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>addcslashes($shortorg, "%_\\").":%"));
 		$lticourserow = $stm->fetch(PDO::FETCH_NUM);
 		if ($lticourserow === false) {
             if ($aidsourcecid == -1) { // not enough info to proceed
@@ -1399,7 +1399,7 @@ if ($_SESSION['lti_keytype']=='cc-of') {
 
 	//look to see if we've already linked this context_id with a course
 	$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
-	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>addcslashes($shortorg, "%_\\").":%"));
 	$courselinkcid = $stm->fetchColumn(0);
 	if ($courselinkcid === false) {
 		//if instructor, see if the source course is ours
@@ -2434,7 +2434,7 @@ if (isset($_GET['launch'])) {
 	//if there was a mixup and multiple records were created, use the first one
 	$query .= "ORDER BY iu.rights, lti.id";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':org'=>"$shortorg:%", ':ltiuserid'=>$ltiuserid));
+	$stm->execute(array(':org'=>addcslashes($shortorg, "%_\\").":%", ':ltiuserid'=>$ltiuserid));
 	$useridcol = $stm->fetchColumn(0);
 	if ($useridcol !== false) {
 		$userid = $useridcol;
@@ -2551,13 +2551,13 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['lti_k
 	$query = "SELECT placementtype,typeid FROM imas_lti_placements WHERE ";
     $query .= "contextid=:contextid AND linkid=:linkid AND typeid>0 AND org LIKE :org";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>"$shortorg:%"));
+	$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':linkid'=>$_SESSION['lti_resource_link_id'], ':org'=>addcslashes($shortorg, "%_\\").":%"));
 	$placementrow2 = $stm->fetch(PDO::FETCH_NUM);
 	if ($placementrow2 === false) {
 		if (isset($_SESSION['place_aid'])) {
 			//look to see if we've already linked this context_id with a course
 			$stm = $DBH->prepare("SELECT courseid FROM imas_lti_courses WHERE contextid=:contextid AND org LIKE :org");
-			$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>"$shortorg:%"));
+			$stm->execute(array(':contextid'=>$_SESSION['lti_context_id'], ':org'=>addcslashes($shortorg, "%_\\").":%"));
 			$lticourserow2 = $stm->fetchColumn(0);
 			if ($lticourserow2 === false) {
 				if ($_SESSION['lti_keytype']=='cc-g') {

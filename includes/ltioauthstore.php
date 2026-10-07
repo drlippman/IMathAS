@@ -23,6 +23,14 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 
       	$keyparts = explode('_',$consumer_key);
 
+      	if (in_array($keyparts[0], ['cid','placein','LTIkey','aid']) &&
+      		(!isset($keyparts[1]) || !ctype_digit($keyparts[1]))
+      	) {
+      		//course/assessment id must be purely numeric; MySQL would otherwise
+      		//accept things like "123%" or "123abc" as id 123
+      		return NULL;
+      	}
+
       	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
       		$stm = $DBH->prepare("SELECT ltisecret FROM imas_courses WHERE id=:id");
       		$stm->execute(array(':id'=>$keyparts[1]));
