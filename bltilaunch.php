@@ -69,9 +69,11 @@ function reporterror($err) {
 	exit;
 }
 
-function ltiUserCanTeach() {
-	global $myrights;
-	return (isset($myrights) && $myrights > 19);
+function ltiUserCanTeach($userid) {
+	global $DBH;
+	$stm = $DBH->prepare('SELECT rights FROM imas_users WHERE id=?');
+	$stm->execute(array($userid));
+	return ($stm->fetchColumn(0) > 19);
 }
 
 function generateToolState() {
@@ -1032,7 +1034,7 @@ if ($placementrow === false) {
 				reporterror(_("Course link not established yet.  Notify your instructor they need to click this assignment to set it up."));
 			}
 			if ($copycourse == "yes") {
-				if (!ltiUserCanTeach()) {
+				if (!ltiUserCanTeach($userid)) {
 					reporterror(_("Your account does not have sufficient rights to create a course."));
 				}
 				//create a course
@@ -1595,7 +1597,7 @@ if ($linkparts[0]=='cid' || $linkparts[0]=='aid' || $linkparts[0]=='placein' || 
 			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 			if ($stm->fetch(PDO::FETCH_NUM) === false) {
 				//reporterror("error - you are not an instructor or tutor on the $installname course this link is associated with.  If you are team-teaching this course, have the other instructor add you as a teacher or tutor on $installname then try again.");
-				if (ltiUserCanTeach()) {
+				if (ltiUserCanTeach($userid)) {
 					$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
 					$addedAs = 'Add Teachers';
 				} else {
@@ -2574,7 +2576,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['lti_k
 						reporterror(_("Course link not established yet"));
 					}
 					if ($copycourse) {
-						if (!ltiUserCanTeach()) {
+						if (!ltiUserCanTeach($userid)) {
 							reporterror(_("Your account does not have sufficient rights to create a course."));
 						}
 						//create a course
