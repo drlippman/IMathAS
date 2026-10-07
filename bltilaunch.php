@@ -1040,6 +1040,7 @@ if ($placementrow === false) {
 				$blockcnt = 1;
 				$itemorder = serialize(array());
 				$randkey = uniqid();
+				$ltisecret = bin2hex(random_bytes(5)); // 10 chars, independent of enrollkey
 				$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
 				$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 				$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
@@ -1058,7 +1059,7 @@ if ($placementrow === false) {
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey,
 					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
-					':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
+					':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':blockcnt'=>$blockcnt));
 				$destcid = $DBH->lastInsertId();
 
 				//call hook, if defined
@@ -2581,6 +2582,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['lti_k
 						$blockcnt = 1;
 						$itemorder = serialize(array());
 						$randkey = uniqid();
+						$ltisecret = bin2hex(random_bytes(5)); // 10 chars, independent of enrollkey
 						$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
 						$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 						$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
@@ -2596,7 +2598,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['lti_k
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, 
 							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
-							':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
+							':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':blockcnt'=>$blockcnt));
 						$destcid  = $DBH->lastInsertId();
 
 						//call hook, if defined

@@ -120,6 +120,7 @@ if (!empty($createcourse)) {
 		$blockcnt = 1;
 		$itemorder = serialize(array());
 		$randkey = uniqid();
+		$ltisecret = bin2hex(random_bytes(5)); // 10 chars, independent of enrollkey
 		$allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
 		$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 		$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
@@ -137,7 +138,7 @@ if (!empty($createcourse)) {
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey,
 			':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
-			':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
+			':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$ltisecret, ':blockcnt'=>$blockcnt));
 		$cid = $DBH->lastInsertId();
 		//if ($myrights==40) {
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
