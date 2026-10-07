@@ -44,6 +44,19 @@ function getTeachers($cid) {
 	return $out;
 }
 
+//returns the subset of $uids that are students in the course
+function getCurrentStudents($cid, $uids) {
+	global $DBH;
+	$uids = array_map('intval', $uids);
+	if (count($uids) == 0) {
+		return array();
+	}
+	$ph = Sanitize::generateQueryPlaceholders($uids);
+	$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=? AND userid IN ($ph)");
+	$stm->execute(array_merge([$cid], $uids));
+	return $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+}
+
 //process AJAX post-backs
 if (isset($_POST['remove'])) {
 	$toremove = array_diff($_POST['remove'], array($courseownerid));
@@ -67,7 +80,33 @@ if (isset($_POST['remove'])) {
 	$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
 	$stm->execute(array($cid));
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
-	$toadd = array_diff($_POST['add'], $existing);
+	$toadd = array_diff(array_map('intval', $_POST['add']), $existing);
+	if (count($toadd) > 0) {
+		// unenroll any who are currently students
+		$currentstus = getCurrentStudents($cid, $toadd);
+		if (count($currentstus) > 0) {
+			require_once "../includes/unenroll.php";
+			unenrollstu($cid, $currentstus);
+		}
+		// remove any tutor records
+		$ph = Sanitize::generateQueryPlaceholders($toadd);
+		$stm = $DBH->prepare("SELECT userid FROM imas_tutors WHERE courseid=? AND userid IN ($ph)");
+		$stm->execute(array_merge([$cid], array_values($toadd)));
+		$tutorsremoved = array_map('intval', $stm->fetchAll(PDO::FETCH_COLUMN, 0));
+		if (count($tutorsremoved) > 0) {
+			$stm = $DBH->prepare("DELETE FROM imas_tutors WHERE courseid=? AND userid IN ($ph)");
+			$stm->execute(array_merge([$cid], array_values($toadd)));
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Roster Action",
+				null,
+				array(
+					'action' => 'Remove Tutors',
+					'ids' => $tutorsremoved
+				)
+			);
+		}
+	}
 	$exarr = array();
 	foreach ($toadd as $uid) {
 		$exarr[] = $uid;
@@ -100,10 +139,16 @@ if (isset($_POST['remove'])) {
 	$stm = $DBH->prepare("SELECT id,LastName,FirstName,rights FROM imas_users WHERE id NOT IN ($ph) AND groupid=? AND rights>19 ORDER BY LastName,FirstName");
 	$existing[] = $coursegroupid;
 	$stm->execute($existing);
-	$out = array();
+	$rows = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($row['rights']==76 || $row['rights']==77) {continue;}
-		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
+		$rows[] = $row;
+	}
+	$currentstus = getCurrentStudents($cid, array_column($rows, 'id'));
+	$out = array();
+	foreach ($rows as $row) {
+		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'],
+			"isstudent"=>in_array($row['id'], $currentstus));
 	}
 	echo json_encode($out, JSON_HEX_TAG);
 	exit;
@@ -114,10 +159,16 @@ if (isset($_POST['remove'])) {
 	
 	require_once "../includes/userutils.php";
 	$possible_teachers = searchForUser(Sanitize::stripHtmlTags($_POST['search']), true, true);
-	$out = array();
+	$rows = array();
 	foreach ($possible_teachers as $row) {
 		if (in_array($row['id'], $existing)) { continue; }
-		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
+		$rows[] = $row;
+	}
+	$currentstus = getCurrentStudents($cid, array_column($rows, 'id'));
+	$out = array();
+	foreach ($rows as $row) {
+		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')',
+			"isstudent"=>in_array($row['id'], $currentstus));
 	}
 	echo json_encode($out, JSON_HEX_TAG);
 	exit;
@@ -212,9 +263,10 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.' - '.Sanitize::encodeStringForDis
 	</p>
 	<transition-group name="fade" tag="ul" class="nomark" v-if="searchResults !== null && searchResults.length>0">
 		<li v-for="teacher in searchResults" :key="teacher.id">
-            <label><input type=checkbox :value="teacher.id"> <span class="pii-full-name">{{teacher.name}}</span></label>
+            <label><input type=checkbox :value="teacher.id"> <span class="pii-full-name">{{teacher.name}}</span><em v-if="teacher.isstudent"> (currently a student)</em></label>
 		</li>
 	</transition-group>
+	<p v-if="anyStu" class="small">Note: If you add someone currently a student in this course as a teacher, they will be unenrolled as a student and any scores will be discarded.</p>
 </div>
 <div class="sr-only" id="statusbar" aria-live="polite" aria-atomic="true">{{statusmessage}}</div>
 </div>
@@ -233,6 +285,18 @@ createApp({
             lastSearchType: '',
 			statusmessage: ''
         };
+	},
+	computed: {
+		anyStu: function () {
+			if (this.searchResults?.length) {
+				for (var i=0; i<this.searchResults.length; i++) {
+					if (this.searchResults[i].isstudent) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 	},
 	methods: {
 		removeTeachers: function() {
