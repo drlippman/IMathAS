@@ -108,6 +108,28 @@ function do112relaunch() {
 	exit;
 }
 
+/*
+ * OAuthRequest::from_request only signs query string, urlencoded POST body,
+ * and Authorization header params, while the launch code reads $_REQUEST,
+ * which could include unsigned values (e.g. multipart POST body, cookies).
+ * After signature verification, replace $_REQUEST with the verified params,
+ * and make sure values read before verification weren't different.
+ */
+function useVerifiedLaunchParams($request, $ltiuserid, $ltikey) {
+	$params = $request->get_parameters();
+	foreach ($params as $k => $v) {
+		if (is_array($v)) {
+			$params[$k] = end($v);  // same as PHP: last duplicate wins
+		}
+	}
+	if (($params['user_id'] ?? null) !== $ltiuserid ||
+		($params['oauth_consumer_key'] ?? null) !== $ltikey
+	) {
+		reporterror(_("Unable to launch - launch parameters do not match the signed request"));
+	}
+	$_REQUEST = $params;
+}
+
 function verify112relaunch() {
 	if (empty($_SESSION['lti_tool_state'])) {
 		reporterror(_("Invalid tool_state. May have been unable to set cookie."));
@@ -624,6 +646,8 @@ if (isset($_GET['launch'])) {
 		reporterror($e->getMessage());
 	}
 	$store->mark_nonce_used($request);
+	useVerifiedLaunchParams($request, $ltiuserid, $ltikey);
+	$ltiorg = empty($_REQUEST['tool_consumer_instance_guid']) ? 'Unknown' : $_REQUEST['tool_consumer_instance_guid'];
 
 	$keyparts = explode('_',$ltikey);
 	$_SESSION['lti_origkey'] = $ltikey;
@@ -2283,6 +2307,8 @@ if (isset($_GET['launch'])) {
 		reporterror($e->getMessage());
 	}
 	$store->mark_nonce_used($request);
+	useVerifiedLaunchParams($request, $ltiuserid, $ltikey);
+	$ltiorg = empty($_REQUEST['tool_consumer_instance_guid']) ? 'Unknown' : $_REQUEST['tool_consumer_instance_guid'];
 
 	$keyparts = explode('_',$ltikey);
 	$_SESSION['lti_origkey'] = $ltikey;
