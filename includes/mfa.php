@@ -25,27 +25,75 @@ function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
     require_once __DIR__.'/../footer.php';
 }
 
-function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true, $admin = false) {
-    global $DBH, $imasroot, $CFG;
-    $error = '';
-    require_once __DIR__.'/GoogleAuthenticator.php';
-    $MFA = new GoogleAuthenticator();
+/**
+ * Returns true if too many recent failed attempts; also expires old failures
+ * from $mfadata (in memory only).
+ */
+function mfa_isLockedOut(&$mfadata) {
     if (isset($mfadata['lastfail']) && time() - $mfadata['lastfail'] > 30) {
         unset($mfadata['failcnt']);
         unset($mfadata['lastfail']);
     }
-    if (isset($mfadata['failcnt']) && $mfadata['failcnt'] > 3) {
-        echo _("Too many failed attempts.  Wait a minute and try again");
-        exit;
+    return (isset($mfadata['failcnt']) && $mfadata['failcnt'] > 3);
+}
+
+/**
+ * Checks a code with rate limiting and replay protection. Returns true/false.
+ * If $uid > 0, failures are recorded (and logged), and a success updates the
+ * replay info. Call mfa_isLockedOut afterwards to tell lockout from a bad code.
+ * $mfadata is updated by reference.  On success, it is saved to the DB only if
+ * $save is true; pass false if the caller will modify $mfadata further and save it.
+ */
+function mfa_checkCode(&$mfadata, $code, $uid = 0, $save = true) {
+    global $DBH, $CFG;
+    if (mfa_isLockedOut($mfadata)) {
+        return false;
     }
+    require_once __DIR__.'/GoogleAuthenticator.php';
+    $MFA = new GoogleAuthenticator();
+    $code = (string) $code;
     //check that code is valid and not a replay
-    if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
-        ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
+    if ($MFA->verifyCode($mfadata['secret'], $code) &&
+        ($code != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
         if ($uid > 0) {
-            $mfadata['last'] = $_POST['mfatoken'];
+            $mfadata['last'] = $code;
             $mfadata['laston'] = time();
             unset($mfadata['failcnt']);
             unset($mfadata['lastfail']);
+            if ($save) {
+                $stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
+                $stm->execute(array(':uid'=>$uid, ':mfa'=>json_encode($mfadata)));
+            }
+        }
+        return true;
+    }
+    if ($uid > 0) {
+        $mfadata['lastfail'] = time();
+        $mfadata['failcnt'] = ($mfadata['failcnt'] ?? 0) + 1;
+        $stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
+        $stm->execute(array(':uid'=>$uid, ':mfa'=>json_encode($mfadata)));
+        if (isset($CFG['cloudwatch_loginlog'])) {
+            require_once __DIR__.'/CloudWatchLogger.php';
+            addLoginLog('login_failure', $uid, [
+                'reason' => 'bad_mfa',
+                'mfafailcnt' => $mfadata['failcnt']
+            ]);
+        }
+    }
+    return false;
+}
+
+function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true, $admin = false) {
+    global $DBH, $imasroot, $CFG;
+    $error = '';
+    if (mfa_isLockedOut($mfadata)) {
+        echo _("Too many failed attempts.  Wait a minute and try again");
+        exit;
+    }
+    if (mfa_checkCode($mfadata, $_POST['mfatoken'], $uid, false)) {
+        if ($uid > 0) {
+            require_once __DIR__.'/GoogleAuthenticator.php';
+            $MFA = new GoogleAuthenticator();
             if (isset($_POST['mfatrust'])) {
                 $trusttoken = $MFA->createSecret();
                 // admin trust (enabling admin features) is tracked separately from login trust
@@ -62,26 +110,9 @@ function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true, $admin =
         }
         return true;
     } else {
-        if ($uid > 0) {
-            $mfadata['lastfail'] = time();
-            if (isset($mfadata['failcnt'])) {
-                $mfadata['failcnt']++;
-            } else {
-                $mfadata['failcnt'] = 1;
-            }
-            $stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
-            $stm->execute(array(':uid'=>$uid, ':mfa'=>json_encode($mfadata)));
-            if (isset($CFG['cloudwatch_loginlog'])) {
-                require_once __DIR__.'/CloudWatchLogger.php';
-                addLoginLog('login_failure', $uid, [
-                    'reason' => 'bad_mfa',
-                    'mfafailcnt' => $mfadata['failcnt']
-                ]);
-            }
-            if ($mfadata['failcnt'] > 3) {
-                echo _("Too many failed attempts.  Wait a minute and try again");
-                exit;
-            }
+        if ($uid > 0 && mfa_isLockedOut($mfadata)) {
+            echo _("Too many failed attempts.  Wait a minute and try again");
+            exit;
         }
         mfa_showLoginEntryForm($formaction, 'error', $showtrust);
         exit;

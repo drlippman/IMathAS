@@ -75,9 +75,11 @@ require_once "includes/sanitize.php";
 
 				if (!empty($user['mfa'])) {
 					$mfadata = json_decode($user['mfa'], true);
-					require_once __DIR__ . '/includes/GoogleAuthenticator.php';
-					$MFA = new GoogleAuthenticator();
-					if (empty($input['mfatoken']) || !$MFA->verifyCode($mfadata['secret'], $input['mfatoken'])) {
+					require_once __DIR__ . '/includes/mfa.php';
+					if (empty($input['mfatoken']) || !mfa_checkCode($mfadata, $input['mfatoken'], $user['id'])) {
+						if (mfa_isLockedOut($mfadata)) {
+							throw new Exception('Too many failed attempts.  Wait a minute and try again');
+						}
 						throw new Exception('2-factor authentication verification failed');
 					}
 				}
@@ -640,13 +642,15 @@ require_once "includes/sanitize.php";
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
         if ($line['mfa'] !== '') {
             $mfadata = json_decode($line['mfa'], true);
-            require_once 'includes/GoogleAuthenticator.php';
-            $MFA = new GoogleAuthenticator();
+            require_once 'includes/mfa.php';
 
-            if (!$MFA->verifyCode($mfadata['secret'], $_POST['mfa'])) {
-                // MFA ok
+            if (!mfa_checkCode($mfadata, $_POST['mfa'] ?? '', $userid)) {
                 require_once "header.php";
-                echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chgpwd$gb\">Try Again</a>\n";
+                if (mfa_isLockedOut($mfadata)) {
+                    echo _("Too many failed attempts.  Wait a minute and try again");
+                } else {
+                    echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chgpwd$gb\">Try Again</a>\n";
+                }
                 require_once "footer.php";
                 exit;
             }
@@ -973,14 +977,16 @@ require_once "includes/sanitize.php";
             }
             if ($lastmfatype > 0) {
                 // also check MFA
-                require_once 'includes/GoogleAuthenticator.php';
-                $MFA = new GoogleAuthenticator();
-   
-                if (!$MFA->verifyCode($mfadata['secret'], $_POST['oldmfa'])) {
-                    // MFA ok
+                require_once 'includes/mfa.php';
+
+                if (!mfa_checkCode($mfadata, $_POST['oldmfa'] ?? '', $userid)) {
                     require_once "header.php";
                     echo $pagetopper;
-                    echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+                    if (mfa_isLockedOut($mfadata)) {
+                        echo _("Too many failed attempts.  Wait a minute and try again");
+                    } else {
+                        echo "2-factor authentication verification failed.  <a href=\"forms.php?action=chguserinfo$gb\">Try Again</a>\n";
+                    }
                     require_once "footer.php";
                     exit;
                 }
