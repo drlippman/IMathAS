@@ -179,39 +179,38 @@ if ($overwriteBody==1) {
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
-	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> ";
-	echo "&gt; Print Test</div>\n";
+	echo "<a href=\"$addq.php?cid=$cid&aid=$aid\">"._('Add/Remove Questions')."</a> ";
+	echo "&gt; "._('Print Test')."</div>\n";
 
     echo '<div class="cpmid">';
     if ($courseUIver == 1) {
-        echo '<a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for in-browser printing</a> | ';
+        echo '<a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">'._('Generate for in-browser printing').'</a> | ';
     }
-    echo '<a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for cut-and-paste</a></div>';
+    echo '<a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">'._('Generate for cut-and-paste').'</a></div>';
 
 	echo "<h1>"._('Generate Word Version')."</h1>";
 
   echo '<h2>'.Sanitize::encodeStringForDisplay($line['name']).'</h2>';
 
-	echo '<p>This page will help you create a copy of this assessment as a Word 2007+ file that you can then edit for printing.</p>';
+	echo '<p>'._('This page will help you create a copy of this assessment as a Word 2007+ file that you can then edit for printing.').'</p>';
 
 	echo "<form method=\"post\" action=\"printlayoutword.php?cid=$cid&aid=$aid&from=$from\" class=\"nolimit\">\n";
-	echo '<span class="form">Number of different versions to generate:</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
-	echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3.<br/>';
-	echo '<input type="radio" name="format" value="trad2" /> Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3, but repick questions from question pools on each version, and reshuffle questions (if enabled in assessment settings) on each version.<br/>';
-	echo '<input type="radio" name="format" value="inter"/> Multiple forms grouped by question - 1a 1b 2a 2b</span><br class="form"/>';
-	echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
-	echo '<span class="form">Question separator:</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
-	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> Use PAGEBREAK for a page break</span><br class="form"/>';
-	echo '<span class="form">Include question numbers:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
-	echo '<span class="form">Include point values:</span><span class="formright"><input type="checkbox" name="showpts" checked="checked" /> </span><br class="form"/>';
-	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes checked="checked" ></span><br class="form"/>';
-	echo '<span class="form">Include between-question text?</span><span class="formright"><input type=checkbox name=showtexts ></span><br class="form"/>';
-	echo '<span class="form">Include detailed solutions?</span><span class="formright"><input type=checkbox name=detsoln ></span><br class="form"/>';
+	echo '<span class="form">'._('Number of different versions to generate:').'</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
+	echo '<span class="form">'._('Format?').'</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> '._('Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3.').'<br/>';
+	echo '<input type="radio" name="format" value="trad2" /> '._('Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3, but repick questions from question pools on each version, and reshuffle questions (if enabled in assessment settings) on each version.').'<br/>';
+	echo '<input type="radio" name="format" value="inter"/> '._('Multiple forms grouped by question - 1a 1b 2a 2b').'</span><br class="form"/>';
+	echo '<span class="form">'._('Generate answer keys?').'</span><span class="formright"> <input type=radio name=keys value=1 checked=1>'._('Yes').' <input type=radio name=keys value=0>'._('No').'</span><br class="form"/>';
+	echo '<span class="form">'._('Question separator:').'</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
+	echo '<span class="form">'._('Version separator:').'</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> '._('Use PAGEBREAK for a page break').'</span><br class="form"/>';
+	echo '<span class="form">'._('Include question numbers:').'</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
+	echo '<span class="form">'._('Include point values:').'</span><span class="formright"><input type="checkbox" name="showpts" checked="checked" /> </span><br class="form"/>';
+	echo '<span class="form">'._('Hide text entry lines?').'</span><span class="formright"><input type=checkbox name=hidetxtboxes checked="checked" ></span><br class="form"/>';
+	echo '<span class="form">'._('Include between-question text?').'</span><span class="formright"><input type=checkbox name=showtexts ></span><br class="form"/>';
+	echo '<span class="form">'._('Include detailed solutions?').'</span><span class="formright"><input type=checkbox name=detsoln ></span><br class="form"/>';
 
-	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
-	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
+	echo '<p>'._('NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.').'</p>';
 
-	echo '<div class="submit"><input type="submit" value="Continue"/></div></form>';
+	echo '<div class="submit"><input type="submit" value="'._('Continue').'"/></div></form>';
 
 
 } else {
@@ -450,19 +449,18 @@ if ($overwriteBody==1) {
 
 	require_once "../header.php";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
-	echo "&gt; Print Test</div>\n";
+	echo "&gt; "._('Print Test')."</div>\n";
 
    	echo '<div class="cpmid">';
     if ($courseUIver == 1) {
-        echo '<a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for in-browser printing</a> | ';
+        echo '<a href="printtest.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">'._('Generate for in-browser printing').'</a> | ';
     }
-    echo '<a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">Generate for cut-and-paste</a></div>';
+    echo '<a href="printlayoutbare.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">'._('Generate for cut-and-paste').'</a></div>';
 
 
 	echo "<h1>"._('Generate Word Version')."</h1>";
 	echo '<p>'._('Assessment is prepared, and ready for conversion').'.</p>';
-	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
-	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
+	echo '<p>'._('NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.').'</p>';
 	echo '<form id="theform" method="post" action="'.$pandocurl.'/html2docx.php">';
 	echo '<p><label><input type="checkbox" name="darkgrid"> '._('Darken graph grid lines').'</label><br/>';
 	echo '<label><input type="checkbox" name="doubleimgs"> '._('Double image sizes').'</label></p>';
