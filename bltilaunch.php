@@ -311,15 +311,20 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$stm = $DBH->prepare('SELECT password,id,mfa FROM imas_users WHERE SID=:sid');
+				$stm = $DBH->prepare('SELECT password,id,mfa,jsondata FROM imas_users WHERE SID=:sid');
+				require_once __DIR__.'/includes/loginlimit.php';
 				$stm->execute(array(':sid'=>$_POST['curSID']));
 				//if (mysql_num_rows($result)==0) {
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row === false) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					list($realpw,$tmpuserid,$mfadata) = $row; //DB mysql_result($result,0,0);
-					if (password_verify($_POST['curPW'],$realpw)) {
+					list($realpw,$tmpuserid,$mfadata,$jsondata) = $row; //DB mysql_result($result,0,0);
+						if (login_isBlocked($jsondata)) {
+							$infoerr = 'Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password';
+							unset($tmpuserid);
+						} else if (password_verify($_POST['curPW'],$realpw)) {
+							login_resetFailures($tmpuserid, $jsondata);
                         if ($mfadata != '') {
                             $mfadata = json_decode($mfadata, true);
                             if (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') {
@@ -340,6 +345,7 @@ if (isset($_GET['launch'])) {
                         $userid= $tmpuserid;
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
+						login_recordFailure($tmpuserid, $jsondata);
 						if (isset($CFG['cloudwatch_loginlog'])) {
 							require_once __DIR__.'/includes/CloudWatchLogger.php';
 							addLoginLog('login_failure', $tmpuserid, [
@@ -2015,14 +2021,18 @@ if (isset($_GET['launch'])) {
 		} else {
 			if (!empty($_POST['curSID']) && !empty($_POST['curPW'])) {
 				//provided current SID/PW pair
-				$stm = $DBH->prepare("SELECT password,id,mfa FROM imas_users WHERE SID=:SID");
+				require_once __DIR__.'/includes/loginlimit.php';
+				$stm = $DBH->prepare("SELECT password,id,mfa,jsondata FROM imas_users WHERE SID=:SID");
 				$stm->execute(array(':SID'=>$_POST['curSID']));
 				$row = $stm->fetch(PDO::FETCH_NUM);
 				if ($row === false) {
 					$infoerr = 'Username (key) is not valid';
 				} else {
-					list($realpw,$queryuserid,$mfadata) = $row;
-					if (password_verify($_POST['curPW'],$realpw)) {
+					list($realpw,$queryuserid,$mfadata,$jsondata) = $row;
+					if (login_isBlocked($jsondata)) {
+						$infoerr = 'Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password';
+					} else if (password_verify($_POST['curPW'],$realpw)) {
+						login_resetFailures($queryuserid, $jsondata);
                         $userid = $queryuserid;
                         if ($mfadata != '') {
                             $mfadata = json_decode($mfadata, true);
@@ -2043,6 +2053,7 @@ if (isset($_GET['launch'])) {
                         }
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
+						login_recordFailure($queryuserid, $jsondata);
 						if (isset($CFG['cloudwatch_loginlog'])) {
 							require_once __DIR__.'/includes/CloudWatchLogger.php';
 							addLoginLog('login_failure', $queryuserid, [

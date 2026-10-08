@@ -61,7 +61,7 @@ require_once "includes/sanitize.php";
 				// Require fresh re-authentication (password + MFA if enabled) before
 				// issuing a registration challenge, so a briefly-unattended logged-in
 				// session can't be used to silently add persistent passkey access.
-				$stm = $DBH->prepare("SELECT id, SID, FirstName, LastName, password, mfa FROM imas_users WHERE id = :id");
+				$stm = $DBH->prepare("SELECT id, SID, FirstName, LastName, password, mfa, jsondata FROM imas_users WHERE id = :id");
 				$stm->execute([':id' => $userid]);
 				$user = $stm->fetch(PDO::FETCH_ASSOC);
 
@@ -69,9 +69,15 @@ require_once "includes/sanitize.php";
 					throw new Exception('User not found');
 				}
 
+				require_once __DIR__ . '/includes/loginlimit.php';
+				if (login_isBlocked($user['jsondata'])) {
+					throw new Exception('Too many invalid attempts - please wait a minute before trying again');
+				}
 				if (empty($input['password']) || !password_verify($input['password'], $user['password'])) {
+					login_recordFailure($user['id'], $user['jsondata']);
 					throw new Exception('Password verification failed');
 				}
+				login_resetFailures($user['id'], $user['jsondata']);
 
 				if (!empty($user['mfa'])) {
 					$mfadata = json_decode($user['mfa'], true);
@@ -640,6 +646,13 @@ require_once "includes/sanitize.php";
 		$stm = $DBH->prepare("SELECT password,email,jsondata,mfa FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
+        require_once 'includes/loginlimit.php';
+        if (login_isBlocked($line['jsondata'])) {
+            require_once "header.php";
+            echo _("Too many invalid attempts.  Wait a minute and try again");
+            require_once "footer.php";
+            exit;
+        }
         if ($line['mfa'] !== '') {
             $mfadata = json_decode($line['mfa'], true);
             require_once 'includes/mfa.php';
@@ -655,7 +668,15 @@ require_once "includes/sanitize.php";
                 exit;
             }
         }
-		if (password_verify($_POST['oldpw'],$line['password']) && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
+		$oldpwok = password_verify($_POST['oldpw'],$line['password']);
+		if (!$oldpwok) {
+			login_recordFailure($userid, $line['jsondata']);
+		} else {
+			// clear in DB, and in $line so later jsondata writes don't restore it
+			login_resetFailures($userid, $line['jsondata']);
+			$line['jsondata'] = login_clearFailures($line['jsondata']);
+		}
+		if ($oldpwok && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
 			$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
@@ -966,9 +987,23 @@ require_once "includes/sanitize.php";
             trim($old_email) != trim($_POST['email'])
         ) {
             // these changes require security check
-            if (password_verify($_POST['oldpw'],$oldpw) && $myrights>5) {
-                // pw ok
+            require_once 'includes/loginlimit.php';
+            if (login_isBlocked($jsondata)) {
+                require_once "header.php";
+                echo $pagetopper;
+                echo _("Too many invalid attempts.  Wait a minute and try again");
+                require_once "footer.php";
+                exit;
+            }
+            $oldpwok = password_verify($_POST['oldpw'],$oldpw);
+            if ($oldpwok && $myrights>5) {
+                // pw ok; clear in DB, and in $jsondata so the later write doesn't restore it
+                login_resetFailures($userid, $jsondata);
+                $jsondata = login_clearFailures($jsondata);
             } else {
+                if (!$oldpwok) {
+                    login_recordFailure($userid, $jsondata);
+                }
                 require_once "header.php";
                 echo $pagetopper;
                 echo _("Password verification failed."),"  <a href=\"forms.php?action=chguserinfo$gb\">",_("Try Again"),"</a>\n";

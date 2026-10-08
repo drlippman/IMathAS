@@ -178,8 +178,8 @@ if ($haslogin && !$hasusername) {
         $stm->execute(array(':SID' => $_POST['username']));
         $line = $stm->fetch(PDO::FETCH_ASSOC);
         if ($line != false) {
-            $json_data = json_decode($line['jsondata'], true);
-            if (isset($json_data['login_blockuntil']) && time() < $json_data['login_blockuntil']) {
+            require_once __DIR__ . '/includes/loginlimit.php';
+            if (login_isBlocked($line['jsondata'])) {
                 echo _('Too many invalid logins - please wait a minute before trying again, or use the forgot password link to reset your password');
                 exit;
             }
@@ -354,11 +354,8 @@ if ($haslogin && !$hasusername) {
                 $_SESSION['tzname'] = Sanitize::simpleASCII($_POST['tzname']);
             }
 
-            if (isset($json_data['login_errors'])) {
-                unset($json_data['login_errors']);
-                unset($json_data['login_blockuntil']);
-                $line['jsondata'] = json_encode($json_data);
-            }
+            require_once __DIR__ . '/includes/loginlimit.php';
+            $line['jsondata'] = login_clearFailures($line['jsondata']);
 
             $stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess,jsondata=:jsondata WHERE id=:id");
             $stm->execute(array(':lastaccess' => $now, ':jsondata' => $line['jsondata'], ':id' => $userid));
@@ -458,15 +455,8 @@ if ($haslogin && !$hasusername) {
         }
 
         if ($line != false) {
-            if (!isset($json_data['login_errors'])) {
-                $json_data['login_errors'] = 0;
-            }
-            $json_data['login_errors']++;
-            if ($json_data['login_errors'] > 3) {
-                $json_data['login_blockuntil'] = time() + 60;
-            }
-            $stm = $DBH->prepare("UPDATE imas_users SET jsondata=:jsondata WHERE id=:id");
-            $stm->execute(array(':jsondata' => json_encode($json_data), ':id' => $line['id']));
+            require_once __DIR__ . '/includes/loginlimit.php';
+            login_recordFailure($line['id'], $line['jsondata']);
             if (isset($CFG['cloudwatch_loginlog'])) {
                 require_once __DIR__.'/includes/CloudWatchLogger.php';
                 if ($badsession) {
