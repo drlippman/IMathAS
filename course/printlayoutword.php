@@ -202,7 +202,8 @@ if ($overwriteBody==1) {
 	echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
 	echo '<span class="form">Question separator:</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
 	echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> Use PAGEBREAK for a page break</span><br class="form"/>';
-	echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
+	echo '<span class="form">Include question numbers:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
+	echo '<span class="form">Include point values:</span><span class="formright"><input type="checkbox" name="showpts" checked="checked" /> </span><br class="form"/>';
 	echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes checked="checked" ></span><br class="form"/>';
 	echo '<span class="form">Include between-question text?</span><span class="formright"><input type=checkbox name=showtexts ></span><br class="form"/>';
 	echo '<span class="form">Include detailed solutions?</span><span class="formright"><input type=checkbox name=detsoln ></span><br class="form"/>';
@@ -321,9 +322,9 @@ if ($overwriteBody==1) {
                     }
                 }
 				if ($courseUIver > 1) {
-					list($newout,$sa[$j][$i],$detsol[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[$j][$i],$detsol[$j][$i]) = printq2($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]],isset($_REQUEST['showqn']),isset($_REQUEST['showpts']));
 				} else {
-					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[$j][$i]) = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]],isset($_REQUEST['showqn']),isset($_REQUEST['showpts']));
 				}
 				$out .= $newout;
 			}
@@ -399,9 +400,9 @@ if ($overwriteBody==1) {
 			for ($j=0; $j<$copies;$j++) {
 				if ($j>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
 				if ($courseUIver > 1) {
-					list($newout,$sa[],$detsol[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+					list($newout,$sa[],$detsol[]) = printq2($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']),isset($_REQUEST['showpts']));
 				} else {
-				list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+				list($newout,$sa[]) = printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']),isset($_REQUEST['showpts']));
 				}
 				$out .= $newout;
 			}
@@ -512,7 +513,7 @@ if ($overwriteBody==1) {
 	exit;
 }
 
-function printq2($qn,$qsetid,$seed,$pts,$showpts) {
+function printq2($qn,$qsetid,$seed,$pts,$showqn,$showpts) {
 	global $a2,$isfinal,$imasroot,$urlmode;
 	$state = array(
 		'seeds' => array($qn => $seed),
@@ -528,8 +529,11 @@ function printq2($qn,$qsetid,$seed,$pts,$showpts) {
 	} else {
 		$retstrout .= "<div class=m id=\"trq$qn\">\n";
 	}
+	if ($showqn) {
+		$retstrout .= ($qn+1).'. ';
+	}
 	if ($showpts) {
-		$retstrout .= ($qn+1).'. ('.$pts.' pts) ';
+		$retstrout .= '('.$pts.' pts) ';
 	}
 	$retstrout .= "<div>\n";
 	$retstrout .= printfilter($res['html']) . '</div>';
@@ -538,7 +542,7 @@ function printq2($qn,$qsetid,$seed,$pts,$showpts) {
 	return array($retstrout, $res['jsparams']['ans'], (($res['solnopts']&5)==5)?$res['soln']:'');
 }
 
-function printq($qn,$qsetid,$seed,$pts,$showpts) {
+function printq($qn,$qsetid,$seed,$pts,$showqn,$showpts) {
 	global $RND,$DBH,$isfinal,$imasroot,$urlmode;
 	$RND->srand($seed);
 	$stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id=:id");
@@ -653,8 +657,11 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	} else {
 		$retstrout .= "<div class=m id=\"trq$qn\">\n";
 	}
+	if ($showqn) {
+		$retstrout .= ($qn+1).'. ';
+	}
 	if ($showpts) {
-		$retstrout .= ($qn+1).'. ('.$pts.' pts) ';
+		$retstrout .= '('.$pts.' pts) ';
 	}
 	$retstrout .= "<div>\n";
 	//$retstrout .= $toevalqtext;
