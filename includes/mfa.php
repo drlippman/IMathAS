@@ -25,7 +25,7 @@ function mfa_showLoginEntryForm($redir, $error = '', $showtrust = true) {
     require_once __DIR__.'/../footer.php';
 }
 
-function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
+function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true, $admin = false) {
     global $DBH, $imasroot, $CFG;
     $error = '';
     require_once __DIR__.'/GoogleAuthenticator.php';
@@ -48,11 +48,14 @@ function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true) {
             unset($mfadata['lastfail']);
             if (isset($_POST['mfatrust'])) {
                 $trusttoken = $MFA->createSecret();
-                setsecurecookie('gatl', $trusttoken, time()+60*60*24*365*10, true);
-                if (!isset($mfadata['logintrusted'])) {
-                    $mfadata['logintrusted'] = array();
+                // admin trust (enabling admin features) is tracked separately from login trust
+                $cookiename = $admin ? 'gat' : 'gatl';
+                $trustkey = $admin ? 'trusted' : 'logintrusted';
+                setsecurecookie($cookiename, $trusttoken, time()+60*60*24*365*10, true);
+                if (!isset($mfadata[$trustkey])) {
+                    $mfadata[$trustkey] = array();
                 }
-                $mfadata['logintrusted'][] = $trusttoken;
+                $mfadata[$trustkey][] = $trusttoken;
             }
             $stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
             $stm->execute(array(':uid'=>$uid, ':mfa'=>json_encode($mfadata)));

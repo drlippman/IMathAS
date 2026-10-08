@@ -1315,39 +1315,20 @@ switch($_POST['action']) {
 		$stm = $DBH->prepare("SELECT mfa FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$userid));
 		$mfadata = $stm->fetchColumn(0);
-		$error = '';
 		if ($mfadata != '') {
 			$mfadata = json_decode($mfadata, true);
-			require_once '../includes/GoogleAuthenticator.php';
-			$MFA = new GoogleAuthenticator();
-			//check that code is valid and not a replay
-			if ($MFA->verifyCode($mfadata['secret'], $_POST['mfatoken']) &&
-			   ($_POST['mfatoken'] != $mfadata['last'] || time() - $mfadata['laston'] > 600)) {
-				$_SESSION['mfaadminverified'] = true;
-				$mfadata['last'] = $_POST['mfatoken'];
-				$mfadata['laston'] = time();
-				if (isset($_POST['mfatrust'])) {
-					$trusttoken = $MFA->createSecret();
-					setsecurecookie('gat', $trusttoken, time()+60*60*24*365*10, true);
-					if (!isset($mfadata['trusted'])) {
-						$mfadata['trusted'] = array();
-					}
-					$mfadata['trusted'][] = $trusttoken;
-				}
-				$stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
-				$stm->execute(array(':uid'=>$userid, ':mfa'=>json_encode($mfadata)));
-				if (isset($_POST['mfatrust'])) {
-					$pagetitle = _('MFA Confirmation');
-					require_once "../header.php";
-					echo '<p>This device is now trusted; you will not be asked for your 2-factor authentication on this device again.</p>';
-					echo '<p>If you ever need to un-trust this device, you can clear all cookies, or disable 2-factor authentication in your account settings.</p>';
-					echo '<p><a href="../index.php">Continue</a></p>';
-					require_once "../footer.php";
-					exit;
-				}
-
-			} else {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/forms.php?action=entermfa&error=true");
+			require_once '../includes/mfa.php';
+			$formaction = $GLOBALS['basesiteurl'] . '/admin/actions.php?from=' . Sanitize::encodeUrlParam($_GET['from'] ?? '');
+			// on failure this shows the entry form and exits
+			mfa_verify($mfadata, $formaction, $userid, true, true);
+			$_SESSION['mfaadminverified'] = true;
+			if (isset($_POST['mfatrust'])) {
+				$pagetitle = _('MFA Confirmation');
+				require_once "../header.php";
+				echo '<p>This device is now trusted; you will not be asked for your 2-factor authentication on this device again.</p>';
+				echo '<p>If you ever need to un-trust this device, you can clear all cookies, or disable 2-factor authentication in your account settings.</p>';
+				echo '<p><a href="../index.php">Continue</a></p>';
+				require_once "../footer.php";
 				exit;
 			}
 		}
