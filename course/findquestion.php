@@ -134,7 +134,7 @@ if ($overwriteBody==1) {
             $thiscid = $cid;
             foreach ($results as $result) {
                 echo '<li>';
-                echo '<label><input type=checkbox name="replacein[]" value="'.$result['id'].'" ';
+                echo '<label><input type=checkbox name="replacein[]" value="'.$result['aid'].'" ';
                 if ($result['takencnt'] > 0) {
                     echo 'disabled class="q-taken"';
                 }
@@ -146,7 +146,7 @@ if ($overwriteBody==1) {
                     $thiscid = intval($result['courseid']);
                     $result['name'] .= sprintf(' (course ID %d)', $thiscid);
                 }
-                echo '<a href="'.$addq.'.php?cid='.$thiscid.'&aid='.$result['id'].'" target="_blank">';
+                echo '<a href="'.$addq.'.php?cid='.$thiscid.'&aid='.$result['aid'].'" target="_blank">';
                 echo $result['name'].'</a></label></li>';
             }
             echo '</ul>';
