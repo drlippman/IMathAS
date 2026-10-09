@@ -277,7 +277,7 @@ if (count($qids)>1) {
 
 //preload qsdata
 $placeholders = Sanitize::generateQueryPlaceholders($qids);
-$stm = $DBH->prepare("SELECT id,qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id IN ($placeholders)");
+$stm = $DBH->prepare("SELECT id,qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts,userights FROM imas_questionset WHERE id IN ($placeholders)");
 $stm->execute($qids);
 $qsdata = array();
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
@@ -285,6 +285,7 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 }
 
 foreach ($qids as $i=>$qid) {
+	if ($qsdata[$qid]['userights'] == 0) { continue; }
 	$i = Sanitize::onlyInt($i);
 	echo '<div id="embedqwrapper'.$i.'" class="embedqwrapper">';
 	$quesout = '';

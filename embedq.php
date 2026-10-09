@@ -50,6 +50,14 @@ if (empty($_GET['id'])) {
 	exit;
 }
 $qsetid=Sanitize::onlyInt($_GET['id']);
+// load question data and load/set state
+$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
+$stm->execute(array(':id' => $qsetid));
+$line = $stm->fetch(PDO::FETCH_ASSOC);
+if ($line['userights'] == 0) {
+    echo 'Question not available';
+    exit;
+}
 
 $page_formAction = "embedq.php?id=$qsetid";
 

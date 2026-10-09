@@ -109,6 +109,10 @@ $showtips = 2;
 $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
 $stm->execute(array(':id' => $qsid));
 $line = $stm->fetch(PDO::FETCH_ASSOC);
+if ($line['userights'] == 0) {
+    echo 'Question not available';
+    exit;
+}
 
 $a2 = new AssessStandalone($DBH);
 $a2->setQuestionData($line['id'], $line);

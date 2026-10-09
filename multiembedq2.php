@@ -255,6 +255,7 @@ $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
 $stm->execute($QS['id']);
 $qsdata = array();
 while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['userights'] == 0) { continue; }
     $qsdata[$row['id']] = $row;
 }
 

@@ -66,6 +66,7 @@ function mbxproc($qn,$qsetid,$seed) {
   $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
   $stm->execute(array(':id'=>$qsetid));
   $qdata = $stm->fetch(PDO::FETCH_ASSOC);
+  if ($qdata['userights'] == 0) { return;}
   if ($qdata['hasimg']>0) {
 		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 		$stm->execute(array(':qsetid'=>$qsetid));
