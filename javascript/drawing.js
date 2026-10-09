@@ -34,6 +34,8 @@
    	1: solid dot
    	2: open dot
    tptypes
+	4.1: solid triangle marker (single point marker)
+	4.2: solid square marker (single point marker)
 	5: line
 	5.1:  dashed line
 	5.2:  ray (no arrow)
@@ -105,6 +107,7 @@ var clickmightbenewcurve = false;
 var hasTouchTimer = null;
 var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 var tpModeN = {
+	"4.1": 1, "4.2": 1,
 	"5": 2, "5.1": 2, "5.2": 2, "5.3": 2, "5.4": 2, "5.8": 2, "5.9": 2,
 	"6": 2, "6.1": 2, "6.2": 2, "6.3": 2, "6.5": 2, "6.6": 2, "6.7": 3,
 	"7": 2, "7.2": 2, "7.4": 2, "7.5": 2,
@@ -275,6 +278,8 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 				{"mode":9, "descr":_("Cosine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point half a phase further")},
 				{"mode":9.1, "descr":_("Sine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point a quarter phase further")}
 			],
+			"triangledot": [{"mode":4.1, "descr":_("Triangle marker"), inN: 1, "input":_("Enter the coordinates of the triangle")}],
+			"squaredot": [{"mode":4.2, "descr":_("Square marker"), inN: 1, "input":_("Enter the coordinates of the square")}],
 			"tan": [{"mode":9.2, "descr":_("Tangent"), inN: 3, "input":_("Enter the inflection point of the tangent, then a point on a vertical asymptote, then a point on the graph")}],
 			"sec": [{"mode":9.3, "descr":_("Secant"), inN: 2, "input":_("Enter a point at a peak of the secant and a point at the trough of the next segment")}],
 			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
@@ -350,7 +355,11 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
                 adda11ydraw(tarnum, 2, pixcoordstopointlist(odots[tarnum][i], tarnum));
             }
             for (var i=0;i<tplines[tarnum].length;i++) {
-                adda11ydraw(tarnum, tptypes[tarnum][i], pixcoordstopointlist(tplines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(tplines[tarnum][i][1], tarnum));
+                var tpvals = [];
+                for (var j=0;j<tplines[tarnum][i].length;j++) {
+                    tpvals.push(pixcoordstopointlist(tplines[tarnum][i][j], tarnum));
+                }
+                adda11ydraw(tarnum, tptypes[tarnum][i], tpvals.join(","));
             }
             for (var i=0;i<ineqlines[tarnum].length;i++) {
                 adda11ydraw(tarnum, ineqtypes[tarnum][i], pixcoordstopointlist(ineqlines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][1], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][2], tarnum));
@@ -575,7 +584,7 @@ function encodea11ydraw(qn) {
 			} else if (mode<1) {
 				enclines.push('('+outpts.join('),(')+')');
                 lines[tarnum].push(outptsraw);
-			} else if (mode>=5 && mode<10) {
+			} else if (mode>=4 && mode<10) {
 				enctplines.push('('+mode+','+outpts.join(',')+')');
                 tplines[tarnum].push(outptsraw);
                 tptypes[tarnum].push(mode);
@@ -630,7 +639,7 @@ function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,im
 	if (tptypes[tarnum]==null) {tptypes[tarnum] = new Array();}
 	if (ineqlines[tarnum]==null) {ineqlines[tarnum] = new Array();}
 	if (ineqtypes[tarnum]==null) {ineqtypes[tarnum] = new Array();}
-	if (defmode>=5) {
+	if (defmode>=4) {
 		drawstyle[tarnum] = 1;
 	} else {
 		drawstyle[tarnum] = 0;
@@ -944,7 +953,21 @@ function drawTarget(x,y,skipencode) {
 	}
 	ctx.strokeStyle = "rgb(0,0,255)";
 	for (var i=0;i<tplines[curTarget].length; i++) {
-		if (tptypes[curTarget][i]>=5 && tptypes[curTarget][i]<5.5) {//if a tpline
+		if (tptypes[curTarget][i]==4.1 || tptypes[curTarget][i]==4.2) {//solid triangle or square marker
+			var mx = tplines[curTarget][i][0][0];
+			var my = tplines[curTarget][i][0][1];
+			ctx.beginPath();
+			if (tptypes[curTarget][i]==4.1) {
+				ctx.moveTo(mx, my-6);
+				ctx.lineTo(mx+6, my+5);
+				ctx.lineTo(mx-6, my+5);
+				ctx.closePath();
+			} else {
+				ctx.rect(mx-5, my-5, 10, 10);
+			}
+			ctx.fill();
+			ctx.beginPath();
+		} else if (tptypes[curTarget][i]>=5 && tptypes[curTarget][i]<5.5) {//if a tpline
 			var slope = null;
 			var x2 = null;
 			var y2 = null; var u, uperp;
@@ -2016,7 +2039,7 @@ function drawTarget(x,y,skipencode) {
 
 	for (var i=0;i<tplines[curTarget].length; i++) {
 		//draw control points
-		if (tptypes[curTarget][i]==targets[curTarget].mode || targets[curTarget].mode==-1) {
+		if ((tptypes[curTarget][i]==targets[curTarget].mode || targets[curTarget].mode==-1) && tpModeN[tptypes[curTarget][i]] > 1) {
 			ctx.fillStyle = "rgb(255,0,0)";
 			for (var j=0; j<tplines[curTarget][i].length; j++) {
 				ctx.fillRect(tplines[curTarget][i][j][0]-3,tplines[curTarget][i][j][1]-3,6,6);
@@ -2041,7 +2064,7 @@ function deleteCurve(curveType,num) {
 		odots[curTarget].splice(num,1);
 	} else if (curveType>=0 && curveType<1) {
 		lines[curTarget].splice(num,1);
-	} else if (curveType>=5 && curveType<10) { //if twopoint, delete line
+	} else if (curveType>=4 && curveType<10) { //if twopoint, delete line
 		tplines[curTarget].splice(num,1);
 		tptypes[curTarget].splice(num,1);
 		curTPcurve = null;
@@ -2195,7 +2218,7 @@ function drawMouseDown(ev) {
 				}
 				if (curLine!=null && foundpt[0]<1 && curLine!=foundpt[1]) {
 					foundpt = null;
-				} else if (curTPcurve!=null & foundpt[0]>=5 && foundpt[0]<10 && curTPcurve!=foundpt[1]) {
+				} else if (curTPcurve!=null & foundpt[0]>=4 && foundpt[0]<10 && curTPcurve!=foundpt[1]) {
 					foundpt = null;
 				} else if (curIneqcurve!=null && foundpt[0]>=10 && foundpt[0]<11 && curIneqcurve!=foundpt[1]) {
 					foundpt = null;
@@ -2229,12 +2252,18 @@ function drawMouseDown(ev) {
 						curLine = null;
 						dragObj = null;
 					}
-				} else if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {//in twopoint mode
+				} else if (targets[curTarget].mode>=4 && targets[curTarget].mode<10) {//in twopoint mode
 					if (curTPcurve==null) { //start new tpline
 						tplines[curTarget].push([[mouseOff.x,mouseOff.y]]);
 						curTPcurve = tplines[curTarget].length-1;
 						tptypes[curTarget][curTPcurve] = targets[curTarget].mode;
-						mouseisdown = false;
+						if (tpModeN[targets[curTarget].mode]==1) {
+							//single point marker; done, like a dot. allow dragging
+							dragObj = {mode: targets[curTarget].mode, num: curTPcurve, subnum: 0};
+							curTPcurve = null;
+						} else {
+							mouseisdown = false;
+						}
 					} else {//in existing line
 						tplines[curTarget][curTPcurve].push([mouseOff.x,mouseOff.y]);
 						if (tplines[curTarget][curTPcurve].length==tpModeN[targets[curTarget].mode]) {
@@ -2306,14 +2335,14 @@ function drawMouseDown(ev) {
 					setCursor('move');
 					//targets[curTarget].el.style.cursor = 'move';
 					dragObj = {mode: 2, num: foundpt[1]};
-				} else if (foundpt[0]>=5 && foundpt[0]<10) { //if point is on twopoint
+				} else if (foundpt[0]>=4 && foundpt[0]<10) { //if point is on twopoint
 					if (curTPcurve == null) {
 						setCursor('move');
 						//targets[curTarget].el.style.cursor = 'move';
 						//start dragging
 						dragObj = {mode: foundpt[0], num: foundpt[1], subnum: foundpt[2]};
 						oldpointpos = tplines[curTarget][foundpt[1]][foundpt[2]];
-						clickmightbenewcurve = true;
+						clickmightbenewcurve = (tpModeN[foundpt[0]] > 1);
 						//curTPcurve = foundpt[1];
 					}
 				} else if (foundpt[0]>=10 && foundpt[0]<11) { //if point is on ineqline
@@ -2401,7 +2430,7 @@ function findnearpoint(thetarget,mouseOff) {
 			}
 		}
 	}
-	if ((targets[thetarget].mode>=5 && targets[thetarget].mode<10) || targets[thetarget].mode==-1) { //if in tpline mode
+	if ((targets[thetarget].mode>=4 && targets[thetarget].mode<10) || targets[thetarget].mode==-1) { //if in tpline mode
 		for (var i=tplines[thetarget].length-1; i>=0; i--) { //check lines
 			for (var j=tplines[thetarget][i].length-1; j>=0; j--) {
 				if (tptypes[thetarget][i]!=targets[thetarget].mode && targets[thetarget].mode!=-1) {
@@ -2443,7 +2472,7 @@ function drawMouseUp(ev) {
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 		var releaseInTarget = (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height);
 		if (clickmightbenewcurve==true) {
-			if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {
+			if (targets[curTarget].mode>=4 && targets[curTarget].mode<10) {
 				tplines[curTarget].push([[mouseOff.x,mouseOff.y]]);
 				curTPcurve = tplines[curTarget].length-1;
 				tptypes[curTarget][curTPcurve] = targets[curTarget].mode;
@@ -2548,7 +2577,7 @@ function drawMouseUp(ev) {
 				lines[curTarget].splice(dragObj.num,1);
 			} else if (dragObj.mode==0) { //if line, return pt to orig pos
 				lines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
-			} else if (dragObj.mode>=5 && dragObj.mode<10) { //if twopoint, delete line
+			} else if (dragObj.mode>=4 && dragObj.mode<10) { //if twopoint, delete line
 				tplines[curTarget].splice(dragObj.num,1);
 				tptypes[curTarget].splice(dragObj.num,1);
 				//tplines[curTarget][dragObj.num][dragObj.subnum] = oldpointpos;
@@ -2746,7 +2775,7 @@ function drawMouseMove(ev) {
 					dots[curTarget][dragObj.num] = [mouseOff.x,mouseOff.y];
 				} else if (dragObj.mode==2) {
 					odots[curTarget][dragObj.num] = [mouseOff.x,mouseOff.y];
-				} else if (dragObj.mode>=5 && dragObj.mode<10) {
+				} else if (dragObj.mode>=4 && dragObj.mode<10) {
 					tplines[curTarget][dragObj.num][dragObj.subnum] = [mouseOff.x,mouseOff.y];
 				} else if (dragObj.mode>=10 && dragObj.mode<11) {
 					ineqlines[curTarget][dragObj.num][dragObj.subnum] = [mouseOff.x,mouseOff.y];

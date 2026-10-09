@@ -304,6 +304,8 @@ class DrawingScorePart implements ScorePart
             $anshyperbolas = array();
             $ansrects = array();
             $anstrapapprox = array();
+            $anstriangles = array();
+            $anssquares = array();
             $epsilon = ($settings[1]-$settings[0])/499;
             $x0 = $settings[0] - 3*$epsilon;
             $x1 = 1/4*$settings[1] + 3/4*$settings[0] - $epsilon;
@@ -350,13 +352,17 @@ class DrawingScorePart implements ScorePart
                 //curves: function
                 //    function, xmin, xmax
                 //dot:  x,y
-                //  x,y,"closed" or "open"
+                //  x,y,"closed" or "open" or "triangle" or "square"
                 //form: function, color, xmin, xmax, startmaker, endmarker
-                if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+                if (count($function)==2 || (count($function)==3 && in_array($function[2], ['open','closed','triangle','square']))) { //is dot
                     $pixx = (evalbasic($function[0],true) - $settings[0])*$pixelsperx + $imgborder;
                     $pixy = $settings[7] - (evalbasic($function[1],true)-$settings[2])*$pixelspery - $imgborder;
                     if (count($function)==2 || $function[2]=='closed') {
                         $ansdots[$key] = array($pixx,$pixy);
+                    } else if ($function[2]=='triangle') {
+                        $anstriangles[$key] = array($pixx,$pixy);
+                    } else if ($function[2]=='square') {
+                        $anssquares[$key] = array($pixx,$pixy);
                     } else {
                         $ansodots[$key] = array($pixx,$pixy);
                     }
@@ -833,12 +839,21 @@ class DrawingScorePart implements ScorePart
             $trapapprox = array();
             $cubics = array();
             $cuberoots = array();
+            $markers = array('4.1'=>array(), '4.2'=>array());
             if ($tplines=='') {
                 $tplines = array();
             } else {
                 $tplines = explode('),(', substr($tplines,1,strlen($tplines)-2));
                 foreach ($tplines as $k=>$val) {
                     $pts = array_map('floatval', explode(',',$val));
+                    if ($pts[0]==4.1 || $pts[0]==4.2) {
+                        //single point markers: 4.1 solid triangle, 4.2 solid square
+                        if (count($pts)>2) {
+                            $markers[(string)$pts[0]][] = array($pts[1],$pts[2]);
+                        }
+                        unset($tplines[$k]);
+                        continue;
+                    }
                     if ($pts[1]==$pts[3] && $pts[2]==$pts[4] && $pts[0]!==5.4) {
                       //the points are the same; skip it except for vectors
                       unset($tplines[$k]);
@@ -1093,6 +1108,18 @@ class DrawingScorePart implements ScorePart
                     if (($odots[$i][0]-$ansodot[0])*($odots[$i][0]-$ansodot[0]) + ($odots[$i][1]-$ansodot[1])*($odots[$i][1]-$ansodot[1]) <= 25*max(1,$reltolerance)) {
                         $scores[$scoretype[$key]][$key] = 1;
                         break;
+                    }
+                }
+            }
+
+            foreach (['4.1'=>$anstriangles, '4.2'=>$anssquares] as $mtype=>$ansmarkers) {
+                foreach ($ansmarkers as $key=>$ansmarker) {
+                    $scores[$scoretype[$key]][$key] = 0;
+                    foreach ($markers[$mtype] as $marker) {
+                        if (($marker[0]-$ansmarker[0])*($marker[0]-$ansmarker[0]) + ($marker[1]-$ansmarker[1])*($marker[1]-$ansmarker[1]) <= 25*max(1,$reltolerance)) {
+                            $scores[$scoretype[$key]][$key] = 1;
+                            break;
+                        }
                     }
                 }
             }
@@ -1854,7 +1881,8 @@ class DrawingScorePart implements ScorePart
                 }
             }
             //extra stuff is total count of drawn items - # of scored items - # of correct optional items
-            $extrastuffpenalty = max((count($tplines)+count($dots)+count($odots)-count($scores[0])-array_sum($scores[1])-$dupstoignore)/(max(count($scores[0]),count($tplines)+count($dots)+count($odots))),0);
+            $numstuff = count($tplines)+count($dots)+count($odots)+count($markers['4.1'])+count($markers['4.2']);
+            $extrastuffpenalty = max(($numstuff-count($scores[0])-array_sum($scores[1])-$dupstoignore)/(max(count($scores[0]),$numstuff)),0);
             // don't need optional scores anymore
             $scores = $scores[0];
         } else if ($answerformat[0]=="inequality") {

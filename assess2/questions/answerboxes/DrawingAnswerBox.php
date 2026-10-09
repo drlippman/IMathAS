@@ -513,6 +513,18 @@ class DrawingAnswerBox implements AnswerBox
                             $def = 2;}
                         $out .= ' alt="Open dot"/>';
                     }
+                    if (in_array('triangledot', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tpsvg/tptridot.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"4.1\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'triangledot') {$out .= 'class="sel" ';
+                            $def = 4.1;}
+                        $out .= ' alt="Triangle marker"/>';
+                    }
+                    if (in_array('squaredot', $answerformat)) {
+                        $out .= "<img src=\"$staticroot/img/tpsvg/tpsqdot.svg\" data-drawaction=\"settool\" data-qn=\"$qn\" data-val=\"4.2\" ";
+                        if (count($answerformat) > 1 && $answerformat[1] == 'squaredot') {$out .= 'class="sel" ';
+                            $def = 4.2;}
+                        $out .= ' alt="Square marker"/>';
+                    }
                 } else if ($answerformat[0] == 'numberline') {
                     $def = 0.5;
                     if (in_array('lineseg', $answerformat)) {
@@ -658,7 +670,21 @@ class DrawingAnswerBox implements AnswerBox
                 if ($answerformat[0] == 'inequality') {
                     $saarr[$k] = makepretty($function[0]) . ',' . $ineqcolors[$k % 3];
                 } else {
-                    if (count($function) == 2 || (count($function) == 3 && ($function[2] == 'open' || $function[2] == 'closed'))) { //is dot
+                    if (count($function) == 3 && ($function[2] == 'triangle' || $function[2] == 'square')) { //solid triangle or square marker
+                        $mx = evalbasic($function[0], true);
+                        $my = evalbasic($function[1], true);
+                        $mdx = 6 * ($settings[1] - $settings[0]) / ($settings[6] - 2 * $imgborder);
+                        $mdy = 6 * ($settings[3] - $settings[2]) / ($settings[7] - 2 * $imgborder);
+                        if ($function[2] == 'triangle') {
+                            $mpts = [[$mx, $my + $mdy], [$mx + $mdx, $my - $mdy * 0.85], [$mx - $mdx, $my - $mdy * 0.85], [$mx, $my + $mdy]];
+                            $recttext[] = sprintf(_('Triangle marker at (%s,%s), color %s.'), $mx, $my, $defcolor);
+                        } else {
+                            $mpts = [[$mx - $mdx * 0.85, $my - $mdy * 0.85], [$mx + $mdx * 0.85, $my - $mdy * 0.85], [$mx + $mdx * 0.85, $my + $mdy * 0.85], [$mx - $mdx * 0.85, $my + $mdy * 0.85], [$mx - $mdx * 0.85, $my - $mdy * 0.85]];
+                            $recttext[] = sprintf(_('Square marker at (%s,%s), color %s.'), $mx, $my, $defcolor);
+                        }
+                        $mstr = implode(',', array_map(function ($p) { return '[' . $p[0] . ',' . $p[1] . ']'; }, $mpts));
+                        $rectcmds[] = 'stroke="' . $defcolor . '";strokewidth=1;fill="' . $defcolor . '";path([' . $mstr . ']);fill="none";';
+                    } else if (count($function) == 2 || (count($function) == 3 && ($function[2] == 'open' || $function[2] == 'closed'))) { //is dot
                         $saarr[$k] = $function[1] . ',' . $defcolor . ',' . $function[0] . ',' . $function[0];
                         if (count($function) == 2 || $function[2] == 'closed') {
                             $saarr[$k] .= ',closed';
