@@ -165,6 +165,10 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
         $code = 9.2;
     } else if ($type == 'vector') {
         $code = 5.4;
+    } else if ($type == 'triangledot') {
+        $code = 4.1;
+    } else if ($type == 'squaredot') {
+        $code = 4.2;
     } else {
         $code = -1;
     }
@@ -181,10 +185,14 @@ function gettwopointdata($str, $type, $xmin = null, $xmax = null, $ymin = null, 
         $pts = explode(',', $val);
         if ($pts[0] == $code) {
             $pts[1] = ($pts[1] - $imgborder) / $pixelsperx + $xmin;
-            $pts[3] = ($pts[3] - $imgborder) / $pixelsperx + $xmin;
             $pts[2] = ($h - $pts[2] - $imgborder) / $pixelspery + $ymin;
-            $pts[4] = ($h - $pts[4] - $imgborder) / $pixelspery + $ymin;
-            $outpt = array($pts[1], $pts[2], $pts[3], $pts[4]);
+            if ($code < 5) {
+                $outpt = [$pts[1], $pts[2]];
+            } else {
+                $pts[3] = ($pts[3] - $imgborder) / $pixelsperx + $xmin;
+                $pts[4] = ($h - $pts[4] - $imgborder) / $pixelspery + $ymin;
+                $outpt = array($pts[1], $pts[2], $pts[3], $pts[4]);
+            }
             if ($type == 'ellipserad') {
                 $pts[3] = abs($pts[3] - $pts[1]);
                 $pts[4] = abs($pts[4] - $pts[2]);
