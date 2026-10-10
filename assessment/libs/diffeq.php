@@ -240,19 +240,78 @@ function diffeq_comparegensoln($a,$b,$vars,$const,$tol='.001',$domain='-10,10') 
                 } else if ($ai > -1 && abs($aval)<=.00000001 && is_numeric($bval) && abs($bval)<=.00000001) {
                     $cntbothzero++;
                 }
-                if ($ai==-1) {
-                    // for yp, test now using normal method
-                    if (isset($abstolerance)) {
-                        if (abs($aval-$bval) > $abstolerance-1E-12) {return false;}
-                    } else {
-                        if ((abs($aval-$bval)/(abs($aval)+.0001) > $tol-1E-12)) {return false;}
-                    }
-                }
+                // for yp (ai==-1), difference is tested after loop, allowing
+                // it to differ by a combination of homogeneous solutions
             }
             if ($cntnana==20 || $cntnanb==20 || ($ai==-1 && $diffnan>1)) {
                 // either function evaluated to nan at all points, or for yp, nans are diff
                 return false;
-            }   
+            }
+            if ($ai==-1) {
+                // particular parts may differ by a combo of homogeneous solns
+                // (absorbing constants). Least-squares fit b_p - a_p to a's basis.
+                $n = count($const);
+                $rows = [];
+                for ($i = 0; $i < 20; $i++) {
+                    if (isNaN($avals[-1][$i]) || isNaN($bvals[-1][$i])) { continue; }
+                    if (abs($tps[$i][$varcnt]) < 1e-6) { continue; } // can't normalize basis
+                    $row = [];
+                    for ($k = 0; $k < $n; $k++) {
+                        // basis was evaluated with constant = tps value; normalize to 1
+                        $row[$k] = $avals[$k][$i] / $tps[$i][$varcnt];
+                    }
+                    $row[$n] = $bvals[-1][$i] - $avals[-1][$i];
+                    $skip = false;
+                    foreach ($row as $v) {
+                        if (isNaN($v)) { $skip = true; break; }
+                    }
+                    if (!$skip) { $rows[$i] = $row; }
+                }
+                // normal equations M c = rhs
+                $M = [];
+                for ($r = 0; $r < $n; $r++) {
+                    $M[$r] = array_fill(0, $n + 1, 0);
+                    foreach ($rows as $row) {
+                        for ($c = 0; $c < $n; $c++) {
+                            $M[$r][$c] += $row[$r] * $row[$c];
+                        }
+                        $M[$r][$n] += $row[$r] * $row[$n];
+                    }
+                }
+                // gaussian elimination with partial pivoting
+                $coef = array_fill(0, $n, 0);
+                $piv = [];
+                for ($c = 0; $c < $n; $c++) {
+                    $best = $c;
+                    for ($r = $c; $r < $n; $r++) {
+                        if (abs($M[$r][$c]) > abs($M[$best][$c])) { $best = $r; }
+                    }
+                    if (abs($M[$best][$c]) < 1e-9) { continue; } // dependent; leave coef 0
+                    $tmp = $M[$c]; $M[$c] = $M[$best]; $M[$best] = $tmp;
+                    for ($r = 0; $r < $n; $r++) {
+                        if ($r == $c) { continue; }
+                        $f = $M[$r][$c] / $M[$c][$c];
+                        for ($cc = $c; $cc <= $n; $cc++) {
+                            $M[$r][$cc] -= $f * $M[$c][$cc];
+                        }
+                    }
+                    $piv[] = $c;
+                }
+                foreach ($piv as $c) {
+                    $coef[$c] = $M[$c][$n] / $M[$c][$c];
+                }
+                foreach ($rows as $i => $row) {
+                    $resid = $row[$n];
+                    for ($k = 0; $k < $n; $k++) {
+                        $resid -= $coef[$k] * $row[$k];
+                    }
+                    if (isset($abstolerance)) {
+                        if (abs($resid) > $abstolerance-1E-12) {return false;}
+                    } else {
+                        if (abs($resid)/(abs($avals[-1][$i])+.0001) > $tol-1E-12) {return false;}
+                    }
+                }
+            }
             if ($ai>-1) {
                 $match = false;
                 if ($cntbothzero > 18-min($cntnana,$cntnanb)) {
