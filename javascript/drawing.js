@@ -869,39 +869,32 @@ function drawTarget(x,y,skipencode) {
 						ctx.stroke();
 					}
 				}
-			} else if (ineqtypes[curTarget][i] <= 10.4) {//quadratic inequality shading
-				if (ineqtypes[curTarget][i]==10.3) {//solid parabola
-					if (x2 != ineqlines[curTarget][i][0][0]) {
-						if (y2==ineqlines[curTarget][i][0][1]) {
-							ctx.moveTo(0,y2);
-							ctx.lineTo(targets[curTarget].imgwidth,y2);
-						} else {
-							var stretch = (y2 - ineqlines[curTarget][i][0][1])/((x2 - ineqlines[curTarget][i][0][0])*(x2 - ineqlines[curTarget][i][0][0]));
-							if (y2>ineqlines[curTarget][i][0][1]) {
-								//crosses at y=imgheight
-								var inta = Math.sqrt((targets[curTarget].imgheight - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
-								var intb = -1*Math.sqrt((targets[curTarget].imgheight - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
-								var cnty = ineqlines[curTarget][i][0][1] - (targets[curTarget].imgheight - ineqlines[curTarget][i][0][1]);
-								var qy = targets[curTarget].imgheight;
-							} else {
-								var inta = Math.sqrt((0 - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
-								var intb = -1*Math.sqrt((0 - ineqlines[curTarget][i][0][1])/stretch)+ineqlines[curTarget][i][0][0];
-								var cnty = 2*ineqlines[curTarget][i][0][1];
-								var qy = 0;
-							}
-							var cp1x = inta + 2.0/3.0*(ineqlines[curTarget][i][0][0] - inta);
-							var cp1y = qy + 2.0/3.0*(cnty - qy);
-							var cp2x = cp1x + (intb - inta)/3.0;
-							var cp2y = cp1y;
-							ctx.moveTo(inta,qy);
-							ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,intb,qy);
-						}
+			} else if (ineqtypes[curTarget][i] <= 10.4) {//quadratic inequality
+				var vx = ineqlines[curTarget][i][0][0];
+				var vy = ineqlines[curTarget][i][0][1];
+				if (x2 != vx) {
+					ctx.save();
+					if (ineqtypes[curTarget][i]==10.4) {//dashed parabola
+						ctx.setLineDash([8,8]);
+					}
+					// draw each half out from the vertex, so dashes are anchored there
+					if (y2==vy) {
+						ctx.moveTo(vx,vy);
+						ctx.lineTo(0,vy);
+						ctx.moveTo(vx,vy);
+						ctx.lineTo(targets[curTarget].imgwidth,vy);
+					} else {
+						var stretch = (y2 - vy)/((x2 - vx)*(x2 - vx));
+						var qy = (y2>vy) ? targets[curTarget].imgheight : 0;
+						var dx = Math.sqrt((qy - vy)/stretch);
+						// quadratic bezier with horizontal tangent at vertex is exact
+						ctx.moveTo(vx,vy);
+						ctx.quadraticCurveTo(vx + dx/2,vy,vx + dx,qy);
+						ctx.moveTo(vx,vy);
+						ctx.quadraticCurveTo(vx - dx/2,vy,vx - dx,qy);
 					}
 					ctx.stroke();
-				} else {//10.4, dashed parabola
-					if(x2 != ineqlines[curTarget][i][0][0]){
-						dashedParabola(ctx,ineqlines[curTarget][i][0][0],ineqlines[curTarget][i][0][1],x2,y2,targets[curTarget].imgwidth,targets[curTarget].imgheight);
-					}
+					ctx.restore();
 				}
 			} else { //abs ineq
                 if (x2!=ineqlines[curTarget][i][0][0]) {
@@ -3177,82 +3170,6 @@ function chgnormtype(id) {
 		document.getElementById("normleft"+id).style.width = (maxp-minp)+"px";
 	}
 	normupdatevalues(id);
-}
-
-//a parabola given two points,
-//context to draw on - ctx
-//the vertex - (Vx,Vy)
-//another point on the parabola - (x,y)
-//screen width - sw
-//screen height - sh
-function dashedParabola(ctx,Vx,Vy,x,y,sw,sh){
-
-	if (y==Vy) {//horizontal line across screen
-		ctx.moveTo(0,y);
-		ctx.dashedLine(0,y,sw,y);
-	}
-
-	else{
-		//find out where the parabola touches the edge of the screen
-        	var a = (y-Vy)/((x-Vx)*(x-Vx));
-		var b = -2*a*Vx;
-	    	var shift = 0;
-		if(y > Vy){//hits image height, not 0
-			shift = sh;
-		}
-        	var c = a*Vx*Vx+Vy - shift;
-
-        	//calculate control points
-		var discr = Math.sqrt(b*b-4*a*c);
-		c += shift;
-        	var p0x = (-b - discr)/(2*a);
-		var p0y = a*p0x*p0x + b*p0x + c;
-
-		var p2x = (-b + discr)/(2*a);
-		var p2y = p0y;
-
-        	if(p2x < p0x){
-            		var temp = p0x;
-            		p0x = p2x;
-            		p2x = temp;
-        	}
-
-        	var stroke = 8;//length of dashes
-        	var strokeSqr = stroke*stroke;
-		var xChange = p2x - p0x;
-		var px = Vx;
-        	var py = Vy;
-        	var counter = 0;
-		while(px > p0x-5 && px>-5) {
-
-			if(counter%2 == 0)
-                		ctx.moveTo(px,py);
-            		else
-                		ctx.lineTo(px,py);
-
-            		//px -= Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
-            		px -= Math.min(Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2))), Math.sqrt(stroke/Math.abs(a)));
-            		py = a*px*px+b*px+c;
-            		counter++;
-		}
-
-        	px = Vx;
-        	py = Vy;
-        	counter = 0;
-        	while(px < p2x+5 && px < sw+5){
-           		if(counter%2 == 0)
-                		ctx.moveTo(px,py);
-            		else
-                		ctx.lineTo(px,py);
-
-            		//px += Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2)));
-            		px += Math.min(Math.sqrt(strokeSqr/(1+Math.pow(2*a*(px-Vx),2))), Math.sqrt(stroke/Math.abs(a)));
-            		py = a*px*px+b*px+c;
-            		counter++;
-        	}
-
-	}
-	ctx.stroke();
 }
 
 //a parabola given two points,
