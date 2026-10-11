@@ -79,11 +79,16 @@ function chop(x,n) {
 function prepWithMath(str) {
   // avoid double-prep cased by script wrap of prepWithMath followed by
   // secondary after prepWithMath
-  str = str.replace(/Ma(t|\(t\)\*)h\./g,'');
-	str = str.replace(/\b(abs|acos|asin|atan|ceil|floor|sign|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
-	str = str.replace(/\(E\)/g,'(Math.E)');
-	str = str.replace(/\((PI|pi)\)/g,'(Math.PI)');
-	return str;
+  // String literals are left untouched (so text([2,3],"`sqrt(5)`") is safe);
+  // plot() function strings have any Math. stripped later by makeMathFunction.
+  return str.replace(/("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|[^"']+|["']/g, function(m, strlit) {
+    if (strlit) { return m; }
+    m = m.replace(/Ma(t|\(t\)\*)h\./g,'');
+    m = m.replace(/\b(abs|acos|asin|atan|ceil|floor|sign|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
+    m = m.replace(/\(E\)/g,'(Math.E)');
+    m = m.replace(/\((PI|pi)\)/g,'(Math.PI)');
+    return m;
+  });
 }
 
 function ran(a,b,n) {
