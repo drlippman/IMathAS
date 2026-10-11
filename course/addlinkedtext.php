@@ -626,11 +626,12 @@ if ($overwriteBody==1) {
 				<script type="text/javascript">
 				$(function() {
 					var curname = <?php echo json_encode(basename($filename)); ?>;
+					var usedElsewhere = <?php echo $fileUsedElsewhere ? 'true' : 'false'; ?>;
 					$("#userfile").on("change", function() {
 						var f = this.files && this.files.length ? this.files[0].name : '';
 						var same = (f !== '' && f === curname);
 						$("#overwriteopt").toggle(same);
-						if (!same) { $("#overwriteopt input").prop("checked", false); }
+						$("#overwriteopt input").prop("checked", same && !usedElsewhere);
 					});
 				});
 				</script>
