@@ -3499,8 +3499,11 @@ comparelogic("p->q", "~p vv q", "p,q")        // true  (material conditional)</p
   <details class="example"><summary>Example</summary><pre>$a = 5
 isset($a)  // true
 isset($b)  // false  ($b not yet defined)</pre></details></li>
-<li><strong>is_numeric(str)</strong>: Returns true if the string represents an integer or decimal number (not fractions or expressions).
+<li><strong>is_numeric(str)</strong>: Returns true if the input is a integer or decimal number, or 
+	a string representing an integer or decimal number (not fractions or expressions). Values that 
+	pass this can be used in calculations.
   <details class="example"><summary>Example</summary><pre>is_numeric("3.14")  // true
+is_numeric(3.14)  // true
 is_numeric("3/4")   // false
 is_numeric("abc")   // false</pre></details></li>
 <li><strong>are_numeric(v1,v2,v3,...)</strong>: Returns true only if all arguments are numeric values or strings. Can also pass a single array.
@@ -3512,6 +3515,10 @@ are_numeric([3,"3/2"])  // false</pre></details></li>
 is_nan($a)  // true
 is_nan(5)   // false
 is_nan("sqrt(-1)")   // triggers an error; cannot use on strings</pre></details></li>
+<li><strong>is_string(str)</strong>: Returns true if the input is a string.
+  <details class="example"><summary>Example</summary><pre>is_string("3.14")  // true
+is_string(3.14)   // false
+is_string("abc")   // true</pre></details></li>
 <li><strong>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</strong>: Checks whether 
 	all required words appear in a student's text answer. 
 	If they do, redefines $answer to mark the student correct and highlights the matched words in $showanswer. 

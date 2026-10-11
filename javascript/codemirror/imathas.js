@@ -108,7 +108,8 @@
         + " addimageborder formatcomplex array_keys array_values comparelogic comparesetexp stuansready comparentuples"
         + " comparenumberswithunits isset atan2 keepif checkanswerformat preg_match preg_replace is_nan intval"
         + " comparesameform comparecomplex splicearray getsigfigs checksigfigs prettysigfig_instring prettyreal_instring"
-        + " round_instring setupmathquillfillin simplifyexpr floatval levenshtein uniqid trim rtrim ltrim compareintervals";
+        + " round_instring setupmathquillfillin simplifyexpr floatval levenshtein uniqid trim rtrim ltrim compareintervals"
+        + " is_nicenumber is_string";
   //builtin
   imathasBuiltin += " loadlibrary importcodefrom includecodefrom setseed";
   //math

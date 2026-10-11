@@ -24,6 +24,7 @@ array_push(
     'root',
     'is_numeric',
     'is_nan',
+    'is_string',
     'sign',
     'sgn',
     'dechex',
