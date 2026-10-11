@@ -12,7 +12,7 @@ array_push($allowedmacros,"nCr","nPr","mean","stdev","variance","absmeandev","pe
  "csvdownloadlink","modes","forceonemode","dotplot","gamma_cdf","gamma_inv","beta_cdf","beta_inv",
  "anova1way_f","anova1way","anova2way","anova_table","anova2way_f","student_t",
  "stats_randg","stats_randF","stats_randchi2","stats_randt","stats_randpoisson","cluster_bargraph",
- "stem_plot","poissonpdf","poissoncdf","gamma_log","geometricdf","geometripdf","negbinomialpdf",
+ "stem_plot","back_to_back_stem_plot","poissonpdf","poissoncdf","gamma_log","geometricdf","geometripdf","negbinomialpdf",
  "negbinomialcdf","hypgeomcdf","hypgeompdf");
 
 //nCr(n,r)
@@ -3669,5 +3669,127 @@ function poissoncdf($lambda,$x) {
 		$sum += poissonpdf($lambda, $i);
 	}
 	return $sum;
+}
+/* back_to_back_stem_plot(leftdata, rightdata, [options])
+ * Returns an HTML table comparing two numerical datasets on shared stems.
+ * Values are rounded to integers. Either side may be empty,
+ * but at least one value is required. Negative zero stems are kept separate.
+ * Options: split, space, key, customkey, stemlabel, leftlabel, rightlabel.
+ * Labels and customkey are plain text. At most 1000 stems may be displayed.
+ */
+function back_to_back_stem_plot($leftdata, $rightdata, $options = array()) {
+    if (!is_array($leftdata) || !is_array($rightdata) || !is_array($options)) {
+        echo 'back_to_back_stem_plot expects two arrays of numerical data and an options array';
+        return false;
+    }
+    if (count($leftdata) + count($rightdata) == 0) {
+        echo 'back_to_back_stem_plot requires at least one data value';
+        return false;
+    }
+
+    $groups = array(array(), array());
+    $minrow = null;
+    $maxrow = null;
+    $keyvalue = null;
+    foreach (array($leftdata, $rightdata) as $side => $data) {
+        foreach ($data as $value) {
+            if (!is_numeric($value) || !is_finite((float)$value)) {
+                echo 'back_to_back_stem_plot expects finite numerical data';
+                return false;
+            }
+            $rounded = round((float)$value, 0);
+            // Avoid overflowing integer conversion and abs(PHP_INT_MIN).
+            if ($rounded <= -PHP_INT_MAX || $rounded >= PHP_INT_MAX) {
+                echo 'back_to_back_stem_plot data exceeds the supported integer range';
+                return false;
+            }
+            $value = (int)$rounded;
+            $stem = intdiv(abs($value), 10);
+            // Ordered row IDs distinguish stem -0 (row -1) from 0 (row 0).
+            $row = $value < 0 ? -$stem - 1 : $stem;
+            $groups[$side][$row][] = abs($value % 10);
+            $minrow = $minrow === null ? $row : min($minrow, $row);
+            $maxrow = $maxrow === null ? $row : max($maxrow, $row);
+            if ($keyvalue === null) {
+                $keyvalue = $value;
+            }
+        }
+    }
+    if ($maxrow - $minrow + 1 > 1000) {
+        echo 'back_to_back_stem_plot supports a maximum of 1000 stems';
+        return false;
+    }
+
+    $labels = array('stemlabel' => 'Stem', 'leftlabel' => 'Left', 'rightlabel' => 'Right');
+    foreach ($labels as $name => $default) {
+        if (isset($options[$name])) {
+            if (!is_scalar($options[$name])) {
+                echo 'back_to_back_stem_plot labels must be text';
+                return false;
+            }
+            $labels[$name] = (string)$options[$name];
+        }
+        $labels[$name] = htmlspecialchars($labels[$name], ENT_QUOTES, 'UTF-8');
+    }
+    $caption = '';
+    if (isset($options['customkey'])) {
+        if (!is_scalar($options['customkey'])) {
+            echo 'back_to_back_stem_plot customkey must be text';
+            return false;
+        }
+        $caption = (string)$options['customkey'];
+    } elseif (!isset($options['key']) || $options['key'] != false) {
+        $keystem = ($keyvalue < 0 ? '-' : '') . intdiv(abs($keyvalue), 10);
+        $keyleaf = abs($keyvalue % 10);
+        $caption = "Key: $keyleaf | $keystem | $keyleaf represents $keyvalue on either side.";
+    }
+
+    $split = !empty($options['split']);
+    $separator = isset($options['space']) && $options['space'] == false ? '' : ' ';
+    $display = '<table style="margin:0 auto; border-collapse:collapse; border:0;">';
+    if ($caption !== '') {
+        $display .= '<caption style="caption-side:bottom; text-align:center; padding-top: 15px;">'
+            . htmlspecialchars($caption, ENT_QUOTES, 'UTF-8') . '</caption>';
+    }
+    $display .= '<thead><tr><th scope="col" style="text-align:right; padding:0 0.5em; border-bottom:1px solid;">'
+        . $labels['leftlabel'] . '</th><th scope="col" style="text-align:center; padding:0 0.5em; border-bottom:1px solid;">'
+        . $labels['stemlabel'] . '</th><th scope="col" style="text-align:left; padding:0 0.5em; border-bottom:1px solid;">'
+        . $labels['rightlabel'] . '</th></tr></thead><tbody>';
+
+    for ($row = $minrow; $row <= $maxrow; $row++) {
+        $negative = $row < 0;
+        $stemlabel = $negative ? '-' . (-$row - 1) : (string)$row;
+        $leftleaves = $groups[0][$row] ?? array();
+        $rightleaves = $groups[1][$row] ?? array();
+       
+        if ($negative) {
+            sort($leftleaves, SORT_NUMERIC);
+            rsort($rightleaves, SORT_NUMERIC);
+        } else {
+            rsort($leftleaves, SORT_NUMERIC);
+            sort($rightleaves, SORT_NUMERIC);
+        }
+        $halves = $split ? ($negative ? array(1, 0) : array(0, 1)) : array(null);
+        foreach ($halves as $half) {
+            $left = $leftleaves;
+            $right = $rightleaves;
+            $rowdescription = "Stem $stemlabel";
+            if ($half !== null) {
+                $inhalf = function ($leaf) use ($half) {
+                    return intdiv($leaf, 5) == $half;
+                };
+                $left = array_filter($left, $inhalf);
+                $right = array_filter($right, $inhalf);
+                $rowdescription .= $half == 0 ? ', leaves 0 to 4' : ', leaves 5 to 9';
+            }
+            $display .= '<tr><td style="text-align:right; white-space:nowrap; padding:0 0.5em;">'
+                . implode($separator, $left)
+                . '</td><th scope="row" aria-label="' . $rowdescription
+                . '" style="font-weight:normal; text-align:center; border-left:1px solid; border-right:1px solid; padding:0 0.5em;">'
+                . $stemlabel . '</th><td style="text-align:left; white-space:nowrap; padding:0 0.5em;">'
+                . implode($separator, $right) . '</td></tr>';
+        }
+    }
+    return $display . '</tbody></table>';
 }
 ?>

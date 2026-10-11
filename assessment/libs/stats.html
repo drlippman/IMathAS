@@ -32,6 +32,7 @@
 <li><a href="#histogram">histogram</a></li>
 <li><a href="#fdhistogram">fdhistogram</a></li>
 <li><a href="#stem_plot">stem_plot</a></li>
+<li><a href="#back_to_back_stem_plot">back_to_back_stem_plot</a></li>
 <li><a href="#fdbargraph">fdbargraph</a></li>
 <li><a href="#cluster_bargraph">cluster_bargraph</a></li>
 <li><a href="#piechart">piechart</a></li>
@@ -285,6 +286,39 @@ the data.</p>
 <p><em>Returns:</em> a stem-and-leaf display.</p>
 <details class="example"><summary>Examples</summary><pre>$plot = stem_plot(array(21,22,22,23,25,31,34), ['split'=>true])</pre></details>
 
+<h3 id="back_to_back_stem_plot"><a name="back_to_back_stem_plot">back_to_back_stem_plot</a></h3>
+<p><strong>back_to_back_stem_plot(leftdata, rightdata, [options])</strong></p>
+<p>Returns an HTML back-to-back stem-and-leaf display, with left leaves, shared stems,
+and right leaves. Data values are rounded to the nearest integer (halves away from
+zero), as in <code>stem_plot</code>. Either dataset may be empty, but at least one
+value is required. Duplicate leaves and empty stems between the minimum and maximum
+are retained. At most 1000 stems are supported.</p>
+<p>On nonnegative stems, left leaves appear in descending order and right leaves in
+ascending order. On negative stems, these orders reverse to match numerical order;
+<code>-0</code> and <code>0</code> are separate stems. For example, a leaf 4 beside stem
+<code>-0</code> represents -4, and beside stem <code>-1</code> represents -14.</p>
+<ul>
+<li><strong>leftdata, rightdata</strong>: arrays of numerical values. Numeric strings are accepted.</li>
+<li><strong>options</strong> (optional): associative array:
+<ul>
+<li><code>split</code>: true splits each stem into leaves 0&ndash;4 and 5&ndash;9. On negative stems, the 5&ndash;9 row comes first. Default false.</li>
+<li><code>space</code>: false removes spaces between leaf digits. Default true.</li>
+<li><code>key</code>: false hides the default key. Default true.</li>
+<li><code>customkey</code>: custom key text; overrides <code>key</code>.</li>
+<li><code>stemlabel</code>: center heading. Default "Stem".</li>
+<li><code>leftlabel</code>, <code>rightlabel</code>: dataset headings. Defaults "Left" and "Right".</li>
+</ul></li>
+</ul>
+<p>Labels and custom keys are plain text, with HTML characters escaped. Invalid input
+prints an error message and returns false.</p>
+<details class="example"><summary>Examples</summary><pre>loadlibrary("stats")
+$left = array(21,22,22,25,31,34)
+$right = array(20,23,24,29,32,35)
+$plot = back_to_back_stem_plot($left, $right, ["leftlabel"=&gt;"Group A", "rightlabel"=&gt;"Group B"])
+// Include $plot in Question Text.
+
+$splitplot = back_to_back_stem_plot($left, $right, ["split"=&gt;true])</pre></details>
+  
 <h3 id="fdbargraph"><a name="fdbargraph">fdbargraph</a></h3>
 <p><strong>fdbargraph(barlabels, freqarray, label, [width, height, options])</strong></p>
 <ul>
