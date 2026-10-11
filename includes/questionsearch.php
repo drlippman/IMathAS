@@ -399,6 +399,15 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     $rightsand = []; // for libid>0
     $rightsand2 = []; // for libid=0
     $searchvals2 = $searchvals;
+    $noprivate = isset($search['private']) && $search['private'] == 0;
+    if ($noprivate) {
+        $rightsand[] = 'iq.userights>0';
+        $rightsand2[] = 'iq.userights>0';
+    }
+    if (isset($search['public']) && $search['public'] == 0) {
+        $rightsand[] = 'iq.userights=0';
+        $rightsand2[] = 'iq.userights=0';
+    }
     if (!empty($search['mine'])) {
         $rightsand[] = '(iq.ownerid=?)';
         $searchvals[] = $userid;
@@ -406,20 +415,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $searchvals2[] = $userid;
     } else {
         if (!empty($options['isadmin'])) {
-            if (isset($search['private']) && $search['private'] == 0) {
-                $rightsand[] = 'iq.userights>0';
-                $rightsand2[] = 'iq.userights>0';
-            }
-            if (isset($search['public']) && $search['public'] == 0) {
-                $rightsand[] = 'iq.userights=0';
-                $rightsand2[] = 'iq.userights=0';
-            }
+            // no additional restrictions
         } else if (!empty($options['isgroupadmin'])) {
             $admingroupid = $options['isgroupadmin'];
-            if (isset($search['private']) && $search['private'] == 0) {
-                $rightsand[] = 'iq.userights>0';
-                $rightsand2[] = 'iq.userights>0';
-            } else if ($searchtype != 'assess') {
+            if (!$noprivate && $searchtype != 'assess') {
                 $rightsand[] = '(imas_users.groupid=? OR iq.userights>0)';
                 $searchvals[] = $admingroupid;
                 // groupid limit for unassigned is handled by separate query; only need here if no libquery
@@ -427,10 +426,6 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                     $rightsand2[] = '(imas_users.groupid=? OR iq.userights>0)';
                     $searchvals2[] = $admingroupid;
                 }
-            }
-            if (isset($search['public']) && $search['public'] == 0) {
-                $rightsand[] = 'iq.userights=0';
-                $rightsand2[] = 'iq.userights=0';
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
                 // no unassigned is handled by libquery; only need here if no libquery
@@ -452,18 +447,11 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $searchvals2[] = $admingroupid;
             }
         } else {
-            if (isset($search['private']) && $search['private'] == 0) {
-                $rightsand[] = 'iq.userights>0';
-                $rightsand2[] = 'iq.userights>0';
-            } else if ($searchtype != 'assess') {
+            if (!$noprivate && $searchtype != 'assess') {
                 $rightsand[] = '(iq.ownerid=? OR iq.userights>0)';
                 $searchvals[] = $userid;
                 $rightsand2[] = '(iq.ownerid=? OR iq.userights>0)';
                 $searchvals2[] = $userid;
-            }
-            if (isset($search['public']) && $search['public'] == 0) {
-                $rightsand[] = 'iq.userights=0';
-                $rightsand2[] = 'iq.userights=0';
             }
             if ($searchtype != 'assess' && isset($search['id'])) {
                 // no unassigned is handled by libquery; only need here if no libquery
