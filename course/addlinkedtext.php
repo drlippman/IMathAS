@@ -11,6 +11,22 @@ require_once "../includes/parsedatetime.php";
 
 ini_set("max_execution_time", "120");
 
+/**
+ * Check that a stored course file path ("courseid/filename") belongs to a
+ * course the given user teaches, so it is OK for them to overwrite it.
+ */
+function canOverwriteCourseFile($filepath, $uid) {
+	global $DBH;
+	$parts = explode('/', $filepath);
+	if (count($parts) != 2 || !ctype_digit($parts[0]) || $parts[1] === '') {
+		return false;
+	}
+	$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=? AND courseid=?");
+	$stm->execute(array($uid, intval($parts[0])));
+	return ($stm->fetchColumn(0) !== false);
+}
+
+
 
 
 
@@ -119,15 +135,38 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$_POST['text'] = _("File upload error")." - $errormsg";
 						$uploaderror = true;
 					} else {
-						if (($filename=storeuploadedcoursefile('userfile',$cid.'/'.$filename))===false) {
+						$overwriteKey = '';
+						if (!empty($_POST['overwritefile']) && !empty($_POST['curfile'])) {
+							// verify rights to overwrite, and that filename matches
+							$chkfile = Sanitize::sanitizeFilePathAndCheckBlacklist($_POST['curfile']);
+							if (canOverwriteCourseFile($chkfile, $userid) && basename($chkfile) === $filename) {
+								$overwriteKey = $chkfile;
+							}
+						}
+						if ($overwriteKey !== '') {
+							$filename = storeuploadedcoursefile('userfile',$overwriteKey,"public-read",true);
+						} else {
+							$filename = storeuploadedcoursefile('userfile',$cid.'/'.$filename);
+						}
+						if ($filename===false) {
 							$errormsg = _("Try again");
 							$_POST['text'] = _("File upload error")." - $errormsg";
 							$uploaderror = true;
 						} else {
 							$_POST['text'] = "file:$filename";
-							$stm = $DBH->prepare("INSERT INTO imas_linked_files (filename) VALUES (?) ");
+							$stm = $DBH->prepare("SELECT id FROM imas_linked_files WHERE filename=?");
 							$stm->execute(array($filename));
-							$newfileid = $DBH->lastInsertId();
+							$newfileid = $stm->fetchColumn(0);
+							if ($newfileid === false) {
+								$stm = $DBH->prepare("INSERT INTO imas_linked_files (filename) VALUES (?) ");
+								$stm->execute(array($filename));
+								$newfileid = $DBH->lastInsertId();
+							}
+							if ($overwriteKey !== '') {
+								// bump version so cached copies of the old file get bypassed
+								$stm = $DBH->prepare("UPDATE imas_linked_files SET ver=ver+1 WHERE id=?");
+								$stm->execute(array($newfileid));
+							}
 						}
 
 					}
@@ -340,6 +379,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$type = 'file';
 				$filename = substr($line['text'],5);
 				$line['text'] = "";
+				$filever = 0;
+				if ($line['fileid'] > 0) {
+					$stm = $DBH->prepare("SELECT ver FROM imas_linked_files WHERE id=?");
+					$stm->execute(array($line['fileid']));
+					$filever = $stm->fetchColumn(0) ?: 0;
+				}
+				$canOverwrite = false;
+				$fileUsedElsewhere = false;
+				if ($line['fileid'] > 0) { // older files without a fileid can't be checked cheaply
+					$canOverwrite = canOverwriteCourseFile($filename, $userid);
+					if ($canOverwrite) {
+						$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_linkedtext WHERE id<>? AND fileid=?");
+						$stm->execute(array($linkid, $line['fileid']));
+						$fileUsedElsewhere = ($stm->fetchColumn(0) > 0);
+					}
+				}
 			} else if (substr($line['text'],0,8)=='exttool:') {
 				$type = 'tool';
 				$points= $line['points'];
@@ -552,13 +607,34 @@ if ($overwriteBody==1) {
 			<?php if ($filename != '') {
 				require_once "../includes/filehandler.php";
 				echo '<input type="hidden" name="curfile" value="'.Sanitize::encodeStringForDisplay($filename).'"/>';
-				$alink = getcoursefileurl($filename);
+				$alink = getcoursefileurl($filename, false, $filever ?? 0);
 				echo _('Current file:').' <a target="_blank" href="' . Sanitize::url($alink) . '">'.Sanitize::encodeStringForDisplay(basename($filename)).'</a><br/>'._('Replace').' ';
 			} else {
 				echo _('Attach ');
 			}
 			?>
 			file (Max 15MB): <input name="userfile" id=userfile type="file" />
+			<?php if (!empty($canOverwrite)) { ?>
+				<div id="overwriteopt" style="display:none;margin-top:5px">
+					<?php echo _('This file has the same filename as the current file.'); ?><br/>
+					<?php if ($fileUsedElsewhere) { ?>
+						<span class="noticetext"><?php echo _('Warning: this file is used in other places. Overwriting it will change the file everywhere it is used.'); ?></span><br/>
+					<?php } ?>
+					<label><input type="checkbox" name="overwritefile" value="1" />
+						<?php echo _('Overwrite the existing file. If you do not, the new file will be assigned a different filename.'); ?></label>
+				</div>
+				<script type="text/javascript">
+				$(function() {
+					var curname = <?php echo json_encode(basename($filename)); ?>;
+					$("#userfile").on("change", function() {
+						var f = this.files && this.files.length ? this.files[0].name : '';
+						var same = (f !== '' && f === curname);
+						$("#overwriteopt").toggle(same);
+						if (!same) { $("#overwriteopt input").prop("checked", false); }
+					});
+				});
+				</script>
+			<?php } ?>
 			</span><br class="form">
 		</div>
 		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>

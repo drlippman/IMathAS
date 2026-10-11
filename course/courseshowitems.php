@@ -1456,7 +1456,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                 $icon = 'web';
             } else if (substr(strip_tags($line['text']), 0, 5) == "file:") {
                 $filename = substr(strip_tags($line['text']), 5);
-                $alink = getcoursefileurl($filename); //$imasroot . "/course/files/".$filename;
+                $alink = getcoursefileurl($filename, false, $line['filever'] ?? 0);
                 $ext = substr($filename, strrpos($filename, '.') + 1);
                 switch ($ext) {
                     case 'xlsx':

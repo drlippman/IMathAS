@@ -329,7 +329,7 @@ function downsizeimage($fileinfo) {
 	}
 }
 
-function storeuploadedcoursefile($id,$key,$sec="public-read") {
+function storeuploadedcoursefile($id,$key,$sec="public-read",$overwrite=false) {
 	$key = Sanitize::sanitizeFilePathAndCheckBlacklist($key);
 	if (getfilehandlertype('filehandlertypecfiles') == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
@@ -341,7 +341,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			$t=0;
 			$fn = $key;
-			while ($s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false) !==false) {
+			while (!$overwrite && $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false) !==false) {
 				$key = substr($fn,0,strpos($fn,"."))."_$t".strstr($fn,".");
 				$t++;
 			}
@@ -364,7 +364,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 				mkdir_recursive($dir);
 			}
 			$t=0; $tfn = $fn;
-			while(file_exists($dir.'/'.$fn)){
+			while(!$overwrite && file_exists($dir.'/'.$fn)){
 				$fn = substr($tfn,0,strpos($tfn,"."))."_$t".strstr($tfn,".");
 				$t++;
 			}
@@ -1131,19 +1131,20 @@ function getfopenloc($key) {
 		return "../filestore/$key";
 	}
 }
-function getcoursefileurl($key,$abs=false) {
+function getcoursefileurl($key,$abs=false,$ver=0) {
 	global $urlmode,$imasroot;
 	$st = substr($key,0,6);
 	if ($st == 'http:/' || $st=='https:') {
 		return $key;
 	} else if (getfilehandlertype('filehandlertypecfiles') == 's3') {
-		return getS3endpoint($key) . "/cfiles/$key";
+		return getS3endpoint($key) . "/cfiles/$key" . ($ver > 0 ? '?v=' . intval($ver) : '');
 	} else {
 		$key = Sanitize::rawurlencodePath($key);  //shouldn't be needed since filenames sanitized, but better to be safe
+		$vstr = ($ver > 0) ? '?v=' . intval($ver) : ''; //cache-busting for overwritten files
 		if ($abs==true) {
-			return $GLOBALS['basesiteurl'] . "/course/files/$key";
+			return $GLOBALS['basesiteurl'] . "/course/files/$key$vstr";
 		} else {
-			return "$imasroot/course/files/$key";
+			return "$imasroot/course/files/$key$vstr";
 		}
 	}
 }

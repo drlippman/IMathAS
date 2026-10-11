@@ -23,9 +23,9 @@
 	}
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
-	$stm = $DBH->prepare("SELECT text,title,target,avail,startdate,enddate FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
+	$stm = $DBH->prepare("SELECT text,title,target,avail,startdate,enddate,(SELECT ver FROM imas_linked_files WHERE imas_linked_files.id=imas_linkedtext.fileid) AS filever FROM imas_linkedtext WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$linkedtextid, ':cid'=>$cid));
-	list($text,$title,$target,$avail,$startdate,$enddate) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
+	list($text,$title,$target,$avail,$startdate,$enddate,$filever) = $stm->fetch(PDO::FETCH_NUM) ?: [null,null,null];
 	if ($text === null) {
 		echo "Invalid ID";
 		exit;
@@ -59,7 +59,7 @@
 	} else if (substr(strip_tags($text),0,5)=="file:") {
 		$filename = substr(strip_tags($text),5);
 		require_once "../includes/filehandler.php";
-		$alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
+		$alink = getcoursefileurl($filename, false, $filever);
 		$text = '<p>Download file: <a href="'.Sanitize::url($alink).'">'.Sanitize::encodeStringForDisplay($title).'</a></p>';
 	}
 

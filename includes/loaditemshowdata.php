@@ -206,7 +206,7 @@ function loadItemShowData($items,$onlyopen,$viewall,$inpublic=false,$ispublic=fa
 		if ($limited) {
 			$tosel = 'id,title,summary';
 		} else {
-			$tosel = 'id,title,summary,text,startdate,enddate,avail,target';
+			$tosel = 'id,title,summary,text,startdate,enddate,avail,target,(SELECT ver FROM imas_linked_files WHERE imas_linked_files.id=imas_linkedtext.fileid) AS filever';
 		}
 		$stm = $DBH->prepare("SELECT $tosel FROM imas_linkedtext WHERE id IN ($placeholders)");
 		$stm->execute(array_keys($typelookups['LinkedText']));

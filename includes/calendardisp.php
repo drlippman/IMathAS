@@ -411,9 +411,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid=:courseid ORDER BY title";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target,(SELECT ver FROM imas_linked_files WHERE imas_linked_files.id=imas_linkedtext.fileid) AS filever FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid=:courseid ORDER BY title";
 } else {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target,(SELECT ver FROM imas_linked_files WHERE imas_linked_files.id=imas_linkedtext.fileid) AS filever FROM imas_linkedtext WHERE ";
 	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
 	$query .= "(avail=2 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid=:courseid ORDER BY title";
 }
@@ -445,7 +445,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $alink = trim($row[3]);
 	   } else if (substr($row[3],0,5)=="file:") {
 		   $filename = substr(strip_tags($row[3]),5);
-		   $alink = getcoursefileurl($filename);//$alink = $imasroot . "/course/files/".$filename;
+		   $alink = getcoursefileurl($filename, false, $row[9]);
 	   } else {
 		   $alink = '';
 	   }
