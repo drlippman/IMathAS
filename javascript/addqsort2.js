@@ -161,11 +161,21 @@ function refreshTable() {
             var col = $(this).closest("td,th").index();
             var row = $(this).closest("tr").index();
             var rtype = $(this).closest("tbody,thead")[0].nodeName;
-            curqlastfocus = [rtype, row, col];
+            curqlastfocus = [rtype, row, col, (this.id || "").substring(0, 4)];
         });
     if (curqlastfocus.length > 0) {
-        $("#curqtbl "+curqlastfocus[0]+ " tr").eq(curqlastfocus[1])
-            .find("td,th").eq(curqlastfocus[2]).find("input,button,a").focus();
+        var focuscands = $("#curqtbl "+curqlastfocus[0]+ " tr").eq(curqlastfocus[1])
+            .find("td,th").eq(curqlastfocus[2]).find("input,button,a,select");
+        if (curqlastfocus[3] !== "") {
+            // multiple inputs can share a cell (e.g. groups); match on id prefix
+            var idmatch = focuscands.filter(function () {
+                return this.id.substring(0, 4) === curqlastfocus[3];
+            });
+            if (idmatch.length > 0) {
+                focuscands = idmatch;
+            }
+        }
+        focuscands.first().focus();
     }
     $("#noqs").toggle(itemarray.length == 0);
     $("#curqform").toggle(itemarray.length != 0);
