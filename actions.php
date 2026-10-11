@@ -628,7 +628,11 @@ require_once "includes/sanitize.php";
 		) {
             $stm = $DBH->prepare("UPDATE imas_users SET msgnotify=0 WHERE email=?");
             $stm->execute([$_GET['email']]);
+            // also stop diagnostic results emails to this address
+            $stm = $DBH->prepare("UPDATE imas_diags SET resultsemail='' WHERE resultsemail=?");
+            $stm->execute([$_GET['email']]);
             echo _('The account(s) using this email have been updated to not send email notifications of new messages.  You can re-enable email notifications by editing your user profile.');
+            echo ' ' . _('Diagnostic results emails to this address have also been turned off.');
         } else {
             echo 'Invalid link';
         }

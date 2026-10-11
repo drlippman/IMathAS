@@ -7,6 +7,45 @@
 class AssessUtils
 {
   /**
+   * Email diagnostic results to the address set in the diagnostic setup, if any.
+   * Call after the attempt has been submitted and totaled.
+   * @param  int $diagid         The diagnostic ID
+   * @param  int $userid         The student's user ID
+   * @param  int $aid            The assessment ID
+   * @param  float $score        The attempt score
+   * @param  float $pointsPossible
+   * @return void
+   */
+  public static function sendDiagResultsEmail($diagid, $userid, $aid, $score, $pointsPossible) {
+    global $DBH, $sendfrom, $installname, $basesiteurl;
+    $stm = $DBH->prepare('SELECT name,resultsemail FROM imas_diags WHERE id=?');
+    $stm->execute(array($diagid));
+    $diag = $stm->fetch(PDO::FETCH_ASSOC);
+    if ($diag === false || trim($diag['resultsemail']) == '') {
+      return;
+    }
+    $stm = $DBH->prepare('SELECT SID,FirstName,LastName FROM imas_users WHERE id=?');
+    $stm->execute(array($userid));
+    $user = $stm->fetch(PDO::FETCH_ASSOC);
+    $stm = $DBH->prepare('SELECT name FROM imas_assessments WHERE id=?');
+    $stm->execute(array($aid));
+    $aname = $stm->fetchColumn();
+    if ($user === false) {
+      return;
+    }
+    // diag SID format is ID~term~courseid[~selector]
+    $diagStuId = explode('~', $user['SID'])[0];
+    $subject = sprintf(_('Diagnostic results: %s'), $diag['name']);
+    $message = sprintf(_('Diagnostic: %s'), $diag['name']) . "\n";
+    $message .= sprintf(_('Assessment: %s'), $aname) . "\n";
+    $message .= sprintf(_('Student: %s, %s'), $user['LastName'], $user['FirstName']) . "\n";
+    $message .= sprintf(_('ID: %s'), $diagStuId) . "\n";
+    $message .= sprintf(_('Score: %1$s out of %2$s'), round($score, 2), round($pointsPossible, 2)) . "\n";
+    require_once __DIR__ . '/../includes/email.php';
+    send_email($diag['resultsemail'], $sendfrom, $subject, $message, array(), array(), 5, true);
+  }
+
+  /**
     * Get the group ID and group members
     * @param  int $userid     The user ID
     * @param  int $groupsetid The group set ID

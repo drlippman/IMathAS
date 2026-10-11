@@ -150,6 +150,10 @@ if (($myrights<100 && ($myspecialrights&4)!=4) ||
 
 } elseif (isset($_GET['step']) && $_GET['step']==3 && isset($_POST['sel1list'])) {  //STEP 3 DATA PROCESSING
 	$sel1 = explode(',',$_POST['sel1list']);
+	$resultsemail = Sanitize::emailAddress($_POST['resultsemail'] ?? '');
+	if (!filter_var($resultsemail, FILTER_VALIDATE_EMAIL)) {
+		$resultsemail = '';
+	}
 	$aids = array();
 	$forceregen = 0;
 	for ($i=0;$i<count($sel1);$i++) {
@@ -187,23 +191,23 @@ if (($myrights<100 && ($myspecialrights&4)!=4) ||
 	if (!empty($diagId)) {
 		$query = "UPDATE imas_diags SET ";
 		$query .= "name=:name,cid=:cid,term=:term,public=:public,ips=:ips,pws=:pws,idprompt=:idprompt,sel1name=:sel1name,";
-		$query .= "sel1list=:sel1list,aidlist=:aidlist,sel2name=:sel2name,sel2list=:sel2list,entryformat=:entryformat,forceregen=:forceregen,reentrytime=:reentrytime ";
+		$query .= "sel1list=:sel1list,aidlist=:aidlist,sel2name=:sel2name,sel2list=:sel2list,entryformat=:entryformat,forceregen=:forceregen,reentrytime=:reentrytime,resultsemail=:resultsemail ";
 		$query .= " WHERE id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':name'=>$_POST['diagname'], ':cid'=>$_POST['cid'], ':term'=>$_POST['term'], ':public'=>$_POST['public'],
 			':ips'=>$_POST['iplist'], ':pws'=>$_POST['pwlist'], ':idprompt'=>$_POST['idprompt'], ':sel1name'=>'!'.$_POST['sel1name'],
 			':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>'!'.$_POST['sel2name'], ':sel2list'=>$sel2list,
-			':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime'], ':id'=>$_POST['id']));
+			':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime'], ':resultsemail'=>$resultsemail, ':id'=>$_POST['id']));
 		$id = Sanitize::onlyInt($diagId);
 		$page_successMsg = "<p>Diagnostic Updated</p>\n";
 	} else {
-		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime) VALUES ";
-		$query .= "(:ownerid, :name, :cid, :term, :public, :ips, :pws, :idprompt, :sel1name, :sel1list, :aidlist, :sel2name, :sel2list, :entryformat, :forceregen, :reentrytime)";
+		$query = "INSERT INTO imas_diags (ownerid,name,cid,term,public,ips,pws,idprompt,sel1name,sel1list,aidlist,sel2name,sel2list,entryformat,forceregen,reentrytime,resultsemail) VALUES ";
+		$query .= "(:ownerid, :name, :cid, :term, :public, :ips, :pws, :idprompt, :sel1name, :sel1list, :aidlist, :sel2name, :sel2list, :entryformat, :forceregen, :reentrytime, :resultsemail)";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':ownerid'=>$userid, ':name'=>$_POST['diagname'], ':cid'=>$_POST['cid'], ':term'=>$_POST['term'],
 			':public'=>$_POST['public'], ':ips'=>$_POST['iplist'], ':pws'=>$_POST['pwlist'], ':idprompt'=>$_POST['idprompt'],
 			':sel1name'=>'!'.$_POST['sel1name'], ':sel1list'=>$_POST['sel1list'], ':aidlist'=>$aidlist, ':sel2name'=>'!'.$_POST['sel2name'],
-			':sel2list'=>$sel2list, ':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime']));
+			':sel2list'=>$sel2list, ':entryformat'=>$_POST['entryformat'], ':forceregen'=>$forceregen, ':reentrytime'=>$_POST['reentrytime'], ':resultsemail'=>$resultsemail));
 		$id = $DBH->lastInsertId();
 		$page_successMsg = "<p>Diagnostic Added</p>\n";
 	}
@@ -212,7 +216,7 @@ if (($myrights<100 && ($myspecialrights&4)!=4) ||
 
 } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
 	if (isset($_GET['id'])) {
-		$stm = $DBH->prepare("SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id=:id");
+		$stm = $DBH->prepare("SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid,resultsemail FROM imas_diags WHERE id=:id");
 		$stm->execute(array(':id'=>$diagId));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		$diagname = $line['name'];
@@ -227,6 +231,11 @@ if (($myrights<100 && ($myspecialrights&4)!=4) ||
 		$entryformat = $line['entryformat'];
 		$forceregen = $line['forceregen'];
 		$reentrytime = $line['reentrytime'];
+		$resultsemail = $line['resultsemail'];
+		$resultsbounced = (substr($resultsemail,0,7) === 'BOUNCED');
+		if ($resultsbounced) {
+			$resultsemail = substr($resultsemail,7);
+		}
 		if ($myrights>=75) {
 			$owner = $line['ownerid'];
 		} else if ($line['ownerid']!=$userid) {
@@ -248,6 +257,8 @@ if (($myrights<100 && ($myspecialrights&4)!=4) ||
 		$entryformat = 'C0';
 		$forceregen = 0;
 		$reentrytime = 0;
+		$resultsemail = '';
+		$resultsbounced = false;
 		$owner = $userid;
 	}
 	if ($sel[0]=='!') {
@@ -331,6 +342,7 @@ if ($overwriteBody==1) { //NO AUTHORITY
 			<input type=hidden name="entryformat" value="<?php echo Sanitize::encodeStringForDisplay($entryformat); ?>"/>
 			<input type=hidden name="public" value="<?php echo Sanitize::encodeStringForDisplay($public); ?>"/>
 			<input type=hidden name="reentrytime" value="<?php echo Sanitize::encodeStringForDisplay($_POST['reentrytime']); ?>"/>
+			<input type=hidden name="resultsemail" value="<?php echo Sanitize::encodeStringForDisplay($_POST['resultsemail'] ?? ''); ?>"/>
 			<input type=hidden name="id" value="<?php echo Sanitize::onlyInt($page_updateId); ?>" >
 			<p>Second-level selector name (ex: "Select your instructor"):
 			<input type=text name=sel2name value="<?php echo Sanitize::encodeStringForDisplay($sel2name); ?>"/></p>
@@ -440,6 +452,10 @@ if ($overwriteBody==1) { //NO AUTHORITY
         </select>
 
 	</p>
+
+	<p>Email results to (optional): <input type="email" size="40" name="resultsemail" value="<?php echo Sanitize::encodeStringForDisplay($resultsemail); ?>" />
+	<?php if ($resultsbounced) { echo '<br/><span class="noticetext">'._('Emails to this address bounced, so it is disabled. Re-save to re-enable it, or enter a different address.').'</span>'; } ?>
+	<br/><span class="small">If provided, an email with the student's score will be sent each time a student completes the diagnostic.</span></p>
 
 	<p>Unique ID prompt: <input type=text size=60 name="idprompt" value="<?php echo Sanitize::encodeStringForDisplay($idprompt); ?>" /></p>
 

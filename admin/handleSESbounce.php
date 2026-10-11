@@ -61,6 +61,10 @@ if (count($emails) > 0) {
 	$ph = Sanitize::generateQueryPlaceholders($emails);
 	$stm = $DBH->prepare("UPDATE imas_users SET email=CONCAT('BOUNCED', email) WHERE email IN ($ph)");
 	$stm->execute($emails);
+
+	// also mark any diagnostic results emails as bounced
+	$stm = $DBH->prepare("UPDATE imas_diags SET resultsemail=CONCAT('BOUNCED', resultsemail) WHERE resultsemail IN ($ph)");
+	$stm->execute($emails);
 }
 
 echo "Done";
