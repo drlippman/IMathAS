@@ -809,7 +809,7 @@ function getuserfiles($uid,$img=false) {
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
 			if ($img) {
-				$imgext = array(".gif",".jpg",".png",".jpeg");
+				$imgext = array(".gif",".jpg",".png",".jpeg",".svg",".webp");
 				foreach ($arr as $k=>$v) {
 					if (!in_array(strtolower(strrchr($arr[$k]['name'],".")),$imgext)) {
 						unset($arr[$k]);
@@ -823,20 +823,18 @@ function getuserfiles($uid,$img=false) {
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		if ($handle = @opendir($base."/ufiles/$uid")) {
-			$imgext = array(".gif",".jpg",".png",".jpeg");
+			$imgext = array(".gif",".jpg",".png",".jpeg",".svg",".webp");
 			$arr = array();
 			$k = 0;
 			while (false !== ($file=readdir($handle))) {
-				if ($file != "." && $file != ".." && !is_dir($file)) {
-					if ($img) {
-						if (in_array(strtolower(strrchr($file,".")),$imgext)) {
-							$arr[$k]['name'] = "ufiles/$uid/$file";
-							$k++;
-						}
-					} else {
-						$arr[$k]['name'] = "ufiles/$uid/$file";
-						$k++;
+				if ($file != "." && $file != ".." && !is_dir($base."/ufiles/$uid/".$file)) {
+					if ($img && !in_array(strtolower(strrchr($file,".")),$imgext)) {
+						continue;
 					}
+					$arr[$k]['name'] = "ufiles/$uid/$file";
+					$arr[$k]['time'] = @filemtime($base."/ufiles/$uid/".$file);
+					$arr[$k]['size'] = @filesize($base."/ufiles/$uid/".$file);
+					$k++;
 				}
 			}
 			closedir($handle);
