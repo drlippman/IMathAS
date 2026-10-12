@@ -112,7 +112,7 @@ function doAdvSearch() {
     outstr += $("#search-words").val() + ' ';
     var exclude = $("#search-exclude").val().trim();
     if (exclude != '') {
-        outstr += '!' + exclude.split(/\s+/).join(' !');
+        outstr += '!' + exclude.split(/\s+/).join(' !') + ' ';
     }
     var author = $("#search-author").val().trim()
     if (author != '') {
