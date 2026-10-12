@@ -485,7 +485,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $rightsquery2 = '';
     }
 
-    if ($searchtype == 'all' && empty($wholewords) && !$searchintext && !empty($search['terms'])) {
+    if ($searchtype == 'all' && empty($wholewords) && !$searchintext && !empty($search['terms']) && empty($search['mine'])) {
         return _('Cannot search all libraries without at least one 3+ letter word in the search terms');
     }
     if ($searchtype == 'all' && $searchquery === '') {
