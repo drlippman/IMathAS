@@ -118,11 +118,16 @@ class LTI_Grade_Update {
    * @param  int    $isstu            default 1
    * @param  ?int    $addedon         default null
    * @param  string $comment          default ''
-   * @return false|array  false on failure, or array with body and headers
+   * @param  bool   $detailed         default false. If true, always return an
+   *                                  array with the raw response details, even on failure
+   * @return false|array  false on failure, or array with body and headers.
+   *                      If $detailed, array with success, http_code, error,
+   *                      headers, body (raw string), url
    */
   public function send_update(string $token, string $score_url, float $score, int $ptsposs,
     string $ltiuserid, string $hash, string $activityProgress='Submitted',
-    string $gradingProgress='FullyGraded', $isstu = 1, ?int $addedon = null, string $comment = ''
+    string $gradingProgress='FullyGraded', $isstu = 1, ?int $addedon = null, string $comment = '',
+    bool $detailed = false
   ) {
     $pos = strpos($score_url, '?');
     $score_url = $pos === false ? $score_url . '/scores' : substr_replace($score_url, '/scores', $pos, 0);
@@ -168,10 +173,8 @@ class LTI_Grade_Update {
 
     $response = curl_exec($ch);
     $request_info = curl_getinfo($ch);
-    if (curl_errno($ch) || round(intval($request_info['http_code'])/100) != 2) {
-        $this->debuglog('Grade update Error:' . curl_error($ch));
-        return false;
-    }
+    $curl_errno = curl_errno($ch);
+    $curl_error = curl_error($ch);
     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     if (PHP_VERSION_ID >= 80000) {
 			unset($ch);
@@ -179,8 +182,23 @@ class LTI_Grade_Update {
 			curl_close($ch);
 		};
 
-    $resp_headers = substr($response, 0, $header_size);
-    $resp_body = substr($response, $header_size);
+    $resp_headers = ($response === false) ? '' : substr($response, 0, $header_size);
+    $resp_body = ($response === false) ? '' : substr($response, $header_size);
+    $is_success = !$curl_errno && round(intval($request_info['http_code'])/100) == 2;
+    if ($detailed) {
+      return [
+        'success' => $is_success,
+        'http_code' => intval($request_info['http_code']),
+        'error' => $curl_error,
+        'headers' => array_filter(explode("\r\n", $resp_headers)),
+        'body' => $resp_body,
+        'url' => $score_url
+      ];
+    }
+    if (!$is_success) {
+        $this->debuglog('Grade update Error:' . $curl_error);
+        return false;
+    }
     $this->debuglog('Grade update success:' . $resp_body);
     return [
         'headers' => array_filter(explode("\r\n", $resp_headers)),

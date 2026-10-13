@@ -541,6 +541,9 @@ if (isset($_GET['form'])) {
 	echo '<a href="itemsearch.php">Search inline/linked items</a><br/>';
     echo '<a href="utils.php?form=setupfcm">Set up FCM for push notifications</a><br/>';
 	echo '<a href="ipeds_admin.php">Edit IPEDS</a><br/>';
+	if (!empty($CFG['LTI']['usequeue'])) {
+		echo '<a href="ltiqueuestatus.php">LTI queue check</a><br/>';
+	}
 	require_once "../footer.php";
 }
 ?>

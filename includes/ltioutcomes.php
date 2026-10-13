@@ -126,7 +126,8 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$aidposs=1,$sendno
 }
 
 // for 1.1, grade is a number 0-1
-function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false) {
+// if $checkResponse is true, waits for the LMS response and returns array(ok, response text)
+function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$checkResponse=false) {
   global $DBH,$testsettings,$cid,$CFG,$userid;
 
 	//otherwise, send now
@@ -187,9 +188,9 @@ function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false)
 		}
 		if ($secret != '') {
 			if ($action=='update') {
-				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
+				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade,$checkResponse);
 			} else if ($action=='delete') {
-				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);
+				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid,0,$checkResponse);
 			} else {
 				return false;
 			}
