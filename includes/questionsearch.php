@@ -636,9 +636,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         if (!empty($options['getowner'])) {
             $row['ownername'] = Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']);
         }
-        if (!empty($options['includeowner'])) {
-            $row['ownershort'] = Sanitize::encodeStringForDisplay($row['LastName'].','.substr($row['FirstName'],0,1));
-        }
+        $row['ownershort'] = Sanitize::encodeStringForDisplay($row['LastName'].','.substr($row['FirstName'],0,1));
         unset($row['LastName']);
         unset($row['FirstName']);
         $row['extrefval'] = 0;

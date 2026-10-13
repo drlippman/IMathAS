@@ -89,8 +89,8 @@ if (!empty($search['unused']) && $searchcontext!='c') {
 if ($searchcontext=='c') {
     $options['includelastmod'] = 1;
 }
+
 if ($_GET['cid'] === 'admin') {
-    $options['includeowner'] = 1;
     if ($myrights == 100) {
         $options['isadmin'] = true;
     } else if ($myrights > 74) {

@@ -284,18 +284,18 @@ function displayQuestionList(results) {
         $('<th>').text(_('Description')),
         $('<th>').text(_('Actions')),
         $('<th>').text(_('Info')),
-        $('<th>').text(_('ID')),
+        $('<th>').text(_('Owner')),
         $('<th>').text(_('Type')),
         $('<th>').text(_('Times Used')),
         $('<th>').text(searchcontext == 'manageq' ? _('Last Mod') : _('Avg Time'))
     );
-    if (curcid == 'admin') {
-        $theadRow.append($('<th>').text(_('Owner')));
+    if (searchcontext == 'manageq') {
+        $theadRow.append($('<th>').text(_('ID')));
     }
     var $thead = $('<thead>').append($theadRow);
-    var sortinit = [false,'S',false,'S','N','S','N', searchcontext == 'manageq' ? 'D' : 'N'];
-    if (curcid == 'admin') {
-        sortinit.push('S');
+    var sortinit = [false,'S',false,'S','S','S','N', searchcontext == 'manageq' ? 'D' : 'N'];
+    if (searchcontext == 'manageq') {
+        sortinit.push('N');
     }
     var $tbody = $('<tbody>');
     var lastlib = -1;
@@ -427,7 +427,7 @@ function displayQuestionList(results) {
         );
 
         var $checkboxTd = $('<td>').append(
-            $('<input type="checkbox" name="nchecked[]">').attr({id: 'qo'+i, value: q['id']})
+            $('<input type="checkbox" name="nchecked[]">').attr({id: 'qo'+i, value: q['id'], title: 'ID '+q['id']})
         );
 
         var $descrTd = $('<td>');
@@ -447,7 +447,7 @@ function displayQuestionList(results) {
             $descrTd,
             $actionsTd,
             $features,
-            $('<td>').text(q['id']),
+            $('<td>').text(q['ownershort']),
             $('<td>').text(q['qtype']),
             $('<td class="c">').text(q['times'])
         );
@@ -468,8 +468,8 @@ function displayQuestionList(results) {
             }
             $row.append($avgTd);
         }
-        if (curcid == 'admin') {
-            $row.append($('<td>').append(q['ownershort']));
+        if (searchcontext == 'manageq') {
+            $row.append($('<td>').append(q['id']));
         }
         $tbody.append($row);
     }
