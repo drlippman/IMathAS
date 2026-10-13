@@ -17,14 +17,22 @@
 	$aid = Sanitize::onlyInt($_GET['aid']);
     $now = time();
     
-    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs,scoresingb FROM imas_assessments WHERE id=:id AND courseid=:cid");
+    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs,scoresingb,submitby,showscores FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	$res = $stm->fetch(PDO::FETCH_NUM);
 	if ($res === false) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible,$scoresingb) = $res;
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible,$scoresingb,$submitby,$showscores) = $res;
+    $canShowInProgress = ($aver > 1 && $submitby == 'by_assessment' && $showscores == 'during');
+    $showInProgress = false;
+    if ($canShowInProgress) {
+        if (isset($_GET['scoretype'])) {
+            $_SESSION[$cid.'scoretype'.$aid] = ($_GET['scoretype'] == 'inprogress') ? 'inprogress' : 'gb';
+        }
+        $showInProgress = (($_SESSION[$cid.'scoretype'.$aid] ?? 'gb') == 'inprogress');
+    }
     if ($istutor && $tutoredit == 2) {  // tutor, no access to view grades
         echo 'No access';
         exit;
@@ -205,11 +213,30 @@
             }
             echo  '>' . Sanitize::encodeStringForDisplay($secname) . '</option>';
         }
+        echo '</select> ';
+    }
+    if ($canShowInProgress) {
+        echo '<label for="scoretypesel">' . _('Grade to show') . ':</label> ';
+        echo '<select id="scoretypesel" onchange="chgscoretype()">';
+        echo '<option value="gb"' . ($showInProgress ? '' : ' selected') . '>' . _('Gradebook score') . '</option>';
+        echo '<option value="inprogress"' . ($showInProgress ? ' selected' : '') . '>' . _('In-progress score') . '</option>';
         echo '</select>';
+    }
+    if ($canShowInProgress || ($hassection && empty($tutorsection))) {
         echo '<script type="text/javascript">
         function chgsecfilter(el) {
-            var sec = el.value;
-            var toopen = "isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'&secfilter=" + encodeURIComponent(sec);
+            chgscoretype();
+        }
+        function chgscoretype() {
+            var toopen = "isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'";
+            var secsel = document.getElementById("secfiltersel");
+            if (secsel) {
+                toopen += "&secfilter=" + encodeURIComponent(secsel.value);
+            }
+            var typesel = document.getElementById("scoretypesel");
+            if (typesel) {
+                toopen += "&scoretype=" + encodeURIComponent(typesel.value);
+            }
             window.location = toopen;
         }
         </script>';
@@ -315,31 +342,32 @@
 		echo ' <a tabindex=0 class="dropdown-toggle arrow-down" id="dropdownMenuWithsel" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 		echo _('With Selected').'</a>';
 		echo '<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuWithsel">';
-		echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to excuse these grades?\')) { postWithSelform(\'Excuse Grade\'); } return false;">', _('Excuse Grade'), "</a></li>";
-		echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to un-excuse these grades?\')) { postWithSelform(\'Un-excuse Grade\'); } return false;">', _('Un-excuse Grade'), "</a></li>";
+		echo ' <li><a href="#" onclick="if (confirm(\'' . Sanitize::encodeStringForJavascript(_('Are you sure you want to excuse these grades?')) . '\')) { postWithSelform(\'Excuse Grade\'); } return false;">', _('Excuse Grade'), "</a></li>";
+		echo ' <li><a href="#" onclick="if (confirm(\'' . Sanitize::encodeStringForJavascript(_('Are you sure you want to un-excuse these grades?')) . '\')) { postWithSelform(\'Un-excuse Grade\'); } return false;">', _('Un-excuse Grade'), "</a></li>";
 		if ($isteacher || ($istutor && $tutoredit == 3)) {
 			echo ' <li><a href="#" onclick="postWithSelform(\'Make Exception\');return false;" title="',_("Make due date exceptions for selected students"),'">',_('Make Exception'), "</a></li>";
 		}
 		if ($scoresingb === 'manual') {
-			echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to release these grades?\')) { postWithSelform(\'manualrelease\'); } return false;">',_('Release Grades to Students'), "</a></li>";
-			echo ' <li><a href="#" onclick="if (confirm(\'Are you sure you want to un-release these grades?\')) { postWithSelform(\'manualunrelease\'); } return false;">',_('Un-Release Grades to Students'), "</a></li>";
+			echo ' <li><a href="#" onclick="if (confirm(\'' . Sanitize::encodeStringForJavascript(_('Are you sure you want to release these grades?')) . '\')) { postWithSelform(\'manualrelease\'); } return false;">',_('Release Grades to Students'), "</a></li>";
+			echo ' <li><a href="#" onclick="if (confirm(\'' . Sanitize::encodeStringForJavascript(_('Are you sure you want to un-release these grades?')) . '\')) { postWithSelform(\'manualunrelease\'); } return false;">',_('Un-Release Grades to Students'), "</a></li>";
 		}
 		echo '</ul></span>';
         echo '</div>';
     }
 
-	echo "<table id=myTable class=gb><thead><tr><th>Name</th>";
+	echo "<table id=myTable class=gb><thead><tr><th>" . _('Name') . "</th>";
 	if ($hassection && !$hidesection) {
-		echo '<th>Section</th>';
+		echo '<th>' . _('Section') . '</th>';
 	}
 	if ($hascodes && !$hidecode) {
-		echo '<th>Code</th>';
+		echo '<th>' . _('Code') . '</th>';
 	}
-	echo "<th>Grade</th><th>%</th><th>Last Change</th>";
+	echo '<th>' . _('Grade') . '</th>';
+	echo '<th>%</th><th>' . _('Last Change') . '</th>';
 	if ($includeduedate) {
-		echo "<th>Due Date</th>";
+		echo '<th>' . _('Due Date') . '</th>';
 	}
-	echo "<th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
+	echo '<th>' . _('Time Spent (In Questions)') . '</th><th>' . _('Feedback') . '</th></tr></thead><tbody>';
 
 	if (!empty($CFG['assess2-use-vue-dev'])) {
 		$assessGbUrl = sprintf("%s/gbviewassess.html?", $CFG['assess2-use-vue-dev-address']);
@@ -384,6 +412,15 @@
 		}
 		if ($aver>1) {
 			$total = $line['score'];
+			if ($showInProgress && ($line['status']&1)>0) {
+				$ipdata = json_decode(Sanitize::gzexpand($line['scoreddata']), true);
+				if (!empty($ipdata['assess_versions'])) {
+					$lastver = end($ipdata['assess_versions']);
+					if (isset($lastver['score'])) {
+						$total = $lastver['score'];
+					}
+				}
+			}
 			$timeused = $line['lastchange'] - $line['starttime'];
 			$timeontask = round($line['timeontask']/60,1);
             // don't display OT marker anymore for new assess
