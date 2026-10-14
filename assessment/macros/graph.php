@@ -154,7 +154,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
     if (isset($lbl) && count($lbl) > 3) {
         $xvar = $lbl[2];
         $yvar = $lbl[3];
-        if ($xvar != '') {
+        if ($xvar != '' && $xvar != 'off') {
             $commands .= "text([{$winxmax},0],\"{$xvar}\",\"aboveleft\");";
         }
         if ($yvar != '') {
