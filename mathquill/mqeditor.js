@@ -260,6 +260,17 @@ var MQeditor = (function($) {
   function attachEditor(mqel) {
     // set up editor to display on focus
     $(mqel).find(".mq-textarea > [tabindex=0]")
+      .attr('aria-keyshortcuts', 'Alt+ArrowDown')
+      .off('keydown.mqeditorpalette')
+      .on('keydown.mqeditorpalette', function(e) {
+        // Alt+Down moves focus from the entry box into the palette
+        if (e.altKey && !e.ctrlKey && !e.metaKey && e.key === 'ArrowDown') {
+          if (focusPalette()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      })
       .on('focus.mqeditor', showEditor)
       .on('blur.mqeditor', function(e) {
         if (e.relatedTarget && $(e.relatedTarget).closest("#mqeditor").length > 0) {
@@ -297,7 +308,12 @@ var MQeditor = (function($) {
     var mqel = $(event.target).closest(".mq-editable-field");
     if (initialized === false) {
       // first time through: inject the mqeditor div
-      $("body").append($("<div/>", {id:"mqeditor", class:"mqeditor"}));
+      $("body").append($("<div/>", {
+        id:"mqeditor",
+        class:"mqeditor",
+        role:"group",
+        "aria-label":"Equation editor palette"
+      }));
       // prevent clicks in editor from triggering blur in MQ field
       $("#mqeditor").on("mousedown touchstart", function(evt) {evt.preventDefault();});
       initialized = true;
@@ -526,6 +542,11 @@ var MQeditor = (function($) {
   function buildTabPanel(baseel, layoutarr, baseid) {
     var tabdiv = document.createElement("div");
     tabdiv.className = "mqed-row mqed-tabrow";
+    // tablist holds only the tabs; spacer and close button sit beside it
+    var tablist = document.createElement("div");
+    tablist.className = "mqed-row mqed-tablist";
+    tablist.setAttribute('role', 'tablist');
+    tabdiv.appendChild(tablist);
     var panelcont = document.createElement("div");
     var btncont, btn, paneldiv, tabcnt = 0;
     baseel.appendChild(tabdiv);
@@ -535,10 +556,12 @@ var MQeditor = (function($) {
         continue;
       }
       tabcnt++;
-      buildButton(tabdiv, layoutarr.tabs[i], baseid+'-'+i);
+      buildButton(tablist, layoutarr.tabs[i], baseid+'-'+i);
       paneldiv = document.createElement("div");
       paneldiv.className = "mqed-row mqed-tabpanel";
       paneldiv.id = baseid+'-'+i+'-tabpanel';
+      paneldiv.setAttribute('role', 'tabpanel');
+      paneldiv.setAttribute('aria-labelledby', baseid+'-'+i);
       panelcont.appendChild(paneldiv);
       for (var j=0; j < layoutarr.tabs[i].tabcontent.length; j++) {
         btn = layoutarr.tabs[i].tabcontent[j];
@@ -556,7 +579,8 @@ var MQeditor = (function($) {
     buildButton(tabdiv, {s: 1});
     buildButton(tabdiv, {p: '&times;', c: 'close', a: 'close'});
 
-    $(baseel).find(".mqed-tab").first().addClass("mqed-activetab");
+    $(baseel).find(".mqed-tab").attr('aria-selected', 'false')
+      .first().addClass("mqed-activetab").attr('aria-selected', 'true');
   }
 
   /*
@@ -706,9 +730,13 @@ var MQeditor = (function($) {
       $(btnel).addClass("mqed-tab");
       cmdtype = 'showtabpanel';
       cmdval = baseid+'-tabpanel';
+      btnel.id = baseid;
+      btnel.setAttribute('role', 'tab');
+      btnel.setAttribute('aria-controls', cmdval);
     }
     $(btnel).data("cmdtype", cmdtype).data("cmdval", cmdval);
-    $(btnel).on("click mousedown touchstart keydown", makeBtnListener(cmdtype, cmdval))
+    $(btnel).on("click mousedown touchstart", makeBtnListener(cmdtype, cmdval))
+      .on("keydown", onPaletteKeydown)
       .on("touchend", function(evt) { setTimeout(function() {$(evt.currentTarget).removeClass("mactive"); }, 50);})
       .on("touchend mouseup", function() {clearTimeout(keyRepeatInterval); keyRepeatInterval = null;});
     btncont.appendChild(btnel);
@@ -733,18 +761,22 @@ var MQeditor = (function($) {
     } else if (event.type=='click' && cmdval === 'Backspace') {
       return;
     }
-    if (event.type=='keydown' && event.key !== 'Enter') {
-      return;
-    }
+    var fromKey = (event.type=='keydown');
+    var btnEl = event.currentTarget;
     if (event.type=='touchstart') {
       event.preventDefault();
       $(event.currentTarget).addClass("mactive");
     }
-
+    if (!curMQfield) {
+      return;
+    }
 
     //clearTimeout(blurTimer);
-    // return focus to editor
-    curMQfield.focus();
+    // return focus to editor (the command needs it), except when switching
+    // tabs by keyboard. Keyboard users get focus put back on the button below.
+    if (!(fromKey && cmdtype == 'showtabpanel')) {
+      curMQfield.focus();
+    }
 
     if (cmdtype == 't') {
       // do typedText
@@ -773,7 +805,7 @@ var MQeditor = (function($) {
     } else if (cmdtype=='k') {
       // do MQ keystroke
       curMQfield.keystroke(cmdval);
-      if (cmdval === 'Backspace') {
+      if (cmdval === 'Backspace' && !fromKey) {
         // set up for repeats - wait 600ms then repeat every 70ms
         keyRepeatInterval = setTimeout(function () {
           handleMQbtn(event, cmdtype, cmdval);
@@ -827,6 +859,8 @@ var MQeditor = (function($) {
       target.closest(".mqeditor").find(".mqed-btn.mqed-activetab").removeClass("mqed-activetab");
       $("#"+cmdval).show();
       target.addClass("mqed-activetab");
+      target.closest(".mqed-tabrow").find(".mqed-tab").attr('aria-selected', 'false');
+      target.attr('aria-selected', 'true');
       if (config.hasOwnProperty('onTab')) {
         config.onTab(target[0], config.curlayoutstyle, cmdval);
       }
@@ -854,6 +888,160 @@ var MQeditor = (function($) {
     } else if (cmdtype=='close') {
         curMQfield.blur();
         //hideEditor();
+    }
+    // keyboard users stay in the palette
+    if (fromKey && cmdtype != 'close' && btnEl && document.body.contains(btnEl)) {
+      btnEl.focus();
+    }
+  }
+
+  /*
+    Move focus from the entry box into the palette: to the selected tab if
+    there are tabs, otherwise the first button. Returns true on success.
+  */
+  function focusPalette() {
+    var ed = $("#mqeditor");
+    if (!curMQfield || ed.length == 0 || !ed.is(":visible")) {
+      return false;
+    }
+    var target = ed.find(".mqed-tab.mqed-activetab").first();
+    if (target.length == 0) {
+      target = getNavButtons(ed).first();
+    }
+    if (target.length == 0) {
+      return false;
+    }
+    target[0].focus();
+    return true;
+  }
+
+  /*
+    Buttons in the grid that arrow keys move between: the visible buttons of
+    the scope (a tabpanel or the whole editor), excluding tabs and close
+  */
+  function getNavButtons(scope) {
+    return $(scope).find(".mqed-btn").filter(":visible")
+      .not(".mqed-tab, .mqed-closebtn");
+  }
+
+  function btnCenter(el) {
+    var r = el.getBoundingClientRect();
+    return {x: r.left + r.width/2, y: r.top + r.height/2, h: r.height};
+  }
+
+  /*
+    Find the neighbor button in the up (-1) or down (1) direction:
+    the nearest row, then the button in it closest horizontally
+  */
+  function findVertical(btns, cur, dir) {
+    var c = btnCenter(cur);
+    var bestDy = Infinity;
+    var rowY = null;
+    var i, p, dy;
+    for (i = 0; i < btns.length; i++) {
+      p = btnCenter(btns[i]);
+      dy = (p.y - c.y) * dir;
+      if (dy > c.h/2 && dy < bestDy - 1) {
+        bestDy = dy;
+        rowY = p.y;
+      }
+    }
+    if (rowY === null) {
+      return null;
+    }
+    var best = null, bestDx = Infinity;
+    for (i = 0; i < btns.length; i++) {
+      p = btnCenter(btns[i]);
+      if (Math.abs(p.y - rowY) <= c.h/2 && Math.abs(p.x - c.x) < bestDx) {
+        bestDx = Math.abs(p.x - c.x);
+        best = btns[i];
+      }
+    }
+    return best;
+  }
+
+  /*
+    Keyboard handling for palette buttons.
+    Tabs: Left/Right/Home/End move between tabs, Down enters the panel.
+    Panel buttons: arrows move in the grid, Home/End go to row start/end,
+      Ctrl+Home/End to first/last, Up from the top row goes to the tab.
+    Enter/Space activate. Escape returns to the entry box; Tab leaves the
+    palette via the entry box.
+  */
+  function onPaletteKeydown(event) {
+    var key = event.key;
+    var btn = event.currentTarget;
+    if (event.altKey || event.metaKey) {
+      return;
+    }
+    if (key === 'Tab') {
+      // hand focus back to the entry box; the default Tab action then moves on
+      if (curMQfield) {
+        curMQfield.focus();
+      }
+      return;
+    }
+    if (key === 'Escape') {
+      event.preventDefault();
+      if (curMQfield) {
+        curMQfield.focus();
+      }
+      return;
+    }
+    if (key === 'Enter' || key === ' ') {
+      event.preventDefault();
+      handleMQbtn(event, $(btn).data("cmdtype"), $(btn).data("cmdval"));
+      return;
+    }
+    var target = null;
+    var isTab = $(btn).hasClass("mqed-tab");
+    if (isTab) {
+      var tabs = $(btn).closest(".mqed-tabrow").find(".mqed-tab");
+      var idx = tabs.index(btn);
+      if (key === 'ArrowRight') {
+        target = tabs[(idx + 1) % tabs.length];
+      } else if (key === 'ArrowLeft') {
+        target = tabs[(idx - 1 + tabs.length) % tabs.length];
+      } else if (key === 'Home') {
+        target = tabs[0];
+      } else if (key === 'End') {
+        target = tabs[tabs.length - 1];
+      } else if (key === 'ArrowDown') {
+        var panel = $("#" + $(btn).data("cmdval"));
+        if (panel.is(":visible")) {
+          target = getNavButtons(panel)[0];
+        }
+      }
+    } else {
+      var panel = $(btn).closest(".mqed-tabpanel");
+      var btns = getNavButtons(panel.length ? panel : $("#mqeditor")).toArray();
+      var i = btns.indexOf(btn);
+      var c = btnCenter(btn);
+      var row = btns.filter(function (b) {
+        return Math.abs(btnCenter(b).y - c.y) <= c.h/2;
+      });
+      if (key === 'ArrowRight') {
+        target = btns[i + 1];
+      } else if (key === 'ArrowLeft') {
+        target = btns[i - 1];
+      } else if (key === 'ArrowDown') {
+        target = findVertical(btns, btn, 1);
+      } else if (key === 'ArrowUp') {
+        target = findVertical(btns, btn, -1);
+        if (!target) { // top row: go to the selected tab
+          target = $("#mqeditor .mqed-tab.mqed-activetab")[0];
+        }
+      } else if (key === 'Home') {
+        target = event.ctrlKey ? btns[0] : row[0];
+      } else if (key === 'End') {
+        target = event.ctrlKey ? btns[btns.length - 1] : row[row.length - 1];
+      }
+    }
+    if (['ArrowRight','ArrowLeft','ArrowUp','ArrowDown','Home','End'].indexOf(key) !== -1) {
+      event.preventDefault(); // don't scroll the page
+      if (target) {
+        target.focus();
+      }
     }
   }
   return {

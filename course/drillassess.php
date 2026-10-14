@@ -260,7 +260,7 @@ if ($courseUIver > 1) {
     $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2_min.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     $placeinhead .= '<script src="'.$staticroot.'/javascript/assess2supp.js?v='.$lastvueupdate.'" type="text/javascript"></script>';
     $placeinhead .= '<link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mathquill-basic.css?v=070726">
-        <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v=020226">';
+        <link rel="stylesheet" type="text/css" href="'.$staticroot.'/mathquill/mqeditor.css?v='.$lastvueupdate.'">';
     $placeinhead .= '<style>form > hr { border: 0; border-bottom: 1px solid #ddd;}</style>';
     require_once "../header.php";
 } else {

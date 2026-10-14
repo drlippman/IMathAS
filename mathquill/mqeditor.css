@@ -83,6 +83,11 @@
 .mqed-btn:active, .mqed-btn.mactive, .mqed-btn.active {
   box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
 }
+.mqed-btn:focus-visible {
+  outline: 2px solid #1a56c4;
+  outline-offset: 1px;
+  z-index: 1;
+}
 .mqed-btn.mqed-navkey {
   background-color: #eee;
 }
@@ -105,11 +110,11 @@
   background-color: #fff;
   margin-bottom: 4px;
 }
-.mqed-tabrow > .mqed-btn-cont {
+.mqed-tabrow .mqed-btn-cont {
   flex-grow: unset;
   height: auto;
 }
-.mqed-tabrow > .mqed-btn-cont > .mqed-btn {
+.mqed-tabrow .mqed-btn-cont > .mqed-btn {
   position: static;
   padding: 4px 6px;
   margin-left: 4px;
