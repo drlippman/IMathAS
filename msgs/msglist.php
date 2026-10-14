@@ -429,7 +429,7 @@ if (isset($_GET['add'])) {
 			list($title, $message, $courseid) = $stm->fetch(PDO::FETCH_NUM);
 			$title = _("Re: ") . $title;
 			if (isset($_GET['toquote'])) {
-				$message = '<br/><hr/>' . _('In reply to:') . '<br/>' . $message;
+				$message = '<br/><hr/><p class="small"><em>' . _('Write your reply above this line.') . '</em></p><p>' . _('In reply to:') . '</p>' . $message;
 			} else {
 				$message = '';
 			}
@@ -461,8 +461,11 @@ if (isset($_GET['add'])) {
 				}, $message);
 			}
 			$message = preg_replace('/(`[^`]*`)/', "<span class=\"AM\">$1</span>", $message);
-			$qinfo = 'Question ID ' . Sanitize::onlyInt($parts[1]) . ', seed ' . Sanitize::onlyInt($parts[2]);
-			$message = '<br/><hr/>' . $qinfo . '<br/><br/>' . $message;
+			$qinfo = _('Question ID') . ' ' . Sanitize::onlyInt($parts[1]);
+			if ($parts[3] === 'reperr') {
+				$qinfo .= ', seed ' . Sanitize::onlyInt($parts[2]);
+			}
+			$message = '<br/><hr/><p class="small"><em>' . _('Write your message above this line.') . '</em></p><p>' . $qinfo . '</p><br/>' . $message;
 			//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 			if (isset($parts[3]) && $parts[3] === 'reperr') {
 				$title = "Problem with question ID " . Sanitize::onlyInt($parts[1]);
