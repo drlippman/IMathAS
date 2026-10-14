@@ -95,14 +95,14 @@ class DrawingAnswerBox implements AnswerBox
                         $pts = explode(':', $grid[$i]);
                         foreach ($pts as $k => $v) {
                             if ($v[0] === "h") {
-                                $pts[$k] = ($k<2) ? "h" . evalbasic(substr($v, 1)) : $v;
+                                $pts[$k] = ($k<2) ? "h" . self::evalGridValue(substr($v, 1)) : $v;
                             } else {
-                                $pts[$k] = ($k<2) ? evalbasic($v) : $v;
+                                $pts[$k] = ($k<2) ? self::evalGridValue($v) : $v;
                             }
                         }
                         $settings[$i] = implode(':', $pts);
                     } else {
-                        $settings[$i] = evalbasic($grid[$i]);
+                        $settings[$i] = self::evalGridValue($grid[$i]);
                     }
                 }
             }
@@ -1066,5 +1066,18 @@ class DrawingAnswerBox implements AnswerBox
     public function getPreviewLocation(): string
     {
         return $this->previewLocation;
+    }
+
+    /**
+     * A grid value as DrawingScorePart reads it (evalbasic with $doextra), so the student draws on
+     * the window the grader maps their pixels back through; plain evalbasic() leaves "-2^3" or
+     * "sqrt(64)" unevaluated. When that is not a finite number ('auto', '2**3') the grader cannot
+     * use the window anyway, so keep the old reading: it preserves showplot's 'auto' and keeps NAN
+     * out of json_encode().
+     */
+    private static function evalGridValue($v)
+    {
+        $val = evalbasic($v, true);
+        return is_nicenumber($val) ? $val : evalbasic($v);
     }
 }
