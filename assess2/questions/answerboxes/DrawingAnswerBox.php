@@ -1078,6 +1078,10 @@ class DrawingAnswerBox implements AnswerBox
     private static function evalGridValue($v)
     {
         $val = evalbasic($v, true);
-        return is_nicenumber($val) ? $val : evalbasic($v);
+        if (!is_nicenumber($val)) {
+            echo sprintf(_('Invalid grid value: %s'), $v);
+            return 0;
+        }
+        return $val;
     }
 }
