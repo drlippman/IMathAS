@@ -121,13 +121,14 @@ function updateLTIgrade($action,$sourcedid,$aid,$uid,$grade=0,$aidposs=1,$sendno
 	} else {
 		$grade = 0;
 	}
-    updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade,$sendnow);
+    updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade,$sendnow,false,$isstu ? $addtime : null);
   }
 }
 
 // for 1.1, grade is a number 0-1
 // if $checkResponse is true, waits for the LMS response and returns array(ok, response text)
-function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$checkResponse=false) {
+// $addtime: unix time of submission to report, or null to omit
+function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,$checkResponse=false,$addtime=null) {
   global $DBH,$testsettings,$cid,$CFG,$userid;
 
 	//otherwise, send now
@@ -188,7 +189,7 @@ function updateLTI1p1grade($action,$sourcedid,$aid,$uid,$grade=0,$sendnow=false,
 		}
 		if ($secret != '') {
 			if ($action=='update') {
-				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade,$checkResponse);
+				return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade,$checkResponse,$addtime,$aid.'-'.$uid);
 			} else if ($action=='delete') {
 				return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid,0,$checkResponse);
 			} else {
@@ -519,9 +520,30 @@ function normalizeGrade($grade) {
 	return number_format($grade,8);
 }
 
-function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResponse=false) {
+// Builds optional LTI 1.1 XML fragments: submission time and submission review URL
+// $addtime: unix time of submission, or null to omit
+// $hash: aid-uid string for the submission review URL, or null to omit
+function getLTI1p1OutcomeExtras($addtime, $hash) {
+	$submission = '';
+	$resultdata = '';
+	if (!empty($addtime)) {
+		$submission = '<submissionDetails><submittedAt>'
+			. date('Y-m-d\TH:i:s', $addtime) . '.000' . date('P', $addtime)
+			. '</submittedAt></submissionDetails>';
+	}
+	if (!empty($hash) && !empty($GLOBALS['basesiteurl'])) {
+		$reviewurl = $GLOBALS['basesiteurl'] . '/lti/launch.php?submissionreview=' . $hash;
+		$resultdata = '<resultData><ltiLaunchUrl>'
+			. htmlspecialchars($reviewurl, ENT_XML1 | ENT_QUOTES, 'UTF-8')
+			. '</ltiLaunchUrl></resultData>';
+	}
+	return array($submission, $resultdata);
+}
 
-	$grade = normalizeGrade($grade);	
+function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResponse=false,$addtime=null,$hash=null) {
+
+	$grade = normalizeGrade($grade);
+	list($submission, $resultdata) = getLTI1p1OutcomeExtras($addtime, $hash);
 
 	$method="POST";
 	$content_type = "application/xml";
@@ -536,6 +558,7 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResp
 		</imsx_POXHeader>
 		<imsx_POXBody>
 			<OPERATION>
+				SUBMISSION
 				<resultRecord>
 					<sourcedGUID>
 						<sourcedId>SOURCEDID</sourcedId>
@@ -545,6 +568,7 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResp
 							<language>en-us</language>
 							<textString>GRADE</textString>
 						</resultScore>
+						RESULTDATA
 					</result>
 				</resultRecord>
 			</OPERATION>
@@ -573,8 +597,8 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResp
 	if ($action=='update') {
 	    $operation = 'replaceResultRequest';
 	    $postBody = str_replace(
-		array('SOURCEDID', 'GRADE', 'OPERATION','MESSAGE'),
-		array($sourcedid, $grade, $operation, uniqid()),
+		array('SOURCEDID', 'GRADE', 'OPERATION','MESSAGE','SUBMISSION','RESULTDATA'),
+		array($sourcedid, $grade, $operation, uniqid(), $submission, $resultdata),
 		$body);
 	} else if ($action=='read') {
 	    $operation = 'readResultRequest';
@@ -597,9 +621,10 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0,$checkResp
 }
 
 
-function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
+function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0,$addtime=null,$hash=null) {
 
 	$grade = normalizeGrade($grade);
+	list($submission, $resultdata) = getLTI1p1OutcomeExtras($addtime, $hash);
 
 	$body = '<?xml version = "1.0" encoding = "UTF-8"?>
 	<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -611,6 +636,7 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 		</imsx_POXHeader>
 		<imsx_POXBody>
 			<OPERATION>
+				SUBMISSION
 				<resultRecord>
 					<sourcedGUID>
 						<sourcedId>SOURCEDID</sourcedId>
@@ -620,6 +646,7 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 							<language>en-us</language>
 							<textString>GRADE</textString>
 						</resultScore>
+						RESULTDATA
 					</result>
 				</resultRecord>
 			</OPERATION>
@@ -648,8 +675,8 @@ function prepLTIOutcomePost($action,$key,$secret,$url,$sourcedid,$grade=0) {
 	if ($action=='update') {
 	    $operation = 'replaceResultRequest';
 	    $postBody = str_replace(
-		array('SOURCEDID', 'GRADE', 'OPERATION','MESSAGE'),
-		array($sourcedid, $grade, $operation, uniqid()),
+		array('SOURCEDID', 'GRADE', 'OPERATION','MESSAGE','SUBMISSION','RESULTDATA'),
+		array($sourcedid, $grade, $operation, uniqid(), $submission, $resultdata),
 		$body);
 	} else if ($action=='read') {
 	    $operation = 'readResultRequest';

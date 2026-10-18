@@ -186,7 +186,7 @@ if (isset($_POST['aid']) && isset($_POST['uid'])) {
 			} else {
 				$grade = $q['ptsposs'] > 0 ? $q['grade'] / $q['ptsposs'] : 0;
 				// checkResponse=true waits for and returns array(ok, response text)
-				$value = updateLTI1p1grade('update', $qsource, $aid, $uid, $grade, true, true);
+				$value = updateLTI1p1grade('update', $qsource, $aid, $uid, $grade, true, true, $q['isstu'] ? intval($q['addedon']) : null);
 				if (!is_array($value)) {
 					echo '<p>' . _('Unable to send: invalid sourcedid or unable to look up secret.') . '</p>';
 				} else {
