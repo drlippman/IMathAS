@@ -73,9 +73,12 @@ class Sanitize
 	 *
 	 * @param $uncleanPath string The file path to sanitize and check.
 	 *   example:  ufiles/1/filename.doc
+	 * @param $keepInnerDots bool If true, don't collapse extra periods in the
+	 *   filename to underscores. Only use when referencing an already-existing
+	 *   file (legacy uploads may be named like a.b.pdf), never for naming new files.
 	 * @return string A sanitized file path.
 	 */
-	public static function sanitizeFilePathAndCheckBlacklist($uncleanPath)
+	public static function sanitizeFilePathAndCheckBlacklist($uncleanPath, $keepInnerDots = false)
 	{
 		$saferFilePath = preg_replace('/[^\da-z\._\-\/]/i', '', $uncleanPath);
 		//prevent ../ paths
@@ -84,8 +87,10 @@ class Sanitize
 			$saferFilePath = str_replace('../','',$saferFilePath,$cnt);
 		}
 
-		$saferFilePath = self::singleExtension($saferFilePath);
-		
+		if (!$keepInnerDots) {
+			$saferFilePath = self::singleExtension($saferFilePath);
+		}
+
 		if (self::isFilenameBlacklisted(basename($saferFilePath)) || basename($saferFilePath)=='') {
 			print("Invalid filename used! Halting.\n");
 			// Normally, an exception would be thrown here, but we don't have exception handling. Yet! :)

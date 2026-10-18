@@ -202,7 +202,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if (!empty($_POST['curfile'])) {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				///if (!file_exists($uploaddir . $_POST['curfile'])) {
-				$curfile = Sanitize::sanitizeFilePathAndCheckBlacklist($_POST['curfile']);
+				$curfile = Sanitize::sanitizeFilePathAndCheckBlacklist($_POST['curfile'], true);
 				if (!doesfileexist('cfile', $curfile)) {
 					$processingerror = true;
 				} else {
@@ -334,6 +334,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($uploaderror == true || $processingerror == true) {
 			if ($uploaderror == true) {
 				$body = "<p>"._("Error uploading file!")." $errormsg</p>\n";
+			} else if (!empty($_POST['curfile'])) {
+				$body = "<p>"._("Error with your submission"). ' '._('The previously uploaded file may no longer be allowed. You may need to replace it, or download and reupload it.')"</p>";			
 			} else {
 				$body = "<p>"._("Error with your submission")."</p>";
 			}
