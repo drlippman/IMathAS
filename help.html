@@ -2559,6 +2559,15 @@ $rows = array("Row1","Row2")
 $table = showrecttable($data, $cols, $rows)
 // table with column headers A and B, row headers Row1 and Row2, first row 10, 20
 </pre></details></li>
+<li><strong>addcopytablebutton(htmltable, [buttontext])</strong>:
+Takes an HTML table (like the output of showarrays) and returns it with a button
+  below it that copies the table contents to the clipboard as tab-separated text,
+  which can be pasted into Excel or other spreadsheet programs. Button text can
+  optionally be provided (default "Copy to clipboard").
+<details class="example"><summary>Examples</summary>
+<pre>$table = showarrays("Height", $heights, "Weight", $weights)
+$table = addcopytablebutton($table)</pre></details>
+</li>
 <li><strong>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</strong>: Creates a graph from one or more function strings.
   <details class="example"><summary>Parameters</summary>
 	<ul>

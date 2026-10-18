@@ -1373,6 +1373,48 @@ jQuery(document).ready(function($) {
 });
 
 
+function setupCopyTableButtons(base) {
+	$(base).find('button.copytablebtn').not('.prepped').each(function(i,btn) {
+		$(btn).addClass('prepped').on('click', function() {
+			var tb = $(btn).closest('div.copytablewrap').find('table').get(0);
+			if (!tb) { return; }
+			var rows = [];
+			for (var i = 0; i < tb.rows.length; i++) {
+				var row = [];
+				for (var j = 0; j < tb.rows[i].cells.length; j++) {
+					var c = tb.rows[i].cells[j];
+					row.push(c.textContent.replace(/\s+/g, ' ').trim());
+					for (var k = 1; k < (parseInt(c.colSpan) || 1); k++) {
+						row.push('');
+					}
+				}
+				rows.push(row.join('\t'));
+			}
+			var t = rows.join('\n');
+			var orig = btn.textContent;
+			var done = function() {
+				btn.textContent = btn.getAttribute('data-copied') || _('Copied!');
+				setTimeout(function() { btn.textContent = orig; }, 1500);
+			};
+			var fallback = function() {
+				var a = document.createElement('textarea');
+				a.value = t;
+				a.style.position = 'fixed';
+				a.style.opacity = 0;
+				document.body.appendChild(a);
+				a.select();
+				try { document.execCommand('copy'); done(); } catch (e) {}
+				document.body.removeChild(a);
+			};
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(t).then(done, fallback);
+			} else {
+				fallback();
+			}
+		});
+	});
+}
+
 function initlinkmarkup(base) {
 	if (typeof isImathasAssessment != 'undefined') {
 		$(base).find('a:not([target])').not('.textsegment a, .mce-content-body a').each(addBlankTarget);
@@ -1386,6 +1428,7 @@ function initlinkmarkup(base) {
 	setIframeSpinner(base);
     setupToggler(base);
 	setupToggler2(base);
+	setupCopyTableButtons(base);
     setupPopuplinks(base);
     //setupToggleResize(base);
 	$(base).fitVids();

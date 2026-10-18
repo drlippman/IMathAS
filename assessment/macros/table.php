@@ -7,7 +7,8 @@ array_push(
     'showarrays',
     'showrecttable',
     'horizshowarrays',
-    'showdataarray'
+    'showdataarray',
+    'addcopytablebutton'
 );
 
 function showarrays() {
@@ -333,4 +334,14 @@ function showdataarray($a, $n = 1, $opts = null) {
         $out .= '</tbody></table>';
     }
     return $out;
+}
+
+function addcopytablebutton($table, $btntext = '') {
+  if ($btntext === '') {
+    $btntext = _('Copy to clipboard');
+  }
+  return '<div class="copytablewrap">' . $table . '<div>'
+    . '<button type="button" class="copytablebtn" data-copied="'
+    . Sanitize::encodeStringForDisplay(_('Copied!')) . '">'
+    . Sanitize::encodeStringForDisplay($btntext) . '</button></div></div>';
 }
