@@ -340,13 +340,6 @@ if ($end_attempt) {
   $totalScore = $assessInfoOut['score'];
   $assessInfoOut['has_active_attempt'] = false;
 
-  if (isset($_SESSION['isdiag']) && $assessInfoOut['submitby'] == 'by_assessment' && !$canViewAll) {
-    AssessUtils::sendDiagResultsEmail(
-      Sanitize::onlyInt($_SESSION['isdiag']), $uid, $aid, $totalScore,
-      $assess_info->getSetting('points_possible')
-    );
-  }
-
   //get prev attempt info
   $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts();
   $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
@@ -371,6 +364,13 @@ if ($end_attempt) {
       $totalScore,
       $assess_info->getSetting('points_possible')
   );
+
+  if (isset($_SESSION['isdiag']) && $assessInfoOut['submitby'] == 'by_assessment' && !$canViewAll) {
+    AssessUtils::sendDiagResultsEmail(
+      Sanitize::onlyInt($_SESSION['isdiag']), $uid, $aid, $totalScore,
+      $assess_info->getSetting('points_possible'), $assessInfoOut['endmsg']
+    );
+  }
 
   $assessInfoOut['newexcused'] = $assess_record->get_new_excused();
 

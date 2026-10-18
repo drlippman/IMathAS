@@ -14,17 +14,18 @@ class AssessUtils
    * @param  int $aid            The assessment ID
    * @param  float $score        The attempt score
    * @param  float $pointsPossible
+   * @param  string $endmessage
    * @return void
    */
-  public static function sendDiagResultsEmail($diagid, $userid, $aid, $score, $pointsPossible) {
+  public static function sendDiagResultsEmail($diagid, $userid, $aid, $score, $pointsPossible, $endmessage) {
     global $DBH, $sendfrom, $installname, $basesiteurl;
-    $stm = $DBH->prepare('SELECT name,resultsemail FROM imas_diags WHERE id=?');
+    $stm = $DBH->prepare('SELECT name,resultsemail,sel1name,sel2name FROM imas_diags WHERE id=?');
     $stm->execute(array($diagid));
     $diag = $stm->fetch(PDO::FETCH_ASSOC);
     if ($diag === false || trim($diag['resultsemail']) == '') {
       return;
     }
-    $stm = $DBH->prepare('SELECT SID,FirstName,LastName FROM imas_users WHERE id=?');
+    $stm = $DBH->prepare('SELECT SID,FirstName,LastName,email FROM imas_users WHERE id=?');
     $stm->execute(array($userid));
     $user = $stm->fetch(PDO::FETCH_ASSOC);
     $stm = $DBH->prepare('SELECT name FROM imas_assessments WHERE id=?');
@@ -36,11 +37,24 @@ class AssessUtils
     // diag SID format is ID~term~courseid[~selector]
     $diagStuId = explode('~', $user['SID'])[0];
     $subject = sprintf(_('Diagnostic results: %s'), $diag['name']);
-    $message = sprintf(_('Diagnostic: %s'), $diag['name']) . "\n";
-    $message .= sprintf(_('Assessment: %s'), $aname) . "\n";
-    $message .= sprintf(_('Student: %s, %s'), $user['LastName'], $user['FirstName']) . "\n";
-    $message .= sprintf(_('ID: %s'), $diagStuId) . "\n";
-    $message .= sprintf(_('Score: %1$s out of %2$s'), round($score, 2), round($pointsPossible, 2)) . "\n";
+    // send_email sends as HTML, so use <br> and escape the plain-text values
+    $message = '<p>' . Sanitize::encodeStringForDisplay(sprintf(_('Diagnostic: %s'), $diag['name'])) . '<br/>';
+    $message .= Sanitize::encodeStringForDisplay(sprintf(_('Assessment: %s'), $aname)) . '<br/>';
+    $message .= Sanitize::encodeStringForDisplay(sprintf(_('Student: %s, %s'), $user['LastName'], $user['FirstName'])) . '<br/>';
+    $message .= Sanitize::encodeStringForDisplay(sprintf(_('ID: %s'), $diagStuId)) . '<br/>';
+    // email field holds sel1val@sel2val; selector names starting with ! are literal
+    $selvals = explode('@', $user['email'], 2);
+    foreach (array(1, 2) as $i) {
+      $selname = ltrim($diag['sel'.$i.'name'], '!');
+      if ($selname !== '' && isset($selvals[$i - 1])) {
+        $message .= Sanitize::encodeStringForDisplay($selname . ': ' . $selvals[$i - 1]) . '<br/>';
+      }
+    }
+    $message .= Sanitize::encodeStringForDisplay(sprintf(_('Score: %1$s out of %2$s'), round($score, 2), round($pointsPossible, 2))) . '</p>';
+    if (trim($endmessage) != '') {
+      $message .= '<p>' . _('Diagnostic end message:') . '</p>';
+      $message .= '<div>' . $endmessage . '</div>';
+    }
     require_once __DIR__ . '/../includes/email.php';
     send_email($diag['resultsemail'], $sendfrom, $subject, $message, array(), array(), 5, true);
   }
