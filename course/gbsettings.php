@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
 	require_once "../init.php";
 	require_once "../includes/htmlutil.php";
+	require_once "../includes/TeacherAuditLog.php";
 
 
 	if (!(isset($teacherid))) {
@@ -18,9 +19,21 @@
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}*/
 	if (isset($_POST['remove'])) {  //via ajax post
+		$stm = $DBH->prepare("SELECT * FROM imas_gbcats WHERE id=:id AND courseid=:cid");
+		$stm->execute(array(':id'=>$_POST['remove'], ':cid'=>$cid));
+		$removedcat = $stm->fetch(PDO::FETCH_ASSOC);
 		$stm = $DBH->prepare("DELETE FROM imas_gbcats WHERE id=:id AND courseid=:cid");
 		$stm->execute(array(':id'=>$_POST['remove'], ':cid'=>$cid));
 		if ($stm->rowCount()>0) {
+			if ($removedcat !== false) {
+				unset($removedcat['courseid']);
+				TeacherAuditLog::addTracking(
+					$cid,
+					"Gradebook Settings Change",
+					null,
+					['categories_removed' => [$removedcat['id'] => $removedcat]]
+				);
+			}
 			$stm = $DBH->prepare("UPDATE imas_assessments SET gbcategory=0 WHERE gbcategory=:gbcategory");
 			$stm->execute(array(':gbcategory'=>$_POST['remove']));
 			$stm = $DBH->prepare("UPDATE imas_gbitems SET gbcategory=0 WHERE gbcategory=:gbcategory");
@@ -36,6 +49,19 @@
 	}
 
 	if (isset($_POST['submit']) ) {  //|| isset($_POST['addnew'])
+
+		//grab old settings for change logging
+		$stm = $DBH->prepare("SELECT useweights,orderby,usersort,defaultcat,defgbmode,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$old_gbscheme = $stm->fetch(PDO::FETCH_ASSOC);
+		$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$old_gbcats = array();
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$old_gbcats[$row['id']] = $row;
+		}
+		$cats_added = array();
+		$cats_changed = array();
 
 		//WORK ON ME
 		$useweights = $_POST['useweights'];
@@ -95,12 +121,24 @@
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':courseid'=>$cid, ':name'=>$name, ':scale'=>$scale, ':scaletype'=>$st, ':chop'=>$chop, ':dropn'=>$drop,
 						':weight'=>$weight, ':hidden'=>$hide, ':calctype'=>$calctype));
+					$cats_added[$DBH->lastInsertId()] = array('name'=>$name, 'scale'=>$scale, 'scaletype'=>$st,
+						'chop'=>$chop, 'dropn'=>$drop, 'weight'=>$weight, 'hidden'=>$hide, 'calctype'=>$calctype);
 				}
 			} else if ($id=='0') {
 				$defaultcat = "$scale,$st,$chop,$drop,$weight,$hide,$calctype";
 			} else {
 				$stm = $DBH->prepare("UPDATE imas_gbcats SET name=:name,scale=:scale,scaletype=:scaletype,chop=:chop,dropn=:dropn,weight=:weight,hidden=:hidden,calctype=:calctype WHERE id=:id AND courseid=:cid");
 				$stm->execute(array(':name'=>$name, ':scale'=>$scale, ':scaletype'=>$st, ':chop'=>$chop, ':dropn'=>$drop, ':weight'=>$weight, ':hidden'=>$hide, ':calctype'=>$calctype, ':id'=>$id, ':cid'=>$cid));
+				if (isset($old_gbcats[$id])) {
+					$newcat = array('name'=>$name, 'scale'=>$scale, 'scaletype'=>$st, 'chop'=>$chop,
+						'dropn'=>$drop, 'weight'=>$weight, 'hidden'=>$hide, 'calctype'=>$calctype);
+					foreach ($newcat as $k=>$v) {
+						if ($old_gbcats[$id][$k] != $v) {
+							$cats_changed[$id]['name'] = $old_gbcats[$id]['name'];
+							$cats_changed[$id][$k] = ['old'=>$old_gbcats[$id][$k], 'new'=>$v];
+						}
+					}
+				}
 			}
 		}
 		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'] + 40000*$_POST['gbmode40000'] + 400000*$_POST['gbmode400000'];
@@ -113,6 +151,31 @@
 		$stugbmode = ($_POST['stugbmode1'] ?? 0) + ($_POST['stugbmode2'] ?? 0) + ($_POST['stugbmode4'] ?? 0) + ($_POST['stugbmode8'] ?? 0);
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,usersort=:usersort,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode,colorize=:colorize WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$useweights, ':orderby'=>$orderby, ':usersort'=>$usersort, ':defaultcat'=>$defaultcat, ':defgbmode'=>$defgbmode, ':stugbmode'=>$stugbmode, ':colorize'=>$_POST['colorize'], ':courseid'=>$cid));
+
+		$changesToLog = array();
+		if ($old_gbscheme !== false) {
+			$newscheme = array('useweights'=>$useweights, 'orderby'=>$orderby, 'usersort'=>$usersort,
+				'defaultcat'=>$defaultcat, 'defgbmode'=>$defgbmode, 'stugbmode'=>$stugbmode, 'colorize'=>$_POST['colorize']);
+			foreach ($newscheme as $k=>$v) {
+				if ($old_gbscheme[$k] != $v) {
+					$changesToLog[$k] = ['old'=>$old_gbscheme[$k], 'new'=>$v];
+				}
+			}
+		}
+		if (!empty($cats_added)) {
+			$changesToLog['categories_added'] = $cats_added;
+		}
+		if (!empty($cats_changed)) {
+			$changesToLog['categories_changed'] = $cats_changed;
+		}
+		if (!empty($changesToLog)) {
+			TeacherAuditLog::addTracking(
+				$cid,
+				"Gradebook Settings Change",
+				null,
+				$changesToLog
+			);
+		}
 
         if (isset($_POST['submit'])) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=".Sanitize::courseId($_GET['cid'])."&refreshdef=true"."&r=".Sanitize::randomQueryStringParam());
@@ -277,7 +340,7 @@
 	$links = ((floor($defgbmode/100)%10)&1); //0: view/edit, 1 q breakdown
 	$hidelocked = ((floor($defgbmode/100)%10)&2); //0: show 2: hide locked
 	$includeduedate = (((floor($defgbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
-	$hidenc = (floor($defgbmode/10)%10)%3; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$hidenc = (floor($defgbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$includelastchange = (((floor($defgbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all, 3 past&attempted, 4 avail only
 
