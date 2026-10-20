@@ -6084,6 +6084,11 @@ $answerboxsize = 3
 		answers. Set in general, or indexed for specific parts. Generally not necessary, but may be useful 
 		in certain cases where later answers depend on earlier ones.
 	</dd>
+<dt>$overwritescore</dt>
+	<dd>If you want to use your own custom scoring method on a part (like with Conditional, but for one part out of 
+		a multipart question), you can define <code>$overwritescore[partindex]</code> with a value from 0 to 1 to 
+		override the default scoring and assign your own score for that part index.
+	</dd>
 <dt>$showanswer </dt>
 	<dd>You can either define $showanswer for individual question parts (ie, $showanswer[1]="`x^2`"), or you can set one
 	$showanswer, which will be the only answer shown for the problem (ie, $showanswer = "x=$answer[0], y=$answer[1]")</dd>

@@ -48,6 +48,7 @@ class ScoreEngine
         'requiretimes',
         'requiretimeslistpart',
         'scoremethod',
+        'overwritescore',
         'snaptogrid',
         'strflags',
         'questions',
@@ -734,7 +735,11 @@ class ScoreEngine
                   );
             }
             if (isset($scorePartResult)) {
-                $raw[$partnum] = $scorePartResult->getRawScore();
+                if (isset($overwritescore[$partnum]) && $overwritescore[$partnum] >= 0 && $overwritescore[$partnum]<=1) {
+                    $raw[$partnum] = $overwritescore[$partnum];
+                } else {
+                    $raw[$partnum] = $scorePartResult->getRawScore();
+                }
             }
             
 
