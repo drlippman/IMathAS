@@ -67,6 +67,7 @@ function runRuleSet($ruleset) {
 	$compwords = array('no','one','all');
 
 	$groupsout = array();
+	$grpnum = -1;
 	foreach ($ruleset as $grpnum=>$rule) {
 		if ($rule['timeframe']=='since' || $rule['timeframe']=='between') {
 			$rule['sdate'] = parsedatetime($rule['sdate'],"12:00am");

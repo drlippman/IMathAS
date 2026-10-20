@@ -48,7 +48,7 @@ class ScoreEngine
         'requiretimes',
         'requiretimeslistpart',
         'scoremethod',
-        'overwritescore',
+        'overridescore',
         'snaptogrid',
         'strflags',
         'questions',
