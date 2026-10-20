@@ -426,7 +426,12 @@ if (isset($_GET['add'])) {
 		if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
 			$stm = $DBH->prepare("SELECT imas_msgs.title,imas_msgs.message,imas_msgs.courseid,imas_msgs.senddate,imas_users.FirstName,imas_users.LastName FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE imas_msgs.id=:id AND imas_msgs.msgto=:msgto");
 			$stm->execute(array(':id' => $replyto, ':msgto' => $userid));
-			list($title, $message, $courseid, $quotesenddate, $quotefirst, $quotelast) = $stm->fetch(PDO::FETCH_NUM);
+			$row = $stm->fetch(PDO::FETCH_NUM);
+			if ($row === false) {
+				echo 'Invalid message to reply to';
+				exit;
+			}
+			list($title, $message, $courseid, $quotesenddate, $quotefirst, $quotelast) = $row;
 			$title = _("Re: ") . $title;
 			if (isset($_GET['toquote'])) {
 				$message = '<br/><hr/><p class="small"><em>' . _('Write your reply above this line.') . '</em></p><p>' . sprintf(_('On %s at %s, %s wrote:'), tzdate('M j, Y', $quotesenddate), tzdate('g:i a', $quotesenddate),Sanitize::encodeStringForDisplay($quotefirst . ' ' . $quotelast)) . '</p>' . $message;
