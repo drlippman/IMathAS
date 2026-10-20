@@ -73,7 +73,7 @@ function updatePhpFiles() {
       let cssFile = manifest['style.css'].file;
 
       // Update your PHP file
-      let phpPath = path.resolve(__dirname, '../index.php');npm
+      let phpPath = path.resolve(__dirname, '../index.php');
       let phpContent = fs.readFileSync(phpPath, 'utf-8');
       phpContent = phpContent.replace(/js\/(index\.js\?v=[\w-]+|index-[\w-]{8}\.js)/g, jsFile)
                             .replace(/js\/(index-legacy\.js\?v=[\w-]+|index-legacy-[\w-]{8}\.js)/g, legacyJsFile)

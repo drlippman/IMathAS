@@ -153,6 +153,9 @@ table.stats tbody tr td {
   border: 1px solid #000;
   padding: 1px 10px;
 }
+table.stats tbody tr:nth-child(even) { 
+  background-color: #f5f5ff;
+}
 table.stats tbody tr td {
   text-align: right;
 }
