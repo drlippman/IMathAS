@@ -192,7 +192,9 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
                         'keytype' => $keytype,
                         'url' => $ltiurl,
                         'sourcedid' => $lti_sourcedid,
-                        'grade' => $grade
+                        'grade' => $grade,
+                        'hash' => $row['hash'],
+                        'addedon' => $row['isstu'] ? $row['addedon'] : null
                     ),
                     null, //no special callback
                     array( 	  //user-data; will get passed to response
@@ -333,7 +335,9 @@ function LTIqueuePostdataCallback($data) {
 		$secret,
 		$data['url'],
 		$data['sourcedid'],
-		$data['grade']
+		$data['grade'],
+		$data['addedon'],
+		$data['hash']
 	);
 }
 
