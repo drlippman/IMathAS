@@ -84,9 +84,30 @@ $eqnhelper = 4;
 $useeqnhelper = 4;
 $showtips = 2;
 
+// load question data, dropping questions that don't exist or aren't shared
+$QS['id'] = array_values($QS['id']);
+$ph = Sanitize::generateQueryPlaceholders($QS['id']);
+$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
+$stm->execute($QS['id']);
+$qsdata = array();
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['userights'] == 0) { continue; }
+    $qsdata[$row['id']] = $row;
+}
+if (!isset($_POST['state'])) {
+    // with a signed state, the ids must stay aligned with the state arrays
+    $QS['id'] = array_values(array_filter($QS['id'], function ($id) use ($qsdata) {
+        return isset($qsdata[$id]);
+    }));
+    if (empty($QS['id'])) {
+        echo 'No accessible questions found';
+        exit;
+    }
+}
+
 $numq = count($QS['id']);
 
-$a2 = new AssessStandalone($DBH);
+$a2= new AssessStandalone($DBH);
 
 if (isset($_POST['state'])) {
     $state = json_decode(json_encode(JWT::decode($_POST['state'], $statesecret)), true);
@@ -192,11 +213,7 @@ if (isset($_POST['toscoreqn'])) {
     }
     $qsid = $QS['id'][$qn];
 
-    // load question data
-    $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
-    $stm->execute(array(':id' => $qsid));
-    $line = $stm->fetch(PDO::FETCH_ASSOC);
-    $a2->setQuestionData($qsid, $line);
+    $a2->setQuestionData($qsid, $qsdata[$qsid]);
 
     $res = $a2->scoreQuestion($qn, $parts_to_score);
     $jwtcontents = array(
@@ -231,11 +248,7 @@ if (isset($_POST['toscoreqn'])) {
     $state['useda11yalt'][$qn] = false;
     $a2->setState($state);
     
-    // load question data
-    $stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id=:id");
-    $stm->execute(array(':id' => $qsid));
-    $line = $stm->fetch(PDO::FETCH_ASSOC);
-    $a2->setQuestionData($qsid, $line);
+    $a2->setQuestionData($qsid, $qsdata[$qsid]);
     $disp = $a2->displayQuestion($qn);
     if ($disp['useda11yalt'] != $state['useda11yalt'][$qn]) {
         $state['useda11yalt'][$qn] = $disp['useda11yalt'];
@@ -249,16 +262,7 @@ if (isset($_POST['toscoreqn'])) {
     exit;
 }
 
-// load question data and load/set state
-$ph = Sanitize::generateQueryPlaceholders($QS['id']);
-$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE id IN ($ph)");
-$stm->execute($QS['id']);
-$qsdata = array();
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    if ($row['userights'] == 0) { continue; }
-    $qsdata[$row['id']] = $row;
-}
-
+// load/set state
 $disps = array();
 
 for ($qn=0; $qn < $numq; $qn++) {
