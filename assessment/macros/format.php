@@ -183,6 +183,9 @@ function makereducedmixednumber($n, $d) {
 
 function makereducedfraction($n, $d, $dblslash = false, $varinnum = false) {
     if ($n == 0) {
+        if ($dblslash === 'parts') {
+            return [0, 1];
+        }
         return '0';
     }
     if ($d == 0) {
