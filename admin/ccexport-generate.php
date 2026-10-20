@@ -166,6 +166,7 @@ if ($linktype=='canvas') {
 function filtercapture($str,&$res) {
 	global $newdir,$imgcnt,$imasroot,$addmathabs,$mathimgurl,$filedir,$linktype;
 	$str = stripCourseLinks($str);
+	$str = signfileurlsperm($str); //private files aren't bundled; link with permanent signature
 	$str = forcefiltermath($str);
 	$str = forcefiltergraph($str);
 	$graphfiles = getgraphfilenames($str);

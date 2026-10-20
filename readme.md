@@ -32,6 +32,7 @@ requires PHP 7.4+, and MySQL 5.7+.  PHP has the following recommended or require
     -   `/course/files`
     -   `/filter/graph/imgs`
     -   `/filestore` (if you're not using S3 for file storeage)
+    -   `/privfilestore` (if you're not using S3 for file storage). This holds private user files and must **not** be directly readable from the web; see "Private files" below.
 7.  Log into IMathAS. If you didn't change the initial imathas user settings when running install.php, log in as 'root' with password 'root'.
 8.  Edit `loginpage.php` and `infoheader.php` if desired, which allow you to customize the login page. If you plan to use the new instructor account request page, you may customize `newinstructor.php`.
 
@@ -67,6 +68,7 @@ These are all added to the `config.php` by the install script.
 -   `$allowcourseimport`: Whether anyone should be able to import/export questions and libraries from the course page. Intended for easy sharing between systems, but the course page is cleaner if turned off.
 -   `$enablebasiclti`: Set to true to enable use of IMathAS as an LTI producer (tool).
 -   `$AWSkey, $AWSsecret, $AWSbucket`: To allow students and teachers to upload files through the text editor, and to enable file upload questions, this specifies an Amazon S3 key, secret, and bucket to use for file storage. If not specified, local storage will be used instead.
+-   `$CFG['GEN']['filepresecret']`, `$CFG['GEN']['filesigsecret']`: Required. Long random strings used to sign URLs for private files (see "Private files"). `filepresecret` must never change. `filesigsecret` may be an array; to rotate it, put the new secret first and keep the old one(s) in the array so that permanent links in course exports keep working.
 - `$CFG['GEN']['newpasswords']`:  this is now obsolete.  The system now only supports this mode by default.
 - `$CFG['MySQL_ver']`: Set to your MySQL version, as a simple decimal with major version only, like 5.6, 8.0, or 8.1. Only necessary if you're using 8+. If upgrading from 5.x to 8,
 make sure you also edit your config.php and make sure the PDO connection includes a charset.  If it doesn't already, you'll want to add <code>;charset=latin1</code> to 
@@ -178,6 +180,18 @@ course list from the course browser options, so you must also have `$CFG['course
   are allowed to point to. Defaults to host domain and amazonaws.com.  Set as stringified
   javascript array like <code>'["site1.com","site2.com"]'</code>
 
+### Private files
+
+Forum attachments, assessment file uploads (student and instructor), and text-editor uploads outside of course-page text
+(e.g. in forum posts, messages, assessment intros/questions, and everything students upload) are private. Course files
+and text-editor uploads in course-page text (item summaries, inline text, linked text) are public.
+Private files are served by `getfile.php` using signed, expiring URLs.
+
+Required setup:
+
+-   If using local file storage, ensure `/privfilestore` is writable by the web server, and block direct web access to it.
+    The included `.htaccess` does this for Apache. For nginx, add: `location /privfilestore/ { deny all; }` (nginx ignores `.htaccess`).
+-   If using S3, no bucket changes are needed: private files are stored with a private ACL under the same keys.
 
 ### LTI
 

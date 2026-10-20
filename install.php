@@ -102,6 +102,16 @@ if (!empty($_POST['AWSkey']) && !empty($_POST['AWSsecret']) && !empty($_POST['AW
 //\$AWSbucket = \"{$_POST['AWSbucket']}\";\n\n";
 }
 
+//secrets used to sign private file URLs (getfile.php). Keep these private.
+//filepresecret should never be changed.  filesigsecret can be rotated by
+//putting the new secret first in the array and keeping the old one.
+$contents .= "//File URL signing secrets 
+\$CFG['GEN']['filepresecret'] = '".bin2hex(random_bytes(24))."';
+";
+$contents .= "\$CFG['GEN']['filesigsecret'] = ['".bin2hex(random_bytes(24))."'];
+
+";
+
 $contents .= '
 //Uncomment to change the default course theme, also used on the home & admin page:
 //$defaultcoursetheme = "default.css"
@@ -142,7 +152,7 @@ $c2 =chmod('assessment/qimages',0755);
 $c3 =chmod('admin/import',0755);
 $c4 =chmod('course/files',0755);
 $c5 =chmod('filter/graph/imgs',0755);
-$c6 =chmod('filestore',0755);
+$c6 =chmod('filestore',0755) && chmod('privfilestore',0755);
 
 if ($c1 && $c2 && $c3 && $c4 && $c5 && $c6) {
 	echo 'Permissions set on writeable directories<br/>';

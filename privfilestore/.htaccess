@@ -1,0 +1,8 @@
+# Private user files: no direct web access. Files are served through getfile.php using signed URLs.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order Allow,Deny
+    Deny from all
+</IfModule>

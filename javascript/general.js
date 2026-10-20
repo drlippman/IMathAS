@@ -707,6 +707,31 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 				e.preventDefault();
 			}
 		});
+		// The image plugin's upload tab has no hook for extra content, so add the
+		// "uploads are public" notice below its dropzone when this editor uploads publicly.
+		editor.on('OpenWindow', function() {
+			if (!getEditorUploadCtx() || !window.editorPublicNotice) {
+				return;
+			}
+			var dialog = document.querySelector('.tox-dialog');
+			if (!dialog) { return; }
+			var addNotice = function() {
+				// image plugin dropzone, or the attach plugin's file input
+				var dz = dialog.querySelector('.tox-dropzone-container') ||
+					dialog.querySelector('#attach-upload');
+				if (dz && !dialog.querySelector('.editor-public-notice')) {
+					var n = document.createElement('div');
+					n.className = 'notice editor-public-notice';
+					n.textContent = window.editorPublicNotice;
+					dz.parentNode.insertBefore(n, dz.nextSibling);
+				}
+			};
+			addNotice();
+			// dropzone is rendered when the Upload tab is selected
+			var obs = new MutationObserver(addNotice);
+			obs.observe(dialog, {childList: true, subtree: true});
+			editor.once('CloseWindow', function() { obs.disconnect(); });
+		});
 		if (setupfunction) {
 			setupfunction.call(this, editor);
 		}
@@ -733,6 +758,10 @@ function filePickerCallBack(callback, value, meta) {
 			connector += "?type=files";
 			break;
 	}
+	var uploadctx = getEditorUploadCtx();
+	if (uploadctx) {
+		connector += "&ctx=" + encodeURIComponent(uploadctx);
+	}
 	tinyMCE.activeEditor.windowManager.openUrl({
 		url : connector,
 		title : 'File Manager',
@@ -747,6 +776,16 @@ function filePickerCallBack(callback, value, meta) {
 			}
         }
 	});
+}
+// Server-issued token (see header.php) letting course-page text editors store
+// uploads publicly.  Map of editor id -> token; absent means uploads are private.
+function getEditorUploadCtx() {
+	try {
+		if (window.editorUploadCtx && window.tinymce && tinymce.activeEditor) {
+			return window.editorUploadCtx[tinymce.activeEditor.id] || '';
+		}
+	} catch (e) {}
+	return '';
 }
 const image_upload_handler = (blobInfo, progress, isattach) => new Promise((resolve, reject) => {
   const xhr = new XMLHttpRequest();
@@ -802,6 +841,10 @@ const image_upload_handler = (blobInfo, progress, isattach) => new Promise((reso
 	formData.append('file', res, filename);
 	if (isattach === true) {
 		formData.append('type', 'attach');
+	}
+	var uploadctx = getEditorUploadCtx();
+	if (uploadctx) {
+		formData.append('ctx', uploadctx);
 	}
   	xhr.send(formData);
   });

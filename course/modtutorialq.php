@@ -982,6 +982,7 @@ $ansfmtval = array("","fraction","reducedfraction","fracordec","mixednumber","mi
 $ansfmtlbl = array("none","any fraction","reduced fraction","fraction or decimal","mixed number","mixed number or fraction","scientific notation","no decimal values");
 
 $useeditor = "text,popuptxt";
+$editorquestionids = "text,popuptxt"; //question editors: uploads stored publicly
 
 $placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js"></script>';

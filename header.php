@@ -149,12 +149,43 @@ if (isset($_SESSION['graphdisp']) && $_SESSION['graphdisp']==1) {
 
 
 if (isset($useeditor) && $_SESSION['useed']==1) {
+    // stored HTML loaded into editors (e.g. in textareas) holds pre-signed private file
+    // URLs; sign them for this viewer so images preview while editing. Saving converts back.
+    require_once __DIR__ . '/includes/filehandler.php';
+    ob_start(function ($buf) { return signfileurls($buf); });
     echo '<script src="'.$staticroot.'/tinymce8/tinymce.min.js?v=060225" referrerpolicy="origin" crossorigin="anonymous"></script>';
 
 	echo "\n";
 	echo '<script>';
 	echo 'var coursetheme = "'.$coursetheme.'";';
 	echo 'var tinymceUseSnippets = '.($myrights>10?1:0).';';
+	if ((!empty($editorpublicids) && !empty($teacherid) && !empty($cid) && !empty($userid)) ||
+		(!empty($editorquestionids) && !empty($userid) && $myrights >= 20)
+	) {
+		// Server grants "store publicly" to course-page text editors and question editors via
+		// signed, scoped tokens. The upload handler re-checks rights (teacher of the course /
+		// question author) at upload time.
+		require_once __DIR__ . '/includes/filehandler.php';
+		try {
+			$editorctxmap = array();
+			if (!empty($editorpublicids) && !empty($teacherid) && !empty($cid) && !empty($userid)) {
+				$editorctxtoken = filesig_makectxtoken('coursepage', intval($cid), intval($userid));
+				foreach (explode(',', $editorpublicids) as $editorctxid) {
+					$editorctxmap[trim($editorctxid)] = $editorctxtoken;
+				}
+			}
+			if (!empty($editorquestionids) && !empty($userid) && $myrights >= 20) {
+				$editorctxtoken = filesig_makectxtoken('question', 0, intval($userid));
+				foreach (explode(',', $editorquestionids) as $editorctxid) {
+					$editorctxmap[trim($editorctxid)] = $editorctxtoken;
+				}
+			}
+			echo 'var editorUploadCtx = '.json_encode($editorctxmap).';';
+			echo 'var editorPublicNotice = '.json_encode(_('Files uploaded in course documents and questions are not secured, and can be accessed by anyone who can guess the address.  Do not upload files with private information.')).';';
+		} catch (RuntimeException $e) {
+			// signing not configured: uploads stay private
+		}
+	}
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		echo 'var filePickerCallBackFunc = filePickerCallBack;';
 	} else {

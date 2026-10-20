@@ -1,5 +1,40 @@
 <?php
 
+require_once __DIR__ . "/filesigning.php";
+
+/**
+ * Local (non-S3) user file stores.  filestore/ is web-readable (legacy and
+ * public files); privfilestore/ is denied to direct web access and only
+ * served through getfile.php.
+ */
+function getlocalstorebase($sec = "private") {
+	$root = rtrim(dirname(__DIR__), '/\\');
+	return $root . ($sec == "public" || $sec == "public-read" ? '/filestore/' : '/privfilestore/');
+}
+// returns array of both bases, private first
+function getlocalstorebases() {
+	return [getlocalstorebase("private"), getlocalstorebase("public")];
+}
+/**
+ * Find a stored user file in either local store.
+ * @return string|false full path
+ */
+function getlocalprivfilepath($key) {
+	if (filesig_validkey($key) === false) {
+		return false;
+	}
+	foreach (getlocalstorebases() as $base) {
+		$path = realpath($base . $key);
+		$realbase = realpath($base);
+		if ($path !== false && $realbase !== false && is_file($path) &&
+			strpos($path, $realbase . DIRECTORY_SEPARATOR) === 0
+		) {
+			return $path;
+		}
+	}
+	return false;
+}
+
 function getfilehandlertype($filetype) {
 	if ($filetype=='filehandlertype' || $filetype=='filehandlertypecfiles') {
 		if (isset($GLOBALS[$filetype])) {
@@ -37,7 +72,7 @@ function storecontenttofile($content,$key,$sec="private") {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+		$base = getlocalstorebase($sec);
 		$dir = $base.dirname($key);
 		$fn = basename($key);
 		if (!is_dir($dir)) {
@@ -207,7 +242,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 				require_once __DIR__ . '/svg-sanitizer/svgcleaner.php';
 				sanitizeSvg($_FILES[$id]);
 			}
-			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+			$base = getlocalstorebase($sec);
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {
@@ -434,7 +469,7 @@ function getasidfileurl($file) {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		return $s3->queryStringGet($GLOBALS['AWSbucket'],$s3object,7200);
 	} else {
-		return $imasroot.'/filestore/adata/'.$file;
+		return getprivfileurl('adata/'.$file);
 	}
 }
 
@@ -445,6 +480,10 @@ function getasidfilepath($file) {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		return $s3->queryStringGet($GLOBALS['AWSbucket'],$s3object,7200);
 	} else {
+		$path = getlocalprivfilepath('adata/'.$file);
+		if ($path !== false) {
+			return $path;
+		}
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\');
 		return $base.'/filestore/adata/'.$file;
 	}
@@ -535,12 +574,10 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 			}
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (@unlink($base.'/adata/'.$file)) {
+			if (unlinklocaluserfile('adata/'.$file)) {
 				$deled[] = $file;
-				recursiveRmdir(dirname($base.'/adata/'.$file));
 			}
 		}
 	}
@@ -629,12 +666,10 @@ function deleteAssess2FilesOnUnenroll($tounenroll, $aids, $groupassess) {
 		}
 		*/
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (@unlink(realpath($base.'/adata/'.$file))) {
+			if (unlinklocaluserfile('adata/'.$file)) {
 				$deled[] = $file;
-				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
 			}
 		}
 	}
@@ -739,12 +774,10 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 			}
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (@unlink(realpath($base.'/adata/'.$file))) {
+			if (unlinklocaluserfile('adata/'.$file)) {
 				$deled[] = $file;
-				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
 			}
 		}
 	}
@@ -794,8 +827,7 @@ function deleteallaidfiles($aid) {
 		}
 
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (($delcnt = unlinkRecursive($base."/adata/$aid",true))==0) {
+		if (($delcnt = unlinkRecursiveBothStores("adata/$aid"))==0) {
 			return false;
 		}
 	}
@@ -821,27 +853,30 @@ function getuserfiles($uid,$img=false) {
 			return array();
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if ($handle = @opendir($base."/ufiles/$uid")) {
-			$imgext = array(".gif",".jpg",".png",".jpeg",".svg",".webp");
-			$arr = array();
-			$k = 0;
-			while (false !== ($file=readdir($handle))) {
-				if ($file != "." && $file != ".." && !is_dir($base."/ufiles/$uid/".$file)) {
-					if ($img && !in_array(strtolower(strrchr($file,".")),$imgext)) {
-						continue;
+		$imgext = array(".gif",".jpg",".png",".jpeg",".svg",".webp");
+		$arr = array();
+		$seen = array();
+		$k = 0;
+		$pubbase = getlocalstorebase("public");
+		foreach (getlocalstorebases() as $base) {
+			if ($handle = @opendir($base."ufiles/$uid")) {
+				while (false !== ($file=readdir($handle))) {
+					if ($file != "." && $file != ".." && !is_dir($base."ufiles/$uid/".$file) && !isset($seen[$file])) {
+						$seen[$file] = true;
+						if ($img && !in_array(strtolower(strrchr($file,".")),$imgext)) {
+							continue;
+						}
+						$arr[$k]['name'] = "ufiles/$uid/$file";
+						$arr[$k]['time'] = @filemtime($base."ufiles/$uid/".$file);
+						$arr[$k]['size'] = @filesize($base."ufiles/$uid/".$file);
+						$arr[$k]['public'] = ($base === $pubbase);
+						$k++;
 					}
-					$arr[$k]['name'] = "ufiles/$uid/$file";
-					$arr[$k]['time'] = @filemtime($base."/ufiles/$uid/".$file);
-					$arr[$k]['size'] = @filesize($base."/ufiles/$uid/".$file);
-					$k++;
 				}
+				closedir($handle);
 			}
-			closedir($handle);
-			return $arr;
-		} else {
-			return array();
 		}
+		return $arr;
 	}
 }
 function deleteuserfile($uid,$file) {
@@ -855,8 +890,7 @@ function deleteuserfile($uid,$file) {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (@unlink($base."/ufiles/$uid/$safeFilename")) {
+		if (unlinklocaluserfile("ufiles/$uid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -876,8 +910,7 @@ function deleteforumfile($postid,$file) {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (@unlink($base."/ffiles/$postid/$safeFilename")) {
+		if (unlinklocaluserfile("ffiles/$postid/$safeFilename")) {
 			return true;
 		} else {
 			return false;
@@ -964,8 +997,7 @@ function deletefilebykey($key) {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (@unlink($base."/$safeFilename")) {
+		if (unlinklocaluserfile($safeFilename)) {
 			return true;
 		} else {
 			return false;
@@ -985,8 +1017,7 @@ function deleteallpostfiles($postid) {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (($delcnt = unlinkRecursive($base."/ffiles/$postid",true))==0) {
+		if (($delcnt = unlinkRecursiveBothStores("ffiles/$postid"))==0) {
 			return false;
 		}
 	}
@@ -1026,8 +1057,7 @@ function deletealluserfiles($uid) {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (($delcnt = unlinkRecursive($base."/ufiles/$uid",true))==0) {
+		if (($delcnt = unlinkRecursiveBothStores("ufiles/$uid"))==0) {
 			return false;
 		}
 	}
@@ -1048,8 +1078,8 @@ function getfilesize($type, $key) {
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, true)['size'];
 		} else {
-			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
-			return filesize($base.$key);
+			$path = getlocalprivfilepath($key);
+			return $path === false ? false : filesize($path);
 		}
     }
 }
@@ -1076,8 +1106,7 @@ function doesfileexist($type,$key) {
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, false);
 		} else {
-			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
-			return file_exists($base.$key);
+			return getlocalprivfilepath($key) !== false;
 		}
 	}
 }
@@ -1110,12 +1139,170 @@ function getuserfileurl($key) {
 		return "$imasroot/filestore/$key";
 	}
 }
+/**
+ * Signed getfile.php URL for a private user file (ufiles/, ffiles/, adata/)
+ * Call only after verifying the viewer is allowed to see the file.
+ * @param string $mode 'user' (signed for current user), 'public' (public pages), 'perm' (permanent)
+ */
+function getprivfileurl($key, $mode = 'user', $abs = false) {
+	global $imasroot, $userid;
+	$base = $abs ? $GLOBALS['basesiteurl'] : $imasroot;
+	return filesig_signedurl($key, $mode, $base, $mode === 'user' ? intval($userid ?? 0) : 0);
+}
+/**
+ * Reverse of signfileurls(): convert validly signed getfile.php URLs back to the
+ * stored pre-signed form (for incoming HTML round-tripped through an editor).
+ */
+function unsignfileurls($html) {
+	global $imasroot, $userid;
+	if (strpos($html, 'getfile.php?') === false) {
+		return $html;
+	}
+	try {
+		return filesig_presignhtml($html, $imasroot, intval($userid ?? 0));
+	} catch (RuntimeException $e) {
+		error_log($e->getMessage());
+	}
+	return $html;
+}
+/**
+ * Convert pre-signed getfile.php URLs in HTML to permanent absolute links, for
+ * course export where the files are not bundled.  Only use on content from the exported course.
+ */
+function signfileurlsperm($html) {
+	if (strpos($html, 'getfile.php?') === false) {
+		return $html;
+	}
+	try {
+		return filesig_rewritehtml($html, 'perm', $GLOBALS['basesiteurl']);
+	} catch (RuntimeException $e) {
+		error_log($e->getMessage());
+	}
+	return $html;
+}
+/**
+ * URL stored in text-editor HTML for a private upload.  filter() converts to a signed URL on display.
+ */
+function getprivfilepresignedurl($key) {
+	global $imasroot;
+	return filesig_presignedurl($key, $imasroot);
+}
+/**
+ * URL to hand back to the text editor after an upload/pick of a private file.
+ * Signed for the current user so images preview and file links can be opened while
+ * editing.  The signed URL is converted back to pre-signed form when the content is saved.
+ */
+/**
+ * Is a stored file publicly readable?  On S3 this costs a request to read the ACL.
+ */
+function fileispublic($key) {
+	if (getfilehandlertype('filehandlertype') == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$acp = $s3->getAccessControlPolicy($GLOBALS['AWSbucket'], $key);
+		if ($acp === false || empty($acp['acl'])) {
+			return false;
+		}
+		foreach ($acp['acl'] as $g) {
+			if ($g['type'] == 'Group' && $g['uri'] == 'http://acs.amazonaws.com/groups/global/AllUsers' &&
+				in_array($g['permission'], ['READ', 'FULL_CONTROL'])
+			) {
+				return true;
+			}
+		}
+		return false;
+	}
+	// matches getuserfiles(): the private store wins if a file is in both
+	return !is_file(getlocalstorebase("private") . $key) && is_file(getlocalstorebase("public") . $key);
+}
+function geteditorfileurl($key) {
+	return getprivfileurl($key);
+}
+/**
+ * Convert pre-signed getfile.php URLs in HTML to signed ones for the current viewer.
+ * Called by filter(). Public (unsigned) URLs are left alone.
+ */
+function signfileurls($html) {
+	global $imasroot, $userid, $ispublic;
+	if (strpos($html, 'getfile.php?') === false) {
+		return $html;
+	}
+	try {
+		if (!empty($ispublic)) {
+			return filesig_rewritehtml($html, 'public', $imasroot);
+		} else if (!empty($userid)) {
+			return filesig_rewritehtml($html, 'user', $imasroot, intval($userid));
+		}
+	} catch (RuntimeException $e) {
+		error_log($e->getMessage());
+	}
+	return $html;
+}
+
+/**
+ * Should a text-editor upload be stored publicly?
+ * Public is a privilege granted by the server, never requested by the client:
+ *  1. $token is a server-issued upload-context token for this user, unexpired, and
+ *  2. the user is currently a teacher of the course the token is scoped to.
+ * Anything else (missing/forged/expired token, errors) means private.
+ */
+function editoruploadispublic($token) {
+	global $DBH, $userid, $myrights;
+	if (empty($token) || empty($userid) || !is_string($token)) {
+		return false;
+	}
+	try {
+		$ctx = filesig_verifyctxtoken($token, $userid);
+	} catch (RuntimeException $e) {
+		return false;
+	}
+	if ($ctx === false) {
+		return false;
+	}
+	if ($ctx[0] === 'question') {
+		// question editor (moddataset/modtutorialq): same rights those pages require
+		return ($ctx[1] === 0 && !empty($myrights) && $myrights >= 20);
+	}
+	if ($ctx[0] !== 'coursepage' || $ctx[1] < 1) {
+		return false;
+	}
+	$stm = $DBH->prepare("SELECT 1 FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
+	$stm->execute(array(':userid'=>intval($userid), ':courseid'=>$ctx[1]));
+	return ($stm->fetchColumn() !== false);
+}
+
+/**
+ * Delete a user file (key like ufiles/1/a.png) from whichever local store holds it
+ */
+function unlinklocaluserfile($key) {
+	if (filesig_validkey($key) === false) {
+		return false;
+	}
+	$deleted = false;
+	foreach (getlocalstorebases() as $base) {
+		if (@unlink($base.$key)) {
+			$deleted = true;
+			recursiveRmdir(dirname($base.$key));
+		}
+	}
+	return $deleted;
+}
+// remove a directory (e.g. adata/12) from both local stores; returns count of files deleted
+function unlinkRecursiveBothStores($subdir) {
+	$cnt = 0;
+	foreach (getlocalstorebases() as $base) {
+		$cnt += intval(unlinkRecursive(rtrim($base, '/').'/'.$subdir, true));
+	}
+	return $cnt;
+}
 function getprivatefileurl($key,$exp=7200) {
     global $imasroot;
+    $rawkey = $key;
     $key = Sanitize::rawurlencodePath($key);
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		return $s3->queryStringGet($GLOBALS['AWSbucket'],$key,$exp);
+	} else if (is_file(getlocalstorebase('private').$rawkey) && filesig_validkey($rawkey) !== false) {
+		return getprivfileurl($rawkey);
 	} else {
 		return $imasroot.'/filestore/'.$key;
 	}

@@ -107,11 +107,15 @@
 	}
 
 	function filter($str) {
-		global $userfullname,$urlmode,$imasroot;
+		global $userfullname,$urlmode,$imasroot,$filterdir;
 		if ($urlmode == 'https://') {
 			$str = str_replace(array('http://www.youtube.com','http://youtu.be'),array('https://www.youtube.com','https://youtu.be'), $str);
 		}
         $str = str_replace('"http://quietube.com/v.php/http','"http', $str);
+		if (strpos($str,'getfile.php?')!==false) { //pre-signed private file URLs -> signed for this viewer
+			require_once "$filterdir/../includes/filehandler.php";
+			$str = signfileurls($str);
+		}
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
 		}

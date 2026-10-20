@@ -10,6 +10,8 @@ if (isset($_REQUEST["type"])) {
 	$type = -2;
 }
 
+$ispublicupload = editoruploadispublic($_REQUEST['ctx'] ?? '');
+
 if (isset($_REQUEST["action"]))
 {
 	if ($_REQUEST["action"] == "upload_file")
@@ -36,12 +38,20 @@ if (isset($_REQUEST["action"]))
 					$ncnt++;
 				}
 			}
-			if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public")) {
+			$ispublicupload = editoruploadispublic($_REQUEST['ctx'] ?? '');
+			if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,$ispublicupload?"public":"private")) {
 
 			} else {
 				unset($_REQUEST["action"]);
 			}
 		}
+	}
+	else if ($_REQUEST["action"] == "get_url")
+	{
+		// url to insert for an existing file; S3 listings don't include the ACL
+		$key = "ufiles/$userid/" . Sanitize::sanitizeFilenameAndCheckBlacklist($_REQUEST["item_name"] ?? '');
+		echo fileispublic($key) ? getuserfileurl($key) : geteditorfileurl($key);
+		exit;
 	}
 	else if ($_REQUEST["action"] == "delete_file")
 	{
@@ -65,11 +75,12 @@ if (isset($_REQUEST['showfiles'])) {
 		$isimg = in_array($ext, $imgext);
 		$rows[] = array(
 			'name' => $name,
-			'url' => getuserfileurl($v['name']),
+			'url' => !empty($v['public']) ? getuserfileurl($v['name']) : geteditorfileurl($v['name']),
 			'ext' => $ext,
 			'time' => intval($v['time'] ?? 0),
 			'size' => intval($v['size'] ?? 0),
 			'isimg' => $isimg,
+			'resolve' => !isset($v['public']), // public status unknown (S3); look up on insert
 			// clipboard pastes / image tool output; names are auto-generated
 			'pasted' => $isimg && preg_match('/^(mceclip|imagetool|pastedimage)/i', $name) === 1,
 		);
@@ -128,9 +139,9 @@ if (isset($CFG['locale'])) {
 	}
 }
 ?>
-<script src="file_manager/file_manager.js?v=3"></script>
+<script src="file_manager/file_manager.js?v=4"></script>
 </head>
-<body data-type="<?php echo Sanitize::encodeStringForDisplay($type); ?>" data-files-url="file_manager.php?showfiles=true&amp;type=<?php echo Sanitize::encodeUrlParam($type); ?>"<?php if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") { echo ' data-inserted="' . Sanitize::encodeStringForDisplay(getuserfileurl("ufiles/$userid/".$filename)) . '"'; } ?>>
+<body data-type="<?php echo Sanitize::encodeStringForDisplay($type); ?>" data-files-url="file_manager.php?showfiles=true&amp;type=<?php echo Sanitize::encodeUrlParam($type); ?>"<?php if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") { echo ' data-inserted="' . Sanitize::encodeStringForDisplay($ispublicupload ? getuserfileurl("ufiles/$userid/".$filename) : geteditorfileurl("ufiles/$userid/".$filename)) . '"'; } ?>>
 <?php
 if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 	echo '<div class="td_main">';
@@ -167,9 +178,11 @@ if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 	<?php echo _('Uploading ...'); ?>
 	</div>
 </div>
+<?php if ($ispublicupload) { ?>
 <div class="notice">
-<?php echo _('Files uploaded are not secured, and can be accessed by anyone who can guess the address.  Do not upload files with private information.'); ?>
+<?php echo _('Files uploaded in course documents and questions are not secured, and can be accessed by anyone who can guess the address.  Do not upload files with private information.'); ?>
 </div>
+<?php } ?>
 </div>
 <div role="tabpanel" id="panel_files" aria-labelledby="tab_files" hidden></div>
 </body>

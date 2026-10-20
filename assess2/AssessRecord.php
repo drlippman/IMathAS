@@ -2034,7 +2034,7 @@ class AssessRecord
       }
       if ($ver == 'last' && ($this->assess_info->getQuestionSetting($curq['qid'],'showwork') & 2) == 2) {
         $qver = $this->getQuestionVer($qn, $ver);
-        $out['work'] = isset($qver['work']) ? $qver['work'] : '';
+        $out['work'] = isset($qver['work']) ? signfileurls($qver['work']) : '';
       }
     }
 
@@ -2048,7 +2048,7 @@ class AssessRecord
    */
   public function getGenShowwork($ver = 'last') {
     $aver = $this->getAssessVer($ver);
-    return [$aver['swgen'] ?? '', isset($aver['swgentime']) ? tzdate("n/j/y, g:i a", $aver['starttime'] + $aver['swgentime']) : ''];
+    return [signfileurls($aver['swgen'] ?? ''), isset($aver['swgentime']) ? tzdate("n/j/y, g:i a", $aver['starttime'] + $aver['swgentime']) : ''];
   }
 
   /**
@@ -2371,7 +2371,7 @@ class AssessRecord
   public function getQuestionHtml($qn, $ver = 'last', $clearans = false, $force_scores = false, $force_answers = false, $tryToShow = 'last', $includeCorrect = false) {
     // get assessment attempt data for given version
     $qver = $this->getQuestionVer($qn, $ver);
-    $work = isset($qver['work']) ? $qver['work'] : '';
+    $work = isset($qver['work']) ? signfileurls($qver['work']) : '';
     $worktime = '0';
     if (!empty($qver['worktime'])) {
         $worktime = tzdate("n/j/y, g:i a", intval($qver['worktime']) + intval($this->assessRecord['starttime']));
@@ -2425,7 +2425,7 @@ class AssessRecord
     $usedAutosave = array();
 
     if (isset($autosave['work'])) {
-      $work = $autosave['work'];
+      $work = signfileurls($autosave['work']);
       $usedAutosave[] = 'work';
     }
 
@@ -4501,7 +4501,9 @@ class AssessRecord
           }*/
           $out[$pn][] = $outstr;
         } else if ($qtype == 'essay') {
-          $out[$pn][] = $parttrydata[$tn]['stuans'] ?? '';
+          // text-editor uploads in answers are private; sign for this viewer
+          require_once __DIR__ . "/../includes/filehandler.php";
+          $out[$pn][] = signfileurls($parttrydata[$tn]['stuans'] ?? '');
         } else if (($qtype == 'matrix' || $qtype == 'calcmatrix') && isset($GLOBALS['answersize'][$partref])) {
           $chunks = array_chunk(explode('|', $parttrydata[$tn]['stuans'] ?? ''), $GLOBALS['answersize'][$partref][1]);
           foreach ($chunks as $k=>$v) {

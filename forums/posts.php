@@ -750,12 +750,12 @@ function printchildren($base,$restricttoowner=false) {
 			}
 			for ($i=0;$i<count($fl)/2;$i++) {
 				//if (count($fl)>2) {echo '<li>';}
-				echo '<a href="'.getuserfileurl('ffiles/'.$child.'/'.$fl[2*$i+1]).'" target="_blank">';
+				echo '<a href="'.getprivfileurl('ffiles/'.$child.'/'.$fl[2*$i+1]).'" target="_blank">';
 				$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
 				if (isset($itemicons[$extension])) {
-					echo "<img alt=\"$extension\" src=\"$staticroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+					echo "<img alt=\"$extension\" src=\"$staticroot/img/{$itemicons[$extension]}\" class=\"mida\" style=\"width:24px\"/> ";
 				} else {
-					echo "<img alt=\"doc\" src=\"$staticroot/img/doc.png\" class=\"mida\"/> ";
+					echo "<img alt=\"doc\" src=\"$staticroot/img/doc.png\" class=\"mida\" style=\"width:24px\"/> ";
 				}
 				echo $fl[2*$i].'</a> ';
 				//if (count($fl)>2) {echo '</li>';}

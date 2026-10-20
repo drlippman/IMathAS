@@ -12,6 +12,7 @@ require_once "../includes/htmlutil.php";
 $overwriteBody = 0;
 $body = "";
 $useeditor = "description,postinstr,replyinstr";
+$editorpublicids = "description,postinstr,replyinstr"; //editors for course-page text: uploads stored publicly (instructors only)
 
 $cid = Sanitize::courseId($_GET['cid']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";

@@ -20,6 +20,7 @@ if (isset($courseUIver) && $courseUIver > 1) {
 $overwriteBody = 0;
 $body = "";
 $useeditor = "summary,intro";
+$editorpublicids = "summary,intro"; //editors for course-page text: uploads stored publicly (instructors only)
 $pagetitle = "Assessment Settings";
 $cid = Sanitize::courseId($_GET['cid']);
 

@@ -886,6 +886,7 @@
 	$placeinhead = '';
 
 	$useeditor = "noinit";
+	$editorquestionids = "qtext,solution"; //question editors: uploads stored publicly
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=101926"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css?v=091522">';

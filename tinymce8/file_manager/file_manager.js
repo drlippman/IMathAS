@@ -25,6 +25,22 @@ var FileBrowserDialogue = {
 			FileBrowserDialogue.mySubmit(inserted);
 		}
 	},
+	// insert a listed file; on S3 the url to use depends on the file's ACL,
+	// which is only looked up on demand
+	insertFile: function (f) {
+		if (!f.resolve) {
+			FileBrowserDialogue.mySubmit(f.url);
+			return;
+		}
+		$.ajax({
+			url: "file_manager.php",
+			data: { action: "get_url", item_name: f.name }
+		}).done(function(url) {
+			FileBrowserDialogue.mySubmit(url || f.url);
+		}).fail(function() {
+			FileBrowserDialogue.mySubmit(f.url);
+		});
+	},
 	mySubmit: function (filename) {
 		// insert information now
 		window.parent.postMessage({
@@ -143,7 +159,7 @@ function renderList() {
 			var extn = dot > 0 ? f.name.substr(dot) : '';
 			$('<a href="#" class="file">').attr('title', f.name)
 				.append($('<span class="fbase">').text(base), $('<span class="fext">').text(extn))
-				.on('click', function(e) { e.preventDefault(); FileBrowserDialogue.mySubmit(f.url); }).appendTo($row);
+				.on('click', function(e) { e.preventDefault(); FileBrowserDialogue.insertFile(f); }).appendTo($row);
 			if (f.time) {
 				$('<span class="fdate">').text(new Date(f.time*1000).toLocaleDateString()).appendTo($row);
 			}
@@ -183,7 +199,7 @@ function gridMore($grid, $more) {
 			.on('click', function(e) { e.preventDefault(); delete_file(f, $t); }).appendTo($t);
 		$('<a href="#" class="thumbimg">').attr('title', f.name)
 			.append($('<img loading="lazy" alt="">').attr('src', f.url))
-			.on('click', function(e) { e.preventDefault(); FileBrowserDialogue.mySubmit(f.url); }).appendTo($t);
+			.on('click', function(e) { e.preventDefault(); FileBrowserDialogue.insertFile(f); }).appendTo($t);
 		if (f.time) {
 			$('<span class="fdate">').text(new Date(f.time*1000).toLocaleDateString()).appendTo($t);
 		}

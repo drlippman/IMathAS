@@ -21,7 +21,7 @@ ini_set("max_execution_time", "120");
 if (isset($_POST['remove'])) {
     $res = false;
     if (strpos($_POST['remove'], "ufiles/$userid/") !== false) {
-        $res = deleteuserfile($userid, basename($_POST['remove']));
+        $res = deleteuserfile($userid, rawurldecode(basename($_POST['remove'])));
     }
     echo '{"done": '.($res?'true':'false').'}';
     exit;
@@ -101,12 +101,26 @@ if (isset($_POST['remove'])) {
 	$filename = implode('.',$filenamepts);
 	$ncnt++;
     }
-    if (storeuploadedfile($tempkey,"ufiles/$userid/".$filename,"public")) {
+    // public only for course-page text editors with a valid server-issued token
+    // and current teacher rights; everything else is private.
+    $ispublicupload = editoruploadispublic($_POST['ctx'] ?? '');
+    $storekey = "ufiles/$userid/".$filename;
+    if (!$ispublicupload) {
+      try {
+        filesig_getsecrets('pre');
+      } catch (RuntimeException $e) {
+        error_log('upload_handler: ' . $e->getMessage());
+        header("HTTP/1.0 500 File signing is not configured");
+        exit;
+      }
+    }
+    if (storeuploadedfile($tempkey,$storekey,$ispublicupload?"public":"private")) {
 
       // Respond to the successful upload with JSON.
       // Use a location key to specify the path to the saved image resource.
       // { location : '/your/uploaded/image/file'}
-      echo json_encode(array('location' => getuserfileurl("ufiles/$userid/".$filename)));
+      // Private uploads return a pre-signed URL that filter() converts at display time.
+      echo json_encode(array('location' => $ispublicupload ? getuserfileurl($storekey) : geteditorfileurl($storekey)));
     } else {
       error_log('upload_handler failed to save: ' . print_r($temp, true));
       header("HTTP/1.0 500 Unable to Save");

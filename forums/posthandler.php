@@ -307,7 +307,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$_POST['newfiledesc-'.$i] = str_replace('@@','@',$_POST['newfiledesc-'.$i]);
 				$extension = strtolower(strrchr($userfilename,"."));
 				if (!in_array($extension,$badextensions) && storeuploadedfile('newfile-'.$i,'ffiles/'
-						.Sanitize::sanitizeFilenameAndCheckBlacklist($_GET['modify']).'/'.$userfilename,"public")) {
+						.intval($_GET['modify']).'/'.$userfilename,"private")) {
 					$files[] = $_POST['newfiledesc-'.$i];
 					$files[] = $userfilename;
 				}
@@ -546,7 +546,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					for ($i=0;$i<count($files)/2;$i++) {
 						echo '<input type="text" name="filedesc['.$i.']" value="'.Sanitize::encodeStringForDisplay($files[2*$i]).'" aria-label="'._('Description').'"/>';
 						// $_GET['modify'] will be sanitized by getuserfileurl().
-						echo '<a href="'.Sanitize::encodeStringForDisplay(getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1])).'" target="_blank">View</a> ';
+						echo '<a href="'.Sanitize::encodeStringForDisplay(getprivfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1])).'" target="_blank">View</a> ';
 						echo '<label for="filedel['.$i.']">Delete?</label> <input type="checkbox" name="filedel['.$i.']" id="filedel['.$i.']" value="1"/><br/>';
 					}
 				}

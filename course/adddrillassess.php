@@ -254,6 +254,7 @@ if (!isset($_GET['daid'])) {
 
 
 $useeditor = "summary";
+$editorpublicids = "summary"; //editors for course-page text: uploads stored publicly (instructors only)
 $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
 $placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';

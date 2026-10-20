@@ -73,6 +73,7 @@ function makeFilestoreAbs($str) {
 	global $imasroot, $storebase, $storebaseenc, $absbase, $absbaseenc;
 	$str = str_replace('"'.$storebase, '"'.$absbase, $str);
 	$str = str_replace('"'.$storebaseenc, '"'.$absbaseenc, $str);
+	$str = signfileurlsperm($str);
 	return $str;
 }
 
@@ -247,7 +248,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				if ($line['files']!='') {
 					$files = explode('@@',$line['files']);
 					for ($i=0;$i<count($files)/2;$i++) {
-						$files[2*$i+1] = getuserfileurl('ffiles/'.$line['forumid'].'/'.$files[2*$i+1]);
+						$files[2*$i+1] = getprivfileurl('ffiles/'.$line['forumid'].'/'.$files[2*$i+1], 'perm', true);
 					}
 					$line['files'] = $files;
 				}

@@ -402,7 +402,7 @@ if ($searchtype == 'thread') {
 			}
 			for ($i=0;$i<count($fl)/2;$i++) {
 				//if (count($fl)>2) {echo '<li>';}
-				echo '<a href="'.getuserfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
+				echo '<a href="'.getprivfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
 				$extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
 				if (isset($itemicons[$extension])) {
 					echo "<img alt=\"".Sanitize::encodeStringForDisplay($extension)."\" src=\"$staticroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";

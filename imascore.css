@@ -1600,6 +1600,12 @@ details:not(.noborder) {
 details[open]:not(.noborder) summary {
 	border-bottom: 1px solid #ccc;
 }
+
+.tox .editor-public-notice {
+	color: rgba(34, 47, 62, .7);
+	font-size: 14px;
+	padding: 0px 8x;
+}
 /* override MathJax dark mode colors */
 @media (prefers-color-scheme: dark) {
 	:root {

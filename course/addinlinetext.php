@@ -33,6 +33,7 @@ function generatemoveselect($count,$num) {
 $overwriteBody = 0;
 $body = "";
 $useeditor = "text";
+$editorpublicids = "text"; //editors for course-page text: uploads stored publicly (instructors only)
 $cid = Sanitize::courseId($_GET['cid']);
 
 

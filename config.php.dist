@@ -124,6 +124,14 @@
   //$AWSsecret = "";
   //$AWSbucket = "";
 
+  //Secrets used to sign URLs for private files (served by getfile.php).
+  //Required.  Use long random strings, e.g. output of bin2hex(random_bytes(24)).
+  //filepresecret: never change this.
+  //filesigsecret: may be rotated; list the new secret first and keep the old
+  //  ones in the array so existing permanent links keep working.
+  //$CFG['GEN']['filepresecret'] = '';
+  //$CFG['GEN']['filesigsecret'] = [''];
+
 	//use secure password hashing
 	$CFG['GEN']['newpasswords'] = 'only';
 

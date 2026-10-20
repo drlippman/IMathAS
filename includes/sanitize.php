@@ -640,7 +640,8 @@ class Sanitize
 	 * @return string The sanitized content.
 	 */
 	public static function outgoingHtml($unsafeContent) {
-		return myhtmLawed($unsafeContent);
+		// pre-signed private file URLs -> URLs signed for the current viewer
+		return signfileurls(myhtmLawed($unsafeContent));
 	}
 
 

@@ -29,8 +29,9 @@ function convertdatauris($in) {
 			$ext = $matches[2][$k];
 			if (!isset($okext[$ext])) { continue;}
 			$key = "ufiles/$userid/pastedimage".$milliseconds.'-'.$k.$okext[$ext];
-			storecontenttofile($img,$key,"public");
-			$in = str_replace($matches[1][$k],getuserfileurl($key),$in);
+			if (storecontenttofile($img,$key,"private")) {
+				$in = str_replace($matches[1][$k],getprivfilepresignedurl($key),$in);
+			}
 		}	
 	} 
     return stripdataimage($in);
@@ -70,7 +71,8 @@ function myhtmLawed($t, $NC=1, $NS='') {
 		$S .= ';'.$S;
 	}
 	
-	return htmLawed($t, $C, $S);
+	// store private file URLs in pre-signed form, not as expiring viewer-signed URLs
+	return unsignfileurls(htmLawed($t, $C, $S));
 }
 
 
