@@ -735,7 +735,8 @@ class ScoreEngine
                   );
             }
             if (isset($scorePartResult)) {
-                if (isset($overridescore[$partnum]) && $overridescore[$partnum] >= 0 && $overridescore[$partnum]<=1) {
+                if (isset($overridescore) && is_array($overridescore) && 
+                    isset($overridescore[$partnum]) && $overridescore[$partnum] >= 0 && $overridescore[$partnum]<=1) {
                     $raw[$partnum] = $overridescore[$partnum];
                 } else {
                     $raw[$partnum] = $scorePartResult->getRawScore();
