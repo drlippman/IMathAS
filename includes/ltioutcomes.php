@@ -43,33 +43,34 @@ $aidtotalpossible = array();
 //use this if we don't know the total possible
 function calcandupdateLTIgrade($sourcedid,$aid,$uid,$scores,$sendnow=false,$aidposs=-1,$isstu=true,$addtime=null) {
 	global $DBH, $aidtotalpossible;
-  if ($aidposs == -1) {
-    if (isset($aidtotalpossible[$aid])) {
-      $aidposs = $aidtotalpossible[$aid];
-    } else {
-  		$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
-  		$stm->execute(array(':id'=>$aid));
-  		$line = $stm->fetch(PDO::FETCH_ASSOC);
-  		if ($line['ptsposs']==-1) {
-  			$line['ptsposs'] = updatePointsPossible($aid, $line['itemorder'], $line['defpoints']);
-  		}
-  		$aidposs = $line['ptsposs'];
-  	}
-  }
-	$allans = true;
-  if (is_array($scores)) {
-    // old assesses
-    $total = 0;
-  	for ($i =0; $i < count($scores);$i++) {
-  		if ($allans && strpos($scores[$i],'-1')!==FALSE) {
-  			$allans = false;
-  		}
-  		if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
-  	}
-  } else {
-    // new assesses
-    $total = $scores;
-  }
+	if ($aidposs == -1) {
+		if (isset($aidtotalpossible[$aid])) {
+			$aidposs = $aidtotalpossible[$aid];
+		} else {
+			$stm = $DBH->prepare("SELECT ptsposs,itemorder,defpoints FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$aid));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
+			if ($line['ptsposs']==-1) {
+				$line['ptsposs'] = updatePointsPossible($aid, $line['itemorder'], $line['defpoints']);
+			}
+			$aidposs = $line['ptsposs'];
+		}
+	}
+	$allans = false;
+	if (is_array($scores)) {
+		// old assesses
+		$total = 0;
+		$allans = true;
+		for ($i =0; $i < count($scores);$i++) {
+			if ($allans && strpos($scores[$i],'-1')!==FALSE) {
+				$allans = false;
+			}
+			if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
+		}
+	} else {
+		// new assesses
+		$total = $scores;
+	}
 
 	$grade = max(0,$total);
 	return updateLTIgrade('update',$sourcedid,$aid,$uid,$grade,$aidposs,$allans||$sendnow,$isstu,$addtime);
