@@ -531,12 +531,14 @@ function getLTI1p1OutcomeExtras($addtime, $hash) {
 			. date('Y-m-d\TH:i:s', $addtime) . '.000' . date('P', $addtime)
 			. '</submittedAt></submissionDetails>';
 	}
+	/* TODO: Add submission review endpoint for LTI 1.1
 	if (!empty($hash) && !empty($GLOBALS['basesiteurl'])) {
-		$reviewurl = $GLOBALS['basesiteurl'] . '/lti/launch.php?submissionreview=' . $hash;
+		$reviewurl = $GLOBALS['basesiteurl'] . 'TODO?submissionreview=' . $hash;
 		$resultdata = '<resultData><ltiLaunchUrl>'
 			. htmlspecialchars($reviewurl, ENT_XML1 | ENT_QUOTES, 'UTF-8')
 			. '</ltiLaunchUrl></resultData>';
 	}
+	*/
 	return array($submission, $resultdata);
 }
 
