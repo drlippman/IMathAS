@@ -87,6 +87,9 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 // load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
+// used to skip LTI update if score is unchanged
+$origGbScore = $assess_record->getGbScore()['gbscore'];
+$isFirstChange = ($assess_record->getLastChange() == 0);
 
 // make sure a record exists
 if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
@@ -429,7 +432,9 @@ if ($end_attempt) {
 // Record record
 $assess_record->saveRecord();
 
-if (($assessInfoOut['submitby'] == 'by_question' && !$in_practice) || $end_attempt) {
+if ($end_attempt || ($assessInfoOut['submitby'] == 'by_question' && !$in_practice &&
+    ($isFirstChange || abs($assess_record->getGbScore()['gbscore'] - $origGbScore) > 1e-9))
+) {
     $assess_record->updateLTIscore($end_attempt, true);
 }
 
