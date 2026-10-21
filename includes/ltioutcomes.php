@@ -14,6 +14,7 @@ require_once __DIR__.'/../lti/LTI_Grade_Update.php';
  * @param int	 $ptsposs	Points possible
  * @param boolean $sendnow   true to send in the next update, false (default)
  *                          to send after the $CFG-set queuedelay.
+ * @param ?int	  $addtime	The time the submission should indicate it was made
  * @param boolean $isstu    whether it was a student initiated grade change
  */
 function addToLTIQueue($sourcedid, $key, $grade, $ptsposs = 1, $sendnow=false, $isstu=true, $addtime=null) {
@@ -23,7 +24,7 @@ function addToLTIQueue($sourcedid, $key, $grade, $ptsposs = 1, $sendnow=false, $
 
 	$query = 'INSERT INTO imas_ltiqueue (hash, sourcedid, grade, ptsposs, failures, sendon, isstu, addedon) ';
 	$query .= 'VALUES (:hash, :sourcedid, :grade, :ptsposs, 0, :sendon, :isstu, :addedon) ON DUPLICATE KEY UPDATE ';
-	$query .= 'grade=VALUES(grade),ptsposs=VALUES(ptsposs),sendon=VALUES(sendon),sourcedid=VALUES(sourcedid),failures=0,isstu=GREATEST(isstu,VALUES(isstu)) ';
+	$query .= 'grade=VALUES(grade),ptsposs=VALUES(ptsposs),sendon=VALUES(sendon),sourcedid=VALUES(sourcedid),failures=0,isstu=GREATEST(isstu,VALUES(isstu)),addedon=VALUES(addedon) ';
 
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(
