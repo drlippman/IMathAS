@@ -181,7 +181,14 @@ export default {
             }
           })
           .fail(response => {
-            actions.handleError('file_upload_error');
+            const message = response.responseJSON?.error   // if the PHP sends JSON
+                            || response.responseText       // plain-text body fallback
+                            || response.statusText;
+            if (message) {
+              actions.handleError({title: this.$t('error-file_upload_error'), msg: message});
+            } else {
+              actions.handleError('file_upload_error');
+            }
           })
           .always(() => {
             this.$refs.fileinput.value = null;

@@ -32,13 +32,13 @@ if (isset($_POST['remove'])) {
   reset ($_FILES);
   if (count($_FILES)==0) {
     error_log('upload_handler fail: upload empty');
-    header("HTTP/1.0 500 Upload failed.");
+    header("HTTP/1.0 500 " . _("Upload failed"));
     exit;
   }
   $tempkey = key($_FILES);
   $temp = current($_FILES);
   if (Sanitize::isFilenameBlacklisted(str_replace(' ','_',$temp['name']))) {
-    header("HTTP/1.0 500 Invalid file type.");
+    header("HTTP/1.0 500 " . _('Invalid file type'));
     exit;
   }
   $temp['name'] = Sanitize::sanitizeFilenameAndCheckBlacklist(str_replace(' ','_',$temp['name']));
@@ -53,7 +53,7 @@ if (isset($_POST['remove'])) {
 
     // Sanitize input
     if (preg_match("/([^\w\s\d\-_~,;:\[\]\(\).])|([\.]{2,})/", $temp['name'])) {
-        header("HTTP/1.0 500 Invalid file name.");
+        header("HTTP/1.0 500 " . _("Invalid file name"));
         exit;
     }
 
@@ -80,7 +80,7 @@ if (isset($_POST['remove'])) {
     if (isset($_POST['type']) && $_POST['type'] == 'attach') {
       // already checked for blacklisted earlier
     } else if (!in_array($extension, array("gif", "jpg", "png", "jpeg", "svg"))) {
-        header("HTTP/1.0 500 Invalid extension.");
+        header("HTTP/1.0 500 " . _("Invalid extension"));
         exit;
     }
 
@@ -123,11 +123,11 @@ if (isset($_POST['remove'])) {
       echo json_encode(array('location' => $ispublicupload ? getuserfileurl($storekey) : geteditorfileurl($storekey)));
     } else {
       error_log('upload_handler failed to save: ' . print_r($temp, true));
-      header("HTTP/1.0 500 Unable to Save");
+      header("HTTP/1.0 500 " . _("Unable to Save"));
     }
   } else {
     // Notify editor that the upload failed
     error_log('upload_handler fail: not is_uploaded_file: ' . print_r($temp, true));
-    header("HTTP/1.0 500 Server Error");
+    header("HTTP/1.0 500 " . _("Server Error"));
   }
 ?>
