@@ -61,7 +61,7 @@ if ($type=='A') {
 			$qn = substr($key,1);
 			echo '<p>'.sprintf(_('Feedback on Question %d:'), Sanitize::onlyInt($qn+1)).'</p>';
 		}
-		echo '<div class="fbbox">'.Sanitize::outgoingHtml($feedback[$key]).'</div>';
+		echo '<div class="fbbox">'.filter(Sanitize::outgoingHtml($feedback[$key])).'</div>';
 	}
 } else if ($type=='A2') {
 	$uid = Sanitize::simpleString($_GET['uid']);
@@ -114,7 +114,7 @@ if ($type=='A') {
 					if ($by_question && count($qdata['question_versions']) > 1) {
 						$qfb .= '<p>'.sprintf(_('Feedback on Version %d:'), $qv+1).'</p>';
 					}
-					$qfb .= '<div class="fbbox">'.Sanitize::outgoingHtml($qver['feedback']).'</div>';
+					$qfb .= '<div class="fbbox">'.filter(Sanitize::outgoingHtml($qver['feedback'])).'</div>';
 				}
 			}
 			if ($qfb != '') {
@@ -128,7 +128,7 @@ if ($type=='A') {
 			} else {
 				$fbdisp .= '<p>'._('Overall feedback on this attempt:').'</p>';
 			}
-			$fbdisp .= '<div class="fbbox">'.Sanitize::outgoingHtml($aver['feedback']).'</div>';
+			$fbdisp .= '<div class="fbbox">'.filter(Sanitize::outgoingHtml($aver['feedback'])).'</div>';
 		}
 		if ($fbdisp != '') {
 			if (!$by_question) {
@@ -171,7 +171,7 @@ if ($type=='A') {
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':type'=>($type=='O'?'ogviewfb':'liviewfb'), ':typeid'=>$typeid, ':viewtime'=>$now));
 	}
 	echo '<h1>'.sprintf(_('Feedback on %s'), Sanitize::encodeStringForDisplay($aname)).'</h1>';
-	echo '<div class="fbbox">'.Sanitize::outgoingHtml($feedback).'</div>';
+	echo '<div class="fbbox">'.filter(Sanitize::outgoingHtml($feedback)).'</div>';
 }
 
 require_once "../footer.php";

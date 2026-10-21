@@ -1864,7 +1864,7 @@ class AssessRecord
     if ($include_scores) {
       $out['gbscore'] = $aver['questions'][$qn]['score'];
       $out['gbrawscore'] = $aver['questions'][$qn]['rawscore'];
-      $out['feedback'] = $curq['feedback'] ?? '';
+      $out['feedback'] = $this->prepFeedbackOut($curq['feedback'] ?? '');
     }
 
     // set tries
@@ -2172,7 +2172,25 @@ class AssessRecord
    */
   public function getGenFeedback($ver = 'last') {
     $assessver = $this->getAssessVer($ver);
-    return ($assessver['feedback'] ?? '');
+    return $this->prepFeedbackOut($assessver['feedback'] ?? '');
+  }
+
+  /**
+   * Prepare stored feedback HTML for output.
+   * Teachers in the gradebook get it loaded into an editor, so only sign file
+   * URLs (saving reverses that). Everyone else gets it displayed, so run filter().
+   * @param  string $html
+   * @return string
+   */
+  private function prepFeedbackOut($html) {
+    if ($html === null || $html === '') {
+      return '';
+    }
+    if ($this->teacherInGb) {
+      require_once __DIR__ . '/../includes/filehandler.php';
+      return signfileurls($html);
+    }
+    return filter($html);
   }
 
   /**
@@ -3727,6 +3745,7 @@ class AssessRecord
         if ($out['feedback'] == '') {
             $out['feedback'] = $this->assess_info->getSetting('deffeedbacktext');
         }
+        $out['feedback'] = $this->prepFeedbackOut($out['feedback']);
       }
       $out['starttime'] = $aver['starttime'];
       $out['questions'] = $this->getGbQuestionsData($qVerToGet);
@@ -3898,7 +3917,7 @@ class AssessRecord
       $out['timeactive'] = $this->calcTimeActive($qdata);
       $out['ver'] = $by_question ? $qver : $aver;
       if ($showScores) {
-        $out['feedback'] = $qdata['feedback'] ?? '';
+        $out['feedback'] = $this->prepFeedbackOut($qdata['feedback'] ?? '');
       }
       $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $dispqn !== null ? $dispqn : $qn, $out);
       // include autosaves if teacher and last asssess & question version

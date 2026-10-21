@@ -4,6 +4,8 @@
  * (c) 2019 David Lippman
  */
 
+require_once __DIR__ . '/../filter/filter.php';
+
 class AssessUtils
 {
   /**
@@ -238,7 +240,7 @@ class AssessUtils
         }
       }
     }
-    return $outmsg;
+    return $outmsg === '' ? '' : filter($outmsg);
   }
 
   public static function formLTIsourcedId($uids, $aid, $asArray = false) {
