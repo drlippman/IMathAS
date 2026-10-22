@@ -107,20 +107,20 @@ if ($localuserid === false) {
     $groupid = 0;
     if ($role == 'Instructor') {
       $rights = isset($CFG['LTI']['instrrights']) ? $CFG['LTI']['instrrights'] : 40;
-      $groups = $this->db->get_groups($platform_id, $launch->get_deployment_id());
+      $groups = $db->get_groups($platform_id, $launch->get_deployment_id());
       if (count($groups)==1) {
         $groupid = $groups[0]['id'];
-      } else if (count($groups)>1 && in_array($_POST['groupid'], $groups)) {
+      } else if (count($groups)>1 && in_array($_POST['groupid'] ?? '', array_column($groups, 'id'))) {
         $groupid = intval($_POST['groupid']);
       } else {
-        $err = _('Invalid group id');
+        $err .= _('Invalid group id');
       }
     } else {
       $rights = 10;
     }
 
     if ($err == '') {
-      $localuserid = $db->create_user_account($DBH, [
+      $localuserid = $db->create_user_account([
         'SID' => $_POST['SID'],
         'pwhash' => password_hash($_POST['pw1'], PASSWORD_DEFAULT),
         'rights' => $rights,
@@ -183,7 +183,10 @@ if (isset($_SESSION['userid']) && $_SESSION['userid'] != $localuserid) {
   $_SESSION = [];
 } 
 if (!isset($_SESSION['userid'])) {
-  // new login
+  // new login; issue a new session id so a pre-login session id can't be reused
+  session_regenerate_id(true);
+  // identity here is asserted by the LMS, not by password/MFA; see validate.php
+  $_SESSION['is_lti_login'] = true;
   if (isset($CFG['cloudwatch_loginlog'])) {
       require_once __DIR__.'/../includes/CloudWatchLogger.php';
       addLoginLog('login_success', $localuserid, [

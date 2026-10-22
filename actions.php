@@ -255,9 +255,9 @@ require_once "includes/sanitize.php";
 				echo '<input type="hidden" name="courseid" value="'.Sanitize::encodeStringForDisplay($_POST['courseid']).'" />';
 				echo '<input type="hidden" name="ekey" value="'.Sanitize::encodeStringForDisplay($_POST['ekey']).'" />';
 				if (!empty($_POST['fromGoogle'])) {
-					echo '<input type="hidden" name="fromGoogle" value="1" />';
+					echo '<input type="hidden" name="fromGoogle" value="'.Sanitize::encodeStringForDisplay($_POST['fromGoogle']).'" />';
 				}
-				$_SESSION['challenge'] = uniqid();
+				$_SESSION['challenge'] = bin2hex(random_bytes(16));
 				echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
 				if (isset($_POST['agree'])) {
 					echo '<input type="hidden" name="agree" value="1" />';
@@ -275,6 +275,10 @@ require_once "includes/sanitize.php";
         $jsondata = [];
         if (isset($CFG['GEN']['COPPA']) && empty($_POST['over13'])) {
             $jsondata['under13'] = 1;
+        }
+        if ($emailconfirmation) {
+            $confirmtoken = bin2hex(random_bytes(16));
+            $jsondata['confirmtoken'] = $confirmtoken;
         }
 
 		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout, jsondata) ";
@@ -294,11 +298,12 @@ require_once "includes/sanitize.php";
         ));
 		$newuserid = $DBH->lastInsertId();
 
-		if (!empty($_POST['fromGoogle']) && !empty($_SESSION['google_pending_profile'])) {
-			require_once __DIR__ . '/includes/googleoauth.php';
+		require_once __DIR__ . '/includes/googleoauth.php';
+		$pendingGoogle = !empty($_POST['fromGoogle']) ? GoogleOAuthManager::getPendingProfileForToken($_POST['fromGoogle']) : null;
+		if ($pendingGoogle !== null) {
 			$googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
 			try {
-				$googleMgr->linkUser($newuserid, $_SESSION['google_pending_profile']['sub'], $_SESSION['google_pending_profile']['email']);
+				$googleMgr->linkUser($newuserid, $pendingGoogle['sub'], $pendingGoogle['email']);
 			} catch (Exception $e) {
 				// account creation should still succeed even if the Google link fails
 				// (e.g. that Google identity got linked elsewhere in the meantime)
@@ -310,8 +315,8 @@ require_once "includes/sanitize.php";
 			$id = $newuserid;
 			$message  = "<h3>".sprintf(_("This is an automated message from %s.  Do not respond to this email"),$installname)."</h3>\r\n";
 			$message .= "<p>".sprintf(_("To complete your %s registration, please click on the following link, or copy and paste it into your webbrowser:"),$installname)."</p>\r\n";
-			$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
-			$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
+			$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id&code=$confirmtoken\">";
+			$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id&code=$confirmtoken</a>\r\n";
 			require_once "./includes/email.php";
 			send_email($_POST['email'], $sendfrom, $installname._(' Confirmation'), $message, array(), array(), 10);
 
@@ -392,11 +397,24 @@ require_once "includes/sanitize.php";
 	} else if (isset($_GET['action']) && $_GET['action']=="confirm") {
 		require_once "init_without_validate.php";
 
-		$query = "UPDATE imas_users SET rights=10 WHERE id=:id AND rights=0";
-		$stm = $DBH->prepare($query);
+		$confirmed = false;
+		$stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=:id AND rights=0");
 		$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
+		$jsondata = $stm->fetchColumn(0);
+		if ($jsondata !== false) {
+			$jsondata = json_decode($jsondata ?: '', true);
+			if (is_array($jsondata) && !empty($jsondata['confirmtoken']) &&
+				isset($_GET['code']) && is_string($_GET['code']) &&
+				hash_equals($jsondata['confirmtoken'], $_GET['code'])
+			) {
+				unset($jsondata['confirmtoken']);
+				$stm = $DBH->prepare("UPDATE imas_users SET rights=10,jsondata=:jsondata WHERE id=:id AND rights=0");
+				$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id']), ':jsondata'=>json_encode($jsondata)));
+				$confirmed = $stm->rowCount()>0;
+			}
+		}
 
-		if ($stm->rowCount()>0) {
+		if ($confirmed) {
 			require_once "header.php";
 			echo sprintf(_("Confirmed.  Please %s Log In %s"),"<a href=\"index.php\">","</a>\n");
 			require_once "footer.php";
@@ -490,6 +508,15 @@ require_once "includes/sanitize.php";
 				exit;
 			}
 
+            require_once './includes/newusercommon.php';
+            $pwerrors = getPasswordPolicyErrors($_POST['pw1']);
+            if (count($pwerrors) > 0) {
+                echo '<p>', implode('</p><p>', $pwerrors), '</p>';
+                echo '<a href="forms.php?action=resetpw&code='.Sanitize::encodeUrlParam($_POST['code'])
+                    .'&id='.Sanitize::encodeUrlParam($_POST['id'] ?? '').'">',_('Try again'),'</a>';
+                exit;
+            }
+
             require_once './includes/passwordreset.php';
             $linkdata = verify_pwreset_link($_POST['code']);
 
@@ -499,9 +526,18 @@ require_once "includes/sanitize.php";
 				$stm = $DBH->prepare("SELECT jsondata,email FROM imas_users WHERE id=:id");
 				$stm->execute(array(':id'=>$linkdata['uid']));
 				list($jsondata,$oldemail) = $stm->fetch(PDO::FETCH_NUM);
-				json_decode($jsondata, true);
+				$jsondata = json_decode($jsondata ?: "", true);
 				if (!is_array($jsondata)) {
 					$jsondata = [];
+				}
+				// reset secrets are single-use; new ones are made when the next link is requested.
+				// A regular reset must not revoke recovery links (they may be the owner's
+				// only way back after a hijack).
+				unset($jsondata['pwresetsecret']);
+				if ($linkdata['recoverylink']) {
+					// revoke this recovery link and any issued after it (not earlier ones)
+					require_once './includes/passwordreset.php';
+					$jsondata = revoke_recovery_links($jsondata, $linkdata['jti']);
 				}
 
 				if (!isset($jsondata['chglog'])) {
@@ -526,6 +562,10 @@ require_once "includes/sanitize.php";
 
 	          	$stm = $DBH->prepare($query);
                 $stm->execute($qarr);
+
+                // devices trusted to skip MFA may belong to whoever had the account
+                require_once './includes/mfa.php';
+                mfa_clearTrustedDevices($linkdata['uid']);
 
                 echo _("Password Reset"),".  ";
                 echo "<a href=\"index.php\">",_("Login with your new password"),"</a>";
@@ -680,11 +720,19 @@ require_once "includes/sanitize.php";
 			login_resetFailures($userid, $line['jsondata']);
 			$line['jsondata'] = login_clearFailures($line['jsondata']);
 		}
-		if ($oldpwok && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5) {
+		require_once './includes/newusercommon.php';
+		$pwerrors = getPasswordPolicyErrors($_POST['pw1'] ?? '');
+		if ($_GET['action']=="forcechgpwd" && ($_POST['pw1'] ?? '') === ($_POST['oldpw'] ?? '')) {
+			$pwerrors[] = _('The new password must be different from the old password.');
+		}
+		if ($oldpwok && ($_POST['pw1'] == $_POST['pw2']) && $myrights>5 && count($pwerrors)==0) {
 			$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 			
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
+
+            require_once 'includes/mfa.php';
+            mfa_clearTrustedDevices($userid);
 
             $jsondata = json_decode($line['jsondata'],true);
 			if ($_GET['action']=="chgpwd") {
@@ -696,7 +744,11 @@ require_once "includes/sanitize.php";
 				$message .= _('If you did not make these changes, please log into your account and correct the changes and change your password.').' ';
 
                 require_once './includes/passwordreset.php';
-                $code = make_pwreset_link($userid, true);   
+                $code = make_pwreset_link($userid, true);
+                // make_pwreset_link updates jsondata, so reload it
+                $stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=?");
+                $stm->execute(array($userid));
+                $jsondata = json_decode($stm->fetchColumn(0) ?: '', true);
 
 				$message .= _('If you are unable to log into your account, use the following link.'). ' ';
 				$message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&code=$code\">";
@@ -727,7 +779,11 @@ require_once "includes/sanitize.php";
             $stm->execute(array(':now'=>time(), ':id'=>$userid));
             $_SESSION['started'] = time()+1;
 		} else {
-			echo "<html><body>",_("Password change failed"),".  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">",_("Try Again"),"</a>\n";
+			echo "<html><body>",_("Password change failed"),".";
+			if ($oldpwok && count($pwerrors)>0) {
+				echo '<p>', implode('</p><p>', $pwerrors), '</p>';
+			}
+			echo "  <a href=\"forms.php?action=".Sanitize::simpleString($_GET['action']).$gb."\">",_("Try Again"),"</a>\n";
 			echo "</body></html>\n";
 			exit;
 		}
@@ -1033,6 +1089,20 @@ require_once "includes/sanitize.php";
         }
         // if we're here, then security checks for pw, email, and mfa change are OK
 
+        if (isset($_POST['dochgpw'])) {
+            require_once './includes/newusercommon.php';
+            $pwerrors = getPasswordPolicyErrors($_POST['pw1'] ?? '');
+            if (count($pwerrors) > 0) {
+                require_once "header.php";
+                echo $pagetopper;
+                echo _("Password change failed."), '<p>', implode('</p><p>', $pwerrors), '</p>';
+                echo "<a href=\"forms.php?action=chguserinfo$gb\">",_("Try Again"),"</a>
+";
+                require_once "footer.php";
+                exit;
+            }
+        }
+
 		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
 		$stm = $DBH->prepare($query);
@@ -1089,6 +1159,11 @@ require_once "includes/sanitize.php";
 			$stm = $DBH->prepare("UPDATE imas_users SET mfa = '' WHERE id = :uid");
 			$stm->execute(array(':uid'=>$userid));
 		}
+		if ($pwchanged) {
+			// after the mfa settings above are saved, so those writes can't restore the list
+			require_once 'includes/mfa.php';
+			mfa_clearTrustedDevices($userid);
+		}
 		if ($_POST['dochgmfa'] != $lastmfatype) {
 			$acctchangelog['oldmfa'] = $lastmfatype;
 		}
@@ -1113,7 +1188,11 @@ require_once "includes/sanitize.php";
 			$message .= _('If you did not make these changes, please log into your account and correct the changes and change your password.').' ';
 
             require_once './includes/passwordreset.php';
-            $code = make_pwreset_link($userid, true);  
+            $code = make_pwreset_link($userid, true);
+            // make_pwreset_link updates jsondata, so reload it
+            $stm = $DBH->prepare("SELECT jsondata FROM imas_users WHERE id=?");
+            $stm->execute(array($userid));
+            $jsondata = json_decode($stm->fetchColumn(0) ?: '', true);
 
             $message .= _('If you are unable to log into your account, use the following link.'). ' ';
             $message .= '<a href="' . $GLOBALS['basesiteurl'] . "/forms.php?action=resetpw&code=$code\">";

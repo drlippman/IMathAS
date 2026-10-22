@@ -51,7 +51,9 @@ function disallowsSameSiteNone () {
 }
 }
 if (isset($sessionpath)) { session_save_path($sessionpath);}
-ini_set('session.gc_maxlifetime', $CFG['GEN']['sessionmaxlife'] ?? 432000);
+// don't accept client-supplied session ids that don't exist server-side
+ini_set('session.use_strict_mode', 1);
+ini_set('session.gc_maxlifetime',$CFG['GEN']['sessionmaxlife'] ?? 432000);
 if (isset($CFG['GEN']['gc_divisor'])) {
     ini_set('session.gc_divisor', $CFG['GEN']['gc_divisor']);
 }

@@ -81,6 +81,10 @@
             if (isset($CFG['GEN']['COPPA']) && empty($_POST['over13'])) {
                 $jsondata['under13'] = 1;
             }
+            if ($emailconfirmation) {
+                $confirmtoken = bin2hex(random_bytes(16));
+                $jsondata['confirmtoken'] = $confirmtoken;
+            }
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout, jsondata) ";
 			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout, :jsondata)";
 			$stm = $DBH->prepare($query);
@@ -107,8 +111,8 @@
 
 				$message  = "<h3>".sprintf(_("This is an automated message from %s.  Do not respond to this email."),$installname)."</h3>\r\n";
 				$message .= "<p>".sprintf(_("To complete your %s registration, please click on the following link, or copy and paste it into your webbrowser:"),$installname)."</p>\r\n";
-				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id\">";
-				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id</a>\r\n";
+				$message .= "<a href=\"" . $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id&code=$confirmtoken\">";
+				$message .= $GLOBALS['basesiteurl'] . "/actions.php?action=confirm&id=$id&code=$confirmtoken</a>\r\n";
 
 				require_once "./includes/email.php";
 				send_email($_POST['email'], $sendfrom, $installname._(' Confirmation'), $message, array(), array(), 10);
@@ -191,7 +195,7 @@
 		}
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
 		$pagetitle = $coursename;
-		$challenge = uniqid();
+		$challenge = bin2hex(random_bytes(16));
 		$_SESSION['challenge'] = $challenge;
         $_SESSION['newuserstart'] = time();
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';

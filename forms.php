@@ -45,7 +45,8 @@ switch($_GET['action']) {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('New Student Signup'),"</div>\n";
 		}
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('New Student Signup'),'</h1></div>';
-		$googlePending = !empty($_SESSION['google_pending_profile']) ? $_SESSION['google_pending_profile'] : null;
+		require_once __DIR__ . '/includes/googleoauth.php';
+		$googlePending = GoogleOAuthManager::getPendingProfile();
 		if ($googlePending) {
 			echo '<p>'._('You signed in with Google. Finish creating your account below - your name and email have been filled in for you.')."</p>\n";
 		}
@@ -58,7 +59,7 @@ switch($_GET['action']) {
 		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form pii-last-name\" type=\"text\" size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".($googlePending ? Sanitize::encodeStringForDisplay($googlePending['family_name']) : '')."\"><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"email\">",_('Enter E-mail address:'),"</label></span>  <input class=\"form pii-email\" type=\"text\" size=60 id=email name=email autocomplete=\"email\" value=\"".($googlePending ? Sanitize::encodeStringForDisplay($googlePending['email']) : '')."\"><BR class=\"form\">\n";
 		if ($googlePending) {
-			echo '<input type="hidden" name="fromGoogle" value="1">'."\n";
+			echo '<input type="hidden" name="fromGoogle" value="'.Sanitize::encodeStringForDisplay($googlePending['linktoken']).'">'."\n";
 		}
 		echo "<span class=form>",_('Notifications:'),"</span><span class=formright><label><input type=checkbox id=msgnot name=msgnot checked=\"checked\" /> ",_('Notify me by email when I receive a new message:'),"</label></span><BR class=form>\n";
         if (isset($CFG['GEN']['COPPA'])) {
@@ -143,7 +144,7 @@ switch($_GET['action']) {
 				echo '</div>';
 			}
 		}
-		$_SESSION['challenge'] = uniqid();
+		$_SESSION['challenge'] = bin2hex(random_bytes(16));
         $_SESSION['newuserstart'] = time();
 		echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
 		echo '<span class="sr-only"><label aria-hidden=true">Do not fill this out <input name=hval tabindex="-1"></label></span>';
@@ -154,12 +155,12 @@ switch($_GET['action']) {
 		}
 		break;
 	case "googlelink":
-		if (empty($_SESSION['google_pending_profile'])) {
+		require_once __DIR__ . '/includes/googleoauth.php';
+		$googlePending = GoogleOAuthManager::getPendingProfile();
+		if ($googlePending === null) {
 			header('Location: ' . $imasroot . '/index.php');
 			exit;
 		}
-		$googlePending = $_SESSION['google_pending_profile'];
-		require_once __DIR__ . '/includes/googleoauth.php';
 		$googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
 		$matchingUsernames = $googleMgr->findUsernamesByEmail($googlePending['email']);
 
@@ -179,13 +180,14 @@ switch($_GET['action']) {
 		echo '<p class="noticetext">'._('Note: any account using any email can be connected to Sign in with Google, but only one account can be connected.').'</p>';
 			
 		echo '<p>'._('To connect your "Sign in with Google" with an existing account, log in below to connect it:').'</p>';
-		$_SESSION['challenge'] = base64_encode(microtime() . rand(0,9999));
+		$_SESSION['challenge'] = bin2hex(random_bytes(16));
 		echo '<form method="post" action="'.$GLOBALS['basesiteurl'].'/index.php">';
 		echo '<span class=form><label for="glusername">'.$loginprompt.':</label></span> <input class=form type="text" size=15 id=glusername name=username autocomplete="username"><br class=form>';
 		echo '<span class=form><label for="glpassword">'._('Password:').'</label></span> <input class=form type="password" size=15 id=glpassword name=password><br class=form>';
 		echo '<input type=hidden id=gltzoffset name=tzoffset value="">';
 		echo '<input type=hidden id=gltzname name=tzname value="">';
 		echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'">';
+		echo '<input type=hidden name=googlelinktoken value="'.Sanitize::encodeStringForDisplay($googlePending['linktoken']).'">';
 		echo '<div class=submit><input type=submit value="'._('Log In and Connect').'"></div>';
 		echo '</form>';
 		echo '<script type="text/javascript" src="'.$staticroot.'/javascript/jstz_min.js"></script>';
@@ -847,7 +849,7 @@ switch($_GET['action']) {
 			);
 			</script>';
             echo '<p class="sr-only"><label aria-hidden=true>Do not fill this out <input name=terms tabindex="-1" autocomplete="off" /></label></p>';
-            $_SESSION['challenge'] = uniqid();
+            $_SESSION['challenge'] = bin2hex(random_bytes(16));
             echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
             $_SESSION['resetpwstart'] = time();    
 			echo "<p><input type=submit value=\"",_('Submit'),"\" /></p>";
@@ -872,7 +874,7 @@ switch($_GET['action']) {
 		);
 		</script>';
         echo '<p class="sr-only"><label aria-hidden=true>Do not fill this out <input name=terms tabindex="-1" autocomplete="off" /></label></p>';
-        $_SESSION['challenge'] = uniqid();
+        $_SESSION['challenge'] = bin2hex(random_bytes(16));
         echo '<input type=hidden name=challenge value="'.Sanitize::encodeStringForDisplay($_SESSION['challenge']).'"/>';
         $_SESSION['lookupusernamestart'] = time();    
 

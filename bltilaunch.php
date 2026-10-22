@@ -1810,6 +1810,8 @@ $_SESSION['userid'] = $userid;
 $_SESSION['time'] = $now;
 $_SESSION['started'] = $now;
 if ($createnewsession) {
+	// identity here is asserted by the LMS, not by password/MFA; see validate.php
+	$_SESSION['is_lti_login'] = true;
 	if (isset($CFG['cloudwatch_loginlog'])) {
 		require_once __DIR__.'/includes/CloudWatchLogger.php';
 		addLoginLog('login_success', $userid, [
@@ -3115,6 +3117,8 @@ $_SESSION['userid'] = $userid;
 $_SESSION['time'] = $now;
 $_SESSION['started'] = $now;
 if ($createnewsession) {
+	// identity here is asserted by the LMS, not by password/MFA; see validate.php
+	$_SESSION['is_lti_login'] = true;
 	if (isset($CFG['cloudwatch_loginlog'])) {
 		require_once __DIR__.'/includes/CloudWatchLogger.php';
 		addLoginLog('login_success', $userid, [

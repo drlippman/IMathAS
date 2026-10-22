@@ -100,6 +100,29 @@ function checkFormatAgainstRegex($val, $regexs) {
   return $isok;
 }
 
+/**
+ * Checks a new password against the configured policy (format and minimum length).
+ * Returns an array of error messages; empty if the password is acceptable.
+ */
+function getPasswordPolicyErrors($pw) {
+  global $CFG;
+
+  $errors = array();
+  $pw = (string) $pw;
+  if (isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($pw, $CFG['acct']['passwordFormat'])) {
+    $errors[] = "Invalid password format.";
+  }
+  if (isset($CFG['acct']['passwordMinlength'])) {
+    $pwminlen = Sanitize::onlyInt($CFG['acct']['passwordMinlength']);
+  } else {
+    $pwminlen =  6;
+  }
+  if (strlen($pw) < $pwminlen) {
+    $errors[] = "Password must be at least $pwminlen characters.";
+  }
+  return $errors;
+}
+
 function checkNewUserValidation($required = array('SID','firstname','lastname','email','pw1','pw2')) {
   global $loginformat, $loginprompt, $CFG, $DBH;
 
@@ -130,17 +153,7 @@ function checkNewUserValidation($required = array('SID','firstname','lastname','
 	  }
 	}
 	if (in_array('pw1',$required)) {
-	  if (isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($_POST['pw1'], $CFG['acct']['passwordFormat'])) {
-	    $errors[] = "Invalid password format.";
-	  }
-	  if (isset($CFG['acct']['passwordMinlength'])) {
-	    $pwminlen = Sanitize::onlyInt($CFG['acct']['passwordMinlength']);
-	  } else {
-	    $pwminlen =  6;
-	  }
-	  if (strlen($_POST['pw1']) <$pwminlen ) {
-	    $errors[] = "Password must be at least $pwminlen characters.";
-	  }
+	  $errors = array_merge($errors, getPasswordPolicyErrors($_POST['pw1']));
 	  if (in_array('pw2',$required) && $_POST['pw1'] != $_POST['pw2']) {
 	    $errors[] = "Passwords don't match.";
 	  }

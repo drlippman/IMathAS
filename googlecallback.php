@@ -74,12 +74,7 @@ document.getElementById('googleLoginBridge').submit();
     <?php
     exit;
 } else {
-    $_SESSION['google_pending_profile'] = array(
-        'sub' => $profile['sub'],
-        'email' => $profile['email'],
-        'given_name' => $profile['given_name'],
-        'family_name' => $profile['family_name'],
-    );
+    GoogleOAuthManager::setPendingProfile($profile);
     header('Location: ' . $imasroot . '/forms.php?action=googlelink');
     exit;
 }

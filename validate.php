@@ -11,7 +11,10 @@ if (isset($CFG['hooks']['validate'])) {
     require_once $CFG['hooks']['validate'];
 }
 
-session_start();
+if (!session_start()) {
+    echo sprintf(_("Error.  Please %s try again%s"), "<a href=\"$imasroot/index.php\">", "</a>");
+    exit;
+}
 $sessionid = session_id();
 
 $myrights = 0;
@@ -38,8 +41,8 @@ if (!isset($CFG['CPS']['miniicons'])) {
 
 //check for bad sessionids.
 if (strlen($sessionid) < 10) {
-    if (function_exists('session_regenerate_id')) {session_regenerate_id();}
-    echo sprintf(_("Error.  Please %s try again%s"), "<a href=\"$imasroot/index.php\">", "<a href=\"$imasroot/index.php\">", "</a>");
+    if (session_status() === PHP_SESSION_ACTIVE && function_exists('session_regenerate_id')) {session_regenerate_id();}
+    echo sprintf(_("Error.  Please %s try again%s"), "<a href=\"$imasroot/index.php\">", "</a>");
     exit;
 }
 
@@ -366,13 +369,10 @@ if ($haslogin && !$hasusername) {
             (empty($mfadata['mfatype']) || $mfadata['mfatype'] == 'all') 
         ) {
             $loginmfaverified = false;
-            if (isset($_COOKIE['gatl']) && isset($mfadata['logintrusted'])) {
-                foreach ($mfadata['logintrusted'] as $mfatoken) {
-                    if ($mfatoken == $_COOKIE['gatl']) {
-                        $loginmfaverified = true;
-                        break;
-                    }
-                }
+            if (isset($_COOKIE['gatl']) && isset($mfadata['logintrusted']) &&
+                mfa_tokenTrusted($mfadata['logintrusted'], $_COOKIE['gatl'])
+            ) {
+                $loginmfaverified = true;
             }
             if (!$loginmfaverified && isset($_POST['mfatoken'])) {
                 $loginmfaverified = mfa_verify($mfadata, $formAction, $line['id']);
@@ -383,6 +383,9 @@ if ($haslogin && !$hasusername) {
             }
         }
         // do actual login
+        // issue a new session id (dropping the old one) so a pre-login session id can't be reused
+        session_regenerate_id(true);
+        $sessionid = session_id();
         $_SESSION['userid'] = $userid;
         $_SESSION['time'] = $now;
         $_SESSION['started'] = $now;
@@ -390,18 +393,23 @@ if ($haslogin && !$hasusername) {
         unset($_SESSION['challenge']); //challenge is used up - forget it.
         unset($_SESSION['passkey_login_verified']);
         unset($_SESSION['google_login_verified']);
+        unset($_SESSION['is_lti_login']); // a real login isn't limited like an LTI-established session
 
-        // If this login was reached via the "Sign in with Google" link-existing-account
-        // flow, this ordinary (rate-limited, MFA-gated) successful login is the trigger
-        // to actually link the verified Google identity to this account.
+        // If this login was submitted from the "Sign in with Google" link-existing-account
+        // form (it carries the link token), this successful (rate-limited, MFA-gated) login
+        // is the trigger to link the verified Google identity to this account. Any other
+        // login just discards the pending identity.
         if (!empty($_SESSION['google_pending_profile'])) {
             require_once __DIR__ . '/includes/googleoauth.php';
-            $googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
-            try {
-                $googleMgr->linkUser($userid, $_SESSION['google_pending_profile']['sub'], $_SESSION['google_pending_profile']['email']);
-            } catch (Exception $e) {
-                // e.g. this Google identity or account is already linked elsewhere - skip
-                // the link silently rather than blocking an otherwise-successful login.
+            $pendingGoogle = GoogleOAuthManager::getPendingProfileForToken($_POST['googlelinktoken'] ?? '');
+            if ($pendingGoogle !== null) {
+                $googleMgr = new GoogleOAuthManager($CFG['GOOGLE']['client_id'] ?? '', $CFG['GOOGLE']['client_secret'] ?? '', $GLOBALS['basesiteurl'] . '/googlecallback.php');
+                try {
+                    $googleMgr->linkUser($userid, $pendingGoogle['sub'], $pendingGoogle['email']);
+                } catch (Exception $e) {
+                    // e.g. this Google identity or account is already linked elsewhere - skip
+                    // the link silently rather than blocking an otherwise-successful login.
+                }
             }
             unset($_SESSION['google_pending_profile']);
         }
@@ -531,19 +539,26 @@ if ($hasusername) {
     }
     $myspecialrights = $line['specialrights'];
     $userHasAdminMFA = false;
-    if (($myrights > 40 || $myspecialrights > 0) && !empty($line['mfa']) && empty($_SESSION['mfaadminverified'])) {
-        $mfadata = json_decode($line['mfa'], true);
-        if (isset($_COOKIE['gat']) && isset($mfadata['trusted'])) {
-            foreach ($mfadata['trusted'] as $mfatoken) {
-                if ($mfatoken == $_COOKIE['gat']) {
+    // Admin-level rights need admin MFA to be verified this session, if the account has MFA.
+    // Sessions established by an LMS launch skip password and MFA (delegated to the LMS), so
+    // for those, accounts without MFA never get admin-level rights; they have to log in
+    // directly. (is_lti_login isn't named lti* so it survives the clearing of lti* session
+    // keys on visiting index.php.)
+    if (($myrights > 40 || $myspecialrights > 0) && empty($_SESSION['mfaadminverified']) &&
+        (!empty($line['mfa']) || !empty($_SESSION['is_lti_login']))
+    ) {
+        if (!empty($line['mfa'])) {
+            $mfadata = json_decode($line['mfa'], true);
+            if (isset($_COOKIE['gat']) && isset($mfadata['trusted'])) {
+                require_once __DIR__ . '/includes/mfa.php';
+                if (mfa_tokenTrusted($mfadata['trusted'], $_COOKIE['gat'])) {
                     $_SESSION['mfaadminverified'] = true;
-                    break;
                 }
             }
         }
         if (empty($_SESSION['mfaadminverified'])) {
-            $userHasAdminMFA = true;
-            $myrights = 40;
+            $userHasAdminMFA = !empty($line['mfa']); // offer the MFA entry prompt only if they can use it
+            $myrights = min($myrights, 40);
             $myspecialrights = 0;
         }
     }
@@ -994,7 +1009,7 @@ function generaterandstring()
     $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     $pass = '';
     for ($i = 0; $i < 10; $i++) {
-        $pass .= substr($chars, rand(0, 61), 1);
+        $pass .= substr($chars, random_int(0, 61), 1);
     }
     return $pass;
 }

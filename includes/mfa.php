@@ -83,6 +83,43 @@ function mfa_checkCode(&$mfadata, $code, $uid = 0, $save = true) {
     return false;
 }
 
+/**
+ * Does the cookie value match one of the stored trusted-device tokens?
+ */
+function mfa_tokenTrusted($tokens, $cookie) {
+    if (!is_array($tokens) || !is_string($cookie) || $cookie === '') {
+        return false;
+    }
+    foreach ($tokens as $token) {
+        if (is_string($token) && hash_equals($token, $cookie)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Forgets all "do not ask again" devices (login and admin) for a user. Call when the
+ * password is changed or reset, so a device trusted by someone else doesn't keep skipping MFA.
+ */
+function mfa_clearTrustedDevices($uid) {
+    global $DBH;
+    $stm = $DBH->prepare("SELECT mfa FROM imas_users WHERE id=:uid");
+    $stm->execute(array(':uid'=>$uid));
+    $mfa = $stm->fetchColumn(0);
+    if (empty($mfa)) {
+        return;
+    }
+    $mfadata = json_decode($mfa, true);
+    if (!is_array($mfadata) || (!isset($mfadata['trusted']) && !isset($mfadata['logintrusted']))) {
+        return;
+    }
+    unset($mfadata['trusted']);
+    unset($mfadata['logintrusted']);
+    $stm = $DBH->prepare("UPDATE imas_users SET mfa=:mfa WHERE id=:uid");
+    $stm->execute(array(':uid'=>$uid, ':mfa'=>json_encode($mfadata)));
+}
+
 function mfa_verify($mfadata, $formaction, $uid = 0, $showtrust = true, $admin = false) {
     global $DBH, $imasroot, $CFG;
     $error = '';

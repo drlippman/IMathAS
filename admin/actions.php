@@ -818,7 +818,7 @@ switch($_POST['action']) {
 			$chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 			$ltisecret = '';
 			for ($i=0;$i<8;$i++) {
-				$ltisecret .= substr($chars,rand(0,56),1);
+				$ltisecret .= substr($chars,random_int(0,56),1);
 			}
 			$courseownerid = $userid;
 			if (($myrights >= 75 || ($myspecialrights&32)==32) && isset($_POST['for']) && $_POST['for']>0) {

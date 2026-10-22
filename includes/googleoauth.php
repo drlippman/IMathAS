@@ -10,6 +10,9 @@ class GoogleOAuthManager {
     private $clientSecret;
     private $redirectUri;
 
+    // how long a Google identity waiting to be connected to an account stays in the session
+    const PENDING_TTL = 1800;
+
     public function __construct($clientId, $clientSecret, $redirectUri) {
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
@@ -112,6 +115,50 @@ class GoogleOAuthManager {
             'given_name' => $payload['given_name'] ?? '',
             'family_name' => $payload['family_name'] ?? '',
         );
+    }
+
+    /**
+     * Stores a verified Google identity in the session, waiting to be connected to an
+     * account. The form that connects it must post back the link token (see
+     * getPendingProfileForToken), so an unrelated login in the same session can't
+     * connect it.
+     */
+    public static function setPendingProfile(array $profile) {
+        $_SESSION['google_pending_profile'] = array(
+            'sub' => $profile['sub'],
+            'email' => $profile['email'],
+            'given_name' => $profile['given_name'],
+            'family_name' => $profile['family_name'],
+            'linktoken' => bin2hex(random_bytes(16)),
+            'created' => time(),
+        );
+        return $_SESSION['google_pending_profile'];
+    }
+
+    /**
+     * The pending Google identity from the session, or null if there is none or it expired.
+     */
+    public static function getPendingProfile() {
+        if (empty($_SESSION['google_pending_profile'])) {
+            return null;
+        }
+        $p = $_SESSION['google_pending_profile'];
+        if (empty($p['linktoken']) || empty($p['created']) || time() - $p['created'] > self::PENDING_TTL) {
+            unset($_SESSION['google_pending_profile']);
+            return null;
+        }
+        return $p;
+    }
+
+    /**
+     * The pending Google identity, only if $token is the link token issued with it.
+     */
+    public static function getPendingProfileForToken($token) {
+        $p = self::getPendingProfile();
+        if ($p === null || !is_string($token) || !hash_equals($p['linktoken'], $token)) {
+            return null;
+        }
+        return $p;
     }
 
     public function findLinkedUserBySub($sub) {
