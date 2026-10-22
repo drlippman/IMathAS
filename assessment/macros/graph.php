@@ -513,6 +513,22 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         if (count($avoid) > 0) {
             $nextavoid = array_shift($avoid);
         }
+        $adaptive = false;
+        if (!$isparametric && $_SESSION['graphdisp'] != 0 && $xmax > $xmin && $ymax > $ymin) {
+            // adaptive sampling: more points where the curve bends, fewer where it's straight
+            $xpad = $domainlimited ? 0 : 5 * ($xmax - $xmin) / $plotwidth;
+            list($xs, $ys, $brk) = adaptiveplotsamples(
+                $evalfunc,
+                $xmin + 1E-10 - $xpad,
+                $xmax - 1E-10 + $xpad,
+                $plotwidth / ($xmax - $xmin),
+                $plotheight / ($ymax - $ymin),
+                $ymin - ($ymax - $ymin),
+                $ymax + ($ymax - $ymin)
+            );
+            $stopat = count($xs);
+            $adaptive = true;
+        }
         for ($i = 0; $i < $stopat; $i++) {
             if ($isparametric) {
                 $t = $xmin + $dx * $i + 1E-10;
@@ -530,12 +546,16 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     $alt .= "<tr><td>$x</td><td>$y</td></tr>";
                 }
             } else {
-                $x = $xmin + $dx * $i + (($i < $stopat / 2) ? 1E-10 : -1E-10) - (($domainlimited || $_SESSION['graphdisp'] == 0) ? 0 : 5 * abs($xmax - $xmin) / $plotwidth);
+                if ($adaptive) {
+                    $x = $xs[$i];
+                } else {
+                    $x = $xmin + $dx * $i + (($i < $stopat / 2) ? 1E-10 : -1E-10) - (($domainlimited || $_SESSION['graphdisp'] == 0) ? 0 : 5 * abs($xmax - $xmin) / $plotwidth);
+                }
                 if (in_array($x, $avoid)) {
                     continue;
                 }
                 //echo $func.'<br/>';
-                $yorig = $evalfunc(['x' => $x]);
+                $yorig = $adaptive ? $ys[$i] : $evalfunc(['x' => $x]);
 
                 if (isNaN($yorig)) {
                     if ($lastl != 0) {
@@ -617,7 +637,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                         $tempy = $evalyfunc(['t' => $t - $dx / 100 - 1E-10]);
                     } else {
                         $y = $evalfunc(['x' => $x - 1E-10]);
-                        $tempy = $evalfunc(['x' => $x - $dx / 100 - 1E-10]);
+                        // step size is variable when adaptively sampled
+                        $tempy = $evalfunc(['x' => $x - ($adaptive ? $x - $px : $dx) / 100 - 1E-10]);
                     }
                     if ($tempy > $y) { //seems to be coming down
                         $iy = $yymax;
@@ -640,6 +661,19 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     $lastl++;
                 } else { //still out
 
+                }
+            } else if ($adaptive && !empty($brk[$i])) {
+                // sampler found a jump discontinuity between the previous point
+                // and this one. End the path at the previous point (a lone point is dropped)
+                if ($lastl > 0) {
+                    $pathstr .= ",[$px,$py]]);";
+                }
+                $lastl = 0;
+                if ($py < $absymin) {
+                    $absymin = $py;
+                }
+                if ($py > $absymax) {
+                    $absymax = $py;
                 }
             } else { //all in
                 if ($lastl == 0) {
@@ -814,7 +848,73 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
     }
 }
 
-function addplotborder($plot, $left, $bottom = 5, $right = 5, $top = 5) {
+/*
+ Adaptively sample $f(['x'=>x]) over [$xa,$xb].
+ Starts with a uniform grid of $nseed intervals, then recursively bisects any
+ interval whose midpoint is more than $tol screen pixels from the chord joining
+ its endpoints. y is clamped to [$ylo,$yhi] before comparing, so wildly
+ off-screen values don't trigger refinement. Intervals with an undefined
+ endpoint or midpoint are also bisected (down to $maxdepth) to locate domain
+ edges and asymptotes.
+ A jump discontinuity is flagged when an interval that is still too curved at
+ $maxdepth has both ends on screen, a vertical gap over $jumppx pixels, and a
+ gap that hasn't shrunk (>=90%) since the previous bisection. A continuous
+ steep curve's gap shrinks as the interval does; a jump's doesn't.
+ $pxperx, $pxpery: pixels per unit in x and y.
+ Returns [array of x, array of raw f values, array of break flags]
+ where $brk[i] is set if point i shouldn't be connected to point i-1.
+*/
+function adaptiveplotsamples($f, $xa, $xb, $pxperx, $pxpery, $ylo, $yhi, $nseed = 47, $maxdepth = 7, $tol = 0.25, $maxpts = 2500, $jumppx = 3) {
+    // odd seed count so the grid is unlikely to line up with a function's period
+    $xs = [$xa];
+    $ys = [$f(['x' => $xa])];
+    $brk = [];
+    $screeny = function ($y) use ($ylo, $yhi, $pxpery) {
+        return $pxpery * min($yhi, max($ylo, $y));
+    };
+    $rec = function ($x0, $y0, $x1, $y1, $d, $pgap) use (&$rec, &$xs, &$ys, &$brk, $f, $screeny, $ylo, $yhi, $maxdepth, $tol, $maxpts, $jumppx) {
+        $nan0 = isNaN($y0);
+        $nan1 = isNaN($y1);
+        $gap = ($nan0 || $nan1) ? 0 : abs($screeny($y1) - $screeny($y0));
+        if ($d < $maxdepth && count($xs) < $maxpts) {
+            $xm = ($x0 + $x1) / 2;
+            $ym = $f(['x' => $xm]);
+            $nanm = isNaN($ym);
+            if ($nan0 && $nan1 && $nanm) {
+                $split = false;
+            } else if ($nan0 || $nan1 || $nanm) {
+                $split = true;
+            } else {
+                $split = abs($screeny($ym) - ($screeny($y0) + $screeny($y1)) / 2) > $tol;
+            }
+            if ($split) {
+                $rec($x0, $y0, $xm, $ym, $d + 1, $gap);
+                $rec($xm, $ym, $x1, $y1, $d + 1, $gap);
+                return;
+            }
+        } else if (
+            $d >= $maxdepth && !$nan0 && !$nan1 && $gap > $jumppx && $gap >= 0.9 * $pgap &&
+            $y0 >= $ylo && $y0 <= $yhi && $y1 >= $ylo && $y1 <= $yhi
+        ) {
+            $brk[count($xs)] = 1;
+        }
+        $xs[] = $x1;
+        $ys[] = $y1;
+    };
+    $step = ($xb - $xa) / $nseed;
+    $x0 = $xa;
+    $y0 = $ys[0];
+    for ($j = 1; $j <= $nseed; $j++) {
+        $x1 = ($j == $nseed) ? $xb : $xa + $step * $j;
+        $y1 = $f(['x' => $x1]);
+        $rec($x0, $y0, $x1, $y1, 0, 0);
+        $x0 = $x1;
+        $y0 = $y1;
+    }
+    return [$xs, $ys, $brk];
+}
+
+function addplotborder($plot,$left, $bottom = 5, $right = 5, $top = 5) {
     return preg_replace("/setBorder\(.*?\);/", "setBorder($left,$bottom,$right,$top);", $plot);
     //return str_replace("setBorder(5)","setBorder($left,$bottom,$right,$top)",$plot);
 

@@ -1457,8 +1457,62 @@ function drawPics(base) {
 	}
 }
 
+// Adaptively sample g({x:x}) over [xa,xb].
+// Starts with a uniform grid of nseed intervals, then recursively bisects any
+// interval whose midpoint is more than tol screen pixels from the chord joining
+// its endpoints. y is clamped to [ylo,yhi] before comparing, so wildly
+// off-screen values don't trigger refinement. Intervals with an undefined
+// endpoint or midpoint are also bisected (down to maxdepth) to locate domain
+// edges and asymptotes.
+// A jump discontinuity is flagged when an interval that is still too curved at
+// maxdepth has both ends on screen, a vertical gap over jumppx pixels, and a
+// gap that hasn't shrunk (>=90%) since the previous bisection.
+// Returns {x:[], y:[], brk:{}} where brk[i] is set if point i shouldn't be
+// connected to point i-1.
+function adaptiveSamples(g, xa, xb, ylo, yhi) {
+  var nseed = 47,  // odd, so grid is unlikely to line up with a function's period
+      maxdepth = 7, tol = 0.25, maxpts = 2500, jumppx = 3;
+  var xs = [xa], ys = [g({x:xa})], brk = {};
+  var bad = function(y) { return isNaN(y) || Math.abs(y)=="Infinity"; };
+  var sy = function(y) { return yunitlength*Math.min(yhi, Math.max(ylo, y)); };
+  var rec = function(x0, y0, x1, y1, d, pgap) {
+    var nan0 = bad(y0), nan1 = bad(y1);
+    var gap = (nan0 || nan1) ? 0 : Math.abs(sy(y1) - sy(y0));
+    if (d < maxdepth && xs.length < maxpts) {
+      var xm = (x0 + x1)/2, ym = g({x:xm}), nanm = bad(ym), split;
+      if (nan0 && nan1 && nanm) {
+        split = false;
+      } else if (nan0 || nan1 || nanm) {
+        split = true;
+      } else {
+        split = Math.abs(sy(ym) - (sy(y0) + sy(y1))/2) > tol;
+      }
+      if (split) {
+        rec(x0, y0, xm, ym, d+1, gap);
+        rec(xm, ym, x1, y1, d+1, gap);
+        return;
+      }
+    } else if (d >= maxdepth && !nan0 && !nan1 && gap > jumppx && gap >= 0.9*pgap &&
+      y0 >= ylo && y0 <= yhi && y1 >= ylo && y1 <= yhi) {
+      brk[xs.length] = true;
+    }
+    xs.push(x1);
+    ys.push(y1);
+  };
+  var step = (xb - xa)/nseed, x0 = xa, y0 = ys[0], x1, y1;
+  for (var j = 1; j <= nseed; j++) {
+    x1 = (j == nseed) ? xb : xa + step*j;
+    y1 = g({x:x1});
+    rec(x0, y0, x1, y1, 0, 0);
+    x0 = x1;
+    y0 = y1;
+  }
+  return {x:xs, y:ys, brk:brk};
+}
+
 //modified by David Lippman from original in AsciiSVG.js by Peter Jipsen
 //added min/max type:  0:nothing, 1:arrow, 2:open dot, 3:closed dot
+//non-parametric plots use adaptive sampling unless points is given
 function plot(fun,x_min,x_max,points,id,min_type,max_type) {
   var pth = [];
   var f = function(obj) { return obj.t }, g = fun;
@@ -1478,27 +1532,41 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
   if (max <= min) { return null;}
   //else {
   var inc = max-min-0.000001*(max-min);
-  inc = (points==null?inc/200:inc/points);
-  var gt;
+  var ts = [], gs = [], brk = {}, t, gt, i;
+  if (!isParam && ymax > ymin) {
+    var smp = adaptiveSamples(g, min, max-0.000001*(max-min), ymin-(ymax-ymin), ymax+(ymax-ymin));
+    ts = smp.x;
+    gs = smp.y;
+    brk = smp.brk;
+  } else {
+    inc = (points==null?inc/200:inc/points);
+    for (t = min; t <= max; t += inc) {
+      ts.push(t);
+      gs.push(isParam ? g({t:t}) : g({x:t}));
+    }
+  }
+  var firstpts = [];  // first two points, for min_type
 
-  for (var t = min; t <= max; t += inc) {
-    gt = isParam ? g({t:t}) : g({x:t});
+  for (i = 0; i < ts.length; i++) {
+    t = ts[i];
+    gt = gs[i];
     if (!(isNaN(gt)||Math.abs(gt)=="Infinity")) {
-	    if ((pth.length > 0) && (Math.abs(gt-pth[pth.length-1][1]) > (ymax-ymin))) {
+	    if ((pth.length > 0) && (brk[i] || Math.abs(gt-pth[pth.length-1][1]) > (ymax-ymin))) {
+		    // jump or too steep to connect; end this path and start another
 		    if (pth.length > 1)  path(pth,name);
 		    pth.length=0;
-	    } else {
-		    pth[pth.length] = [f({t:t}), gt];
 	    }
+	    pth[pth.length] = [f({t:t}), gt];
+	    if (firstpts.length < 2) { firstpts.push(pth[pth.length-1]); }
     }
   }
   if (pth.length > 1) path(pth,name);
   if (min_type == 1) {
-	arrowhead(pth[1],pth[0]);
+	arrowhead(firstpts[1],firstpts[0]);
   } else if (min_type == 2) {
-	dot(pth[0], "open");
+	dot(firstpts[0], "open");
   } else if (min_type == 3) {
-	dot(pth[0], "closed");
+	dot(firstpts[0], "closed");
   }
   if (max_type == 1) {
 	arrowhead(pth[pth.length-2],pth[pth.length-1]);
