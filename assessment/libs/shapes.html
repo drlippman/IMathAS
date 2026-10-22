@@ -235,7 +235,7 @@ $gr = draw_cylinder("height,x","fill,30,gold")
   <li><strong>"altitude,[_,_,_,lab1,lab2,lab3,ptlab1,ptlab2,ptlab3]"</strong> Similar to bisector. Putting a "1" will draw the altitude for that angle. lab1,lab2,lab3 are labels for the altitudes, and ptlab1,ptlab2,ptlab3 are labels for where the altitudes intersect their opposite (extended) sides. Dashed lines are drawn to extend opposite side if necessary.</li>
   <li><strong>"random"</strong> Creates random angles for the triangle. Using this means "angles" should omit A,B,C and "sides" should omit a,b,c, but both can have labels. [i.e. Don't leave blanks, but completely omit those entries, such as "angles,lab1,lab2,lab3".]</li>
   <li><strong>"rotate,[ang]"</strong> Rotates the triangle counterclockwise by ang degrees. If "ang" is omitted, rotates by a random angle.</li>
-  <li><strong>"size,length"</strong> Sets the image size to be length x length. [Default is 350x350]</li>
+  <li><strong>"size,length,[trim]"</strong> Sets the image size to be length x length. [Default is 350x350]. add "trim" as third argument to trim blank space.</li>
   <li><strong>"colorfill,color"</strong> shades interior of the shape with a color</li>
   <li><strong>"alttext,text"</strong> overwrites the auto-generated alttext for the image.</li>
 </ul>
