@@ -1367,6 +1367,7 @@ function draw_rectangle() {
 // "random" Using this creates random angles for the triangle. This means "angles" should omit A,B,C and "sides" should omit a,b,c, both having just labels.
 // Note: By default, triangles are drawn with angle 0 at bottom left, angle 1 at bottom right, and angle 2 at the top.
 // "rotate" Use to randomly rotate the triangle.
+// "size,400,trim" Sets the size. With the optional "trim", the image keeps its scale and aspect ratio, but the width and height are trimmed to leave minimal empty space around the triangle and labels.
 function draw_triangle() {
   $input = func_get_args();
   $argsArray = [];
@@ -1402,9 +1403,10 @@ function draw_triangle() {
   $hasAltSidLab = false;
   $hasUserAltText = false;
   $size = 350;
+  $trimSize = false;
   $colorFill = 'none';
   $args = '';
-  
+
   foreach ($argsArray as $key => $in) {
     if (empty($in) || count($in) == 0) {
       unset($argsArray[$key]);
@@ -1450,6 +1452,9 @@ function draw_triangle() {
   foreach ($argsArray as $key => $in) {
     if ($in[0]=="size" && isset($in[1])) {
       $size = $in[1];
+      if (isset($in[2]) && $in[2] == "trim") {
+        $trimSize = true;
+      }
     }
     if ($in[0]=="angles") {
       $noAngles = false;
@@ -2289,7 +2294,58 @@ function draw_triangle() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(10);initPicture($xminDisp,$xmaxDisp,$yminDisp,$ymaxDisp);$args;",$size,$size,$alt);
+  $width = $size;
+  $height = $size;
+  if ($trimSize === true) {
+    // Bounds of the geometry
+    $cxs = $x;
+    $cys = $y;
+    if ($hasAltitude === true) {
+      foreach ($altEnd as $pt) {
+        $cxs[] = $pt[0];
+        $cys[] = $pt[1];
+      }
+    }
+    preg_match_all("/text\(\[([-+\d.eE]+),([-+\d.eE]+)\],'(.*?)'\)/", $args, $tm, PREG_SET_ORDER);
+    // Label sizes are estimated in pixels, using the untrimmed scale (10px border on each side)
+    $pxPerUnit = ($size - 20) / ($xmaxDisp - $xminDisp);
+    $cxmin = min($cxs);
+    $cxmax = max($cxs);
+    $cymin = min($cys);
+    $cymax = max($cys);
+    // Extend bounds to fit labels
+    foreach ($tm as $t) {
+      $txt = trim(preg_replace('/&\w+;/', 'x', strip_tags($t[3])));
+      if ($txt === '') {
+        continue;
+      }
+      $halfW = (4 * strlen($txt) + 3) / $pxPerUnit;
+      $halfH = 9 / $pxPerUnit;
+      $cxmin = min($cxmin, $t[1] - $halfW);
+      $cxmax = max($cxmax, $t[1] + $halfW);
+      $cymin = min($cymin, $t[2] - $halfH);
+      $cymax = max($cymax, $t[2] + $halfH);
+    }
+    // Larger dimension gets $size; the other is scaled by the ratio of the bounds
+    $xRange = $cxmax - $cxmin;
+    $yRange = $cymax - $cymin;
+    if ($xRange >= $yRange) {
+      $width = $size;
+      $height = (int) round(($size - 20) * $yRange / $xRange) + 20;
+    } else {
+      $height = $size;
+      $width = (int) round(($size - 20) * $xRange / $yRange) + 20;
+    }
+    $xMidDisp = ($cxmax + $cxmin) / 2;
+    $yMidDisp = ($cymax + $cymin) / 2;
+    $halfXRange = $xRange / 2;
+    $halfYRange = $yRange / 2;
+    $xminDisp = $xMidDisp - $halfXRange;
+    $xmaxDisp = $xMidDisp + $halfXRange;
+    $yminDisp = $yMidDisp - $halfYRange;
+    $ymaxDisp = $yMidDisp + $halfYRange;
+  }
+  $gr = showasciisvg("setBorder(10);initPicture($xminDisp,$xmaxDisp,$yminDisp,$ymaxDisp);$args;",$width,$height,$alt);
   return $gr;
 }
 
