@@ -229,7 +229,9 @@ if (isset($_GET['add'])) {
 			exit;
 		}
 
-		$messagePost = Sanitize::incomingHtml($_POST['message']);
+		// remove the "write your reply above this line" helper text
+		$messagePost = preg_replace('/<p\b[^>]*class="[^"]*\bmsgmarker\b[^"]*"[^>]*>.*?<\/p>\s*/s', '', $_POST['message']);
+		$messagePost = Sanitize::incomingHtml($messagePost);
 		$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
 		if (trim($subjectPost) == '') {
 			$subjectPost = '(' . _('none') . ')';
@@ -434,7 +436,7 @@ if (isset($_GET['add'])) {
 			list($title, $message, $courseid, $quotesenddate, $quotefirst, $quotelast) = $row;
 			$title = _("Re: ") . $title;
 			if (isset($_GET['toquote'])) {
-				$message = '<br/><hr/><p class="small"><em>' . _('Write your reply above this line.') . '</em></p><p>' . sprintf(_('On %s at %s, %s wrote:'), tzdate('M j, Y', $quotesenddate), tzdate('g:i a', $quotesenddate),Sanitize::encodeStringForDisplay($quotefirst . ' ' . $quotelast)) . '</p>' . $message;
+				$message = '<br/><hr/><p class="small msgmarker"><em>' . _('Write your reply above this line.') . '</em></p><p>' . sprintf(_('On %s at %s, %s wrote:'), tzdate('M j, Y', $quotesenddate), tzdate('g:i a', $quotesenddate),Sanitize::encodeStringForDisplay($quotefirst . ' ' . $quotelast)) . '</p>' . $message;
 			} else {
 				$message = '';
 			}
@@ -470,7 +472,7 @@ if (isset($_GET['add'])) {
 			if ($parts[3] === 'reperr') {
 				$qinfo .= ', seed ' . Sanitize::onlyInt($parts[2]);
 			}
-			$message = '<br/><hr/><p class="small"><em>' . _('Write your message above this line.') . '</em></p><p>' . $qinfo . '</p><br/>' . $message;
+			$message = '<br/><hr/><p class="small msgmarker"><em>' . _('Write your message above this line.') . '</em></p><p>' . $qinfo . '</p><br/>' . $message;
 			//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 			if (isset($parts[3]) && $parts[3] === 'reperr') {
 				$title = "Problem with question ID " . Sanitize::onlyInt($parts[1]);
