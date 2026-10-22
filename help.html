@@ -287,7 +287,7 @@ The options available in the question set manager are:
 <ul>
 <li><strong>Modify</strong>: Change the source code of the question and make library assignments.  You will only see this option for
    questions you own or when the owner has given permission for anyone to modify the question.</li>
-<li><strong>View</strong>:  View the source code of the question and make library assignements.  You will only see this option for question
+<li><strong>View</strong>:  View the source code of the question and make library assignements.  You will only see this option for questions
    you do not own.</li>
 <li><strong>Template</strong>:  Create a new question, using the code of an existing question as a starting point.  When you template a
    question, the original question is not changed.</li>
@@ -326,7 +326,7 @@ Libraries have use rights.  Options are:
 </p>
 <ul>
 <li><strong>Private</strong>:  Only the owner or an administrator can list questions in these libraries</li>
-<li><strong>Closed to group, private to others</strong>: Anyone in group can list and use questions, , but only
+<li><strong>Closed to group, private to others</strong>: Anyone in group can list and use questions, but only
 	the owner or an admin can add questions to the library.  Hidden to anyone outside the group.</li>
 <li><strong>Open to group, private to others</strong>: Anyone in group can list and use questions and add to the library.
 	Hidden to anyone outside the group.</li>
@@ -338,7 +338,7 @@ Libraries have use rights.  Options are:
 <p>
 With library rights, child rights take precedence over parent rights.  For example,
 if an open library is a child to a private library, the parent will not be hidden
-from other users.  However a private library as child to a private parent will be
+from other users.  However, a private library as child to a private parent will be
 hidden from other users.
 </p>
 <p>Depending upon the system configuration, non-admins may be limited to creating libraries that are private
@@ -353,7 +353,7 @@ by any user, but only the person who made the assignment can remove that assignm
 <h3 id="exportlibraries">Export Libraries</h3>
 Use the &quot;Export Libraries&quot; feature to export an entire library or tree
 of libraries for backup or sharing.  Use the tree to select libraries to export.
-Note that if a parent library is selected, it's children libraries are automatically
+Note that if a parent library is selected, its children libraries are automatically
 included in the export, and heirarchy will be maintained. If libraries from different
 trees are selected, the topmost libraries in each branch selected will be exported
 at the same level.
@@ -412,12 +412,12 @@ some specified number of months.  You can delete just students, or all non-Admin
 <h2 id="importstudents">Import Students from File</h2>
 
 Use the Import Students from File feature to register and enroll a set of students
-automatically from a CSV (commas separated values) file.  You can generate a CSV
+automatically from a CSV (comma-separated values) file.  You can generate a CSV
 file using any spreadsheet program.
 
 <p>
 The form will guide you through specifying which columns of the CSV file contain
-First name, Last name, email address, and desired username.  Once setting these options,
+First name, Last name, email address, and desired username.  Once you set these options,
 the first five rows of the file will be displayed so you can verify that the import
 settings are correct.  If you selected a class to enroll the imported students in,
 the students will be both registered and enrolled in that class upon submission.</p>
@@ -436,7 +436,7 @@ rights over group users and libraries.  By default, users are added to a Default
 <h2 id="diagnostics">Diagnostics</h2>
 <p>Diagnostics allow you to create a special login page for larger-scale diagnostic assessment.
 This provides a way for students to access and take the diagnostic without needing
-to register and enroll in a course.  Also, it delivers them the correct assessment based
+to register and enroll in a course.  Also, it delivers the correct assessment based
 on a specified selection.</p>
 
 <p>If you are a group admin or full admin, click the "Add New Diagnostic" button to set up
@@ -447,7 +447,7 @@ create a course and add your diagnostic assessments to that course.</p>
 <ul>
  <li>Diagnostic name: the name of your diagnostic to display to students on the login page</li>
  <li>Term designator: Can be changed each term for ongoing assessments to keep track of which term an assessment was taken in.  Also will create a unique
-   username for each term, so same student ID could take the assessment again in the different term.</li>
+   username for each term, so the same student ID could take the assessment again in the different term.</li>
  <li>Linked with course:  What course contains your diagnostic assessments.  You must be listed as a teacher for the course</li>
  <li>Available:  Whether students can take the diagnostic</li>
  <li>Public:  Whether the diagnostic should be listed on the main Diagnostics list page at $imasroot/diag.  If set to no,
@@ -457,29 +457,29 @@ create a course and add your diagnostic assessments to that course.</p>
      the diagnostic they can reenter the diagnostic.</li>
  <li>Unique ID prompt:  How you want to word the prompt for a unique user id</li>
  <li>ID entry format:  Lets you specify the format of the unique ID, so ensure valid IDs</li>
- <li>Allow access IP addresses:  IP addressed for which the diagnostic can be taken without a password.  If you want to
+ <li>Allow access IP addresses:  IP addresses for which the diagnostic can be taken without a password.  If you want to
      allow access from anywhere, enter "*".  You can use "*" for a wildcard as well, e.g. 123.45.* to allow any IP beginning
      with 123.45.</li>
- <li>Passwords:  Passwords which will allow access to the diagnostic from other IP addresses.  Passwords are not case sensitive.</li>
+ <li>Passwords:  Passwords which will allow access to the diagnostic from other IP addresses.  Passwords are not case-sensitive.</li>
  <li>Super passwords:  These passwords will override the "allow reentry" time limit, if you specified one earlier.  These passwords would be intended
      for use by instructors or proctors, and generally would not be shared directly with students.</li>
-  <li>First level selector name:  Students will be asked to select two items from pull-down lists, with the values in the second
+  <li>First-level selector name:  Students will be asked to select two items from pull-down lists, with the values in the second
      depending upon the values in the first.  The choice in the first list also dictates which assessment is delivered.  For
      selector name, specify what this selection should be called, filling in the blank "Please enter your ______".  In many cases
      the two selectors will be Course and Instructor, or Course and Section</li>
- <li>First level selector options:  Add options for the first level selector</li>
- <li>Second level selector name:  Secondary selection, with values depending upon the first-level selector choice.  Fill in the blank
-	"Enter your _________".  Second level selectors will be become the student's section identifier in the course, allowing you to
+ <li>First-level selector options:  Add options for the first-level selector</li>
+ <li>Second-level selector name:  Secondary selection, with values depending upon the first-level selector choice.  Fill in the blank
+	"Enter your _________".  Second-level selectors will be become the student's section identifier in the course, allowing you to
 	use the tutor system with diagnostics.</li>
  <li>Deliver assessment:  For each first-level selector, specify which assessment should be delivered if the student
-     selects that option</li>
- <li>Second level selector options:  For each first-level selector, specify the options for the second level selector.</li>
+     selects that option.</li>
+ <li>Second-level selector options:  For each first-level selector, specify the options for the second-level selector.</li>
 </ul>
 <p>After submitting the second page, you will be provided with the direct access link to the diagnostic, which you can
-provide to students or use to create a link from another website</p>
+provide to students or use to create a link from another website.</p>
 
 <p>In courses for which a diagnostic has been set up, the gradebook will display differently, showing the student unique ID,
-the term, and the first and second selector values in addition to the students' names and scores</p>
+the term, and the first and second selector values in addition to the students' names and scores.</p>
 
 </div> <!-- h2 -->
 <div class=h2>
@@ -507,7 +507,7 @@ find them in the user list and click the &quot;Change Rights&quot; link.
 When adding a new administrator or changing rights, there are several rights levels, each
 higher level including the rights of the lower levels:
 <ol>
-<li><strong>Guest</strong>:  Can access all class materials, including taking tests (however, test is restarted next time the guest user
+<li><strong>Guest</strong>:  Can access all class materials, including taking tests (however, test is restarted the next time the guest user
        accesses the test).  Cannot enroll or unenroll in courses, or change
        user info or password.  Cannot post in forums</li>
 <li><strong>Student</strong>: Can only access class materials - cannot edit anything</li>
@@ -518,9 +518,9 @@ higher level including the rights of the lower levels:
 <li><strong>Diagnostic Creator</strong>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
        that they create.  Can create diagnostics.</li>
 <li><strong>Group Admin</strong>: Can add/delete teachers and set user rights, but only for users in their group.  Can modify/delete questions
-       and libraries created by members of the group regardless of ownership or use rights.  Can always create "open to all" libraries</li>
+       and libraries created by members of the group regardless of ownership or userights.  Can always create "open to all" libraries.</li>
 <li><strong>Full Administrator</strong>: Can add/delete administrators and set user rights.  Can import macro files, if installation allows.
-       Can modify/delete questions and libraries regardless of ownership or use rights</li>
+       Can modify/delete questions and libraries regardless of ownership or userights.</li>
 </ol>
 
 </div> <!-- h3 -->
@@ -565,7 +565,7 @@ name or the &quot;Expand&quot; button to view the block's contents.  If the bloc
 displayed as a folder (has a folder icon next to it), click the block name to view
 the block items.</p>
 
-<p>Text items are preceded with an information <span class=icon>!</span> icon, forums are preceded with a
+<p>Text items are preceded with an information <span class=icon>!</span> icon, forums are preceded with an
 <span class=icon>F</span> icon, and assessments are preceded with a <span class=icon>?</span>
 icon.  The icons will be grey when the item is not available, and
 (depending upon install settings) may change color as a deadline approaches.  The color is
@@ -584,7 +584,7 @@ Add an item by selecting the item type from the &quot;Add Item&quot; pulldown.  
 <div class=h3>
 <h3 id="blocks">Blocks</h3>
 
-For Blocks, you will asked to provide:
+For Blocks, you will be asked to provide:
 <ul>
 <li><strong>Title</strong>:  The title of the block</li>
 <li><strong>Available after</strong>:  The first date for the item to display to students</li>
@@ -601,7 +601,7 @@ For Blocks, you will asked to provide:
 <div class=h3>
 <h3 id="inlinetextitems">Inline Text Items</h3>
 
-For Inline Text items, you will asked to provide:
+For Inline Text items, you will be asked to provide:
 <ul>
 <li><strong>Title</strong>:  The title of the item</li>
 <li><strong>Hide title</strong>: If you want to hide the title and icon, and just display the text</li>
@@ -616,7 +616,7 @@ of the file.  A list of the descriptions, with links to the files, will display 
 <div class=h3>
 <h3 id="linkedtextitems">Linked Text Items</h3>
 
-For Linked Text items, you will asked to provide:
+For Linked Text items, you will be asked to provide:
 <ul>
 <li><strong>Title</strong>:  The title of the item</li>
 <li><strong>Summary</strong>:  A description of the link (displays on course page)</li>
@@ -634,7 +634,7 @@ For Linked Text items, you will asked to provide:
 <div class=h3>
 <h3 id="forumitems">Forum Items</h3>
 
-For Forum items, you will asked to provide:
+For Forum items, you will be asked to provide:
 <ul>
 <li><strong>Name</strong>:  The name of the forum</li>
 <li><strong>Description</strong>:  A description of the forum (displays on course page)</li>
@@ -666,7 +666,7 @@ For Forum items, you will asked to provide:
 class, and have students respond without seeing other students' replies.</p>
 
 <p>When viewing the forum thread list as an instructor, there is a "List Posts by Name" link which will list
-all posts in the forum, grouped by student name.  New threads are colored in black, replies in green</p>
+all posts in the forum, grouped by student name.  New threads are colored in black, replies in green.</p>
 
 </div> <!-- h3 -->
 <div class=h3>
@@ -695,7 +695,7 @@ assessment in the course page.
 <li><strong>Count</strong>:  Whether the assessment score should be counted in the gradebook, not counted in the grade total, or counted as extra credit.</li>
 <li><strong>Copy Options From</strong>:  If you have other assessments in your course already, you can select to copy the assessment settings
    from another assessment.</li>
-<li><strong>Password</strong>:  If specified, requires student to enter this password to access the assessment.  Leave blank to require no password.</li>
+<li><strong>Password</strong>:  If specified, this requires student to enter this password to access the assessment.  Leave blank to require no password.</li>
 <li><strong>Time Limit</strong>:  The time limit, in minutes, for the test (0 for none).  If the student exceeds the
    time limit, their test will be recorded, and you can decide whether or not
    to accept it in the gradebook detail.  Partial minutes are possible using decimal values.  If you check the
@@ -706,18 +706,18 @@ assessment in the course page.
 	<li><strong>Full test at once</strong>:  All questions are displayed on one page</li>
 	<li><strong>One question at a time</strong>:  One question is shown at a time.  Students
 	    must complete the questions in the order presented</li>
-	<li><strong>Full test, submit one at time</strong>: Full test is displayed, but student submits
-	    answer to one question at a time.  Student can skip between questions.</li>
+	<li><strong>Full test, submit one at a time</strong>: Full test is displayed, but student submits
+	    answer to one question at a time.  Students can skip between questions.</li>
 	<li><strong>Skip around</strong>:  Students are provided with a navigation bar and can
 	    jump between questions and complete them in any order</li>
-	<li><strong>Embedded</strong>:  Similar to "Full test, submit one at time", but all questions are
+	<li><strong>Embedded</strong>:  Similar to "Full test, submit one at a time", but all questions are
 	    always active, and any one can be submitted at any time.  Questions can be embedded into the
 	    Intro/Instructions using [QUESTION #] tags.</li>
 	</ul></li>
 <li><strong>Default points per problem</strong>:  How many points each problem should be worth by default.
     This can be changed for individual problems.</li>
 <li><strong>Default attempts per problem</strong>:  How many attempts a student should have at each problem by default.
-    This can be changed for individual problems.  Enter 0 for unlimited attempts</li>
+    This can be changed for individual problems.  Enter 0 for unlimited attempts.</li>
 <li><strong>Reattempts different versions</strong>:  Reattempting a problem will regenerate the question with new numbers.  By default,
     reattempts of problems receive the same version of the problem.  This option does not make sense to use with Homework mode.</li>
 <li><strong>Default penalty per missed attempt</strong>:  What percentage of points possible a student should lose
@@ -875,7 +875,7 @@ Once added to the assessment you can:
 <h5>After the Assessment has been Taken</h5>
 <p>If students have taken the assessment, you will not be allowed to make as many changes to the assessment, as it
 will mess up existing student attempts.  If you need to change the assessment a lot, you can clear all student attempts.
-Otherwise you can change individual question settings (be careful!) or edit the question if it's yours.  If there is a problem with
+Otherwise, you can change individual question settings (be careful!) or edit the question if it's yours.  If there is a problem with
 the question, you modify it, and want to give students another chance on that question, you can clear all attempts on a single question
 by clicking the "Clear Attempts" link here</p>
 
@@ -917,7 +917,7 @@ you will be given the chance to specify additional print options.  Longer questi
 off in the print layout page. Be sure to resize those questions to show the entire question.</p>
 
 <p>On the next page, select how many versions of the test you would like to generate, and whether you'd like to generate answer
-keys.  After hitting continue, you print version of the test will be displayed.  Choose Print in your browser to print your tests.</p>
+keys.  After hitting continue, your print version of the test will be displayed.  Choose Print in your browser to print your tests.</p>
 
 </div> <!-- h4 -->
 </div> <!-- h3 -->
@@ -926,7 +926,7 @@ keys.  After hitting continue, you print version of the test will be displayed. 
 <div class=h2>
 <h2 id="quickview">Quick View</h2>
 <p>Quick view is a condensed view of the course page.  You can use it to quickly look over
-your entire course.  It is more useful for major editing</p>
+your entire course.  It is more useful for major editing.</p>
 
 <p>It allows easy drag-and-drop
 reordering of course items.  Changes will not be recorded until the "Record Changes" button
@@ -1020,7 +1020,7 @@ Libraries have use rights.  Options are:
 <p>
 With library rights, child rights take precedence over parent rights.  For example,
 if an open library is a child to a private library, the parent will not be hidden
-from other users.  However a private library as child to a private parent will be
+from other users.  However, a private library as child to a private parent will be
 hidden from other users.
 </p>
 <p>Depending upon the system configuration, non-admins may be limited to creating libraries that are private
@@ -1035,7 +1035,7 @@ by any user, but only the person who made the assignment can remove that assignm
 <h3 id="exportlibrariescm">Export Libraries</h3>
 Use the &quot;Export Libraries&quot; feature to export an entire library or tree
 of libraries for backup or sharing.  Use the tree to select libraries to export.
-Note that if a parent library is selected, it's children libraries are automatically
+Note that if a parent library is selected, its children libraries are automatically
 included in the export, and heirarchy will be maintained. If libraries from different
 trees are selected, the topmost libraries in each branch selected will be exported
 at the same level.
@@ -1077,7 +1077,7 @@ the file.
 <div class=h2>
 <h2 id="liststudents">List Students</h2>
 <p>
-Use the &quot;List Students&quot; link to list the students in your class.  On this page you can
+Use the &quot;List Students&quot; link to list the students in your class.  On this page, you can
 import (register and enroll) students from a file, enroll a student (already registered)
 with a known username.  This is the easiest way to add a guest user to your class.  Note that the "Last Login"
 date shows the last time the student logged into IMathAS, not necessarily the last time they accessed
@@ -1119,12 +1119,12 @@ a term.  Unenrolling all students will also delete all regular posts from the co
 <h3 id="importstudentscm">Import Students from File</h3>
 
 Use the Import Students from File feature to register and enroll a set of students
-automatically from a CSV (commas separated values) file.  You can generate a CSV
+automatically from a CSV (comma-separated values) file.  You can generate a CSV
 file using any spreadsheet program.
 
 <p>
 The form will guide you through specifying which columns of the CSV file contain
-First name, Last name, email address, and desired username.  Once setting these options,
+First name, Last name, email address, and desired username.  Once you set these options,
 the first five rows of the file will be displayed so you can verify that the import
 settings are correct.  The students will be both registered and enrolled in the
 current class upon submission.</p>
@@ -1134,7 +1134,7 @@ current class upon submission.</p>
 <h3 id="sectioncodes">Assigning Section and/or Code Numbers</h3>
 
 <p>Click the "Assign section and/or code numbers" link to assign section or code
-numbers to students.  These only serve for identification purposes, the the gradebook
+numbers to students.  These only serve for identification purposes, the gradebook
 will be sorted first by section, then by name.  Section can be alphanumeric; code number
 must be numeric, up to 4 digits.</p>
 
@@ -1146,7 +1146,7 @@ must be numeric, up to 4 digits.</p>
 a LatePass for an extension on an online assessment without your intervention, provided
 you have clicked the "Allow use of latepasses" option in that assessment.</p>
 
-<p>On this page you can also define the number of hours extension a LatePass will grant</p>
+<p>On this page you can also define the number of hours of extension a LatePass will grant.</p>
 
 </div> <!-- h3 -->
 <div class=h3>
@@ -1158,12 +1158,12 @@ and online assessments.  If given permission, tutors can edit or enter online or
 scores.</p>
 
 <p>Add tutors by listing their usernames in the box
-provided.  Remove tutors by clicking the "Remove" checkboxes next to tutors and clicking Update</p>
+provided.  Remove tutors by clicking the "Remove" checkboxes next to tutors and clicking Update.</p>
 
 <p>Once tutors are added, you can limit them to a single section of the course.  If selected,
 tutors will only be able to see scores for students in the section they're limited to.  This
 can be used in conjunction with the diagnostic system, since second-level selections become the
-student's section identifier</p>
+student's section identifier.</p>
 
 </div> <!-- h3 -->
 </div> <!-- h2 -->
@@ -1173,12 +1173,12 @@ student's section identifier</p>
 <p>Click the &quot;Gradebook&quot; link to show the gradebook.  The gradebook shows each student's
 score on each assessment and any offline grades you've entered.  Click on a student's assessment score to show detail on their
 assessment attempt, or on a student's offline grade to change their grade.  Click the Settings link in the table header
-if you need to change an assessment's settings.  Click on an assessment's average score to view an breakdown showing
+if you need to change an assessment's settings.  Click on an assessment's average score to view a breakdown showing
 the average score on each question.  Click on an offline grade's average score or the Settings link in the table header to change the settings for that item or modify all students' grades
 at once.</p>
 
 <p>By using checkboxes next to student's names, you can send messages or emails to multiple students, or make
-due date exceptions for multiple students at once</p>
+due date exceptions for multiple students at once.</p>
 
 <div class=h3>
 <h3 id="gradebooksettings">Gradebook Settings and Categories</h3>
@@ -1189,19 +1189,19 @@ you to create a grading scheme.</p>
 <li>Calculate total using:  Select "points earned" to use a points earned out of points possible grading scheme.  Select "Category weights" to
 assign a percentage weight to each category in calculation of total grade.</li>
 <li>Gradebook display:  Select whether to order the gradebook by item dates (Available until dates for assessments,
-Show After dates for offline grades) or if you want to group items by category</li>
+Show After dates for offline grades) or if you want to group items by category.</li>
 </ul>
 
 <p>The next section lets you define categories.  There is always the "Default" category, but it will not display if there are no items
 assigned to it.  To add a new category, click the "Add Category" link to add a new line to the table, then fill in the name and
-other info, then click "Update"</p>
+other info, then click "Update".</p>
 <p>For each category, you can specify:</p>
 <ul>
 <li>Name:  The name of the category</li>
 <li>Scale (optional):  Scale the category total by specifying a point value or percent value to be scaled up to 100%.
 For example, if the category point value was 80 points, and a student earned 50 points, 
 their category total would be 50 points (62.5%).  If you specified to scale 60 points to a perfect score, 
-then the students grade would become 80*(50/60) = 66.7 points out of 80 = 83.4%.  
+then the student's grade would become 80*(50/60) = 66.7 points out of 80 = 83.4%.  
 You can also base the scale on a percent value, which is usually easier: 
 If you specified to scale 80% to a perfect score,
 and a student's category total started at 70%, it would be scaled to 70*(100/80) = 87.5%.
@@ -1211,9 +1211,9 @@ You can specify no scale by leaving the Scale box blank.</li>
 <li>Weight/Fix Category Point Total:  If you are using a "Category Weights" grading scheme, enter the percent weights for each category
 here.  If the category percents don't add to 100%, they are all scaled equally so they do add to 100%.  If you are using a "Points earned" grading scheme, you can
 fix the point value for the category here (optional).  For example, if the current category total is 50 points and a student earns 40 points,
-if you specified a fixed point value of 100 points, the students score would become 80 points.  Leave this blank to use the actual
+if you specified a fixed point value of 100 points, the student's score would become 80 points.  Leave this blank to use the actual
 category point total.</li>
-<li>Remove:  When you remove a category, any items currently assigned to that category will be assigned to the Default category</li>
+<li>Remove:  When you remove a category, any items currently assigned to that category will be assigned to the Default category.</li>
 </ul>
 
 
@@ -1256,7 +1256,7 @@ The "Clear Scores" link will clear the student's scores and attempts to 0, but t
 version of the assessment when they access it.
 </p>
 <p>If you categorized the questions in the assessment, you will also see a category
-breakdown at the bottom of the details page</p>
+breakdown at the bottom of the details page.</p>
 
 </div> <!-- h3 -->
 </div> <!-- h2 -->
@@ -1282,7 +1282,7 @@ version and progress.  Any changes to an assessment made by one group member aff
 <p>The message system allows you to send a message to students in the class.  This is an internal message system; it is not emailed
 unless the student has requested email notification.  </p>
 <p>Click Send New Message to send a new message to a student.  If you want to send a message to multiple students, use the "List Students" page.
-Select a student from the pull-down list, and type your message.</p>
+Select a student from the pull-down list and type your message.</p>
 <p>When viewing messages, you can either Reply to the message, or use the "Quote in Reply" option to quote the original message in your reply.</p>
 
 </div> <!-- h2 -->
@@ -1314,16 +1314,16 @@ date, or name.</p>
 
 <p>If you change dates on any line and click the "Send down list" button on that line, the date change will be made to all items below
 that item in the list.  For example, if you add one day to an item and click "Send down list", one day will be added to all items
-lower in the list.  By default the system only allows Monday-Friday dates; you can switch to a 7-day week by unchecking the "Shift
-by weekdays only" checkbox</p>
+lower in the list.  By default, the system only allows Monday-Friday dates; you can switch to a 7-day week by unchecking the "Shift
+by weekdays only" checkbox.</p>
 </div> <!-- h2 -->
 <div class=h2>
 <h2 id="masschgassessments">Change Assessments</h2>
 <p>The Change Assessments page allows you to change assessment settings for many assessments at the same time.  Begin by selecting
-all the assessments you want to change settings for using the checkboxes next to each assessment's name</p>
+all the assessments you want to change settings for using the checkboxes next to each assessment's name.</p>
 
 <p>Select which options you want to change by clicking the checkbox in the "Change?" column, then adjust the setting in the "Option"
-column.  When you are done, click "Submit"</p>
+column.  When you are done, click "Submit".</p>
 
 </div> <!-- h2 -->
 <div class=h2>
@@ -1362,7 +1362,7 @@ IMathAS account or create one, and that account will be linked with the account 
 student accesses any LTI placement, they will not need to sign in again.  They will be able to sign in directly to IMathAS as well.</p>
 
 <p>If the last digit of your LTI key is 1, then a student account will automatically be created the first time a student
-accesses the LTI placement, and that account will be linked with the host LMS account.  The student will not be provided an IMathAS
+accesses the LTI placement, and that account will be linked with the host LMS account.  The student will not be provided a IMathAS
 username or password, so they will only be able to access IMathAS resources through the LMS LTI placements.</p>
 
 <p>Note that grade return ONLY works reliably with the _1 type keys, so that type of key is recommended.</p>
@@ -1445,7 +1445,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
 		<ul>
-		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		<li>Links, files, forums, and text items were imported into your LMS.  Changing
 		    them in IMathAS will not change them in your LMS</li>
 		<li>If you change assessment settings or the questions in an assessment in IMathAS,
 		    those changes will show up when the assessment is launched from the LMS</li>
@@ -1547,7 +1547,7 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>To enable grade return, Blackboard requires some additional steps:
 			<ul>
 			<li>Return to the main course page in Blackboard.</li>
-			<li>For each assessment link that was imported, use the drop-down menu and select Edit</li>
+			<li>For each assessment link that was imported, use the drop-down menu and select Edit.</li>
 			<li>Set the Enable Evaluation option to Yes, specify the points possible (it does not
 			    need to match the points possible in IMathAS), and set a Due Date if desired.</li>
 			</ul>
@@ -1566,7 +1566,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
 		<ul>
-		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		<li>Links, files, forums, and text items were imported into your LMS.  Changing
 		    them in IMathAS will not change them in your LMS</li>
 		<li>If you change assessment settings or the questions in an assessment in IMathAS,
 		    those changes will show up when the assessment is launched from the LMS</li>
@@ -1615,7 +1615,7 @@ username or password, so they will only be able to access IMathAS resources thro
 		<li>If importing a Common Cartridge, to enable grade return Blackboard requires some additional steps:
 			<ul>
 			<li>Return to the main course page in Blackboard.</li>
-			<li>For each assessment link that was imported, use the drop-down menu and select Edit</li>
+			<li>For each assessment link that was imported, use the drop-down menu and select Edit.</li>
 			<li>Set the Enable Evaluation option to Yes, specify the points possible (it does not
 			    need to match the points possible in IMathAS), and set a Due Date if desired.</li>
 			</ul>
@@ -1634,7 +1634,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
 		<ul>
-		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		<li>Links, files, forums, and text items were imported into your LMS.  Changing
 		    them in IMathAS will not change them in your LMS</li>
 		<li>If you change assessment settings or the questions in an assessment in IMathAS,
 		    those changes will show up when the assessment is launched from the LMS</li>
@@ -1747,7 +1747,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>Be aware:
 		<ul>
 		<li>LTI assessments may not show in the gradebook columns until a student started working on an assignment.</li>
-		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		<li>Links, files, forums, and text items were imported into your LMS.  Changing
 		    them in IMathAS will not change them in your LMS</li>
 		<li>If you change assessment settings or the questions in an assessment in IMathAS,
 		    those changes will show up when the assessment is launched from the LMS</li>
@@ -1790,7 +1790,7 @@ username or password, so they will only be able to access IMathAS resources thro
 			<li>For Consumer Key, enter: <code>LTIkey_####_1</code>, where #### is your Course ID</li>
 			<li>For Shared Secret enter the secret you set up in your Course Settings</li>
 			<li>Under Privacy, it is recommended to set all options to Always, but it is fine to leave it as Delegate to teacher instead.</li>
-			<li>Save changes</li>
+			<li>Save changes.</li>
 			<li>The Launch URL should now indicate <em>Using tool configuration IMathAS</em>.  Click Save.</li>
 			</ul>
 		</li>
@@ -1809,7 +1809,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>Be aware:
 		<ul>
 		<li>LTI assessments may not show in the gradebook columns until a student started working on an assignment.</li>
-		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		<li>Links, files, forums, and text items were imported into your LMS.  Changing
 		    them in IMathAS will not change them in your LMS</li>
 		<li>If you change assessment settings or the questions in an assessment in IMathAS,
 		    those changes will show up when the assessment is launched from the LMS</li>
@@ -1851,7 +1851,7 @@ username or password, so they will only be able to access IMathAS resources thro
 	<li>Once complete, all the LTI links in your LMS should work.</li>
 	<li>Be aware:
 		<ul>
-		<li>Links, files, forums, and and text items were imported into your LMS.  Changing
+		<li>Links, files, forums, and text items were imported into your LMS.  Changing
 		    them in IMathAS will not change them in your LMS</li>
 		<li>If you change assessment settings or the questions in an assessment in IMathAS,
 		    those changes will show up when the assessment is launched from the LMS</li>
@@ -1907,7 +1907,7 @@ The IMathAS question format is based on PHP.
 
 A question is formed in several parts:
 <ul>
-<li><strong>Description</strong>:  A description of the question.  This is not shown to students</li>
+<li><strong>Description</strong>:  A description of the question.  This is not shown to students.</li>
 <li><strong>Use Rights</strong>:  The rights you wish to grant other people (you always have full rights).  Options are:
 	<ul>
 	<li><strong>Private</strong>:  Only you can see the question in question searches.</li>
@@ -2212,7 +2212,7 @@ is primarily intended for cases where there is a large block of text to control.
 <p>To do conditional text, wrap the text in <code>[if variable==value][/if]</code>. Note that the variable name 
 should be given without the preceeding dollar sign here. You can use other simple comparisons like != or &lt;, but 
 not more complicated expressions. The value should not be in quotes, even if it is text. It is fine to have things 
-like $answerbox inside two conditionals, so long as only one will display at at time.</p>
+like $answerbox inside two conditionals, so long as only one will display at a time.</p>
 
 <p>Example:</p>
 <pre>
@@ -3653,7 +3653,7 @@ $feedback = getfeedbacktxtnumfunc(
 
 <div class=h2>
 <h2 id="usingothermacros">Using Other Macros</h2>
-<p>If an IMathAS administrator has installed other Macro Libraries, you can load a macro library by entering the line
+<p>If a IMathAS administrator has installed other Macro Libraries, you can load a macro library by entering the line
 <code>loadlibrary("list of library names")</code> at the beginning of the Common Control section.</p>
 <p>Examples:  <code>loadlibrary("stats")</code> or  <code>loadlibrary("stats,misc")</code></p>
 
@@ -4972,7 +4972,7 @@ or if the question type gives away critical info to the student.</dd>
 
 <p>Calculated N-Tuple questions require the student to enter an n-tuple or list of n-tuples.
 This can be used for coordinate points, vectors, or any other n-tuple of numbers.
-This is identical the the N-tuple answer type, but allows students to enter mathematical expressions
+This is identical the N-tuple answer type, but allows students to enter mathematical expressions
 rather than just numbers, such as (5/3, 2/3).
 </p>
 
@@ -5099,7 +5099,7 @@ $answer = "(2+3i,4-5i)"
     
     <p>Calculated Complex N-Tuple questions require the student to enter an n-tuple or list of n-tuples of complex numbers.
     This can be used for coordinate points, vectors, or any other n-tuple of complex numbers.
-    This is identical the the Complex N-tuple answer type, but allows students to enter mathematical expressions
+    This is identical the Complex N-tuple answer type, but allows students to enter mathematical expressions
     rather than just numbers, such as (5/3+sqrt(2)i, 2/3+1/4i).
     </p>
 
@@ -5918,7 +5918,7 @@ $variables = "H,O" // adds buttons to the editor
     <h3 id="molecule">Chemical Molecule Drawing</h3>
     
     <p>
-    A student is asked to enter a sketch a molecule, using the Kekule drawing tool.
+    A student is asked to enter a sketch of a molecule, using the Kekule drawing tool.
     If the student has enabled the keyboard-based drawing accessibility option, they will be
     presented with a textbox for them to write out a description instead.
     </p>
@@ -6454,7 +6454,7 @@ what kind of answer is expected.  Some of the types:
     "Preview" button to ensure the system is interpreting your answer the way you intended.  It will also check to
     make sure that it understands your answer, and will tell if you if the syntax is ok.</li>
 <li><strong>String</strong>: You will be asked to enter a word or list of letters</li>
-<li><strong>Numerical Matrix</strong>:  You will asked to enter a matrix of numbers.  In some case, a grid of input boxes will be provided
+<li><strong>Numerical Matrix</strong>:  You will be asked to enter a matrix of numbers.  In some case, a grid of input boxes will be provided
     for you to enter the values.  If not, you will need to enter the matrix in ASCIIMath notation, like [(1,2,3),(4,5,6)]
     for the 2x3 matrix with first row: 1,2,3</li>
 <li><strong>Calculated Matrix</strong>:  Like a numerical matrix, but each entry can be a calculation, like 2/3 or 5^2 or sin(2).</li>
