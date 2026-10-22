@@ -438,7 +438,7 @@ function parsereqsigfigs($reqsigfigs) {
     $sigfigscoretype = array('abs', 0, 'def');
     if (count($reqsigfigparts) > 1) {
         if (substr($reqsigfigparts[1], -1) == '%') {
-            $sigfigscoretype = array('rel', floatval(substr($reqsigfigparts[1], 0, -1)));
+            $sigfigscoretype = array('rel', floatval(substr($reqsigfigparts[1], 0, -1))/100);
         } else {
             $sigfigscoretype = array('abs', floatval($reqsigfigparts[1]));
         }

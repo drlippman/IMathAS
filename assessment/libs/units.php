@@ -791,7 +791,7 @@ function checkunitssigfigs($givenunits, $ansunits, $reqsigfigs, $exactsigfig, $r
 		if ($anans==0) {
 			if (abs($anans - $givenans) < $sigfigscoretype[1]+$epsilon) {return true;}
 		} else {
-			if (abs($anans - $givenans)/(abs($anans)+$epsilon) < $sigfigscoretype[1]/100+$epsilon) {return true;}
+			if (abs($anans - $givenans)/(abs($anans)+$epsilon) < $sigfigscoretype[1]+$epsilon) {return true;}
 		}
 	}
 	return false;
