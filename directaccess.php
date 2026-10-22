@@ -193,7 +193,7 @@
 		} else {
 			$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/infopages.css\" type=\"text/css\">\n";
 		}
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
 		$pagetitle = $coursename;
 		$challenge = bin2hex(random_bytes(16));
 		$_SESSION['challenge'] = $challenge;

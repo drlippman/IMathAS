@@ -54,7 +54,7 @@ if ($foundUserId) {
     ?>
 <!DOCTYPE html>
 <html><head><title><?php echo _('Signing in...'); ?></title>
-<script type="text/javascript" src="<?php echo $staticroot; ?>/javascript/jstz_min.js"></script>
+<script type="text/javascript" src="<?php echo $staticroot; ?>/javascript/jstz_min.js?v=102226"></script>
 </head>
 <body>
 <form id="googleLoginBridge" method="post" action="<?php echo Sanitize::encodeStringForDisplay($returnTo); ?>">

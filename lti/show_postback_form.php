@@ -66,7 +66,7 @@ function show_postback_form($launch, $db, $err='') {
 
   $flexwidth = true;
 	$nologo = true;
-	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js?v=102226\" ></script>";
   $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 	require_once "../header.php";

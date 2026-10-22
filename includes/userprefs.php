@@ -1,7 +1,7 @@
 <?php
 
 //also make sure you have in the header:
-// $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+// $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js?v=102226\" ></script>";
 // and
 
 function showUserPrefsForm($limited = false) {

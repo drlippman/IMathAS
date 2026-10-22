@@ -88,7 +88,7 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
             $cid = 0;
         }
 
-        $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+        $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
         if (isset($_SERVER['QUERY_STRING'])) {
             $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . '&guestaccess=true';
         } else {

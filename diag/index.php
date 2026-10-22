@@ -21,7 +21,7 @@
         $loadinginfoheader = true;;
 		$infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 		$placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
 		require_once "../header.php";
 		$pagetitle = "Diagnostics";
 		require_once (isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php";
@@ -397,7 +397,7 @@ if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludep
 $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 $placeinhead = "<link rel=\"stylesheet\" href=\"$staticroot/{$infopath}infopages.css\" type=\"text/css\">\n";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
 $flexwidth = true;
 require_once "../header.php";
 $pagetitle =$line['name'];

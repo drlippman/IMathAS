@@ -36,7 +36,7 @@ if (isset($CFG['locale'])) {
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
 }
 if ($_GET['action']=='chguserinfo') {
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
 }
 require_once "header.php";
 switch($_GET['action']) {
@@ -190,7 +190,7 @@ switch($_GET['action']) {
 		echo '<input type=hidden name=googlelinktoken value="'.Sanitize::encodeStringForDisplay($googlePending['linktoken']).'">';
 		echo '<div class=submit><input type=submit value="'._('Log In and Connect').'"></div>';
 		echo '</form>';
-		echo '<script type="text/javascript" src="'.$staticroot.'/javascript/jstz_min.js"></script>';
+		echo '<script type="text/javascript" src="'.$staticroot.'/javascript/jstz_min.js?v=102226"></script>';
 		echo '<script type="text/javascript">
 		$(function() {
 			var thedate = new Date();

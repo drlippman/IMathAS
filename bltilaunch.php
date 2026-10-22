@@ -236,7 +236,7 @@ if (isset($_GET['launch'])) {
 	$pref = 0;
 	$flexwidth = true;
 	$nologo = true;
-	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
 	require_once "header.php";
 	echo "<h3>Connecting to $installname</h3>";
     echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
@@ -1950,7 +1950,7 @@ if (isset($_GET['launch'])) {
 	}*/
 	$flexwidth = true;
 	$nologo = true;
-	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js\" ></script>";
+	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
 	require_once "header.php";
 	echo "<h3>Connecting to $installname</h3>";
     echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
