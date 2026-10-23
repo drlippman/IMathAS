@@ -113,6 +113,7 @@ function handleClickTextSegmentButton(e) {
 function refreshTable() {
     tinymce.remove();
     document.getElementById("curqtbl").innerHTML = generateTable();
+    setupTooltips("#curqtbl");
     updateqgrpcookie();
     initeditor("selector", "div.textsegment", null, true /*inline*/, editorSetup);
     tinymce.init({
@@ -1102,7 +1103,7 @@ function generateTable() {
     var badgrppoints = false;
     var badthisgrppoints = false;
     var grppoints = -1;
-    var ECmark = ' <span onmouseover="tipshow(this,\'' + _('Extra Credit') + '\')" onmouseout="tipout()">' + _('EC') + '</span>';
+    var ECmark = ' <span data-tip="' + _('Extra Credit') + '">' + _('EC') + '</span>';
     for (var i = 0; i < itemcount; i++) {
         curistext = 0;
         curisgroup = 0;
@@ -1512,15 +1513,15 @@ function generateTable() {
                 if (curitems[j][8][0] > 0) {
                     if (curitems[j][8].length > 3) {
                         html +=
-                            "<span onmouseover=\"tipshow(this,'Avg score on first try: " +
+                            "<span data-tip=\"Avg score on first try: " +
                             curitems[j][8][1] +
                             "%";
                         html +=
-                            "<br/>Avg time on first try: " +
+                            "&#10;Avg time on first try: " +
                             curitems[j][8][2] +
-                            " min<br/>N=" +
+                            " min&#10;N=" +
                             curitems[j][8][3] +
-                            '\')" onmouseout="tipout()">';
+                            '\">';
                     }
                     html += curitems[j][8][0];
                     if (curitems[j][8].length > 3) {

@@ -322,7 +322,7 @@ function processScriptQueueNext() {
 function setupTips(id, tip, longtip) {
   var el = document.getElementById(id);
   if (!el) { return; }
-  el.setAttribute('data-tip', tip);
+  el.setAttribute('data-entrytip', tip);
   var ref = id.substr(2).split(/-/)[0];
   if (!document.getElementById("tips"+ref)) {
     $("body").append($("<div>", {class:"hidden", id:"tips"+ref}).html(longtip));
@@ -413,10 +413,9 @@ function setScoreMarkers(base) {
           "aria-label": _('Incorrect, wrong format'),
           "data-tip": _('Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format'),
           "data-tooltipclass": "dropdown-pane tooltip-pane"
-      }).on('mouseover focus', function () {tipshow(this)})
-      .on('mouseleave blur', tipout)
-      .html('<svg style="vertical-align:middle;margin-left:3px;" viewBox="0 0 24 24" width="18" height="18" stroke="rgb(255,85,0)" stroke-width="2" stroke-linecap="round" fill="none" role="img" aria-hidden=true><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>')
+      }).html('<svg style="vertical-align:middle;margin-left:3px;" viewBox="0 0 24 24" width="18" height="18" stroke="rgb(255,85,0)" stroke-width="2" stroke-linecap="round" fill="none" role="img" aria-hidden=true><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16"></line></svg>')
   );
+  setupTooltips(base);
 }
 
 function initClearScoreMarkers() {

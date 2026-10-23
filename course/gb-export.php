@@ -318,7 +318,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
 	//total totals
 	$tot = '';
 	if ($catfilter<0) {
-		$fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
+		$fivenum = "<span data-tip=\"". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}\">";
 		if ($gbt[$i][3][4+$availshow]>0) {
 			$pct = round(100*$gbt[$i][3][$availshow]/$gbt[$i][3][4+$availshow],1);
 		} else {
@@ -374,7 +374,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv='', $enddiv='') {
 			}
 			echo '<td class="c">'.$insdiv;
 			if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
-				echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+				echo "<span data-tip=\"", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}\">";
 			}
 			if ($catfilter!=-1) { //single category view
 

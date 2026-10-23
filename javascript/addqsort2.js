@@ -114,6 +114,7 @@ var curqlastfocus = [];
 function refreshTable() {
     tinymce.remove();
     document.getElementById("curqtbl").innerHTML = generateTable();
+    setupTooltips("#curqtbl");
     updateqgrpcookie();
     initeditor("selector", "div.textsegment", null, true /*inline*/, editorSetup);
     tinymce.init({
@@ -1264,7 +1265,7 @@ function generateTable() {
     var badthisgrppoints = false;
     var grppoints = -1;
     var grpextracredit = -1;
-    var ECmark = ' <span onmouseover="tipshow(this,\'' + _('Extra Credit') + '\')" onmouseout="tipout()">' + _('EC') + '</span>';
+    var ECmark = ' <span data-tip="' + _('Extra Credit') + '">' + _('EC') + '</span>';
     for (var i = 0; i < itemcount; i++) {
         curistext = 0;
         curisgroup = 0;
@@ -1810,17 +1811,17 @@ function generateTable() {
                 html += "<td class=c>";
                 if (curitems[j][8][3] > 4) {   
                     html +=
-                        "<span onmouseover=\"tipshow(this,'"+('Avg score on first try: ') +
+                        "<span data-tip=\""+_('Avg score on first try: ') +
                         curitems[j][8][1] +
                         "%";
                     html +=
-                        "<br/>"+_("Avg time on first try: ") +
+                        "&#10;"+_("Avg time on first try: ") +
                         curitems[j][8][2] +
-                        _(" min")+"<br/>&sigma;="+
+                        _(" min")+"&#10;&sigma;="+
                         curitems[j][8][4] +
-                        "<br/>N=" +
+                        "&#10;N=" +
                         curitems[j][8][3] +
-                        '\')" onmouseout="tipout()">';
+                        '\">';
                     
                     html += curitems[j][8][0];
                     html += "</span>";
@@ -2007,7 +2008,7 @@ function generateTable() {
                 }
                 html += '</ul>';
                 if (curitems[j][11] != '') {
-                    html += ' <span style="width:1em" onmouseover="tipshow(this,\'' + _('Settings override: ') + curitems[j][11] + '\')" onmouseout="tipout()" aria-label="has settings override">*</span>';
+                    html += ' <span style="width:1em" data-tip="' + _('Settings override: ') + curitems[j][11].replace(/"/g, '&quot;') + '" aria-label="has settings override">*</span>';
                 } 
                 html += '</div>';
             }

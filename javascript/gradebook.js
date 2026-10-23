@@ -46,7 +46,7 @@ function setupGBpercents() {
   });
   $("tbody td").each(function(i,el) {
 	let col = el.cellIndex;
-    if (el.innerHTML.match(/tipshow/) || colpts[col]==-1) {return;}
+    if (el.innerHTML.match(/data-tip/) || colpts[col]==-1) {return;}
   	var a = $(el).find("a");
   	if (a.length>0) {
   	  el = a[0];

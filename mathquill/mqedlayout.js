@@ -706,13 +706,13 @@ var myMQeditor = (function($) {
     if (rebuild && layoutstyle === 'under') {
       var baseid = mqel.id.substring(8);
       var textel = $('#'+baseid);
-      if (textel[0].hasAttribute("data-tip")) {
+      if (textel[0].hasAttribute("data-entrytip")) {
         var tabpanel = $("#mqeditor .mqed-tabpanel").first();
         var lastdiv = tabpanel.children("div").last();
         var tipwidth = lastdiv.position().left - 12;
-        var tiptext = textel.attr("data-tip");
+        var tiptext = textel.attr("data-entrytip");
         var tipdiv = document.createElement("div");
-        $(tipdiv).html(tiptext);
+        $(tipdiv).html(entryTipToHtml(tiptext));
         if (textel[0].hasAttribute("aria-describedby")) {
           var fulltipRef = textel[0].getAttribute("aria-describedby");
           if (document.getElementById(fulltipRef).textContent != tiptext) {
@@ -735,10 +735,10 @@ var myMQeditor = (function($) {
     } else if (rebuild && layoutstyle === 'OSK') {
       var baseid = mqel.id.substring(8);
       var textel = $('#'+baseid);
-      if (textel[0].hasAttribute("data-tip")) {
+      if (textel[0].hasAttribute("data-entrytip")) {
         var ref = baseid.substr(2).split(/-/)[0];
         reshrinkeh(mqel.id);
-        showehdd(mqel.id, textel[0].getAttribute("data-tip"), ref);
+        showehdd(mqel.id, textel[0].getAttribute("data-entrytip"), ref);
       }
     }
   }

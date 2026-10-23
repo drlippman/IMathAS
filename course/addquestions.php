@@ -1343,13 +1343,13 @@ if ($overwriteBody==1) {
 		<br>
 		<?php echo _('Search') ?>:
 		<input type=text size=15 name=search value="<?php echo Sanitize::encodeStringForDisplay($search); ?>">
-		<span tabindex="0" data-tip="Search all libraries, not just selected ones" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
+		<span tabindex="0" data-tip="Search all libraries, not just selected ones">
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
 		<?php echo _('Search all libs'); ?></span>
-		<span tabindex="0" data-tip="List only questions I own" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
+		<span tabindex="0" data-tip="List only questions I own">
 		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
 		<?php echo _('Mine only'); ?></span>
-		<span tabindex="0" data-tip="Exclude questions already in assessment" onmouseenter="tipshow(this)" onfocus="tipshow(this)" onmouseleave="tipout()" onblur="tipout()">
+		<span tabindex="0" data-tip="Exclude questions already in assessment">
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
 		<?php echo _('Exclude added'); ?></span>
 		<button type="submit"><?php echo _("Search"); ?></button>
@@ -1376,9 +1376,9 @@ if ($overwriteBody==1) {
 				<tr><th>&nbsp;</th><th><?php echo _('Description'); ?></th><th>&nbsp;</th><th>ID</th><th><?php echo _('Preview'); ?></th><th><?php echo _('Type'); ?></th>
 					<?php echo $page_libRowHeader ?>
 					<th><?php echo _('Times Used'); ?></th>
-					<?php if ($page_useavgtimes) {?><th><span onmouseenter=<?php echo "\"tipshow(this,'". _('Average time, in minutes, this question has taken students')."')\""; ?> onmouseleave="tipout()"><?php echo _('Avg Time'); ?></span></th><?php } ?>
+					<?php if ($page_useavgtimes) {?><th><span data-tip="<?php echo Sanitize::encodeStringForDisplay(_('Average time, in minutes, this question has taken students')); ?>"><?php echo _('Avg Time'); ?></span></th><?php } ?>
 					<th><?php echo _('Mine'); ?></th><th><?php echo _('Actions'); ?></th>
-					<?php if ($searchall==0) { echo '<th><span onmouseenter="tipshow(this,\''._('Flag a question if it is in the wrong library').'\')" onmouseleave="tipout()">'._('Wrong Lib').'</span></th>';} ?>
+					<?php if ($searchall==0) { echo '<th><span data-tip="'.Sanitize::encodeStringForDisplay(_('Flag a question if it is in the wrong library')).'">'._('Wrong Lib').'</span></th>';} ?>
 				</tr>
 			</thead>
 			<tbody>
@@ -1421,8 +1421,9 @@ if ($overwriteBody==1) {
 					</td>
 					<?php if ($page_useavgtimes) {?><td class="c"><?php
 					if (isset($page_questionTable[$qid]['qdata'])) {
-						echo '<span onmouseenter="tipshow(this,\''._('Avg score on first try: ').round($page_questionTable[$qid]['qdata'][0]).'%';
-						echo '<br/>'._('Avg time on first try: ').round($page_questionTable[$qid]['qdata'][1]/60,1).' min<br/>N='.$page_questionTable[$qid]['qdata'][2].'\')" onmouseleave="tipout()">';
+						$tip = _('Avg score on first try: ').round($page_questionTable[$qid]['qdata'][0]).'%';
+						$tip .= "\n"._('Avg time on first try: ').round($page_questionTable[$qid]['qdata'][1]/60,1).' min'."\nN=".$page_questionTable[$qid]['qdata'][2];
+						echo '<span data-tip="'.Sanitize::encodeStringForDisplay($tip).'">';
                         echo $page_questionTable[$qid]['meantime'].'</span>';
 					}
 					?></td> <?php }?>

@@ -938,7 +938,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
 
                     echo '<span class="instronly">';
                     if ($line['allowlate'] > 0) {
-                        echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> ';
+                        echo ' <span data-tip="', _('LatePasses Allowed'), '">', _('LP'), '</span> ';
                     }
                     echo '</span>';
 
@@ -985,7 +985,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                 if ($canedit) {
                     echo '<span class="instronly">';
                     if ($line['allowlate'] > 0) {
-                        echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">LP</span> ';
+                        echo ' <span data-tip="', _('LatePasses Allowed'), '">LP</span> ';
                     }
                     echo '</span>';
 
@@ -1109,7 +1109,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
 
                     echo '<span class="instronly">';
                     if ($line['allowlate'] > 0) {
-                        echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> ';
+                        echo ' <span data-tip="', _('LatePasses Allowed'), '">', _('LP'), '</span> ';
                     }
                     echo '</span>';
                 }
@@ -1624,7 +1624,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                 if ($canedit) {
                     echo '<span class="instronly">';
                     if ($line['allowlate'] > 0) {
-                        echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> ';
+                        echo ' <span data-tip="', _('LatePasses Allowed'), '">', _('LP'), '</span> ';
                     }
                     echo '</span>';
                 }
@@ -1736,7 +1736,7 @@ function showitems($items, $parent, $inpublic = false, $greyitems = 0)
                 if ($canedit) {
                     echo '<span class="instronly">';
                     if ($line['allowlate'] > 0) {
-                        echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> ';
+                        echo ' <span data-tip="', _('LatePasses Allowed'), '">', _('LP'), '</span> ';
                     }
                     echo '</span>';
                 }

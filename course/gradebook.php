@@ -1573,7 +1573,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 	$tot = '';
 	if ($catfilter<0) {
         if (isset($gbt[0][3][3+$availshow])) {
-            $fivenum = "<span onmouseover=\"tipshow(this,'". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}')\" onmouseout=\"tipout()\" >";
+            $fivenum = "<span data-tip=\"". _('5-number summary:'). " {$gbt[0][3][3+$availshow]}\">";
         } else {
             $fivenum = '<span>';
         }
@@ -1634,7 +1634,7 @@ function gbInstrCatCols(&$gbt, $i, $insdiv, $enddiv) {
 			}
 			echo '<td class="c">'.$insdiv;
 			if ($gbt[$i][0][0]=='Averages' && $gbt[0][2][$j][6+$availshow]!='') {
-				echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
+				echo "<span data-tip=\"", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}\">";
 			}
 			if ($catfilter!=-1) { //single category view
 
@@ -1955,7 +1955,7 @@ function gbinstrdisp() {
 					if (isset($gbt[$i][1][$j][0])) {
 						if ($gbt[$i][1][$j][4]=='average') {
 							if ($gbt[0][1][$j][2]>0) {
-								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1)."%\n";
 							} else {
 								$avgtip = '';
 							}
@@ -1965,7 +1965,7 @@ function gbinstrdisp() {
 							} else {
 								echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
 							}
-							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
+							echo 'data-tip="'.Sanitize::encodeStringForDisplay($avgtip).'" ';
 							echo ">";
 						} else {
 							if ($gbt[0][1][$j][15] > 1) { // assess2
@@ -2031,14 +2031,14 @@ function gbinstrdisp() {
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
 							if (!empty($gbt[0][1][$j][2]) && $gbt[0][1][$j][2]>0 && isset($gbt[$i][1][$j][0])) {
-								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1)."%\n";
 							} else {
 								$avgtip = '';
 							}
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
 
 							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades=all&amp;gbitem={$gbt[0][1][$j][7]}\" ";
-							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
+							echo 'data-tip="'.Sanitize::encodeStringForDisplay($avgtip).'" ';
 							echo ">";
 						} else {
 							echo "<a href=\"addgrades.php?stu=$stu&amp;cid=$cid&amp;grades={$gbt[$i][4][0]}&amp;gbitem={$gbt[0][1][$j][7]}\">";
@@ -2073,12 +2073,12 @@ function gbinstrdisp() {
 							echo '</a>';
 						} else {
 							if ($gbt[0][1][$j][2]>0) {
-								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1)."%\n";
 							} else {
 								$avgtip = '';
 							}
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
-							echo "<span onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\"> ";
+							echo "<span data-tip=\"".Sanitize::encodeStringForDisplay($avgtip)."\"> ";
 							echo $gbt[$i][1][$j][0];
 
 							echo '</span>';
@@ -2098,13 +2098,13 @@ function gbinstrdisp() {
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
 							if (isset($gbt[$i][1][$j][0]) && $gbt[0][1][$j][2]>0) {
-								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1).'%<br/>';
+								$avgtip = _('Mean:').' '.round(100*$gbt[$i][1][$j][0]/$gbt[0][1][$j][2],1)."%\n";
 							} else {
 								$avgtip = '';
 							}
 							$avgtip .= _('5-number summary:').' '.$gbt[0][1][$j][9];
 							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid=all&amp;lid={$gbt[0][1][$j][7]}\" ";
-							echo "onmouseover=\"tipshow(this,'$avgtip')\" onmouseout=\"tipout()\" ";
+							echo 'data-tip="'.Sanitize::encodeStringForDisplay($avgtip).'" ';
 							echo ">";
 						} else {
 							echo "<a href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid={$gbt[$i][4][0]}&amp;lid={$gbt[0][1][$j][7]}\">";

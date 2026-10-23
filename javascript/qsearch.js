@@ -427,7 +427,7 @@ function displayQuestionList(results) {
         );
 
         var $checkboxTd = $('<td>').append(
-            $('<input type="checkbox" name="nchecked[]">').attr({id: 'qo'+i, value: q['id'], title: 'ID '+q['id']})
+            $('<input type="checkbox" name="nchecked[]">').attr({id: 'qo'+i, value: q['id'], "title": 'ID '+q['id']})
         );
 
         var $descrTd = $('<td>');
@@ -447,7 +447,7 @@ function displayQuestionList(results) {
             $descrTd,
             $actionsTd,
             $features,
-            $('<td>').text(q['ownershort']),
+            $('<td>').append($('<span>', {text: q['ownershort'], "data-tip": _('Question ID') + ' ' + q['id']})),
             $('<td>').text(q['qtype']),
             $('<td class="c">').text(q['times'])
         );
@@ -458,12 +458,10 @@ function displayQuestionList(results) {
             var $avgTd = $('<td class="c">');
             if (q['meantimen'] > 3) {
                 var tipHtml = _('Avg score on first try: ') + q['meanscore'] + '%'
-                    + '<br/>' + _('Avg time on first try: ') + q['meantime'] + _(' min')
-                    + '<br/>N=' + q['meantimen'];
+                    + '\n' + _('Avg time on first try: ') + q['meantime'] + _(' min')
+                    + '\nN=' + q['meantimen'];
                 $avgTd.append(
                     $('<span>').attr('data-tip', tipHtml).text(q['meantime'])
-                        .on('mouseenter', function() { tipshow(this); })
-                        .on('mouseleave', function() { tipout(); })
                 );
             }
             $row.append($avgTd);
@@ -475,6 +473,7 @@ function displayQuestionList(results) {
     }
     $("#myTable").empty().append($thead, $tbody);
     rendermathnode(document.getElementById("myTable"));
+    setupTooltips("#myTable");
 
     initSortTable('myTable', sortinit);
     $(".dropdown-toggle").dropdown();

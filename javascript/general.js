@@ -62,8 +62,11 @@ function tipshow(el,tip, e) {
 		document.getElementsByTagName("body")[0].appendChild(tipobj);
 	}
 	curtipel = el;
+	// data-tip is plain text (it may come from user-authored content); newlines are kept.
+	// HTML is only allowed via the tip argument, which must come from trusted code.
+	tipobj.style.whiteSpace = "pre-line";
 	if (el.hasAttribute("data-tip")) {
-		tipobj.innerHTML = el.getAttribute("data-tip");
+		tipobj.textContent = el.getAttribute("data-tip");
 	} else {
 		tipobj.innerHTML = tip;
 	}
@@ -121,6 +124,15 @@ function tipout(e) {
 		curtipel.removeAttribute("aria-describedby");
 	}
 	curtipel = null;
+}
+// set up tip show/hide listeners on elements with data-tip within base.
+// Skips form fields (data-tip there is used by the question entry tips)
+function setupTooltips(base) {
+	jQuery(base || 'body').find('[data-tip]')
+		.not('input, textarea, select, .tipready')
+		.addClass('tipready')
+		.on('mouseenter focus', function() { tipshow(this); })
+		.on('mouseleave blur', function() { tipout(); });
 }
 jQuery(function() {
 	jQuery(document).on('keyup', function(e) {
@@ -1476,6 +1488,7 @@ function initlinkmarkup(base) {
 	setupToggler2(base);
 	setupCopyTableButtons(base);
     setupPopuplinks(base);
+	setupTooltips(base);
     //setupToggleResize(base);
 	$(base).fitVids();
     resizeResponsiveIframes(base, true);

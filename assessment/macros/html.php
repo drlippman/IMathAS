@@ -15,7 +15,7 @@ function formhoverover($label, $tip) {
     }
     $tip = htmlentities($tip);
     $tip = str_replace('`', '&#96;', $tip);
-    return '<span role="button" tabindex="0" class="link" data-tip="' . $tip . '" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">' . $label . '</span>';
+    return '<span role="button" tabindex="0" class="link" data-tip="' . $tip . '">' . $label . '</span>';
 }
 
 function formpopup($label, $content, $width = 600, $height = 400, $type = 'link', $scroll = 'null', $id = 'popup', $ref = '', $presanitized = false) {

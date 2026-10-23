@@ -438,7 +438,7 @@
 			echo sprintf("<td class=\"c\"><a href=\"#\" aria-haspopup=\"dialog\" role=\"button\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail2.php?cid=%s&aid=%d&qid=%d&type=score',500,500);return false;\"><b>%.0f%%</b></a>",
 				$cid, Sanitize::onlyInt($aid), Sanitize::onlyInt($qid), $pc2);
 			if ($extracredit[$qid] == 1) {
-				echo ' <span onmouseover="tipshow(this,\'' . _('Extra Credit') . '\')" onmouseout="tipout()">' . _('EC') . '</span>';
+				echo ' <span data-tip="' . _('Extra Credit') . '">' . _('EC') . '</span>';
 			}
 			echo '</td>';
 			if ($submitby == 'by_question') {

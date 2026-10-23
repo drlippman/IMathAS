@@ -826,12 +826,12 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$asid}&links=$links&update=true\">\n";
 
 		if ($isteacher) {
-			echo "<div class=\"cpmid\"><a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$asid}&from=$from&uid=$get_uid&clearattempt=true\" onmouseover=\"tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')\" onmouseout=\"tipout()\">Clear Attempt</a> | ";
-			echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$asid}&from=$from&uid=$get_uid&clearscores=true\" onmouseover=\"tipshow(this,'Clear scores and attempts, but keep same versions of questions')\" onmouseout=\"tipout()\">Clear Scores</a> | ";
-			echo "<a href=\"#\" onclick=\"markallfullscore();$('#uppersubmit').show();return false;\" onmouseover=\"tipshow(this,'Change all scores to full credit')\" onmouseout=\"tipout()\">All Full Credit</a> ";
+			echo "<div class=\"cpmid\"><a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$asid}&from=$from&uid=$get_uid&clearattempt=true\" data-tip=\"Clear everything, resetting things like the student never started.  Student will get new versions of questions.\">Clear Attempt</a> | ";
+			echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$asid}&from=$from&uid=$get_uid&clearscores=true\" data-tip=\"Clear scores and attempts, but keep same versions of questions\">Clear Scores</a> | ";
+			echo "<a href=\"#\" onclick=\"markallfullscore();$('#uppersubmit').show();return false;\" data-tip=\"Change all scores to full credit\">All Full Credit</a> ";
 			echo '<input style="display:none;" id="uppersubmit" type="submit" value="Record Changed Grades"> | ';
-			echo "<a href=\"$imasroot/assessment/showtest.php?cid=$cid&id={$line['assessmentid']}&actas=$get_uid\" onmouseover=\"tipshow(this,'Take on role of this student, bypassing date restrictions, to submit answers')\" onmouseout=\"tipout()\">View as student</a> | ";
-			echo "<a href=\"$imasroot/assessment/printtest.php?cid=$cid&asid={$asid}\" target=\"_blank\" onmouseover=\"tipshow(this,'Pull up a print version of this student\'s assessment')\" onmouseout=\"tipout()\">Print Version</a> ";
+			echo "<a href=\"$imasroot/assessment/showtest.php?cid=$cid&id={$line['assessmentid']}&actas=$get_uid\" data-tip=\"Take on role of this student, bypassing date restrictions, to submit answers\">View as student</a> | ";
+			echo "<a href=\"$imasroot/assessment/printtest.php?cid=$cid&asid={$asid}\" target=\"_blank\" data-tip=\"Pull up a print version of this student's assessment\">Print Version</a> ";
 
 			echo "</div>\n";
 		}
@@ -1616,7 +1616,7 @@ function prepchoicedisp($v,$choicesdata) {
 			$sh = substr($sh,0,15).'...';
 		}
 		if ($sh!=$c) {
-			$choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.Sanitize::encodeStringForDisplay(trim(str_replace("\n",' ',$c))).'\')" onmouseout="tipout()">'.Sanitize::encodeStringForDisplay($sh).'</span>';
+			$choicesdata[1][$k] = '<span data-tip="'.Sanitize::encodeStringForDisplay(trim(str_replace("\n",' ',$c))).'">'.Sanitize::encodeStringForDisplay($sh).'</span>';
 		}
 	}
 	if ($choicesdata[0]=='choices') {

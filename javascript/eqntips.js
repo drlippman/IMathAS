@@ -84,6 +84,12 @@ function hideAllEhTips() {
 	document.getElementById("ehdd").style.display = "none";
 	document.getElementById('eh').style.display = "none";
 }
+// Make tip text safe to insert as HTML: escape everything except <br> line breaks
+function entryTipToHtml(tip) {
+	return String(tip).split(/<br *\/?>/i).map(function(part) {
+		return part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}).join('<br/>');
+}
 //show eqn tip dropdown (shorttipe)
 function showehdd(eln,shorttip,qn) {
 	if (eecurel!=null && eecurel==eln) {
@@ -101,7 +107,7 @@ function showehdd(eln,shorttip,qn) {
 		var ehdd = document.getElementById("ehdd");
 		var el = document.getElementById(eln);
 		var offset = jQuery(el).offset();
-		document.getElementById("ehddtext").innerHTML = shorttip;
+		document.getElementById("ehddtext").innerHTML = entryTipToHtml(shorttip);
 		document.getElementById("eh").innerHTML = document.getElementById("tips"+qn).innerHTML;
 		ehdd.style.display = "block";
 		//ehdd.style.left = p[0] + "px";

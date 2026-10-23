@@ -599,7 +599,7 @@ if ($overwriteBody==1) {
 	</form>
 	<p><?php echo _('Assessment points total:') ?> <span id="pttotal"></span><br>
 	   <?php echo _('Estimated average time:') ?> <span id="avgtimetotal"></span> <?php echo _('min'); ?>. 
-		<span class="nowrap" onmouseover="tipshow(this,'<?php echo _('95th percentile: 95&percnt; of past students would take this long or less to complete 1 try at each question') ?>')" onmouseout="tipout()">P<sub>95</sub>: <span id="p95timetotal"></span> <?php echo _('min'); ?>.</span>
+		<span class="nowrap" data-tip="<?php echo Sanitize::encodeStringForDisplay(_('95th percentile: 95% of past students would take this long or less to complete 1 try at each question')) ?>">P<sub>95</sub>: <span id="p95timetotal"></span> <?php echo _('min'); ?>.</span>
 		<span id="avgtimemissing" class="small" style="display:none;"><br><em><?php echo _('Not all questions have time data yet, so this estimate will be inaccurate.');?></em></span>
 		<?php if ($showtimewarning) {
 			echo '<br><span class="small">'._('Your assessment allows multiple attempts or tries on questions, so keep in mind the estimate is for a single try at each question.').'</span>';
