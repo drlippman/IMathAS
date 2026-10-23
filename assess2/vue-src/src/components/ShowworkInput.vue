@@ -159,6 +159,10 @@ export default {
         const data = new FormData();
         data.append('type', 'attach');
         data.append('file', el.files[0]);
+        // token putting the upload in the locked per-assessment folder
+        if (window.editorUploadCtx && window.editorUploadCtx['*']) {
+          data.append('ctx', window.editorUploadCtx['*']);
+        }
         this.uploading = 1;
         window.$.ajax({
           url: store.APIbase.replace(/\/\w+\/$/, '') + '/tinymce8/upload_handler.php',
@@ -208,7 +212,7 @@ export default {
             url: store.APIbase + '../tinymce8/upload_handler.php',
             type: 'POST',
             dataType: 'json',
-            data: { remove: todel },
+            data: { remove: todel, ctx: (window.editorUploadCtx && window.editorUploadCtx['*']) || '' },
             xhrFields: {
               withCredentials: true
             },

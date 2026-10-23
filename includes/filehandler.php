@@ -835,6 +835,10 @@ function deleteallaidfiles($aid) {
 }
 
 
+/**
+ * List a user's editor-uploaded files, including those in afiles/$aid/ subfolders
+ * (uploads made inside assessments, which are locked from overwrite/delete)
+ */
 function getuserfiles($uid,$img=false) {
 	if (getfilehandlertype('filehandlertype') == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -858,22 +862,35 @@ function getuserfiles($uid,$img=false) {
 		$seen = array();
 		$k = 0;
 		$pubbase = getlocalstorebase("public");
+		$subs = array('');
 		foreach (getlocalstorebases() as $base) {
-			if ($handle = @opendir($base."ufiles/$uid")) {
-				while (false !== ($file=readdir($handle))) {
-					if ($file != "." && $file != ".." && !is_dir($base."ufiles/$uid/".$file) && !isset($seen[$file])) {
-						$seen[$file] = true;
-						if ($img && !in_array(strtolower(strrchr($file,".")),$imgext)) {
-							continue;
-						}
-						$arr[$k]['name'] = "ufiles/$uid/$file";
-						$arr[$k]['time'] = @filemtime($base."ufiles/$uid/".$file);
-						$arr[$k]['size'] = @filesize($base."ufiles/$uid/".$file);
-						$arr[$k]['public'] = ($base === $pubbase);
-						$k++;
+			if ($handle = @opendir($base."ufiles/$uid/afiles")) {
+				while (false !== ($d=readdir($handle))) {
+					if (ctype_digit($d) && is_dir($base."ufiles/$uid/afiles/$d")) {
+						$subs["afiles/$d/"] = "afiles/$d/";
 					}
 				}
 				closedir($handle);
+			}
+		}
+		foreach ($subs as $sub) {
+			foreach (getlocalstorebases() as $base) {
+				if ($handle = @opendir($base."ufiles/$uid/$sub")) {
+					while (false !== ($file=readdir($handle))) {
+						if ($file != "." && $file != ".." && !is_dir($base."ufiles/$uid/$sub".$file) && !isset($seen[$sub.$file])) {
+							$seen[$sub.$file] = true;
+							if ($img && !in_array(strtolower(strrchr($file,".")),$imgext)) {
+								continue;
+							}
+							$arr[$k]['name'] = "ufiles/$uid/$sub$file";
+							$arr[$k]['time'] = @filemtime($base."ufiles/$uid/$sub".$file);
+							$arr[$k]['size'] = @filesize($base."ufiles/$uid/$sub".$file);
+							$arr[$k]['public'] = ($base === $pubbase);
+							$k++;
+						}
+					}
+					closedir($handle);
+				}
 			}
 		}
 		return $arr;
@@ -1268,6 +1285,52 @@ function editoruploadispublic($token) {
 	$stm = $DBH->prepare("SELECT 1 FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
 	$stm->execute(array(':userid'=>intval($userid), ':courseid'=>$ctx[1]));
 	return ($stm->fetchColumn() !== false);
+}
+
+/**
+ * Is a text-editor upload happening inside an assessment?  Assessment uploads are stored
+ * private under ufiles/$userid/afiles/$aid/, which no other upload/delete path can touch, so
+ * the student can't later overwrite or delete work they've submitted (other than removing
+ * a file from within the same assessment, see deleteassessuserfile()).
+ * @return array [status, aid]. status is 'valid' for a good assess token, 'expired' for a
+ *   correctly signed but expired one (callers must refuse the upload rather than store it
+ *   unprotected), or '' (aid 0) if not an assessment token.
+ */
+function editoruploadassessstatus($token) {
+	global $userid;
+	if (empty($token) || empty($userid) || !is_string($token)) {
+		return ['', 0];
+	}
+	try {
+		$ctx = filesig_verifyctxtoken($token, $userid, null, true);
+		if ($ctx === false || $ctx[0] !== 'assess' || $ctx[1] < 1) {
+			return ['', 0];
+		}
+		$valid = (filesig_verifyctxtoken($token, $userid) !== false);
+		return [$valid ? 'valid' : 'expired', $ctx[1]];
+	} catch (RuntimeException $e) {
+		return ['', 0];
+	}
+}
+
+/**
+ * Delete a file uploaded within an assessment (key ufiles/$uid/afiles/$aid/name)
+ * @return bool success
+ */
+function deleteassessuserfile($uid, $aid, $file) {
+	$safeFilename = Sanitize::sanitizeFilenameAndCheckBlacklist($file);
+	if ($safeFilename === '' || $safeFilename !== $file || intval($uid) < 1 || intval($aid) < 1) {
+		return false;
+	}
+	$key = "ufiles/".intval($uid)."/afiles/".intval($aid)."/$safeFilename";
+	if (filesig_validkey($key) === false) {
+		return false;
+	}
+	if (getfilehandlertype('filehandlertype') == 's3') {
+		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		return (bool) $s3->deleteObject($GLOBALS['AWSbucket'],$key);
+	}
+	return unlinklocaluserfile($key);
 }
 
 /**

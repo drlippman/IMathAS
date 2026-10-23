@@ -12,6 +12,17 @@ if (isset($_REQUEST["type"])) {
 
 $ispublicupload = editoruploadispublic($_REQUEST['ctx'] ?? '');
 
+// Inside an assessment, files go in a locked subfolder: no overwriting, no deleting,
+// and only that subfolder is listed (so a file inserted into an answer can't be
+// replaced later from another editor).
+[$assessstatus, $assessaid] = editoruploadassessstatus($_REQUEST['ctx'] ?? '');
+if ($assessstatus === 'expired') {
+	echo _('This page has been open too long to upload files. Please reload the assessment page and try again.');
+	exit;
+}
+$inassess = ($assessstatus === 'valid');
+$storeprefix = "ufiles/$userid/" . ($inassess ? "afiles/$assessaid/" : '');
+
 if (isset($_REQUEST["action"]))
 {
 	if ($_REQUEST["action"] == "upload_file")
@@ -28,18 +39,18 @@ if (isset($_REQUEST["action"]))
 		if (in_array($extension,$badextensions)) {
 			unset($_REQUEST["action"]);
 		} else {
-			if (!isset($_REQUEST["overwrite"])) { //check if file exists, change filename if needed
+			if ($inassess || !isset($_REQUEST["overwrite"])) { //check if file exists, change filename if needed
 				$ncnt = 1;
 				$filenamepts = explode('.',$filename);
 				$filename0 = $filenamepts[0];
-				while (doesfileexist('ufiles', "ufiles/$userid/".$filename)) {
+				while (doesfileexist('ufiles', $storeprefix.$filename)) {
 					$filenamepts[0] = $filename0.'_'.$ncnt;
 					$filename = implode('.',$filenamepts);
 					$ncnt++;
 				}
 			}
 			$ispublicupload = editoruploadispublic($_REQUEST['ctx'] ?? '');
-			if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,$ispublicupload?"public":"private")) {
+			if (storeuploadedfile("uploaded_file",$storeprefix.$filename,$ispublicupload?"public":"private")) {
 
 			} else {
 				unset($_REQUEST["action"]);
@@ -55,7 +66,7 @@ if (isset($_REQUEST["action"]))
 	}
 	else if ($_REQUEST["action"] == "delete_file")
 	{
-		if (deleteuserfile($userid,$_REQUEST["item_name"])) {
+		if (!$inassess && deleteuserfile($userid,$_REQUEST["item_name"])) {
 			echo 'OK';
 		} else {
 			echo 'FAIL';
@@ -67,6 +78,13 @@ if (isset($_REQUEST["action"]))
 // file listing, loaded via ajax into the Existing Files tab
 if (isset($_REQUEST['showfiles'])) {
 	$files = getuserfiles($userid,$type=="img");
+	foreach ($files as $k=>$v) {
+		// files uploaded in assessments are private and locked (not deletable)
+		if (strpos($v['name'], "ufiles/$userid/afiles/") === 0) {
+			$files[$k]['locked'] = true;
+			$files[$k]['public'] = false;
+		}
+	}
 	$imgext = array('gif','jpg','jpeg','png','svg','webp');
 	$rows = array();
 	foreach ($files as $v) {
@@ -81,6 +99,7 @@ if (isset($_REQUEST['showfiles'])) {
 			'size' => intval($v['size'] ?? 0),
 			'isimg' => $isimg,
 			'resolve' => !isset($v['public']), // public status unknown (S3); look up on insert
+			'locked' => !empty($v['locked']), // assessment upload; can't be deleted
 			// clipboard pastes / image tool output; names are auto-generated
 			'pasted' => $isimg && preg_match('/^(mceclip|imagetool|pastedimage)/i', $name) === 1,
 		);
@@ -139,9 +158,9 @@ if (isset($CFG['locale'])) {
 	}
 }
 ?>
-<script src="file_manager/file_manager.js?v=4"></script>
+<script src="file_manager/file_manager.js?v=5"></script>
 </head>
-<body data-type="<?php echo Sanitize::encodeStringForDisplay($type); ?>" data-files-url="file_manager.php?showfiles=true&amp;type=<?php echo Sanitize::encodeUrlParam($type); ?>"<?php if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") { echo ' data-inserted="' . Sanitize::encodeStringForDisplay($ispublicupload ? getuserfileurl("ufiles/$userid/".$filename) : geteditorfileurl("ufiles/$userid/".$filename)) . '"'; } ?>>
+<body data-type="<?php echo Sanitize::encodeStringForDisplay($type); ?>" data-files-url="file_manager.php?showfiles=true&amp;type=<?php echo Sanitize::encodeUrlParam($type); if ($inassess) { echo '&amp;ctx=' . Sanitize::encodeUrlParam($_REQUEST['ctx']); } ?>"<?php if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") { echo ' data-inserted="' . Sanitize::encodeStringForDisplay($ispublicupload ? getuserfileurl($storeprefix.$filename) : geteditorfileurl($storeprefix.$filename)) . '"'; } ?>>
 <?php
 if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 	echo '<div class="td_main">';
@@ -170,7 +189,9 @@ if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 		}
 		?>
 		<input type="hidden" name="uploaded_file_name" id="uploaded_file_name" />
+		<?php if (!$inassess) { ?>
 		<label class="checkrow"><input type="checkbox" name="overwrite"/> <?php echo _('Overwrite an existing file if it has the same name?'); ?></label>
+		<?php } ?>
 		<button type="submit" class="primary"><?php echo _('Upload'); ?></button>
 	</form>
 	</div>

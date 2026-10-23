@@ -75,7 +75,7 @@ var usertype = <?php if (isset($teacherid)) { echo 2; } else if (isset($tutorid)
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 <?php if (isset($CFG['S3']['altendpoint'])) { echo 'var altfilesendpoint = "'.Sanitize::encodeStringForDisplay($CFG['S3']['altendpoint']).'";';} ?>
 </script>
-<script src="<?php echo $staticroot;?>/javascript/general.js?v=101826"></script>
+<script src="<?php echo $staticroot;?>/javascript/general.js?v=102026"></script>
 <?php
 // override allowedImgDomains if set in config
 if (isset($CFG['GEN']['allowedImgDomains'])) {
@@ -160,7 +160,8 @@ if (isset($useeditor) && $_SESSION['useed']==1) {
 	echo 'var coursetheme = "'.$coursetheme.'";';
 	echo 'var tinymceUseSnippets = '.($myrights>10?1:0).';';
 	if ((!empty($editorpublicids) && !empty($teacherid) && !empty($cid) && !empty($userid)) ||
-		(!empty($editorquestionids) && !empty($userid) && $myrights >= 20)
+		(!empty($editorquestionids) && !empty($userid) && $myrights >= 20) ||
+		(!empty($editorassessctx) && !empty($userid))
 	) {
 		// Server grants "store publicly" to course-page text editors and question editors via
 		// signed, scoped tokens. The upload handler re-checks rights (teacher of the course /
@@ -179,6 +180,12 @@ if (isset($useeditor) && $_SESSION['useed']==1) {
 				foreach (explode(',', $editorquestionids) as $editorctxid) {
 					$editorctxmap[trim($editorctxid)] = $editorctxtoken;
 				}
+			}
+			if (!empty($editorassessctx) && !empty($userid)) {
+				// editors inside assessments aren't known in advance: '*' applies to all of them.
+				// $editorassessctx is the assessment id.
+				// Uploads go to a locked, non-overwritable folder.
+				$editorctxmap['*'] = filesig_makectxtoken('assess', intval($editorassessctx), intval($userid));
 			}
 			echo 'var editorUploadCtx = '.json_encode($editorctxmap).';';
 			echo 'var editorPublicNotice = '.json_encode(_('Files uploaded in course documents and questions are not secured, and can be accessed by anyone who can guess the address.  Do not upload files with private information.')).';';

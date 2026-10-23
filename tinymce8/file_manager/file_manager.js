@@ -174,8 +174,10 @@ function renderList() {
 					$('<div class="prev">').append($('<img alt="">').attr('src', f.url)).appendTo($row);
 				}).appendTo($row);
 			}
-			$('<a href="#" class="delbtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '">').text('\u00d7')
-				.on('click', function(e) { e.preventDefault(); delete_file(f, $row); }).appendTo($row);
+			if (!f.locked) {
+				$('<a href="#" class="delbtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '">').text('\u00d7')
+					.on('click', function(e) { e.preventDefault(); delete_file(f, $row); }).appendTo($row);
+			}
 			$list.append($row);
 		});
 	if (!$list.children().length) {
@@ -195,8 +197,10 @@ function gridMore($grid, $more) {
 	var shown = $grid.data('shown');
 	items.slice(shown, shown + PASTE_PAGE).forEach(function(f) {
 		var $t = $('<div class="thumb">');
-		$('<a href="#" class="delbtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '">').text('\u00d7')
-			.on('click', function(e) { e.preventDefault(); delete_file(f, $t); }).appendTo($t);
+		if (!f.locked) {
+			$('<a href="#" class="delbtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '">').text('\u00d7')
+				.on('click', function(e) { e.preventDefault(); delete_file(f, $t); }).appendTo($t);
+		}
 		$('<a href="#" class="thumbimg">').attr('title', f.name)
 			.append($('<img loading="lazy" alt="">').attr('src', f.url))
 			.on('click', function(e) { e.preventDefault(); FileBrowserDialogue.insertFile(f); }).appendTo($t);

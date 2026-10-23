@@ -46,6 +46,7 @@ if ($isltilimited || $inTreeReader) {
 }
 $nologo = true;
 $useeditor = "noinit";
+$editorassessctx = $aid; // assessment id; editor uploads go to a locked folder, see header.php
 $pagetitle = _('Assessment');
 require_once '../header.php';
 
@@ -87,11 +88,11 @@ if (preg_match('/Chrome\/(\d+)/', $_SERVER['HTTP_USER_AGENT'] ?? '', $matches)) 
     $isOldChrome = $chromeVersion < 105;
 }
 if ($isOldChrome) {
-  echo '<script defer="defer" src="'.$staticroot.'/assess2/vue/js/index-legacy.js?v=HdhgBdMi"></script>';
+  echo '<script defer="defer" src="'.$staticroot.'/assess2/vue/js/index-legacy.js?v=swBV_AvY"></script>';
 } else {
 ?>
-<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=CRVs9uwi"></script>
-<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/index-legacy.js?v=HdhgBdMi"></script>
+<script defer="defer" type="module" src="<?php echo $staticroot;?>/assess2/vue/js/index.js?v=BAeYvHI2"></script>
+<script defer="defer" nomodule src="<?php echo $staticroot;?>/assess2/vue/js/index-legacy.js?v=swBV_AvY"></script>
 <?php
 }
 $placeinfooter = '<div id="ehdd" class="ehdd" style="display:none;">

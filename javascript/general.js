@@ -710,7 +710,9 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		// The image plugin's upload tab has no hook for extra content, so add the
 		// "uploads are public" notice below its dropzone when this editor uploads publicly.
 		editor.on('OpenWindow', function() {
-			if (!getEditorUploadCtx() || !window.editorPublicNotice) {
+			var uctx = getEditorUploadCtx();
+			// assessment uploads are private, so no "public" notice
+			if (!uctx || uctx.indexOf('assess.') === 0 || !window.editorPublicNotice) {
 				return;
 			}
 			var dialog = document.querySelector('.tox-dialog');
@@ -782,7 +784,8 @@ function filePickerCallBack(callback, value, meta) {
 function getEditorUploadCtx() {
 	try {
 		if (window.editorUploadCtx && window.tinymce && tinymce.activeEditor) {
-			return window.editorUploadCtx[tinymce.activeEditor.id] || '';
+			// '*' applies to editors whose ids aren't known in advance (assessments)
+			return window.editorUploadCtx[tinymce.activeEditor.id] || window.editorUploadCtx['*'] || '';
 		}
 	} catch (e) {}
 	return '';
@@ -803,7 +806,7 @@ const image_upload_handler = (blobInfo, progress, isattach) => new Promise((reso
 
   xhr.onload = () => {
     if (xhr.status === 403) {
-      reject({ message: 'HTTP Error: ' + xhr.statusText, remove: true });
+      reject({ message: _('Upload not permitted. If this page has been open for a long time, reload it and try again.'), remove: true });
       return;
     }
 

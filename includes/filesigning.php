@@ -14,6 +14,7 @@
 define('FILESIG_USER_LIFETIME', 3*24*3600);
 define('FILESIG_EXPIRY_GRANULARITY', 3600); // round expiry so URLs are stable (cacheable) within an hour
 define('FILESIG_CTX_LIFETIME', 6*3600);
+define('FILESIG_CTX_ASSESS_LIFETIME', 48*3600); // assessment pages can stay open a long time
 
 /**
  * Get configured secrets as an array (current first, then previous ones).
@@ -128,14 +129,17 @@ function filesig_validkey($key) {
  * editor. Opaque value: base64url(context|cid|uid|exp) . '.' . sig
  */
 function filesig_makectxtoken($context, $cid, $uid, $now = null) {
-	$exp = ($now ?? time()) + FILESIG_CTX_LIFETIME;
+	$lifetime = ($context === 'assess') ? FILESIG_CTX_ASSESS_LIFETIME : FILESIG_CTX_LIFETIME;
+	$exp = ($now ?? time()) + $lifetime;
 	$sig = filesig_ctxsign($context, $cid, $uid, $exp);
 	return $context . '.' . intval($cid) . '.' . intval($uid) . '.' . $exp . '.' . $sig;
 }
 /**
+ * @param bool $allowexpired if true, a correctly signed token for this user is returned
+ *   even if expired (lets callers fail closed rather than fall back to less-restricted behavior)
  * @return array|false [context,cid] if valid for this user and unexpired
  */
-function filesig_verifyctxtoken($token, $uid, $now = null) {
+function filesig_verifyctxtoken($token, $uid, $now = null, $allowexpired = false) {
 	if ($now === null) { $now = time(); }
 	if (!is_string($token)) { return false; }
 	$parts = explode('.', $token);
@@ -144,7 +148,7 @@ function filesig_verifyctxtoken($token, $uid, $now = null) {
 	if (!preg_match('/^\w+$/', $context) || !ctype_digit($cid) || !ctype_digit($tuid) || !ctype_digit($exp)) {
 		return false;
 	}
-	if (intval($tuid) !== intval($uid) || intval($exp) < $now) { return false; }
+	if (intval($tuid) !== intval($uid) || (!$allowexpired && intval($exp) < $now)) { return false; }
 	foreach (filesig_getsecrets('sig') as $secret) {
 		if (hash_equals(filesig_ctxsign($context, $cid, $tuid, $exp, $secret), $sig)) {
 			return [$context, intval($cid)];

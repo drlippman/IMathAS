@@ -20,7 +20,17 @@ ini_set("max_execution_time", "120");
 
 if (isset($_POST['remove'])) {
     $res = false;
-    if (strpos($_POST['remove'], "ufiles/$userid/") !== false) {
+    $rmurl = rawurldecode($_POST['remove']);
+    if (stripos($rmurl, "/afiles/") !== false) {
+        // files uploaded inside assessments are locked, except that they can be removed
+        // from within the same assessment they were uploaded in
+        [$rmstatus, $rmaid] = editoruploadassessstatus($_POST['ctx'] ?? '');
+        if ($rmstatus === 'valid' && preg_match('~ufiles/(\d+)/afiles/(\d+)/([^/?&#]+)$~', $rmurl, $m) &&
+            intval($m[1]) === intval($userid) && intval($m[2]) === $rmaid
+        ) {
+            $res = deleteassessuserfile($userid, $rmaid, $m[3]);
+        }
+    } else if (strpos($_POST['remove'], "ufiles/$userid/") !== false) {
         $res = deleteuserfile($userid, rawurldecode(basename($_POST['remove'])));
     }
     echo '{"done": '.($res?'true':'false').'}';
@@ -95,8 +105,17 @@ if (isset($_POST['remove'])) {
     	    $filename = implode('.',$filenamepts);
     	    $skipcheck = true;
     }
+    // uploads from within an assessment go in a locked subfolder.  A correctly signed but
+    // expired assessment token is refused rather than stored unprotected.
+    [$assessstatus, $assessaid] = editoruploadassessstatus($_POST['ctx'] ?? '');
+    if ($assessstatus === 'expired') {
+      header("HTTP/1.0 403 Forbidden");
+      exit;
+    }
+    $storeprefix = "ufiles/$userid/" . ($assessstatus === 'valid' ? "afiles/$assessaid/" : '');
     $filename0 = $filenamepts[0];
-    while (!$skipcheck && doesfileexist('ufiles', "ufiles/$userid/".$filename)) {
+    // in assessments, always uniquify (even mceclip/imagetool names) so nothing is replaced
+    while ((!$skipcheck || $assessstatus === 'valid') && doesfileexist('ufiles', $storeprefix.$filename)) {
 	$filenamepts[0] = $filename0.'_'.$ncnt;
 	$filename = implode('.',$filenamepts);
 	$ncnt++;
@@ -104,7 +123,7 @@ if (isset($_POST['remove'])) {
     // public only for course-page text editors with a valid server-issued token
     // and current teacher rights; everything else is private.
     $ispublicupload = editoruploadispublic($_POST['ctx'] ?? '');
-    $storekey = "ufiles/$userid/".$filename;
+    $storekey = $storeprefix.$filename;
     if (!$ispublicupload) {
       try {
         filesig_getsecrets('pre');
