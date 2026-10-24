@@ -459,6 +459,7 @@ function displayQuestionList(results) {
             if (q['meantimen'] > 3) {
                 var tipHtml = _('Avg score on first try: ') + q['meanscore'] + '%'
                     + '\n' + _('Avg time on first try: ') + q['meantime'] + _(' min')
+                    + '\n' + 'σ=' + q['sdtime']
                     + '\nN=' + q['meantimen'];
                 $avgTd.append(
                     $('<span>').attr('data-tip', tipHtml).text(q['meantime'])

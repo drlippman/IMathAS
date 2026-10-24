@@ -499,7 +499,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     // unassigned is never in another library
     if ($searchtype == 'assess' || $searchtype == 'all' || ($searchtype == 'libs' && $libquery != '')) {
         $query .= 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,';
-        $query .= 'iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
+        $query .= 'iq.ownerid, iq.meantime, iq.vartime, iq.meanscore,iq.meantimen,iq.isrand,
         imas_users.LastName, imas_users.FirstName, imas_users.groupid,
         LENGTH(iq.solution) AS hassolution,iq.solutionopts,iq.broken';
         if ($searchtype == 'assess') {
@@ -561,7 +561,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
     if ($libsIncludesUnassigned) {
         // libs search - search separately for unassigned
         $query .= 'SELECT iq.id, iq.description, iq.userights, iq.qtype, iq.extref,';
-        $query .= 'iq.ownerid, iq.meantime, iq.meanscore,iq.meantimen,iq.isrand,
+        $query .= 'iq.ownerid, iq.meantime,iq.vartime, iq.meanscore,iq.meantimen,iq.isrand,
         imas_users.LastName, imas_users.FirstName, imas_users.groupid,
         LENGTH(iq.solution) AS hassolution,iq.solutionopts,iq.broken';
         $query .= ',ili.libid, ili.junkflag, ili.id AS libitemid ';
@@ -663,6 +663,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         unset($row['hassolution']);
         $row['meantime'] = round($row['meantime']/60,1);
         $row['meanscore'] = round($row['meanscore']);
+        $row['sdtime'] = round(sqrt($row['vartime']) / 60, 2);
+        unset($row['vartime']);
         $row['mine'] = ($row['ownerid'] == $userid) ? 1 : 0;
         $row['canedit'] = ($row['ownerid'] == $userid || 
             !empty($options['isadmin']) ||
