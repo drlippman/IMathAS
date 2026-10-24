@@ -589,7 +589,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath mathquill asciisvg | saveclose",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder|style|class],param[name|value],@[sscr],asvg[sscr|src|type|style|alt]',
 		custom_elements: 'asvg',
-        content_css : staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme,
+        content_css : inline ? '' : (staticroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+staticroot+'/themes/'+coursetheme),
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		mathquill_latex_endpoint : AMTcgiloc,
 		convert_urls: false,

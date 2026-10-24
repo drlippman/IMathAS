@@ -435,7 +435,7 @@
 	';
 	$placeinhead .= '</script>';
 	if ($_SESSION['useed']!=0) {
-		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",1,true);</script>';
+		$placeinhead .= '<script type="text/javascript"> initeditor("divs","fbbox",null,true);</script>';
 	}
 	$placeinhead .= '<style type="text/css"> 
         .fixedbottomright {position: fixed; right: 10px; bottom: 10px; z-index:10;}
