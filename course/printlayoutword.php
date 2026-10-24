@@ -107,14 +107,14 @@ function getQuestions($line) {
                 }
                 $lastgroupq = $breakq - $shift;
                 shuffle($thisgroup);
-                $newqout = array_merge($newqout, $thisgroup);
+                $newqout = array_merge($newqout, array_values($thisgroup));
             }
             $thisgroup = [];
             for ($i=$lastgroupq;$i < count($questions); $i++) {
                 $thisgroup[] = $questions[$i];
             }
             shuffle($thisgroup);
-            $qout = array_merge($newqout, $thisgroup);
+            $questions = array_merge($newqout, array_values($thisgroup));
           } else {
             shuffle($questions);
           }
@@ -195,18 +195,18 @@ if ($overwriteBody==1) {
 	echo '<p>'._('This page will help you create a copy of this assessment as a Word 2007+ file that you can then edit for printing.').'</p>';
 
 	echo "<form method=\"post\" action=\"printlayoutword.php?cid=$cid&aid=$aid&from=$from\" class=\"nolimit\">\n";
-	echo '<span class="form">'._('Number of different versions to generate:').'</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
-	echo '<span class="form">'._('Format?').'</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> '._('Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3.').'<br/>';
-	echo '<input type="radio" name="format" value="trad2" /> '._('Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3, but repick questions from question pools on each version, and reshuffle questions (if enabled in assessment settings) on each version.').'<br/>';
-	echo '<input type="radio" name="format" value="inter"/> '._('Multiple forms grouped by question - 1a 1b 2a 2b').'</span><br class="form"/>';
-	echo '<span class="form">'._('Generate answer keys?').'</span><span class="formright"> <input type=radio name=keys value=1 checked=1>'._('Yes').' <input type=radio name=keys value=0>'._('No').'</span><br class="form"/>';
-	echo '<span class="form">'._('Question separator:').'</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
-	echo '<span class="form">'._('Version separator:').'</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> '._('Use PAGEBREAK for a page break').'</span><br class="form"/>';
-	echo '<span class="form">'._('Include question numbers:').'</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
-	echo '<span class="form">'._('Include point values:').'</span><span class="formright"><input type="checkbox" name="showpts" checked="checked" /> </span><br class="form"/>';
-	echo '<span class="form">'._('Hide text entry lines?').'</span><span class="formright"><input type=checkbox name=hidetxtboxes checked="checked" ></span><br class="form"/>';
-	echo '<span class="form">'._('Include between-question text?').'</span><span class="formright"><input type=checkbox name=showtexts ></span><br class="form"/>';
-	echo '<span class="form">'._('Include detailed solutions?').'</span><span class="formright"><input type=checkbox name=detsoln ></span><br class="form"/>';
+	echo '<label class="form" for="versions">'._('Number of different versions to generate:').'</label><span class="formright"><input type=text name=versions id=versions value="1" size="3"></span><br class="form"/>';
+	echo '<span class="form" id="formatlbl">'._('Format?').'</span><span class="formright" role="radiogroup" aria-labelledby="formatlbl"><label><input type="radio" name="format" value="trad" checked="checked" /> '._('Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3.').'</label><br/>';
+	echo '<label><input type="radio" name="format" value="trad2" /> '._('Multiple forms of the whole assessment - Form A: 1 2 3, Form B: 1 2 3, but repick questions from question pools on each version, and reshuffle questions (if enabled in assessment settings) on each version.').'</label><br/>';
+	echo '<label><input type="radio" name="format" value="inter"/> '._('Multiple forms grouped by question - 1a 1b 2a 2b').'</label></span><br class="form"/>';
+	echo '<span class="form" id="keyslbl">'._('Generate answer keys?').'</span><span class="formright" role="radiogroup" aria-labelledby="keyslbl"> <label><input type=radio name=keys value=1 checked=1>'._('Yes').'</label> <label><input type=radio name=keys value=0>'._('No').'</label></span><br class="form"/>';
+	echo '<label class="form" for="qsep">'._('Question separator:').'</label><span class="formright"><input type=text name="qsep" id="qsep" value="" /></span><br class="form"/>';
+	echo '<label class="form" for="vsep">'._('Version separator:').'</label><span class="formright"><input type=text name="vsep" id="vsep" value="+++++++++++++++" aria-describedby="vsephelp" /> <span id="vsephelp">'._('Use PAGEBREAK for a page break').'</span></span><br class="form"/>';
+	echo '<label class="form" for="showqn">'._('Include question numbers:').'</label><span class="formright"><input type="checkbox" name="showqn" id="showqn" checked="checked" /> </span><br class="form"/>';
+	echo '<label class="form" for="showpts">'._('Include point values:').'</label><span class="formright"><input type="checkbox" name="showpts" id="showpts" checked="checked" /> </span><br class="form"/>';
+	echo '<label class="form" for="hidetxtboxes">'._('Hide text entry lines?').'</label><span class="formright"><input type=checkbox name=hidetxtboxes id=hidetxtboxes checked="checked" ></span><br class="form"/>';
+	echo '<label class="form" for="showtexts">'._('Include between-question text?').'</label><span class="formright"><input type=checkbox name=showtexts id=showtexts ></span><br class="form"/>';
+	echo '<label class="form" for="detsoln">'._('Include detailed solutions?').'</label><span class="formright"><input type=checkbox name=detsoln id=detsoln ></span><br class="form"/>';
 
 	echo '<p>'._('NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.').'</p>';
 
