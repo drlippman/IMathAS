@@ -449,6 +449,62 @@ switch($_GET['action']) {
 			require_once "../includes/newusercommon.php";
 			showNewUserValidation("userform", ['group'], ['group' => 'true, min: -1']);
 		} else if ($myrights==100) {
+			// jsondata is already decoded if the COPPA branch above ran
+			$linejson = is_array($line['jsondata']) ? $line['jsondata'] : json_decode($line['jsondata'] ?: '', true);
+			$chglog = $linejson['chglog'] ?? [];
+			echo '<details class="chglog"><summary>'._('Account change log').'</summary>';
+			if (empty($chglog)) {
+				echo '<p>'._('No changes recorded').'</p>';
+			} else {
+				krsort($chglog);
+				$byids = array_unique(array_filter(array_column($chglog, 'by')));
+				$bynames = [];
+				if (count($byids) > 0) {
+					$stm = $DBH->prepare('SELECT id,FirstName,LastName FROM imas_users WHERE id IN ('.Sanitize::generateQueryPlaceholders($byids).')');
+					$stm->execute(array_values($byids));
+					while ($r = $stm->fetch(PDO::FETCH_NUM)) {
+						$bynames[$r[0]] = $r[2].', '.$r[1].' ('.$r[0].')';
+					}
+				}
+				echo '<table class="gb"><thead><tr><th>'._('When').'</th><th>'._('Change').'</th><th>'._('By').'</th></tr></thead><tbody>';
+				foreach ($chglog as $when => $entry) {
+					$desc = [];
+					if (!empty($entry['chgpw'])) { $desc[] = _('Password changed'); }
+					if (!empty($entry['resetpw'])) { $desc[] = _('Password reset'); }
+					if (isset($entry['oldemail'])) {
+						$d = sprintf(_('Email changed from %s'), $entry['oldemail']);
+						if (isset($entry['newemail'])) { $d .= sprintf(_(' to %s'), $entry['newemail']); }
+						$desc[] = $d;
+					}
+					if (isset($entry['oldusername'])) { $desc[] = sprintf(_('Username changed from %s'), $entry['oldusername']); }
+					if (isset($entry['oldname'])) { $desc[] = sprintf(_('Name changed from %s'), $entry['oldname']); }
+					if (isset($entry['newrights'])) {
+						$d = _('Rights changed');
+						if (isset($entry['oldrights'])) { $d .= sprintf(_(' from %d'), $entry['oldrights']); }
+						$desc[] = $d . sprintf(_(' to %d'), $entry['newrights']);
+					}
+					if (isset($entry['oldspecialrights'])) {
+						$desc[] = sprintf(_('Task rights changed from %d to %d'), $entry['oldspecialrights'], $entry['newspecialrights'] ?? 0);
+					}
+					if (isset($entry['oldgroupid']) || isset($entry['newgroupid'])) {
+						$desc[] = sprintf(_('Group changed from %s to %s'), $entry['oldgroupid'] ?? '?', $entry['newgroupid'] ?? '?');
+					}
+					if (isset($entry['oldmfa'])) { $desc[] = _('2-factor authentication setting changed'); }
+					if (!empty($entry['clearmfa'])) { $desc[] = _('2-factor authentication disabled'); }
+					if (!empty($entry['anonymized'])) { $desc[] = _('User anonymized'); }
+					if (count($desc) == 0) { $desc[] = _('Account changed'); }
+					echo '<tr><td>'.Sanitize::encodeStringForDisplay(date('n/j/y g:i a', (int) $when)).'</td><td>';
+					echo implode('<br>', array_map('Sanitize::encodeStringForDisplay', $desc)).'</td><td>';
+					if (!empty($entry['by'])) {
+						echo Sanitize::encodeStringForDisplay($bynames[$entry['by']] ?? $entry['by']);
+					} else {
+						echo _('User');
+					}
+					echo '</td></tr>';
+				}
+				echo '</tbody></table>';
+			}
+			echo '</details>';
 			echo '<p>&nbsp;</p><p>&nbsp;</p>';
 			echo '<a href="forms.php?action=deladmin&id='.Sanitize::encodeUrlParam($_GET['id']).'">Delete User</a> ';
 			echo '<a href="forms.php?action=anonuser&id='.Sanitize::encodeUrlParam($_GET['id']).'">Anonymize User</a>';

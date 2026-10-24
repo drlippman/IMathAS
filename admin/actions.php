@@ -4,6 +4,7 @@
 require_once "../init.php";
 require_once "../includes/password.php";
 require_once "../includes/TeacherAuditLog.php";
+require_once "../includes/chglog.php";
 
 //Look to see if a hook file is defined, and include if it is
 if (isset($CFG['hooks']['admin/actions'])) {
@@ -69,14 +70,14 @@ switch($_POST['action']) {
 		if ($_POST['newrights']>$myrights) {
 			$_POST['newrights'] = $myrights;
 		}
-		$stm = $DBH->prepare("SELECT rights,groupid,jsondata FROM imas_users WHERE id=:id");
+		$stm = $DBH->prepare("SELECT rights,groupid,jsondata,SID,FirstName,LastName,email,specialrights,mfa FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['id']));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
 			echo _("invalid id");
 			exit;
-		} 
-		list($oldrights,$oldgroupid,$oldjsondata) = $row;
+		}
+		list($oldrights,$oldgroupid,$oldjsondata,$oldSID,$oldFirst,$oldLast,$oldemail,$oldspecialrights,$oldmfa) = $row;
 		if ($myrights < 100 && ($myspecialrights&32)!=32 && $oldgroupid!=$groupid) {
 			echo "You don't have the authority for this action";
 			exit;
@@ -180,6 +181,7 @@ switch($_POST['action']) {
 			$query .= " WHERE id=:id";
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);
+			$userUpdated = $stm->rowCount() > 0;
 			$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=:groupid WHERE ownerid=:ownerid");
 			$stm->execute(array(':groupid'=>$newgroup, ':ownerid'=>$_GET['id']));
 		} else {
@@ -203,11 +205,49 @@ switch($_POST['action']) {
 			$query .= " WHERE id=:id AND groupid=:groupid AND rights<100";
 			$stm = $DBH->prepare($query);
 			$stm->execute($arr);
+			$userUpdated = $stm->rowCount() > 0;
 
 			if (!empty($_POST['removefromgroup'])) {
 				// fix library group
 				$stm = $DBH->prepare("UPDATE imas_libraries SET groupid=0 WHERE ownerid=:ownerid");
 				$stm->execute(array(':ownerid'=>$_GET['id']));
+			}
+		}
+
+		//record account changes in the change log
+		if ($userUpdated) {
+			$chglog = [];
+			if ($chgSID && Sanitize::stripHtmlTags($_POST['SID']) != $oldSID) {
+				$chglog['oldusername'] = $oldSID;
+			}
+			if ($arr[':FirstName'] != $oldFirst || $arr[':LastName'] != $oldLast) {
+				$chglog['oldname'] = $oldLast . ', ' . $oldFirst;
+			}
+			if ($arr[':email'] != $oldemail) {
+				$chglog['oldemail'] = $oldemail;
+				$chglog['newemail'] = $arr[':email'];
+			}
+			if (isset($_POST['doresetpw'])) {
+				$chglog['resetpw'] = 1;
+			}
+			if ($_POST['newrights'] != $oldrights) {
+				$chglog['oldrights'] = $oldrights;
+				$chglog['newrights'] = $_POST['newrights'];
+			}
+			if ($specialrights != $oldspecialrights) {
+				$chglog['oldspecialrights'] = $oldspecialrights;
+				$chglog['newspecialrights'] = $specialrights;
+			}
+			if ($newgroup != $oldgroupid) {
+				$chglog['oldgroupid'] = $oldgroupid;
+				$chglog['newgroupid'] = $newgroup;
+			}
+			if ($myrights == 100 && $_GET['id'] != $userid && !isset($_SESSION['emulateuseroriginaluser']) && !empty($_POST['clearMFA']) && $oldmfa != '') {
+				$chglog['clearmfa'] = 1;
+			}
+			if (!empty($chglog)) {
+				$chglog['by'] = $userid;
+				addAccountChangeLog($_GET['id'], $chglog);
 			}
 		}
 
@@ -286,6 +326,9 @@ switch($_POST['action']) {
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:password WHERE id=:id");
 			$stm->execute(array(':password'=>$pwhash, ':id'=>$_GET['id']));
 		}
+		if ($stm->rowCount() > 0) {
+			addAccountChangeLog($_GET['id'], ['resetpw'=>1, 'by'=>$userid]);
+		}
 		break;
 	case "anonuser":
 		if ($myrights < 100) { echo "You don't have the authority for this action"; break;}
@@ -301,6 +344,7 @@ switch($_POST['action']) {
 		}
 		$stm = $DBH->prepare($query);
 		$stm->execute($qarr);
+		addAccountChangeLog($deluid, ['anonymized'=>1, 'by'=>$userid]);
 		break;
 	case "deladmin":
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}

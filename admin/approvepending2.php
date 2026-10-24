@@ -2,6 +2,7 @@
 
 require_once "../init.php";
 require_once '../includes/filehandler.php';
+require_once '../includes/chglog.php';
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
@@ -63,6 +64,7 @@ if (!empty($_POST['newstatus'])) {
 	} else if ($newStatus==10) { //deny
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));
+		addAccountChangeLog($instId, ['newrights'=>10, 'by'=>$userid, 'via'=>'approvepending']);
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 			require_once "../includes/unenroll.php";
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
@@ -121,6 +123,7 @@ if (!empty($_POST['newstatus'])) {
 
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
 		$stm->execute(array(':groupid'=>$group, ':id'=>$instId));
+		addAccountChangeLog($instId, ['newrights'=>40, 'newgroupid'=>$group, 'by'=>$userid, 'via'=>'approvepending']);
 
 		$stm = $DBH->prepare("SELECT FirstName,LastName,SID,email FROM imas_users WHERE id=:id");
 		$stm->execute(array(':id'=>$instId));

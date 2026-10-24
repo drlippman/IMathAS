@@ -730,6 +730,11 @@ require_once "includes/sanitize.php";
 			
 			$stm = $DBH->prepare("UPDATE imas_users SET password=:newpw,forcepwreset=0 WHERE id=:uid LIMIT 1");
 			$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
+			if ($_GET['action']=="forcechgpwd") {
+				// chgpwd logs below, after reloading jsondata
+				require_once './includes/chglog.php';
+				addAccountChangeLog($userid, ['chgpw'=>1]);
+			}
 
             require_once 'includes/mfa.php';
             mfa_clearTrustedDevices($userid);

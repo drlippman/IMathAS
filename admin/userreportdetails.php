@@ -64,6 +64,8 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 
         $stm = $DBH->prepare("UPDATE imas_users SET password=:pw,forcepwreset=1 WHERE id=:uid");
         $stm->execute(array(':pw'=>$newpw, ':uid'=>$uid));
+        require_once "../includes/chglog.php";
+        addAccountChangeLog($uid, ['resetpw'=>1, 'by'=>$userid]);
         $errors = _('Password Reset');
 		  }
 	}

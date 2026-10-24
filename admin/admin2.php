@@ -133,6 +133,17 @@ if ($myrights < 75) {
       echo 'Invalid rights';
       exit;
     }
+    // find users whose rights will actually change, for the change log
+    $sel = "SELECT id,rights FROM imas_users WHERE id IN ($ph) AND rights<75 AND rights<>?";
+    $selarr = array_merge($qarr, [$newrights]);
+    if ($myrights < 100) {
+      $sel .= ' AND groupid=?';
+      $selarr[] = $groupid;
+    }
+    $stm = $DBH->prepare($sel);
+    $stm->execute($selarr);
+    $tochange = $stm->fetchAll(PDO::FETCH_KEY_PAIR);
+
     array_unshift($qarr, $newrights);
     $query = "UPDATE imas_users SET rights=? WHERE id IN ($ph) AND rights<75";
     if ($myrights < 100) {
@@ -141,6 +152,10 @@ if ($myrights < 75) {
     }
     $stm = $DBH->prepare($query);
     $stm->execute($qarr);
+    require_once "../includes/chglog.php";
+    foreach ($tochange as $chgId => $chgOldRights) {
+      addAccountChangeLog($chgId, ['oldrights'=>$chgOldRights, 'newrights'=>$newrights, 'by'=>$userid]);
+    }
     header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/admin2.php?groupdetails=".Sanitize::encodeUrlParam($showgroup). "&r=" .Sanitize::randomQueryStringParam());
     exit;
   } else if (isset($_POST['checked'])) { //initiating rights change
