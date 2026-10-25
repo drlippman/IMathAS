@@ -84,34 +84,35 @@ function tipshow(el,tip, e) {
 	var p = findPos(el);
 
 	if (self.innerHeight) {
-                x = self.innerWidth;
-        } else if (document.documentElement && document.documentElement.clientHeight) {
-                x = document.documentElement.clientWidth;
-        } else if (document.body) {
-                x = document.body.clientWidth;
-        }
-        var scrOfX = 0;
-        if( typeof( window.pageYOffset ) == 'number' ) {
+		x = self.innerWidth;
+	} else if (document.documentElement && document.documentElement.clientHeight) {
+		x = document.documentElement.clientWidth;
+	} else if (document.body) {
+		x = document.body.clientWidth;
+	}
+	var scrOfX = 0;
+	if( typeof( window.pageYOffset ) == 'number' ) {
 	    scrOfX = window.pageXOffset;
-	  } else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ) {
-	    scrOfX = document.body.scrollLeft;
-	  } else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ) {
-	    scrOfX = document.documentElement.scrollLeft;
-	  }
+	} else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ) {
+		scrOfX = document.body.scrollLeft;
+	} else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ) {
+		scrOfX = document.documentElement.scrollLeft;
+	}
 
-        x += scrOfX;
-        if ((p[0] + tipobj.offsetWidth)>x-10) {
-        	p[0] = x - tipobj.offsetWidth - 30;
-        	$(tipobj).addClass("tipright");
-        } else {
-        	$(tipobj).removeClass("tipright");
-        }
-
+    x += scrOfX;
+	if ((p[0] + tipobj.offsetWidth)>x-10) {
+		p[0] = x - tipobj.offsetWidth - 30;
+		$(tipobj).addClass("tipright");
+	} else {
+		$(tipobj).removeClass("tipright");
+	}
+	var tiptop = p[1] - tipobj.offsetHeight;
 	tipobj.style.left = (p[0]+15) + "px";
-	if (p[1] < 30) {
+	var scrY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+	if (tiptop - scrY < 5) { // not enough room above in the visible viewport
 		tipobj.style.top = (p[1]+20) + "px";
 	} else {
-		tipobj.style.top = (p[1]-tipobj.offsetHeight) + "px";
+		tipobj.style.top = tiptop + "px";
 	}
 }
 
