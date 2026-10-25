@@ -463,12 +463,74 @@ if ($overwriteBody==1) {
 	echo '<p>'._('NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.').'</p>';
 	echo '<form id="theform" method="post" action="'.$pandocurl.'/html2docx.php">';
 	echo '<p><label><input type="checkbox" name="darkgrid"> '._('Darken graph grid lines').'</label><br/>';
-	echo '<label><input type="checkbox" name="doubleimgs"> '._('Double image sizes').'</label></p>';
+	echo '<label><input type="checkbox" name="doubleimgs"> '._('Double image sizes').'</label><br/>';
+	echo '<label><input type="checkbox" name="usesvg" id="usesvg" checked="checked"> '._('Use scalable (SVG) graphs. Higher quality, but requires a recent version of Word.').'</label></p>';
 
 	echo '<p><input type="submit" value="'._("Convert to Word").'"/> ';
 	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">'._('Change print settings').'</a></p>';
 	echo '<textarea name="html" style="visibility:hidden">'.Sanitize::encodeStringForDisplay($out).'</textarea>';
 	echo '</form>';
+	?>
+	<script>
+	// If SVG is selected, render the asciisvg <embed> graphs in the browser,
+	// and replace them in the html with the generated svg (as data-URI images)
+	// before the form is posted to the pandoc server.
+	function embedsToSVG(html, darkgrid) {
+		var wrap = document.createElement('div');
+		wrap.style.cssText = 'position:absolute;left:-10000px;top:0;visibility:hidden';
+		document.body.appendChild(wrap);
+		wrap.innerHTML = html.replace(/^[\s\S]*?<body[^>]*>/i, '').replace(/<\/body>[\s\S]*$/i, '');
+		try {
+			if (typeof window.drawPics === 'function') {
+				window.drawPics(wrap);
+			}
+			var embeds = wrap.querySelectorAll('embed');
+			for (var i = 0; i < embeds.length; i++) {
+				var emb = embeds[i];
+				var id = emb.id.replace(/-embed$/, '');
+				var svg = null;
+				var cands = wrap.querySelectorAll('svg');
+				for (var j = 0; j < cands.length; j++) {
+					if (cands[j].id === id) { svg = cands[j]; break; }
+				}
+				if (svg === null) { continue; }
+				// remove interactive/screen-reader extras
+				var junk = svg.querySelectorAll('#magglass1,#magglass2,#magglass3,#pointerpos');
+				for (var k = 0; k < junk.length; k++) { junk[k].remove(); }
+				var sr = wrap.querySelector('[id="' + id + '-srlabel"]');
+				if (sr) { sr.remove(); }
+				var w = svg.getAttribute('width'), h = svg.getAttribute('height');
+				svg.removeAttribute('style');
+				svg.removeAttribute('aria-hidden');
+				var xml = new XMLSerializer().serializeToString(svg);
+				if (darkgrid) { xml = xml.replace(/stroke="#757575"/gi, 'stroke="#646464"'); }
+				var img = document.createElement('img');
+				img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(xml))));
+				if (w) { img.setAttribute('width', w); }
+				if (h) { img.setAttribute('height', h); }
+				img.setAttribute('alt', emb.getAttribute('alt') || svg.getAttribute('alt') || 'Graph');
+				img.setAttribute('style', 'vertical-align: middle;');
+				svg.remove();
+				emb.parentNode.replaceChild(img, emb);
+			}
+			return '<!DOCTYPE html><html><body>' + wrap.innerHTML + '</body></html>';
+		} finally {
+			wrap.remove();
+		}
+	}
+	document.getElementById('theform').addEventListener('submit', function(e) {
+		var ta = this.elements['html'];
+		if (!document.getElementById('usesvg').checked || ta.dataset.svgdone) { return; }
+		try {
+			ta.value = embedsToSVG(ta.value, this.elements['darkgrid'].checked);
+			ta.dataset.svgdone = 1;
+		} catch (err) {
+			console.log(err);
+			document.getElementById('usesvg').checked = false;
+		}
+	});
+	</script>
+	<?php
 
 	/*
 
