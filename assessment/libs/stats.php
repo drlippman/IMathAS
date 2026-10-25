@@ -1411,18 +1411,15 @@ function invtcdf($p,$ndf,$dec=4) {
 	    $y = ((1 / ((($ndf + 6) / ($ndf * $y) - 0.089 * $d - 0.822) * ($ndf + 2) * 3) + 0.5 / ($ndf + 4)) * $y - 1) * ($ndf + 1) / ($ndf + 2) + 1 / $y;
 	  }
 	}
-	if ($dec>3) {
-		$fn_val = invtrefine(sqrt($ndf*$y),1-$p/2,$ndf,$dec);
-		//echo "orig: ".sqrt($ndf*$y).", refined: $fn_val <br/>";
-	} else {
-		$fn_val = round( sqrt($ndf * $y) , $dec);
-	}
+	
+	$fn_val = invtrefine(sqrt($ndf*$y),1-$p/2,$ndf,$dec);
+	
 	if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
 }
 
 function invtrefine($t,$p,$ndf,$dec) {
 	$dv = .001;
-	$eps = pow(.1,$dec+1);
+	$eps = pow(.1,$dec+2);
 	while ($dv>$eps) {
 		$dv = $dv/2;
 		if (tcdf($t,$ndf,$dec+10)>$p) {
