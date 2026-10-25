@@ -107,6 +107,17 @@
           {{ $t('gradebook-' + (showExcused ? 'hide' : 'show') + '_excused') }}
         </button>
       </div>
+      <div v-if="aData.assess_excused">
+        {{ $t('gradebook-assess_excused') }}
+        <button
+          v-if="canEdit"
+          type="button"
+          class="slim"
+          @click="unexcuse"
+        >
+          {{ $t('gradebook-unexcuse') }}
+        </button>
+      </div>
       <div v-if="canEdit && aData.scoresingb === 'manual'">
         {{ $t('gradebook-manualstatus' + aData.manual_released) }}
         <button
@@ -980,6 +991,9 @@ export default {
     },
     clearLPblock () {
       actions.clearLPblock();
+    },
+    unexcuse () {
+      actions.unexcuse();
     },
     submitVersion () {
       actions.endAssess();

@@ -81,7 +81,8 @@ if (!empty($_POST['practice']) && $_POST['practice'] === 'false') {
 }
 
 if ($_SERVER['HTTP_HOST'] == 'localhost') {
-  //to help with development, while vue runs on 8080
+  // to help with development, while vue runs on 8080
+  // be sure to disable csrfp for vue dev
   if (!empty($CFG['assess2-use-vue-dev'])) {
     header('Access-Control-Allow-Origin: '. $CFG['assess2-use-vue-dev-address']);
   }

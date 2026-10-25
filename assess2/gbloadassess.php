@@ -248,6 +248,13 @@ if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
 // get student's assessment attempt metadata
 $assessInfoOut = array_merge($assessInfoOut, $assess_record->getGbAssessMeta());
 
+// see if this assessment has been excused for the student
+$stm = $DBH->prepare("SELECT id FROM imas_excused WHERE type='A' AND typeid=? AND userid=?");
+$stm->execute(array($aid, $uid));
+if ($stm->fetchColumn(0) !== false) {
+  $assessInfoOut['assess_excused'] = 1;
+}
+
 //get attempt info
 $assessInfoOut['has_active_attempt'] = $assess_record->hasActiveAttempt();
 //get time limit expiration of current attempt, if appropriate

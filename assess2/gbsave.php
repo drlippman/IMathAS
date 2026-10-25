@@ -12,6 +12,8 @@
  * POST variables:
  *  scores    JSON string with keys of form av-qn-qv-pn, or gen
  *  feedback  JSON string with keys of the form av-g, or av-qn-qv
+ *  unexcuse  (optional) if set, remove the excused status for this assessment
+ *  A scores value of "x" for gen excuses the assessment rather than overriding
  *
  * Returns: success or error message
  */
@@ -75,7 +77,23 @@ if (!$assess_record->hasRecord()) {
   exit;
 }
 
+// an assessment override of "x" means excuse the assessment, not an override
+$excuseChange = null;
+if (isset($scores['gen']) && strtolower(trim($scores['gen'])) === 'x') {
+  unset($scores['gen']);
+  $stm = $DBH->prepare("INSERT IGNORE INTO imas_excused (userid, courseid, type, typeid, dateset) VALUES (?,?,?,?,?)");
+  $stm->execute(array($uid, $cid, 'A', $aid, time()));
+  $excuseChange = 1;
+} else if (!empty($_POST['unexcuse'])) {
+  $stm = $DBH->prepare("DELETE FROM imas_excused WHERE userid=? AND type='A' AND typeid=?");
+  $stm->execute(array($uid, $aid));
+  $excuseChange = 0;
+}
+
 $changes = $assess_record->setGbScoreOverrides($scores);
+if ($excuseChange !== null) {
+  $changes['excused'] = $excuseChange;
+}
 $assess_record->setGbFeedbacks($feedbacks);
 if (isset($_POST['releasescore'])) {
   if ($assess_record->setManuallyReleased($_POST['releasescore']==1)) {
@@ -87,6 +105,9 @@ $assess_record->saveRecord();
 $out = $assess_record->getGbScore();
 $out['assess_info'] = $assess_record->getGbAssessScoresAndQVersions();
 $out['newscores'] = $assess_record->getScoresAfterOverrides($scores);
+if ($excuseChange !== null) {
+  $out['assess_excused'] = $excuseChange;
+}
 
 if (!empty($changes)) {
   TeacherAuditLog::addTracking(

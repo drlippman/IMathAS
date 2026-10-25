@@ -309,6 +309,10 @@ export const actions = {
         // can tell if we change anything
         for (const key in store.scoreOverrides) {
           if (key === 'gen') {
+            if (String(store.scoreOverrides.gen).trim().toLowerCase() === 'x') {
+              // "x" excuses the assessment rather than setting an override
+              continue;
+            }
             if (store.scoreOverrides.gen === '') {
               delete store.assessInfo.scoreoverride;
             } else {
@@ -358,6 +362,9 @@ export const actions = {
           }
         }
 
+        if (response.hasOwnProperty('assess_excused')) {
+          store.assessInfo.assess_excused = response.assess_excused;
+        }
         store.assessInfo.gbscore = response.gbscore;
         store.assessInfo.scored_version = response.scored_version;
         // Update question scored version
@@ -394,6 +401,47 @@ export const actions = {
   clearLPblock () {
     store.clearAttempts.type = 'practiceview';
     this.clearAttempt(true);
+  },
+  unexcuse () {
+    if (store.inTransit) {
+      window.setTimeout(() => this.unexcuse(), 20);
+      return;
+    }
+    const qs = store.queryString;
+    store.inTransit = true;
+    store.saving = 'saving';
+    store.errorMsg = null;
+    const data = new FormData();
+    data.append('scores', '{}');
+    data.append('feedback', '{}');
+    data.append('practice', 0);
+    data.append('unexcuse', 1);
+    window.$.ajax({
+      url: store.APIbase + 'gbsave.php' + qs,
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      processData: false,
+      contentType: false,
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    })
+      .done(response => {
+        if (response.hasOwnProperty('error')) {
+          this.handleError(response.error);
+          return;
+        }
+        store.saving = 'saved';
+        store.assessInfo.assess_excused = 0;
+      })
+      .fail(response => {
+        this.handleError('send_fail');
+      })
+      .always(response => {
+        store.inTransit = false;
+      });
   },
   setManualRelease (val) {
     if (store.inTransit) {
