@@ -83,33 +83,52 @@
   var imathasKeywords = "and array as break case catch continue do else elseif " +
     "for foreach if or off switch try while where empty isset list";
   var imathasAtoms = "true false null TRUE FALSE NULL";
-  //macros.php
-  var imathasBuiltin = "exp nthlog sinn cosn tann secn cscn cotn rand rrand rands rrands randfrom randsfrom jointrandfrom"
-        + " diffrandsfrom nonzerorand nonzerorrand nonzerorands nonzerorrands diffrands diffrrands nonzerodiffrands"
-        + " nonzerodiffrrands singleshuffle jointshuffle is_array makepretty makeprettydisp showplot addlabel showarrays"
-        + " horizshowarrays showasciisvg listtoarray arraytolist calclisttoarray sortarray consecutive gcd lcm calconarray"
-        + " mergearrays sumarray dispreducedfraction diffarrays intersectarrays joinarray unionarrays count polymakepretty"
-        + " polymakeprettydisp makexpretty makexprettydisp calconarrayif in_array prettyint prettyreal prettysigfig"
-        + " roundsigfig arraystodots subarray showdataarray arraystodoteqns array_flip arrayfindindex fillarray"
-        + " arraysetvalues array_reverse root getsnapwidthheight is_numeric is_nan sign sgn prettynegs dechex hexdec"
-        + " print_r replacealttext randpythag changeimagesize mod fmod numtowords randname randnamewpronouns"
-        + " randmalename randfemalename randnames randmalenames randfemalenames randcity randcities prettytime"
-        + " definefunc evalfunc evalnumstr normalizefunc safepow arrayfindindices stringtoarray strtoupper strtolower"
-        + " ucfirst makereducedfraction makereducedmixednumber stringappend stringprepend textonimage addplotborder"
-        + " addlabelabs makescinot today numtoroman sprintf arrayhasduplicates are_numeric addfractionaxislabels"
-        + " decimaltofraction ifthen cases multicalconarray htmlentities formhoverover formpopup connectthedots"
-        + " jointsort stringpos stringlen stringclean substr substr_count str_replace makexxpretty makexxprettydisp"
-        + " forminlinebutton makenumberrequiretimes comparenumbers comparefunctions getnumbervalue showrecttable"
-        + " htmldisp getstuans checkreqtimes stringtopolyterms getfeedbackbasic getfeedbacktxt getfeedbacktxtessay"
-        + " getfeedbacktxtnumber getfeedbacktxtnumfunc getfeedbacktxtcalculated explode gettwopointlinedata getdotsdata"
-        + " getntupleparts getopendotsdata gettwopointdata gettwopointformulas getlinesdata getineqdata adddrawcommand"
-        + " mergeplots invertplot array_unique ABarray scoremultiorder scoreperiodic scorestring randstate randstates"
-        + " prettysmallnumber makeprettynegative rawurlencode fractowords randcountry randcountries sorttwopointdata"
-        + " addimageborder formatcomplex array_keys array_values comparelogic comparesetexp stuansready comparentuples"
-        + " comparenumberswithunits isset atan2 keepif checkanswerformat preg_match preg_replace is_nan intval"
-        + " comparesameform comparecomplex splicearray getsigfigs checksigfigs prettysigfig_instring prettyreal_instring"
-        + " round_instring setupmathquillfillin simplifyexpr floatval levenshtein uniqid trim rtrim ltrim compareintervals"
-        + " is_nicenumber is_string";
+  //macros/array.php
+  var imathasBuiltin = "listtoarray arraytolist calclisttoarray sortarray consecutive calconarray mergearrays sumarray"
+        + " diffarrays intersectarrays joinarray unionarrays calconarrayif subarray arrayfindindex fillarray"
+        + " arraysetvalues arrayfindindices stringtoarray arrayhasduplicates are_numeric multicalconarray"
+        + " jointsort ABarray keepif splicearray";
+  //macros/conditional.php
+  imathasBuiltin += " comparenumbers comparefunctions scoremultiorder scoreperiodic scorestring comparelogic comparesetexp"
+        + " comparentuples comparenumberswithunits comparesameform comparecomplex compareintervals";
+  //macros/feedback.php
+  imathasBuiltin += " getfeedbackbasic getfeedbacktxt getfeedbacktxtessay getfeedbacktxtnumber getfeedbacktxtnumfunc"
+        + " getfeedbacktxtcalculated";
+  //macros/format.php
+  imathasBuiltin += " makepretty makeprettydisp dispreducedfraction polymakepretty polymakeprettydisp makexpretty"
+        + " makexprettydisp prettyint prettyreal prettysigfig roundsigfig prettynegs numtowords prettytime"
+        + " makereducedfraction makereducedmixednumber makescinot today numtoroman makexxpretty makexxprettydisp"
+        + " htmldisp prettysmallnumber makeprettynegative fractowords formatcomplex prettysigfig_instring"
+        + " prettyreal_instring round_instring simplifyexpr";
+  //macros/graph.php
+  imathasBuiltin += " showplot addlabel showasciisvg arraystodots arraystodoteqns replacealttext changeimagesize"
+        + " textonimage addplotborder addlabelabs addfractionaxislabels connectthedots adddrawcommand mergeplots"
+        + " invertplot addimageborder";
+  //macros/helpers.php
+  imathasBuiltin += " getsnapwidthheight makenumberrequiretimes getstuans checkreqtimes stringtopolyterms"
+        + " gettwopointlinedata getdotsdata getntupleparts getopendotsdata gettwopointdata gettwopointformulas"
+        + " getlinesdata getineqdata sorttwopointdata stuansready checkanswerformat getsigfigs checksigfigs"
+        + " setupmathquillfillin";
+  //macros/html.php
+  imathasBuiltin += " formhoverover formpopup forminlinebutton";
+  //macros/math.php
+  imathasBuiltin += " gcd lcm mod definefunc evalfunc evalnumstr normalizefunc decimaltofraction ifthen cases"
+        + " getnumbervalue is_nicenumber";
+  //macros/randomizers.php
+  imathasBuiltin += " rrand rands rrands randfrom randsfrom jointrandfrom diffrandsfrom nonzerorand nonzerorrand"
+        + " nonzerorands nonzerorrands diffrands diffrrands nonzerodiffrands nonzerodiffrrands singleshuffle"
+        + " jointshuffle randpythag randname randnamewpronouns randmalename randfemalename randnames"
+        + " randmalenames randfemalenames randcity randcities randstate randstates randcountry randcountries";
+  //macros/string.php
+  imathasBuiltin += " stringappend stringprepend stringpos stringlen stringclean";
+  //macros/table.php
+  imathasBuiltin += " showarrays horizshowarrays showdataarray addcopytablebutton showrecttable";
+  //other: mathphp2.php, mathparser.php, and PHP builtins
+  imathasBuiltin += " exp nthlog sinn cosn tann secn cscn cotn rand is_array count in_array array_flip array_reverse root"
+        + " is_numeric is_nan sign sgn dechex hexdec print_r fmod safepow strtoupper strtolower ucfirst sprintf"
+        + " htmlentities substr substr_count str_replace explode array_unique rawurlencode array_keys"
+        + " array_values isset atan2 preg_match preg_replace intval floatval levenshtein uniqid trim rtrim ltrim"
+        + " is_string";
   //builtin
   imathasBuiltin += " loadlibrary importcodefrom includecodefrom setseed";
   //math
