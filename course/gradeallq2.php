@@ -703,8 +703,6 @@
                     $classes = 'qfilter-perfect';
                 } else if ($qdata['gbscore']>0) {
                     $classes = 'qfilter-nonzero';
-                } else if ($qdata['status'] != 'unattempted') {
-                    $classes = 'qfilter-zero';
                 } else {
                     // it's possible only one part is unattempted
                     $unattempted = true;
