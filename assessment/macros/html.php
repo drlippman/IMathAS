@@ -13,9 +13,11 @@ function formhoverover($label, $tip) {
     if (function_exists('filter')) {
         $tip = filter($tip);
     }
-    $tip = htmlentities($tip);
+    // tip may contain HTML (instructor-authored), so pass it directly to tipshow
+    // via inline handlers rather than data-tip, which is shown as plain text
+    $tip = Sanitize::encodeStringForJavascript($tip);
     $tip = str_replace('`', '&#96;', $tip);
-    return '<span role="button" tabindex="0" class="link" data-tip="' . $tip . '">' . $label . '</span>';
+    return '<span role="button" tabindex="0" class="link" onmouseover="tipshow(this,\'' . $tip . '\')" onfocus="tipshow(this,\'' . $tip . '\')" onmouseout="tipout()" onblur="tipout()">' . $label . '</span>';
 }
 
 function formpopup($label, $content, $width = 600, $height = 400, $type = 'link', $scroll = 'null', $id = 'popup', $ref = '', $presanitized = false) {
