@@ -32,5 +32,11 @@ $row = $stm->fetch(PDO::FETCH_ASSOC);
 echo "lti_sourcedid:" . $row['lti_sourcedid']." ;\n";
 print_r(Sanitize::gzexpand($row['scoreddata']));
 echo "\n";
-print_r(json_decode(Sanitize::gzexpand($row['scoreddata']), true));
-print_r(json_decode(Sanitize::gzexpand($row['practicedata']), true));
+if (!empty($row['scoreddata'])) {
+  print_r(json_decode(Sanitize::gzexpand($row['scoreddata']), true));
+}
+if (!empty($row['practicedata'])) {
+  print_r(json_decode(Sanitize::gzexpand($row['practicedata']), true));
+}
+
+

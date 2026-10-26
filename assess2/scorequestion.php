@@ -127,7 +127,10 @@ if (!$isteacher && $assess_info->getSetting('displaymethod') === 'livepoll') {
   $stm = $DBH->prepare("SELECT * FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
   $stm->execute(array(':assessmentid'=>$aid));
   $livepollStatus = $stm->fetch(PDO::FETCH_ASSOC);
-  if ($livepollStatus['curquestion'] - 1 !== $qns[0]) {
+  if ($livepollStatus === false) {
+    echo '{"error": "not_ready"}';
+    exit;
+  } else if ($livepollStatus['curquestion'] - 1 !== $qns[0]) {
     echo '{"error": "livepoll_wrongquestion"}';
     exit;
   } else if ($livepollStatus['curstate'] != 2) {
