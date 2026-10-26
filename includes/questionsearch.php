@@ -376,6 +376,8 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         } else if (!$libsIncludesUnassigned) {
             return 'No accessible libraries selected';
         }
+    } else if ($searchtype == 'libs') {
+        return 'No accessible libraries selected';
     } else if ($searchtype == 'assess' && count($libs) > 0) {
         $llist = implode(',', array_map('intval', $libs));
         $stm = $DBH->prepare("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($llist) AND (courseid=? OR courseid IN (SELECT courseid FROM imas_teachers WHERE userid=?))");
