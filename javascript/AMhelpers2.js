@@ -1440,6 +1440,15 @@ function AMnumfuncPrepVar(qn,str) {
           return part;
         });
         dispstr = dispstr.split(vars[i]).join('{:'+cparts.join(' ')+':}');
+		  } else if (!isgreek && vars[i].match(/^(hat|bar|vec)\([^\(]*?\)$/)) {
+        // hat(x), bar(x), vec(x): leave alone unless the base is a
+        // multi-letter non-greek word, in which case quote just the base
+        var hm = vars[i].match(/^(hat|bar|vec)\(([^\(]*?)\)$/);
+        if (hm[2].length>1 && /^[a-zA-Z0-9]+$/.test(hm[2]) &&
+          greekletters.indexOf(hm[2].toLowerCase())==-1
+        ) {
+          dispstr = dispstr.split(vars[i]).join(hm[1]+'("'+hm[2]+'")');
+        }
 		  } else if (!isgreek && vars[i].replace(/[^\w_]/g,'').length>1) {
 			  varstoquote.push(vars[i]);
 		  }
