@@ -19,7 +19,11 @@ if (isset($_GET['aid']) && isset($teacherid)) {
 }
 
 
-$libs = explode(',', $_POST['libs']);
+if (isset($_POST['libs']) && $_POST['libs'] !== '') {
+    $libs = explode(',', $_POST['libs']);
+} else {
+    $libs = [];
+}
 $_SESSION['searchtype'.$searchcontext.$aid] = $_POST['searchtype'];
 $_SESSION['searchin'.$searchcontext.$aid] = $libs;
 $_SESSION['lastsearch'.$searchcontext.$aid] = $_POST['search'];
