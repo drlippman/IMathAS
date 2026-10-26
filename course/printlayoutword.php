@@ -463,8 +463,8 @@ if ($overwriteBody==1) {
 	echo '<p>'._('NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.').'</p>';
 	echo '<form id="theform" method="post" action="'.$pandocurl.'/html2docx.php">';
 	echo '<p><label><input type="checkbox" name="darkgrid"> '._('Darken graph grid lines').'</label><br/>';
-	echo '<label><input type="checkbox" name="doubleimgs"> '._('Double image sizes').'</label><br/>';
-	echo '<label><input type="checkbox" name="usesvg" id="usesvg" checked="checked"> '._('Use scalable (SVG) graphs. Higher quality, but requires a recent version of Word.').'</label></p>';
+	echo '<label><input type="checkbox" name="usesvg" id="usesvg" checked="checked"> '._('Use scalable (SVG) graphs. Higher quality, but requires a recent version of Word.').'</label><br/>';
+	echo '<label id="doubleimgslbl" style="display:none"><input type="checkbox" name="doubleimgs"> '._('Double image sizes').'</label></p>';
 
 	echo '<p><input type="submit" value="'._("Convert to Word").'"/> ';
 	echo '<a href="printlayoutword.php?cid='.$cid.'&amp;aid='.$aid.'&amp;from='.$from.'">'._('Change print settings').'</a></p>';
@@ -518,6 +518,11 @@ if ($overwriteBody==1) {
 			wrap.remove();
 		}
 	}
+	function toggleDoubleImgs() {
+		document.getElementById('doubleimgslbl').style.display = document.getElementById('usesvg').checked ? 'none' : '';
+	}
+	document.getElementById('usesvg').addEventListener('change', toggleDoubleImgs);
+	toggleDoubleImgs();
 	document.getElementById('theform').addEventListener('submit', function(e) {
 		var ta = this.elements['html'];
 		if (!document.getElementById('usesvg').checked || ta.dataset.svgdone) { return; }
@@ -526,7 +531,7 @@ if ($overwriteBody==1) {
 			ta.dataset.svgdone = 1;
 		} catch (err) {
 			console.log(err);
-			document.getElementById('usesvg').checked = false;
+			document.getElementById('usesvg').checked = false; toggleDoubleImgs();
 		}
 	});
 	</script>
