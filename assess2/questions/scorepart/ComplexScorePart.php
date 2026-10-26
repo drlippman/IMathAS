@@ -183,6 +183,7 @@ class ComplexScorePart implements ScorePart
         }
 
         $ganumarr = array();
+        $ganormarr = array();
         foreach ($gaarr as $j => $givenans) {
             if (in_array('allowjcomplex', $ansformats)) {
                 $givenans = str_replace('j','i',$givenans);
@@ -206,6 +207,10 @@ class ComplexScorePart implements ScorePart
                 }
             }
             $ganumarr[] = $gaparts;
+            if ($checkSameform) {
+                // keep normalized forms parallel to $ganumarr
+                $ganormarr[] = $normalizedGivenAnswers[$j] ?? '';
+            }
         }
         if ($anstype == 'calccomplex' && !$hasNumVal) {
             $givenansval = [];
@@ -241,7 +246,7 @@ class ComplexScorePart implements ScorePart
             $annumarr[] = $ansparts;
             if ($checkSameform) {
                 $anfunc = parseMathQuiet($answer, 'i');
-                $normalizedAnswers[] = $anfunc->normalizeTreeString();
+                $normalizedAnswers[] = ($anfunc === false) ? '' : $anfunc->normalizeTreeString();
             }
         }
         if (count($ganumarr) == 0) {
@@ -267,8 +272,8 @@ class ComplexScorePart implements ScorePart
                         }
                     }
                 }
-                if ($checkSameform && $normalizedAnswers[$ai] != $normalizedGivenAnswers[$j]) {
-                    break;
+                if ($checkSameform && $normalizedAnswers[$ai] != $ganormarr[$j]) {
+                    continue;
                 }
                 if ($i == count($ansparts)) {
                     $correct += 1;
@@ -278,6 +283,9 @@ class ComplexScorePart implements ScorePart
             }
             if ($foundloc > -1) {
                 array_splice($ganumarr, $foundloc, 1); // remove from list
+                if ($checkSameform) {
+                    array_splice($ganormarr, $foundloc, 1);
+                }
                 if (count($ganumarr) == 0) {
                     break;
                 }
