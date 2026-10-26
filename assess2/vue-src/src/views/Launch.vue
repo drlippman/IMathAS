@@ -10,7 +10,7 @@
         </button>
       </div>
 
-      <div class="med-below" v-html="aInfo.summary" ref="summary"></div>
+      <div class="med-below introtext" v-html="aInfo.summary" ref="summary"></div>
 
       <settings-list />
 
@@ -303,7 +303,8 @@ export default {
     reallyStartAssess () {
       const pwval = this.password;
       this.password = '';
-      actions.startAssess(false, pwval, this.newGroupMembers);
+      // if we got back here after starting practice, resume in practice mode
+      actions.startAssess(!!this.aInfo.in_practice, pwval, this.newGroupMembers);
     },
     endAssess () {
       actions.endAssess();

@@ -298,6 +298,7 @@ $assessInfoOut['scored_attempt'] = $assess_record->getScoredAttempt();
 // If in practice, now we overwrite settings
 if ($in_practice) {
   $assess_info->overridePracticeSettings();
+  $assessInfoOut['isgroup'] = $assess_info->getSetting('isgroup');
 }
 
 // See if we need to do anything to the intro, since we're sending it

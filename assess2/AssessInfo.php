@@ -1024,6 +1024,7 @@ class AssessInfo
     $this->assessData['defregens'] = 999; // unlimited
     $this->assessData['shuffle'] &= ~4;  // disable "all stu same version"
     $this->assessData['timelimit'] = 0;
+    $this->assessData['isgroup'] = 0; // no group for practice
     $this->assessData['retake_penalty'] = array('penalty'=>0, 'n'=>1);
     unset($this->assessData['allowed_attempts']);
     foreach ($this->questionData as $i=>$v) {

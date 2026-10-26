@@ -3,6 +3,8 @@
     <div style="flex-grow: 1">
       <h1>{{ settings.name }}</h1>
 
+      <div class="med-below introtext" v-html="settings.summary" ref="summary"></div>
+
       <p>{{ closedMessage }}</p>
 
       <p v-if="showTutorLinks">
