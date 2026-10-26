@@ -80,7 +80,7 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
             $stm = $DBH->prepare("SELECT istemplate,available FROM imas_courses WHERE id=?");
             $stm->execute(array($cid));
             $row = $stm->fetch(PDO::FETCH_ASSOC);
-            if (($row['istemplate'] & 8) != 8 || $row['available'] >= 4) {
+            if ($row === false || ($row['istemplate'] & 8) != 8 || $row['available'] >= 4) {
                 echo '<p>' . _('This course does not allow guest access.') . '</p>';
                 exit;
             }

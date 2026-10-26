@@ -2961,7 +2961,7 @@ class AssessRecord
     foreach ($question_versions as $qver) {
       $outall[] = $qver['qid'];
     }
-    return array($out, $outall);
+    return array($out, array_values(array_unique($outall)));
   }
 
   /**
@@ -2996,7 +2996,7 @@ class AssessRecord
         $outall[] = $qver['qid'];
       }
     }
-    return array($out, array_unique($outall));
+    return array($out, array_values(array_unique($outall)));
   }
 
   /**

@@ -268,8 +268,9 @@ if ($assess_info->getSetting('displaymethod') === 'drill') {
   $activeDrillQn = $assess_record->getActiveDrillQuestion();
   if ($activeDrillQn > -1) {
     if (!in_array($activeDrillQn, $qns)) {
-      list($activeDrillQid, ) = $assess_record->getQuestionId($activeDrillQn);
-      $assess_info->loadQuestionSettings(array($activeDrillQid), true, false);
+      // load all question versions' qids, since reTotalAssess scores them all
+      list($activeDrillQid, $activeDrillQidsToload) = $assess_record->getQuestionId($activeDrillQn);
+      $assess_info->loadQuestionSettings($activeDrillQidsToload, true, false);
     }
     $assess_record->finishDrillTimeout($activeDrillQn);
     $assess_record->reTotalAssess(array($activeDrillQn));
