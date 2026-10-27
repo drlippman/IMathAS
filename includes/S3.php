@@ -1942,7 +1942,7 @@ class S3
 	*
 	* To override the putObject() Content-Type, add it to $requestHeaders
 	*
-	* To use fileinfo, ensure the MAGIC environment variable is set
+	* Falls back to fileinfo if the extension is not recognized
 	*
 	* @internal Used to get mime types
 	* @param string &$file File path
@@ -1954,6 +1954,7 @@ class S3
 			'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'gif' => 'image/gif',
 			'png' => 'image/png', 'ico' => 'image/x-icon', 'pdf' => 'application/pdf',
 			'tif' => 'image/tiff', 'tiff' => 'image/tiff', 'svg' => 'image/svg+xml',
+			'heic' => 'image/heic', 'heif' => 'image/heif',
 			'svgz' => 'image/svg+xml', 'swf' => 'application/x-shockwave-flash', 
 			'zip' => 'application/zip', 'gz' => 'application/x-gzip',
 			'tar' => 'application/x-tar', 'bz' => 'application/x-bzip',
@@ -1972,16 +1973,15 @@ class S3
 		);
 
 		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-        if ($ext=='tmp' || $ext=='') {   
+		if ($ext=='tmp' || $ext=='') {
 			//if temp file, try to grab mime type from key
-			$file = $uri;
-			$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+			$ext = strtolower(pathinfo($uri, PATHINFO_EXTENSION));
 		}
 		if (isset($exts[$ext])) return $exts[$ext];
 
 		// Use fileinfo if available
-		if (extension_loaded('fileinfo') && isset($_ENV['MAGIC']) &&
-		($finfo = finfo_open(FILEINFO_MIME, $_ENV['MAGIC'])) !== false)
+		if (extension_loaded('fileinfo') && is_file($file) &&
+			($finfo = finfo_open(FILEINFO_MIME)) !== false)
 		{
 			if (($type = finfo_file($finfo, $file)) !== false)
 			{
