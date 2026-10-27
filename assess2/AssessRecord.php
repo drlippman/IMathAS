@@ -868,6 +868,9 @@ class AssessRecord
    */
   public function getLastChange() {
     $this->parseData();
+    if (empty($this->assessRecord['lastchange'])) { 
+      return 0;
+    }
     return $this->assessRecord['lastchange'];
   }
 
