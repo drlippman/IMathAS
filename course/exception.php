@@ -13,7 +13,7 @@ require_once "../includes/parsedatetime.php";
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$pagetitle = "Make Exception";
+$pagetitle = _("Make Exception");
 $cid = Sanitize::courseId($_GET['cid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
 $asid = Sanitize::onlyInt($_GET['asid'] ?? 0);
@@ -46,22 +46,22 @@ $curBreadcrumb = $breadcrumbbase;
 if (!isset($_SESSION['ltiitemtype']) || $_SESSION['ltiitemtype']!=0) {
 	$curBreadcrumb .= "<a href=\"course.php?cid=". Sanitize::courseId($_GET['cid'])."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
 	if ($stu>0) {
-		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid\">Student Detail</a> &gt; ";
+		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">" . _('Gradebook') . "</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?stu=" . Sanitize::encodeUrlParam($stu) . "&cid=$cid\">" . _('Student Detail') . "</a> &gt; ";
 	} else if ($_GET['from']=="isolate") {
-		$curBreadcrumb .= " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">View Scores</a> &gt; ";
+		$curBreadcrumb .= " <a href=\"gradebook.php?stu=0&cid=$cid\">" . _('Gradebook') . "</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">" . _('View Scores') . "</a> &gt; ";
 	} else if ($_GET['from']=="gisolate") {
-		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">View Group Scores</a> &gt; ";
+		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">" . _('Gradebook') . "</a> ";
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">" . _('View Group Scores') . "</a> &gt; ";
 	}else if ($_GET['from']=='stugrp') {
-		$curBreadcrumb .= "<a href=\"managestugrps.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">Student Groups</a> &gt; ";
+		$curBreadcrumb .= "<a href=\"managestugrps.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "\">" . _('Student Groups') . "</a> &gt; ";
 	} else {
-		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">" . _('Gradebook') . "</a> &gt; ";
 	}
 }
 
-$curBreadcrumb .= "<a href=\"$backurl\">Assessment Detail</a> &gt Make Exception\n";
+$curBreadcrumb .= "<a href=\"$backurl\">" . _('Assessment Detail') . "</a> &gt " . _('Make Exception') . "\n";
 
 if (isset($tutorid)) {
     $stm = $DBH->prepare('SELECT tutoredit FROM imas_assessments WHERE id=?');
@@ -71,26 +71,26 @@ if (isset($tutorid)) {
 
 if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by a NON-teacher
 	$overwriteBody=1;
-	$body = "You need to log in as a teacher to access this page";
+	$body = _("You need to log in as a teacher to access this page");
 } elseif (!(isset($_GET['cid'])) || !(isset($_GET['aid']))) {
 	$overwriteBody=1;
-	$body = "You need to access this page from the course page menu";
+	$body = _("You need to access this page from the course page menu");
 } elseif (empty($aid) || empty($uid)) {
 	$overwriteBody=1;
-	$body = "Invalid values";
+	$body = _("Invalid values");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	// check valid values
 	$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
 	$stm->execute([$aid]);
 	if ($stm->fetchColumn(0) !== $cid) {
-		echo 'Invalid aid';
+		echo _('Invalid aid');
 		exit;
 	}
 
 	$stm = $DBH->prepare("SELECT id FROM imas_students WHERE courseid=? AND userid=?");
 	$stm->execute([$cid, $uid]);
 	if ($stm->fetchColumn(0) === false) {
-		echo 'Invalid uid';
+		echo _('Invalid uid');
 		exit;
 	}
 
@@ -250,7 +250,7 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
 		$savetitle = _('Create Exception');
 		if ($erow != null) {
 			$savetitle = _('Save Changes');
-			$page_isExceptionMsg = "<p>An exception already exists.  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&uid=" . Sanitize::onlyInt($uid) . "&clear=" . Sanitize::encodeUrlParam($erow['id']) . "&asid=" . Sanitize::onlyInt($asid) . "&stu=" . Sanitize::encodeUrlParam($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "'\">"._("Clear Exception").'</button> or modify below.</p>';
+			$page_isExceptionMsg = "<p>" . _('An exception already exists.') . "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid=" . Sanitize::onlyInt($aid) . "&uid=" . Sanitize::onlyInt($uid) . "&clear=" . Sanitize::encodeUrlParam($erow['id']) . "&asid=" . Sanitize::onlyInt($asid) . "&stu=" . Sanitize::encodeUrlParam($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "'\">"._("Clear Exception").'</button> '. _('or modify below.') . '</p>';
 			$sdate = tzdate("m/d/Y",$erow['startdate']);
 			$edate = tzdate("m/d/Y",$erow['enddate']);
 			$stime = tzdate("g:i a",$erow['startdate']);
@@ -270,9 +270,9 @@ if (!(isset($teacherid) || (isset($tutorid) && $tutoredit == 3))) { // loaded by
             $curescope = 'both';
         }
 		if ($isDateByLTI) {
-			$page_isExceptionMsg .= '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
-			$page_isExceptionMsg .=  'students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given ';
-			$page_isExceptionMsg .= 'priority.  Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.</p>';
+			$page_isExceptionMsg .= '<p class="noticetext">' . _('Note: You have opted to allow your LMS to set assessment dates.') . ' ';
+			$page_isExceptionMsg .= _('If you need to give individual students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given priority.') . ' ';
+			$page_isExceptionMsg .= _('Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.') . '</p>';
 		}
 	} 
 	//DEFAULT LOAD DATA MANIPULATION
@@ -325,13 +325,13 @@ if ($overwriteBody==1) {
 
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerexception" class="pagetitle"><h1>Make Start/Due Date Exception</h1></div>
+	<div id="headerexception" class="pagetitle"><h1><?php echo _('Make Start/Due Date Exception'); ?></h1></div>
 
 <?php
 	echo '<h2><span class="pii-full-name">'.Sanitize::encodeStringForDisplay($stuname).'</span></h2>';
 	echo $page_isExceptionMsg;
-	echo '<p><label for=aidselect class="form">Assessment:</label><span class="formright">';
-	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],Sanitize::onlyInt($aid),"Select an assessment","", " onchange='nextpage()'");
+	echo '<p><label for=aidselect class="form">' . _('Assessment:') . '</label><span class="formright">';
+	writeHtmlSelect ("aidselect",$page_courseSelect['val'],$page_courseSelect['label'],Sanitize::onlyInt($aid),_("Select an assessment"),"", " onchange='nextpage()'");
 	echo '</span><br class="form"/></p>';
 
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
@@ -340,56 +340,55 @@ if ($overwriteBody==1) {
             ));
 ?>
 	<form method=post action="<?php echo Sanitize::encodeStringForDisplay($exceptionUrl); ?>">
-		<span class=form>Available After:</span>
+		<span class=form><?php echo _('Available After:'); ?></span>
 		<span class=formright>
-			<input type=text size=10 name=sdate value="<?php echo $sdate ?>" aria-label="Available after date">
+			<input type=text size=10 name=sdate value="<?php echo $sdate ?>" aria-label="<?php echo _('Available after date'); ?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
-			at <input type=text size=10 name=stime value="<?php echo $stime ?>" aria-label="Available after time">
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="<?php echo _('Calendar'); ?>"/></A>
+			<?php echo _('at'); ?> <input type=text size=10 name=stime value="<?php echo $stime ?>" aria-label="<?php echo _('Available after time'); ?>">
 		</span><BR class=form>
-		<span class=form>Available Until:</span>
+		<span class=form><?php echo _('Available Until:'); ?></span>
 		<span class=formright>
-			<input type=text size=10 name=edate value="<?php echo $edate ?>" aria-label="Available until date">
+			<input type=text size=10 name=edate value="<?php echo $edate ?>" aria-label="<?php echo _('Available until date'); ?>">
 			<a href="#" onClick="displayDatePicker('edate', this); return false">
-			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="Calendar"/></A>
-			at <input type=text size=10 name=etime value="<?php echo $etime ?>" aria-label="Available until time">
+			<img src="<?php echo $staticroot;?>/img/cal.svg" alt="<?php echo _('Calendar'); ?>"/></A>
+			<?php echo _('at'); ?> <input type=text size=10 name=etime value="<?php echo $etime ?>" aria-label="<?php echo _('Available until time'); ?>">
 		</span><BR class=form>
 <?php
 if ($aVer == 1) { // only allow this option for old assess UI for now. TODO
 ?>
 		<span class="form"><input type="checkbox" name="forceregen" id="forceregen"/></span>
-		<span class="formright"><label for=forceregen>Force student to work on new versions of all questions?</label>  Students
-		   will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</span><br class="form"/>
+		<span class="formright"><label for=forceregen><?php echo _('Force student to work on new versions of all questions?'); ?></label>  <?php echo _('Students will keep any scores earned, but must work new versions of questions to improve score.'); ?> <i><?php echo _('Do not use with group assessments'); ?></i>.</span><br class="form"/>
 <?php
 }
 ?>
-		<span class="form"><input type="checkbox" name="eatlatepass" id="eatlatepass" aria-label="deduct latepasses"/></span>
-		<span class="formright"><label for=eatlatepass>Deduct LatePass(es)</label>: <label><input type="number" name="latepassn" size="1" value="1" min="0" max="999"/> Latepass(s)</label> .
-		   Student currently has <?php echo Sanitize::onlyInt($latepasses);?> latepasses.</span><br class="form"/>
+		<span class="form"><input type="checkbox" name="eatlatepass" id="eatlatepass" aria-label="<?php echo _('deduct latepasses'); ?>"/></span>
+		<span class="formright"><label for=eatlatepass><?php echo _('Deduct LatePass(es)'); ?></label>: <label><input type="number" name="latepassn" size="1" value="1" min="0" max="999"/> <?php echo _('LatePass(es)'); ?></label> .
+		   <?php echo sprintf(_('Student currently has %d latepasses.'), Sanitize::onlyInt($latepasses));?></span><br class="form"/>
 		<span class="form"><input type="checkbox" name="waivereqscore" id="waivereqscore" <?php if (($curwaive&1)==1) echo 'checked="checked"';?>/></span>
-		<span class="formright"><label for=waivereqscore>Waive "show based on an another assessment" requirements, if applicable</label>.</span><br class="form"/>
+		<span class="formright"><label for=waivereqscore><?php echo _('Waive "show based on an another assessment" requirements, if applicable'); ?></label>.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="waiveworkcutoff" id="waiveworkcutoff" <?php if (($curwaive&2)==2) echo 'checked="checked"';?>/></span>
-		<span class="formright"><label for=waiveworkcutoff>Waive "add work cutoff", if applicable</label>.</span><br class="form"/>
+		<span class="formright"><label for=waiveworkcutoff><?php echo _('Waive "add work cutoff", if applicable'); ?></label>.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="overridepenalty" id="overridepenalty"  <?php if ($curepenalty!==null) echo 'checked="checked"';?>/></span>
-		<span class="formright"><label for=overridepenalty>Override default exception/LatePass penalty.</label> 
+		<span class="formright"><label for=overridepenalty><?php echo _('Override default exception/LatePass penalty.'); ?></label> <?php echo _('Deduct'); ?>
 			<select name="newpenaltytype" id="newpenaltytype" aria-label="<?php echo _('exception penalty type'); ?>">
-				<option value="fixed" <?php if (empty($curepenaltyinterval)) echo 'selected';?>>fixed</option>
-				<option value="increasing" <?php if (!empty($curepenaltyinterval)) echo 'selected';?>>increasing</option>
+				<option value="fixed" <?php if (empty($curepenaltyinterval)) echo 'selected';?>><?php echo _('fixed'); ?></option>
+				<option value="increasing" <?php if (!empty($curepenaltyinterval)) echo 'selected';?>><?php echo _('increasing'); ?></option>
 			</select>
 			<input type="number" name="newpenalty" size="3" value="<?php echo ($curepenalty===null)?0:Sanitize::onlyFloat($curepenalty);?>" aria-label="<?php echo _('exception penalty percent');?>" min="0" max="100"/>%
-			<span id="newpenaltyintervalwrap" <?php if (empty($curepenaltyinterval)) echo 'style="display:none"';?>>per <input type="number" name="newpenaltyinterval" size="4" value="<?php echo empty($curepenaltyinterval)?24:Sanitize::onlyInt($curepenaltyinterval);?>" aria-label="<?php echo _('exception penalty hours per increment');?>" min="0" max="999"/> hours</span>
-			for questions done while in exception.
-			<br/><label><input type="checkbox" name="alsolatepass" id="alsolatepass" <?php if ($curescope !== 'exception_only') echo 'checked="checked"';?>/> Also apply to questions done in LatePass.</label></span><br class="form"/>
+			<span id="newpenaltyintervalwrap" <?php if (empty($curepenaltyinterval)) echo 'style="display:none"';?>><?php echo _('per'); ?> <input type="number" name="newpenaltyinterval" size="4" value="<?php echo empty($curepenaltyinterval)?24:Sanitize::onlyInt($curepenaltyinterval);?>" aria-label="<?php echo _('exception penalty hours per increment');?>" min="0" max="999"/> <?php echo _('hours'); ?></span>
+			<?php echo _('for questions done while in exception.'); ?>
+			<br/><label><input type="checkbox" name="alsolatepass" id="alsolatepass" <?php if ($curescope !== 'exception_only') echo 'checked="checked"';?>/> <?php echo _('Also apply to questions done in LatePass.'); ?></label></span><br class="form"/>
 <?php
 if ($aVer > 1) { // only for new assess
 ?>
-        <span class="form"><input type="checkbox" name="timelimitext" id="timelimitext" <?php if ($timeext > 0) echo 'checked';?> aria-label="allow extra time"/></span>
-        <span class=formright><label for="timelimitext">If time limit is active or expired, allow additional time:</label> <label><input type=number min=0 max=99999 size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> additional minutes.</label>
-        <span class="small" id="timelimitinfo" <?php if ($timeext == 0) { echo 'style="display:none"';}?>><br>Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.
-        <br>To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student's name).</span>
+        <span class="form"><input type="checkbox" name="timelimitext" id="timelimitext" <?php if ($timeext > 0) echo 'checked';?> aria-label="<?php echo _('allow extra time'); ?>"/></span>
+        <span class=formright><label for="timelimitext"><?php echo _('If time limit is active or expired, allow additional time:'); ?></label> <label><input type=number min=0 max=99999 size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> <?php echo _('additional minutes.'); ?></label>
+        <span class="small" id="timelimitinfo" <?php if ($timeext == 0) { echo 'style="display:none"';}?>><br><?php echo _('Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.'); ?>
+        <br><?php echo _("To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student's name)."); ?></span>
         </span><br class=form>
-        <span class="form"><input type="checkbox" name="attemptext" id="attemptext" <?php if ($attemptext > 0) echo 'checked';?> aria-label="allow additional versions"/></span> 
-        <span class=formright><label for="attemptext" id="attlbl">Allow student additional versions:</label> <label><input type=number min=0 max=999 size=2 name="attemptextnum" value="<?php echo $attemptext; ?>"> additional versions.</label></span>
+        <span class="form"><input type="checkbox" name="attemptext" id="attemptext" <?php if ($attemptext > 0) echo 'checked';?> aria-label="<?php echo _('allow additional versions'); ?>"/></span> 
+        <span class=formright><label for="attemptext" id="attlbl"><?php echo _('Allow student additional versions:'); ?></label> <label><input type=number min=0 max=999 size=2 name="attemptextnum" value="<?php echo $attemptext; ?>"> <?php echo _('additional versions.'); ?></label></span>
         <br class=form>
 
 <?php

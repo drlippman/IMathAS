@@ -5,7 +5,7 @@ require_once __DIR__."/../includes/TeacherAuditLog.php";
 require_once __DIR__."/../includes/checkdata.php";
 
 	if (!isset($imasroot)) {
-		echo "This file cannot be called directly";
+		echo _("This file cannot be called directly");
 		exit;
 	}
 
@@ -279,7 +279,7 @@ require_once __DIR__."/../includes/checkdata.php";
 	}
 
 
-	$pagetitle = "Manage Exceptions";
+	$pagetitle = _("Manage Exceptions");
 	$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 	$placeinhead .= '<style type="text/css">
 	   fieldset { margin-bottom: 10px;}
@@ -324,21 +324,21 @@ require_once __DIR__."/../includes/checkdata.php";
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
     if ($calledfrom=='lu') {
-		echo "<a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Manage Exceptions</div>\n";
+		echo "<a href=\"listusers.php?cid=$cid\">" . _('Roster') . "</a> &gt; " . _('Manage Exceptions') . "</div>\n";
 	} else if ($calledfrom=='gb' || $calledfrom == 'isolateassess') {
 		echo "<a href=\"gradebook.php?cid=$cid";
 		if (isset($_GET['uid'])) {
 			echo "&stu=" . Sanitize::onlyInt($_GET['uid']);
 		}
-        echo "\">Gradebook</a> &gt; ";
+        echo "\">" . _('Gradebook') . "</a> &gt; ";
         if ($calledfrom == 'isolateassess') {
             $aid = Sanitize::onlyInt($_GET['aid']);
             echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">'._('View Scores').'</a> &gt; ';
 	}
-        echo " Manage Exceptions</div>\n";
+        echo " " . _('Manage Exceptions') . "</div>\n";
 	}
 
-	echo '<div id="headermassexception" class="pagetitle"><h1>Manage Exceptions</h1></div>';
+	echo '<div id="headermassexception" class="pagetitle"><h1>' . _('Manage Exceptions') . '</h1></div>';
 	if ($calledfrom=='lu') {
 		$formtag = "<form method=post action=\"listusers.php?cid=$cid&massexception=1\" id=\"qform\">\n";
 	} else if ($calledfrom=='gb') {
@@ -360,14 +360,14 @@ require_once __DIR__."/../includes/checkdata.php";
 		$formtag .= "<input type=hidden name=\"tolist\" value=\"" . Sanitize::onlyInt($_GET['uid']) . "\">\n";
 	} else {
 		if (empty($_POST['checked'])) {
-			echo "<p>No students selected.</p>";
+			echo "<p>" . _('No students selected.') . "</p>";
 			if ($calledfrom=='lu') {
-				echo "<a href=\"listusers.php?cid=$cid\">Try Again</a>\n";
+				echo "<a href=\"listusers.php?cid=$cid\">" . _('Try Again') . "</a>\n";
 			} else if ($calledfrom=='gb') {
-				echo "<a href=\"gradebook.php?cid=$cid\">Try Again</a>\n";
+				echo "<a href=\"gradebook.php?cid=$cid\">" . _('Try Again') . "</a>\n";
 			} else if ($calledfrom == 'isolateassess') {
                 $aid = Sanitize::onlyInt($_GET['aid']);
-                echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">Try Again</a>\n";
+                echo "<a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">" . _('Try Again') . "</a>\n";
 			}
 			require_once "../footer.php";
 			exit;
@@ -388,12 +388,12 @@ require_once __DIR__."/../includes/checkdata.php";
 		$stm->execute(array(':id'=>$tolist, ':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row === false) {
-			echo "Invalid user";
+			echo _("Invalid user");
 			exit;
 		}
 		echo "<h1><span class='pii-full-name'>" . Sanitize::encodeStringForDisplay($row[0]) . ", " . Sanitize::encodeStringForDisplay($row[1]) . '</span>';
 		if ($row[2]!='') {
-			echo ' <span class="small">(Section: '.Sanitize::encodeStringForDisplay($row[2]).')</span>';
+			echo ' <span class="small">(' . sprintf(_('Section: %s'), Sanitize::encodeStringForDisplay($row[2])) . ')</span>';
 		}
 		echo "</h1>";
 	}
@@ -414,8 +414,8 @@ require_once __DIR__."/../includes/checkdata.php";
 	echo '<fieldset><legend>'._("Existing Exceptions").'</legend>';
 	if (count($existingexceptions)>0) {
 		//echo "<h3>Existing Exceptions</h3>";
-		echo "Select exceptions to clear. ";
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',false)">None</a>. ';
+		echo _("Select exceptions to clear.") . " ";
+		echo _('Check:') . ' <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',true)">' . _('All') . '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',false)">' . _('None') . '</a>. ';
 
 		echo '<ul>';
 		if ($isall) {
@@ -441,11 +441,11 @@ require_once __DIR__."/../includes/checkdata.php";
 						echo Sanitize::encodeStringForDisplay("($sdate - $edate)");
 					}
 				} else if ($row['itemtype']=='F') {
-					echo Sanitize::encodeStringForDisplay("(PostBy: $sdate, ReplyBy: $edate)");
+					echo Sanitize::encodeStringForDisplay(sprintf(_('(PostBy: %s, ReplyBy: %s)'), $sdate, $edate));
 				} else if ($row['itemtype']=='P') {
-					echo Sanitize::encodeStringForDisplay("(PostBy: $sdate)");
+					echo Sanitize::encodeStringForDisplay(sprintf(_('(PostBy: %s)'), $sdate));
 				} else if ($row['itemtype']=='R') {
-					echo Sanitize::encodeStringForDisplay("(ReplyBy: $edate)");
+					echo Sanitize::encodeStringForDisplay(sprintf(_('(ReplyBy: %s)'), $edate));
 				}
 				if (($row['waivereqscore']&1)==1) {
 					echo ' <i>('._('waives prereq').')</i>';
@@ -469,10 +469,10 @@ require_once __DIR__."/../includes/checkdata.php";
                     if ($row['timeext'] < 0) {
                         echo _(' - used');
                     }
-                    echo '</i>';
+                    echo ')</i>';
                 }
                 if ($row['attemptext'] > 0) {
-                    $notesarr[$row['eid']] .= ' <i>('.sprintf(_('%d additional versions'), $row['attemptext']).')</i>';
+                    echo ' <i>('.sprintf(_('%d additional versions'), $row['attemptext']).')</i>';
                 }
 				if ($row['islatepass']>0) {
 					echo ' <i>('._('LatePass').')</i>';
@@ -518,11 +518,11 @@ require_once __DIR__."/../includes/checkdata.php";
 						$assessarr[$row['eid']] .= "($sdate - $edate)";
 					}
 				} else if ($row['itemtype']=='F') {
-					$assessarr[$row['eid']] .= "(PostBy: $sdate, ReplyBy: $edate)";
+					$assessarr[$row['eid']] .= sprintf(_('(PostBy: %s, ReplyBy: %s)'), $sdate, $edate);
 				} else if ($row['itemtype']=='P') {
-					$assessarr[$row['eid']] .= "(PostBy: $sdate)";
+					$assessarr[$row['eid']] .= sprintf(_('(PostBy: %s)'), $sdate);
 				} else if ($row['itemtype']=='R') {
-					$assessarr[$row['eid']] .= "(ReplyBy: $edate)";
+					$assessarr[$row['eid']] .= sprintf(_('(ReplyBy: %s)'), $edate);
 				}
 				$notesarr[$row['eid']] = '';
 				if (($row['waivereqscore']&1)==1) {
@@ -571,9 +571,9 @@ require_once __DIR__."/../includes/checkdata.php";
 		}
 		echo '</ul>';
 
-		echo "<input type=submit value=\"Record Changes\" />";
+		echo "<input type=submit value=\"" . _('Record Changes') . "\" />";
 	} else {
-		echo "<p>No exceptions currently exist for the selected students.</p>";
+		echo "<p>" . _('No exceptions currently exist for the selected students.') . "</p>";
 	}
 	echo '</fieldset>';
     //start new form for new exceptions
@@ -589,11 +589,11 @@ require_once __DIR__."/../includes/checkdata.php";
 		if ($row[0]>$lpmax) { $lpmax = $row[0];}
 	}
 	if (count($_POST['checked'])<2) {
-		$lpmsg = "This student has $lpmin latepasses.";
+		$lpmsg = sprintf(_('This student has %d latepasses.'), $lpmin);
 	} else if ($lpmin==$lpmax) {
-		$lpmsg = "These students all have $lpmin latepasses.";
+		$lpmsg = sprintf(_('These students all have %d latepasses.'), $lpmin);
 	} else {
-		$lpmsg = "These students have $lpmin-$lpmax latepasses.";
+		$lpmsg = sprintf(_('These students have %d-%d latepasses.'), $lpmin, $lpmax);
     }
     $forumarr = array();
     if (!isset($tutorid)) {
@@ -629,37 +629,37 @@ require_once __DIR__."/../includes/checkdata.php";
 	//echo "<h3>Make New Exception</h3>";
 	echo '<h2>'._("Make New Exception").'</h2>';
 	if ($isDateByLTI) {
-		echo '<p class="noticetext">Note: You have opted to allow your LMS to set assessment dates.  If you need to give individual ';
-		echo 'students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given ';
-		echo 'priority.  Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.</p>';
+		echo '<p class="noticetext">' . _('Note: You have opted to allow your LMS to set assessment dates.') . ' ';
+		echo _('If you need to give individual students different due dates, you should do so in your LMS, not here, as the date from the LMS will be given priority.') . ' ';
+		echo _('Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.') . '</p>';
 	}
 	echo '<fieldset class="optionlist"><legend>'._("Exception Options").'</legend>';
-	echo '<p class="list"><input type="checkbox" name="eatlatepass" id="eatlatepass"> <label for="eatlatepass" id="dl">Deduct LatePass(es) from each student:</label> <input type="number" min="0" max="999" name="latepassn" size="2" value="1" aria-labelledby="dl"/>. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
-	echo '<p class="list"><label><input type="checkbox" name="sendmsg"/> Send message to these students?</label></p>';
-	echo '<p>For assessments:</p>';
+	echo '<p class="list"><input type="checkbox" name="eatlatepass" id="eatlatepass"> <label for="eatlatepass" id="dl">' . _('Deduct LatePass(es) from each student:') . '</label> <input type="number" min="0" max="999" name="latepassn" size="2" value="1" aria-labelledby="dl"/>. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
+	echo '<p class="list"><label><input type="checkbox" name="sendmsg"/> ' . _('Send message to these students?') . '</label></p>';
+	echo '<p>' . _('For assessments:') . '</p>';
 	if ($courseUIver < 2) {
-		echo '<p class="list"><label><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
-		echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</label></p>';
+		echo '<p class="list"><label><input type="checkbox" name="forceregen"/> ' . _('Force student to work on new versions of all questions?') . ' ';
+		echo _('Students will keep any scores earned, but must work new versions of questions to improve score.') . ' <i>' . _('Do not use with group assessments') . '</i>.</label></p>';
 	}
-	echo '<p class="list"><label><input type="checkbox" name="forceclear"/> Clear students\' attempts?  Students ';
-	echo 'will <b>not</b> keep any scores earned, and must rework all problems.';
+	echo '<p class="list"><label><input type="checkbox" name="forceclear"/> ' . _('Clear students\' attempts?') . ' ';
+	echo sprintf(_('Students will %snot%s keep any scores earned, and must rework all problems.'), '<b>', '</b>');
 	echo '<span style="display:none" class="noticetext" id="forceclearwarn">';
-	echo '<br/>Warning: this will delete the students\' attempts and grades for these assessments.</span></label>';
+	echo '<br/>' . _('Warning: this will delete the students\' attempts and grades for these assessments.') . '</span></label>';
 	echo '</p>';
-	echo '<p class="list"><label><input type="checkbox" name="waivereqscore"/> Waive "show based on an another assessment" requirements, if applicable.</label></p>';
-	echo '<p class="list"><label><input type="checkbox" name="waiveworkcutoff"/> Waive "add work cutoff", if applicable.</label></p>';
-    echo '<p class="list"><label><input type="checkbox" name="overridepenalty"/> Override default exception/LatePass penalty.</label>  Deduct
+	echo '<p class="list"><label><input type="checkbox" name="waivereqscore"/> ' . _('Waive "show based on an another assessment" requirements, if applicable') . '.</label></p>';
+	echo '<p class="list"><label><input type="checkbox" name="waiveworkcutoff"/> ' . _('Waive "add work cutoff", if applicable') . '.</label></p>';
+    echo '<p class="list"><label><input type="checkbox" name="overridepenalty"/> ' . _('Override default exception/LatePass penalty.') . '</label>  ' . _('Deduct') . '
     	<select name="newpenaltytype" id="newpenaltytype" aria-label="'. _('exception penalty type') .'">
-		<option value="fixed">fixed</option><option value="increasing">increasing</option>
+		<option value="fixed">' . _('fixed') . '</option><option value="increasing">' . _('increasing') . '</option>
 		</select>
     	<input type="number" min="0" max="100" name="newpenalty" size="3" value="0" aria-label="'. _('exception penalty percent') . '"/>%
-    	<span id="newpenaltyintervalwrap" style="display:none">per <input type="number" min="0" max="999" name="newpenaltyinterval" size="4" value="24" aria-label="'. _('exception penalty hours per increment').'"/> hours</span>
-    	for questions done while in exception.<br/><label><input type="checkbox" name="alsolatepass"/> Also apply to questions done in LatePass.</label></p>';
+    	<span id="newpenaltyintervalwrap" style="display:none">' . _('per') . ' <input type="number" min="0" max="999" name="newpenaltyinterval" size="4" value="24" aria-label="'. _('exception penalty hours per increment').'"/> ' . _('hours') . '</span>
+    	' . _('for questions done while in exception.') . '<br/><label><input type="checkbox" name="alsolatepass"/> ' . _('Also apply to questions done in LatePass.') . '</label></p>';
     if ($courseUIver > 1) {
-        echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow additional time:</label> <label><input type=number min=0 max=99999 size=2 name="timelimitextmin" value="0"> additional minutes.</label>
-        <span class="small" id="timelimitinfo" style="display:none"><br>Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.
-        <br>To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student\'s name).</span></p>';
-        echo '<p class="list"><label><input type="checkbox" name="attemptext" /> Allow student additional versions:</label> <label><input type=number min=0 max=999 size=2 name="attemptextnum" value="0"> Additional versions</label></p>';
+        echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> ' . _('If time limit is active or expired, allow additional time:') . '</label> <label><input type=number min=0 max=99999 size=2 name="timelimitextmin" value="0"> ' . _('additional minutes.') . '</label>
+        <span class="small" id="timelimitinfo" style="display:none"><br>' . _('Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.') . '
+        <br>' . _('To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student\'s name).') . '</span></p>';
+        echo '<p class="list"><label><input type="checkbox" name="attemptext" /> ' . _('Allow student additional versions:') . '</label> <label><input type=number min=0 max=999 size=2 name="attemptextnum" value="0"> ' . _('Additional versions') . '</label></p>';
     }
     echo '</fieldset>';
 
@@ -677,17 +677,17 @@ require_once __DIR__."/../includes/checkdata.php";
 		$am = ($coursedeftime<12*60)?'am':'pm';
 		$etime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 		//$etime = tzdate("g:i a",$wk);
-		echo "<span class=form>Available After:</span><span class=formright>";
-		echo "<input type=text size=10 name=sdate value=\"$sdate\" aria-label=\"available after date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=stime value=\"$stime\" aria-label=\"available after time\"></span><BR class=form>\n";
+		echo "<span class=form>" . _('Available After:') . "</span><span class=formright>";
+		echo "<input type=text size=10 name=sdate value=\"$sdate\" aria-label=\"" . _('available after date') . "\">\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('sdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"" . _('Calendar') . "\"/></A>\n";
+		echo _('at') . " <input type=text size=10 name=stime value=\"$stime\" aria-label=\"" . _('available after time') . "\"></span><BR class=form>\n";
 
-		echo "<span class=form>Available Until:</span><span class=formright><input type=text size=10 name=edate value=\"$edate\" aria-label=\"available until date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=etime value=\"$etime\" aria-label=\"available until time\"></span><BR class=form>\n";
+		echo "<span class=form>" . _('Available Until:') . "</span><span class=formright><input type=text size=10 name=edate value=\"$edate\" aria-label=\"" . _('available until date') . "\">\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"" . _('Calendar') . "\"/></A>\n";
+		echo _('at') . " <input type=text size=10 name=etime value=\"$etime\" aria-label=\"" . _('available until time') . "\"></span><BR class=form>\n";
 
-		echo "Set Exception for assessments: ";
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',false)">None</a>. ';
+		echo _("Set Exception for assessments:") . " ";
+		echo _('Check:') . ' <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',true)">' . _('All') . '</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addexc[]\',false)">' . _('None') . '</a>. ';
 
 		echo '<ul class="nomark">';
 
@@ -698,7 +698,7 @@ require_once __DIR__."/../includes/checkdata.php";
 			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</label></li>";
 		}
 		echo '</ul>';
-		echo "<input type=submit value=\"Record Changes\" />";
+		echo "<input type=submit value=\"" . _('Record Changes') . "\" />";
 		echo '</fieldset>';
 	}
 
@@ -715,23 +715,23 @@ require_once __DIR__."/../includes/checkdata.php";
 		$pbtime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 		$rbtime = $pbtime;
 		//$etime = tzdate("g:i a",$wk);
-		echo '<span class="form"><label for="forumitemtype">Exception type</label>:</span><span class="formright"><select name="forumitemtype" id="forumitemtype">';
-		echo '<option value="F" checked">Override Post By and Reply By</option>';
-		echo '<option value="P" checked">Override Post By only</option>';
-		echo '<option value="R" checked">Override Reply By only</option></select></span><br class="form"/>';
+		echo '<span class="form"><label for="forumitemtype">' . _('Exception type') . '</label>:</span><span class="formright"><select name="forumitemtype" id="forumitemtype">';
+		echo '<option value="F" checked">' . _('Override Post By and Reply By') . '</option>';
+		echo '<option value="P" checked">' . _('Override Post By only') . '</option>';
+		echo '<option value="R" checked">' . _('Override Reply By only') . '</option></select></span><br class="form"/>';
 
-		echo "<span class=form>Post By:</span><span class=formright><input type=text size=10 name=pbdate value=\"$pbdate\" aria-label=\"post by date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=pbtime value=\"$pbtime\" aria-label=\"post by time\"></span><BR class=form>\n";
+		echo "<span class=form>" . _('Post By:') . "</span><span class=formright><input type=text size=10 name=pbdate value=\"$pbdate\" aria-label=\"" . _('post by date') . "\">\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('pbdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"" . _('Calendar') . "\"/></A>\n";
+		echo _('at') . " <input type=text size=10 name=pbtime value=\"$pbtime\" aria-label=\"" . _('post by time') . "\"></span><BR class=form>\n";
 
-		echo "<span class=form>Reply By:</span><span class=formright><input type=text size=10 name=rbdate value=\"$rbdate\" aria-label=\"reply by date\">\n";
-		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"Calendar\"/></A>\n";
-		echo "at <input type=text size=10 name=rbtime value=\"$rbtime\" aria-label=\"reply by time\"></span><BR class=form>\n";
+		echo "<span class=form>" . _('Reply By:') . "</span><span class=formright><input type=text size=10 name=rbdate value=\"$rbdate\" aria-label=\"" . _('reply by date') . "\">\n";
+		echo "<a href=\"#\" onClick=\"displayDatePicker('rbdate', this); return false\"><img src=\"$staticroot/img/cal.svg\" alt=\"" . _('Calendar') . "\"/></A>\n";
+		echo _('at') . " <input type=text size=10 name=rbtime value=\"$rbtime\" aria-label=\"" . _('reply by time') . "\"></span><BR class=form>\n";
 
 
 
-		echo "Set Exception for forums: ";
-		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',false)">None</a>. ';
+		echo _("Set Exception for forums:") . " ";
+		echo _('Check:') . ' <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',true)">' . _('All') . '</a> <a href="#" onclick="return chkAllNone(\'qform2\',\'addfexc[]\',false)">' . _('None') . '</a>. ';
 
 		echo '<ul class="nomark">';
 
@@ -742,7 +742,7 @@ require_once __DIR__."/../includes/checkdata.php";
 			echo "/>" . Sanitize::encodeStringForDisplay($val) . "</label></li>";
 		}
 		echo '</ul>';
-		echo "<input type=submit value=\"Record Changes\" />";
+		echo "<input type=submit value=\"" . _('Record Changes') . "\" />";
 		echo '</fieldset>';
 	}
 
