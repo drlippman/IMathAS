@@ -108,6 +108,7 @@ if (isset($_POST['setupfcm'])) {
 if (isset($_POST['updatecaption'])) {
 	$vids = array_map('trim', explode(',', $_POST['updatecaption']));
 	$chg = 0;
+	$captionedids = array();
 	foreach ($vids as $vidid) {
 		if (strlen($vidid)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$vidid)) {
 			echo '<p>Invalid video ID</p>';
@@ -126,20 +127,37 @@ if (isset($_POST['updatecaption'])) {
 			$captioned = getCaptionDataByVidId($vidid);
 		}
 		
-		if ($captioned==1 && empty($_POST['skipquestionupdate'])) {
-			$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
-			$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE extref REGEXP ?");
-			$stm->execute(array(MYSQL_LEFT_WRDBND.$vidid.MYSQL_RIGHT_WRDBND));
-			
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$parts = explode('~~', $row[1]);
-				foreach ($parts as $k=>$v) {
-					if (preg_match('/\b'.$vidid.'\b/', $v)) {
-						$parts[$k] = preg_replace('/!!0$/', '!!1', $v);
+		if ($captioned==1) {
+			$captionedids[] = $vidid;
+		}
+	}
+	// do all question updates in a single scan, after the caption lookups
+	if (count($captionedids) > 0 && empty($_POST['skipquestionupdate'])) {
+		$likes = array();
+		$likeparams = array();
+		foreach ($captionedids as $vidid) {
+			$likes[] = 'extref LIKE ?';
+			$likeparams[] = '%'.str_replace('_', '\\_', $vidid).'%';
+		}
+		$idregex = '/\b(?:'.implode('|', array_map('preg_quote', $captionedids)).')\b/';
+		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
+		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE ".implode(' OR ', $likes));
+		$stm->execute($likeparams);
+
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$parts = explode('~~', $row[1]);
+			$changed = false;
+			foreach ($parts as $k=>$v) {
+				if (preg_match($idregex, $v)) {
+					$newv = preg_replace('/!!0$/', '!!1', $v);
+					if ($newv !== $v) {
+						$parts[$k] = $newv;
+						$changed = true;
 					}
 				}
-				$newextref = implode('~~', $parts);
-				$upd->execute(array($newextref, $row[0]));
+			}
+			if ($changed) {
+				$upd->execute(array(implode('~~', $parts), $row[0]));
 				$chg += $upd->rowCount();
 			}
 		}
