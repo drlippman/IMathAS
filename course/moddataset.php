@@ -125,7 +125,7 @@
 					$captioned = 0;
 				}
 			} else if (isset($CFG['YouTubeAPIKey'])) {
-                $captioned = getCaptionDataByVidId($vidid);
+                $captioned = getCaptionDataByVidId($vidid, true);
 				if ($captioned === false || $captioned === '404') {
 					$captioned = 0;
 				}

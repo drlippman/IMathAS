@@ -166,7 +166,7 @@ if (isset($_POST['updatecaptionbyqids'])) {
 			if ($parts[2] == 0) { // not captioned. if it's a video getvideoid will tell
 				$vidid = getvideoid($parts[1]);
 				if ($vidid !== '') {
-					$captioned = getCaptionDataByVidId($vidid);
+					$captioned = getCaptionDataByVidId($vidid, true);
 					if ($captioned == 1) {
 						$parts[2] = 1;
 						$extrefs[$k] = implode('!!', $parts);

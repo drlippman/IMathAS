@@ -50,7 +50,7 @@ function getvideoid($url) {
 
 // temp store so we don't scan the same video twice in one script
 $youtubeCaptionDatastore = [];
-function getCaptionDataByVidId($vidid) {
+function getCaptionDataByVidId($vidid, $fallback = false) {
     global $CFG, $DBH, $youtubeCaptionDatastore;
     
     if (isset($youtubeCaptionDatastore[$vidid])) {
@@ -77,6 +77,15 @@ function getCaptionDataByVidId($vidid) {
                 $query .= "captioned=IF(status=0 OR status=3,VALUES(captioned),captioned)";
                 $novid = $DBH->prepare($query);
                 $novid->execute([$vidid, time()]);
+                if ($fallback) {
+                    $stm = $DBH->prepare("SELECT captioned,status FROM imas_captiondata WHERE vidid=?");
+                    $stm->execute([$vidid]);
+                    $row = $stm->fetch(PDO::FETCH_ASSOC);
+                    if ($row && ($row['status'] == 1 || $row['status'] == 2)) {
+                        $youtubeCaptionDatastore[$vidid] = (int)$row['captioned'];
+                        return (int)$row['captioned'];
+                    }
+                }
                 return '404';
             }
             return false;
