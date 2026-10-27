@@ -16,6 +16,7 @@
 $no_session_handler = 'json_error';
 $init_csrfp_scope = 'question';
 require_once "../init.php";
+$skipClaimCheck = true;
 require_once "./common_start.php";
 require_once "./AssessInfo.php";
 require_once "./AssessRecord.php";

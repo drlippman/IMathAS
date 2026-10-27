@@ -101,6 +101,8 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
 }
 
 function logout() {
+	require_once __DIR__ . '/../assess2/AssessClaim.php';
+	AssessClaim::release();
 	$_SESSION = array();
 	if (isset($_COOKIE[session_name()])) {
 		setsecurecookie(session_name(), '', time()-42000, true);

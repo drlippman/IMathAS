@@ -28,7 +28,13 @@ if (!$isRealStudent) {
   $studentinfo = array('latepasses' => 0, 'timelimitmult' => 1);
 }
 
-// extend time for uploads
+// If another session owns this attempt (timed/passworded assessments), refuse.
+// startassess and loadassess set $skipClaimCheck: startassess makes the claim
+// itself, and loadassess returns only settings, no question content.
+if ($isRealStudent && empty($skipClaimCheck) && !empty($_GET['aid'])) {
+  require_once __DIR__ . '/AssessClaim.php';
+  AssessClaim::verify($userid, intval($_GET['aid']));
+}
 
 
 /**

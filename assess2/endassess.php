@@ -23,6 +23,7 @@ require_once "./common_start.php";
 require_once "./AssessInfo.php";
 require_once "./AssessRecord.php";
 require_once './AssessUtils.php';
+require_once './AssessClaim.php';
 
 check_for_required('GET', array('aid', 'cid'));
 $cid = Sanitize::onlyInt($_GET['cid']);
@@ -67,6 +68,9 @@ if ($assess_record->hasActiveAttempt()) {
   // just reuse existing question scores
   $assess_record->reTotalAssess(array());
   $assess_record->saveRecord();
+  if ($isRealStudent) {
+    AssessClaim::release($aid);
+  }
 } else {
   echo '{"error": "no_active_attempt"}';
   exit;

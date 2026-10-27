@@ -1,10 +1,13 @@
 <template>
-  <div id="app" role="main">
+  <div id="app" role="main" :class="{ 'claim-blocked': claimBlocked }"
+    :inert="claimBlocked ? '' : null"
+  >
     <div v-if="!assessInfoLoaded">
       {{ $t('loading') }}
     </div>
 
-    <router-view v-if="assessInfoLoaded"/>
+    <!-- unmounted entirely once the attempt is claimed elsewhere -->
+    <router-view v-if="assessInfoLoaded && !claimLost"/>
 
     <error-dialog
       v-if="hasError"
@@ -12,6 +15,7 @@
       :lastpos="lastPos"
       @clearerror="clearError"
     />
+    <claim-overlay v-if="claimLost || claimOffline" :lost="claimLost"/>
     <due-dialog v-if="showDueDialog"/>
     <confirm-dialog
       v-if="confirmObj !== null"
@@ -26,6 +30,7 @@
 import { store, actions } from '@/basicstore';
 import ErrorDialog from '@/components/ErrorDialog.vue';
 import DueDialog from '@/components/DueDialog.vue';
+import ClaimOverlay from '@/components/ClaimOverlay.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import './assess2.css';
 
@@ -33,6 +38,7 @@ export default {
   components: {
     ErrorDialog,
     DueDialog,
+    ClaimOverlay,
     ConfirmDialog
   },
   data: function () {
@@ -43,6 +49,15 @@ export default {
   computed: {
     assessInfoLoaded () {
       return (store.assessInfo !== null);
+    },
+    claimLost () {
+      return store.claimLost;
+    },
+    claimOffline () {
+      return store.claimOffline;
+    },
+    claimBlocked () {
+      return store.claimLost || store.claimOffline;
     },
     hasError () {
       return (store.errorMsg !== null);
@@ -111,8 +126,19 @@ export default {
     clearError () {
       store.errorMsg = null;
     },
+    setClaimBlocked (blocked) {
+      document.documentElement.classList.toggle('claim-blocked-scroll', blocked);
+      if (blocked && document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
+    },
     closeConfirm () {
       store.confirmObj = null;
+    }
+  },
+  watch: {
+    claimBlocked (blocked) {
+      this.setClaimBlocked(blocked);
     }
   },
   created () {

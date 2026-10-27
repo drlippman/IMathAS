@@ -14,7 +14,6 @@ export const store = reactive({
   autoSaving: false,
   errorMsg: null,
   confirmObj: null,
-  lastLoaded: [],
   inProgress: false,
   autosaveQueue: {},
   autosaveTimeactive: {},
@@ -23,15 +22,11 @@ export const store = reactive({
   initValues: {},
   initTimes: {},
   work: {},
-  autosaveTimer: null,
   somethingDirty: false,
   noUnload: false,
-  timelimit_timer: null,
   timelimit_expired: false,
   timelimit_grace_expired: false,
   timelimit_restricted: 0,
-  enddate_timer: null,
-  showwork_timer: null,
   showwork_expired: false,
   show_enddate_dialog: false,
   inPrintView: false,
@@ -47,8 +42,23 @@ export const store = reactive({
     questionTimelimit: 60
   },
   livepollStuCnt: 0,
-  livepollResults: {}
+  livepollResults: {},
+  claimOffline: false, // heartbeat failing; cover the questions
+  claimLost: false // another session took over this attempt
 });
+
+// non-reactive state: nothing renders or watches these
+let autosaveTimer = null;
+let timelimitTimer = null;
+let enddateTimer = null;
+let showworkTimer = null;
+const lastLoadedTimes = [];
+
+// single-session heartbeat state
+let heartbeatTimer = null;
+let heartbeatCheckTimer = null;
+let heartbeatVisHandler = null;
+let heartbeatLeaveHandler = null;
 
 export const actions = {
   loadAssessData (callback, doreset) {
@@ -79,7 +89,7 @@ export const actions = {
         // reset store
         store.inProgress = false;
         store.timelimit_expired = false;
-        clearTimeout(store.timelimit_timer);
+        clearTimeout(timelimitTimer);
         // parse response
         response = this.processSettings(response);
         store.assessInfo = response;
@@ -139,6 +149,9 @@ export const actions = {
         store.timeActivated = {};
         store.work = {};
         store.inAssess = true;
+        if (response.claim_heartbeat) {
+          this.startHeartbeat(response.claim_heartbeat, response.claim_overlay);
+        }
         // route to correct display
         if (response.error) {
           this.handleError(response.error);
@@ -539,7 +552,7 @@ export const actions = {
       if (store.work[qn] && store.work[qn] !== actions.getInitValue(qn, 'sw' + qn)) {
         data.append('sw' + qn, store.work[qn]);
       }
-      lastLoaded[k] = store.lastLoaded[qn].getTime();
+      lastLoaded[k] = lastLoadedTimes[qn].getTime();
     }
     data.append('toscoreqn', JSON.stringify(changedQuestions));
     data.append('timeactive', timeactive.join(','));
@@ -678,8 +691,8 @@ export const actions = {
       store.autosaveQueue[qn].push(partnum);
     }
     store.autosaveTimeactive[qn] = timeactive;
-    if (store.autosaveTimer === null) {
-      store.autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 60 * 1000);
+    if (autosaveTimer === null) {
+      autosaveTimer = window.setTimeout(() => { this.submitAutosave(true); }, 60 * 1000);
     }
   },
   clearAutosave (qns) {
@@ -693,8 +706,8 @@ export const actions = {
     }
   },
   clearAutosaveTimer () {
-    window.clearTimeout(store.autosaveTimer);
-    store.autosaveTimer = null;
+    window.clearTimeout(autosaveTimer);
+    autosaveTimer = null;
   },
   addAutosaveData (data, skip) {
     skip = skip || [];
@@ -750,7 +763,7 @@ export const actions = {
             }
           }
         });
-        lastLoaded[qn] = store.lastLoaded[qn].getTime();
+        lastLoaded[qn] = lastLoadedTimes[qn].getTime();
       }
     }
     data.append('autosave-tosaveqn', JSON.stringify(tosaveqn));
@@ -1214,7 +1227,94 @@ export const actions = {
     }
     return changed;
   },
+  // Timed/passworded assessments: only one session may own the attempt. The
+  // server refuses other sessions once they've taken over, but the page would
+  // keep showing the questions, so we ping regularly and cover the page if
+  // the pings fail or the attempt has been claimed elsewhere. The overlay delay
+  // is shorter than the server's stale time, so the questions are always
+  // covered before another session can take over.
+  startHeartbeat (interval, overlayAfter) {
+    this.stopHeartbeat();
+    store.claimOffline = false;
+    store.claimLost = false;
+    // monotonic clock, so changing the system clock doesn't help
+    let lastOk = performance.now();
+    const check = () => {
+      if (!store.inProgress) {
+        this.stopHeartbeat();
+        return;
+      }
+      store.claimOffline = (performance.now() - lastOk > overlayAfter * 1000);
+    };
+    const beat = () => {
+      if (!store.inProgress) {
+        this.stopHeartbeat();
+        return;
+      }
+      window.$.ajax({
+        url: store.APIbase + 'heartbeat.php' + store.queryString,
+        dataType: 'json',
+        xhrFields: {
+          withCredentials: true
+        },
+        crossDomain: true
+      })
+        .done(response => {
+          if (response.hasOwnProperty('error')) {
+            if (response.error === 'attempt_in_use') {
+              this.handleError(response.error);
+            } else if (response.error === 'no_session') {
+              store.errorMsg = null;
+              this.handleError(response.error);
+            }
+            return;
+          }
+          lastOk = performance.now();
+          store.claimOffline = false;
+        })
+        .always(check);
+    };
+    heartbeatTimer = window.setInterval(beat, interval * 1000);
+    heartbeatCheckTimer = window.setInterval(check, 5000);
+    // background tabs throttle timers, and sleeping devices stop them
+    heartbeatVisHandler = () => {
+      if (document.visibilityState === 'visible') {
+        check();
+        beat();
+      }
+    };
+    document.addEventListener('visibilitychange', heartbeatVisHandler);
+    // release the claim when leaving the page, so the student can pick the
+    // assessment back up elsewhere without waiting for it to go stale
+    heartbeatLeaveHandler = () => {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(store.APIbase + 'releaseclaim.php' + store.queryString);
+      }
+    };
+    window.addEventListener('pagehide', heartbeatLeaveHandler);
+  },
+  stopHeartbeat () {
+    window.clearInterval(heartbeatTimer);
+    window.clearInterval(heartbeatCheckTimer);
+    heartbeatTimer = null;
+    heartbeatCheckTimer = null;
+    if (heartbeatVisHandler !== null) {
+      document.removeEventListener('visibilitychange', heartbeatVisHandler);
+      heartbeatVisHandler = null;
+    }
+    if (heartbeatLeaveHandler !== null) {
+      window.removeEventListener('pagehide', heartbeatLeaveHandler);
+      heartbeatLeaveHandler = null;
+    }
+    store.claimOffline = false;
+  },
   handleError (error) {
+    if (error === 'attempt_in_use' && store.inProgress) {
+      // lost the attempt mid-way; permanent overlay, not a dismissable dialog
+      this.stopHeartbeat();
+      store.claimLost = true;
+      return;
+    }
     if (store.assessInfo?.is_lti &&
       error === 'no_session'
     ) {
@@ -1343,7 +1443,7 @@ export const actions = {
           data.questions[i].jsparams.hasseqnext = false;
         }
 
-        store.lastLoaded[i] = new Date();
+        lastLoadedTimes[i] = new Date();
       }
     }
     if (data.hasOwnProperty('showscores')) {
@@ -1356,30 +1456,30 @@ export const actions = {
       store.enableMQ = data.enableMQ;
     }
     if (data.hasOwnProperty('enddate_in') && data.enddate_in > 0 &&
-      store.timelimit_timer === null &&
+      timelimitTimer === null &&
       data.enddate_in < 20 * 24 * 60 * 60 // over 20 days causes int overlow
     ) {
-      window.clearTimeout(store.enddate_timer);
+      window.clearTimeout(enddateTimer);
       const now = new Date().getTime();
       const dueat = data.enddate_in * 1000;
       data.enddate_local = now + dueat;
-      store.enddate_timer = setTimeout(() => { this.handleDueDate(); }, dueat);
+      enddateTimer = setTimeout(() => { this.handleDueDate(); }, dueat);
     }
     if (data.hasOwnProperty('showwork_cutoff_in')) {
-      window.clearTimeout(store.showwork_timer);
+      window.clearTimeout(showworkTimer);
       const now = new Date().getTime();
       const expires = data.showwork_cutoff_in * 1000;
       data.showwork_local_cutoff_expires = now + expires;
       if (expires > 0) {
-        store.showwork_timer = setTimeout(() => { this.handleShowworklimitUp(); }, expires);
+        showworkTimer = setTimeout(() => { this.handleShowworklimitUp(); }, expires);
         store.showwork_expired = false;
       } else {
         store.showwork_expired = true;
       }
     }
     if (data.hasOwnProperty('timelimit_expiresin')) {
-      window.clearTimeout(store.timelimit_timer);
-      window.clearTimeout(store.enddate_timer); // no need for it w timelimit timer
+      window.clearTimeout(timelimitTimer);
+      window.clearTimeout(enddateTimer); // no need for it w timelimit timer
       const now = new Date().getTime();
       if (data.hasOwnProperty('timelimit_expires')) {
         if (data.timelimit_expires === data.enddate) {
@@ -1399,9 +1499,9 @@ export const actions = {
       }
       if (expires > 0) {
         if (data.timelimit_gracein > 0) {
-          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
+          timelimitTimer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
         } else {
-          store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, expires);
+          timelimitTimer = setTimeout(() => { this.handleTimelimitUp(); }, expires);
         }
         store.timelimit_expired = false;
         store.timelimit_grace_expired = false;
@@ -1410,7 +1510,7 @@ export const actions = {
         store.timelimit_grace_expired = true;
         if (data.timelimit_gracein > 0) {
           if (grace > 0) {
-            store.timelimit_timer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
+            timelimitTimer = setTimeout(() => { this.handleTimelimitUp(); }, grace);
             store.timelimit_grace_expired = false;
           }
         }

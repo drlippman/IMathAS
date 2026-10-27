@@ -681,6 +681,8 @@ require_once "includes/sanitize.php";
 
 	require_once "init.php";
 	if (isset($_GET['action']) && $_GET['action']=="logout") {
+		require_once "assess2/AssessClaim.php";
+		AssessClaim::release();
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
 			setsecurecookie(session_name(), '', time()-42000, true);

@@ -22,10 +22,12 @@
 $no_session_handler = 'json_error';
 $init_csrfp_scope = 'question';
 require_once "../init.php";
+$skipClaimCheck = true;
 require_once "./common_start.php";
 require_once "./AssessInfo.php";
 require_once "./AssessRecord.php";
 require_once './AssessUtils.php';
+require_once './AssessClaim.php';
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
@@ -119,6 +121,19 @@ if (!$in_practice && $assess_info->getSetting('timelimit') > 0 &&
         // apply time limit extension
         $assess_record->applyTimeLimitExtension($assess_info->getSetting('timeext'));
     }
+}
+
+// only one session at a time may work on a timed or passworded assessment
+$use_claim = (!$in_practice && $isRealStudent && AssessClaim::applies($assess_info));
+if ($use_claim) {
+  $claimResult = AssessClaim::claim($uid, $aid, true);
+  if ($claimResult === 'in_use') {
+    AssessClaim::log($uid, $cid, $aid, 'assessblocked');
+    echo '{"error": "attempt_in_use"}';
+    exit;
+  } else if ($claimResult === 'takeover') {
+    AssessClaim::log($uid, $cid, $aid, 'assesstakeover');
+  }
 }
 
 // reject start if has current attempt, time limit expired, and is kick out
@@ -290,6 +305,12 @@ if (!$set_lti_sourcedid) {
 }
 
 $assessInfoOut = array();
+
+// tell the client to send heartbeats
+if ($use_claim) {
+  $assessInfoOut['claim_heartbeat'] = AssessClaim::HEARTBEAT_INTERVAL;
+  $assessInfoOut['claim_overlay'] = AssessClaim::OVERLAY_AFTER;
+}
 
 //get prev attempt info before switching to practice mode
 $assessInfoOut['prev_attempts'] = $assess_record->getSubmittedAttempts();

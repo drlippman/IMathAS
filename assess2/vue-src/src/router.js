@@ -235,4 +235,12 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
   nextTick(window.sendLTIresizemsg);
 });
+// when the connection is lost or the attempt was claimed elsewhere, don't let
+// the page navigate; see ClaimOverlay
+router.beforeEach(() => {
+  if (store.claimLost || store.claimOffline) {
+    return false;
+  }
+});
+
 export default router;

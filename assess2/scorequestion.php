@@ -25,6 +25,7 @@ require_once "./common_start.php";
 require_once "./AssessInfo.php";
 require_once "./AssessRecord.php";
 require_once './AssessUtils.php';
+require_once './AssessClaim.php';
 
 // validate inputs
 check_for_required('GET', array('aid', 'cid'));
@@ -435,6 +436,10 @@ if ($end_attempt) {
 
 // Record record
 $assess_record->saveRecord();
+
+if ($end_attempt && $isRealStudent && !$in_practice) {
+  AssessClaim::release($aid);
+}
 
 if ($end_attempt || ($assessInfoOut['submitby'] == 'by_question' && !$in_practice &&
     ($isFirstChange || abs($assess_record->getGbScore()['gbscore'] - $origGbScore) > 1e-9))

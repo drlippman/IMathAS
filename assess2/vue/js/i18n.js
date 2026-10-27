@@ -313,6 +313,12 @@ resource-newtab = Open in a new tab\r
 text-hide = Hide text\r
 text-show = Show question text\r
 \r
+# Single-session claim overlay\r
+claim-lost-title = Assessment opened elsewhere\r
+claim-lost-body = This assessment attempt has been opened in another browser or session, so it can no longer be used here. Anything you entered here after that point was not saved.\r
+claim-offline-title = Connection lost\r
+claim-offline-body = Your connection to the server has been interrupted. The questions are hidden until it is restored. Please check your internet connection; this page will continue automatically once you are back online.\r
+\r
 # Errors\r
 error-error = Error\r
 error-invalid_password = The password you entered was invalid\r
@@ -335,6 +341,7 @@ error-no_active_attempt = You do not have an active attempt\r
 error-no_session = Your login session expired. To continue you will need to log in again.\r
 error-lti_no_session = Your session expired. Please go back to your LMS and open the assignment again.\r
 error-fast_regen = Hey, how about slowing down and trying the problem before hitting Get a Similar Question? Wait 5 seconds before trying again.\r
+error-attempt_in_use = This assessment is already open in another browser or device with this account. Close it there, or wait a few minutes and try again.\r
 error-nochange = Your answers have not changed since your last submission.\r
 error-noserver = The site is not responding\r
 error-parseerror = Server sent an invalid response\r

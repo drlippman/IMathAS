@@ -1015,6 +1015,8 @@ function generaterandstring()
 }
 
 function user_logout() {
+	require_once __DIR__ . '/assess2/AssessClaim.php';
+	AssessClaim::release();
 	$_SESSION = array();
 	if (isset($_COOKIE[session_name()])) {
         setsecurecookie(session_name(), '', time()-42000, true);
