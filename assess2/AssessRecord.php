@@ -4511,7 +4511,7 @@ class AssessRecord
             $parttrydata[$tn]['stuans'] ?? '',
             $GLOBALS['drawinitdata'][$partref]
           );
-        } else if ($qtype == 'file' && strpos($parttrydata[$tn]['stuans'], '@FILE')!==false) {
+        } else if ($qtype == 'file' && strpos($parttrydata[$tn]['stuans'] ?? '', '@FILE')!==false) {
           $file = preg_replace('/@FILE:(.+?)@/',"$1",$parttrydata[$tn]['stuans'] ?? '');
           $url = getasidfileurl($file);
           $extension = substr($url,strrpos($url,'.')+1,3);
