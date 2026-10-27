@@ -2472,13 +2472,13 @@ function gbtable() {
 				for ($k=0; $k<5; $k++) {
 					$fivenum[] = gbpercentile($avgs,$k*25);
 				}
-				$fivenumsum = 'n = '.count($avgs).'<br/>';
+				$fivenumsum = 'n = '.count($avgs)."\n";
 				$fivenumsum .= implode(',&nbsp;',$fivenum);
 				if ($gb[0][1][$j][2]>0) {
 					for ($k=0; $k<5; $k++) {
 						$fivenum[$k] = round(100*$fivenum[$k]/$gb[0][1][$j][2],1);
 					}
-					$fivenumsum .= '<br/>'.implode('%,&nbsp;',$fivenum).'%';
+					$fivenumsum .= "\n".implode('%,&nbsp;',$fivenum).'%';
 				}
 				if ($limuser==-1 && count($avgtime)>0) {
 					$gb[$ln][1][$j][7] = round(array_sum($avgtime)/count($avgtime),1);
