@@ -10,7 +10,7 @@
         </button>
       </div>
 
-      <div class="med-below introtext" v-html="aInfo.summary" ref="summary"></div>
+      <div v-if="aInfo.summary !== ''" class="med-below introtext" v-html="aInfo.summary" ref="summary"></div>
 
       <settings-list />
 
