@@ -634,7 +634,7 @@ require_once __DIR__."/../includes/checkdata.php";
 		echo 'priority.  Only create a manual exception here if it is for a special purpose, like waiving a prerequisite.</p>';
 	}
 	echo '<fieldset class="optionlist"><legend>'._("Exception Options").'</legend>';
-	echo '<p class="list"><input type="checkbox" name="eatlatepass" id="eatlatepass"> <label for="eatlatepass" id="dl">Deduct LatePass(es) from each student:</label> <input type="input" name="latepassn" size="1" value="1" aria-labelledby="dl"/>. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
+	echo '<p class="list"><input type="checkbox" name="eatlatepass" id="eatlatepass"> <label for="eatlatepass" id="dl">Deduct LatePass(es) from each student:</label> <input type="number" min="0" max="999" name="latepassn" size="2" value="1" aria-labelledby="dl"/>. '.Sanitize::encodeStringForDisplay($lpmsg).'</p>';
 	echo '<p class="list"><label><input type="checkbox" name="sendmsg"/> Send message to these students?</label></p>';
 	echo '<p>For assessments:</p>';
 	if ($courseUIver < 2) {
@@ -652,14 +652,14 @@ require_once __DIR__."/../includes/checkdata.php";
     	<select name="newpenaltytype" id="newpenaltytype" aria-label="'. _('exception penalty type') .'">
 		<option value="fixed">fixed</option><option value="increasing">increasing</option>
 		</select>
-    	<input type="input" name="newpenalty" size="2" value="0" aria-label="'. _('exception penalty percent') . '"/>%
-    	<span id="newpenaltyintervalwrap" style="display:none">per <input type="input" name="newpenaltyinterval" size="3" value="24" aria-label="'. _('exception penalty hours per increment').'"/> hours</span>
+    	<input type="number" min="0" max="100" name="newpenalty" size="3" value="0" aria-label="'. _('exception penalty percent') . '"/>%
+    	<span id="newpenaltyintervalwrap" style="display:none">per <input type="number" min="0" max="999" name="newpenaltyinterval" size="4" value="24" aria-label="'. _('exception penalty hours per increment').'"/> hours</span>
     	for questions done while in exception.<br/><label><input type="checkbox" name="alsolatepass"/> Also apply to questions done in LatePass.</label></p>';
     if ($courseUIver > 1) {
-        echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow additional time:</label> <label><input size=2 name="timelimitextmin" value="0"> additional minutes.</label>
+        echo '<p class="list"><label><input type="checkbox" name="timelimitext"/> If time limit is active or expired, allow additional time:</label> <label><input type=number min=0 max=99999 size=2 name="timelimitextmin" value="0"> additional minutes.</label>
         <span class="small" id="timelimitinfo" style="display:none"><br>Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.
         <br>To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student\'s name).</span></p>';
-        echo '<p class="list"><label><input type="checkbox" name="attemptext" /> Allow student additional versions:</label> <label><input size=2 name="attemptextnum" value="0"> Additional versions</label></p>';
+        echo '<p class="list"><label><input type="checkbox" name="attemptext" /> Allow student additional versions:</label> <label><input type=number min=0 max=999 size=2 name="attemptextnum" value="0"> Additional versions</label></p>';
     }
     echo '</fieldset>';
 

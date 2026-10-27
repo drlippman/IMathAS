@@ -364,7 +364,7 @@ if ($aVer == 1) { // only allow this option for old assess UI for now. TODO
 }
 ?>
 		<span class="form"><input type="checkbox" name="eatlatepass" id="eatlatepass" aria-label="deduct latepasses"/></span>
-		<span class="formright"><label for=eatlatepass>Deduct LatePass(es)</label>: <label><input type="input" name="latepassn" size="1" value="1"/> Latepass(s)</label> .
+		<span class="formright"><label for=eatlatepass>Deduct LatePass(es)</label>: <label><input type="number" name="latepassn" size="1" value="1" min="0" max="999"/> Latepass(s)</label> .
 		   Student currently has <?php echo Sanitize::onlyInt($latepasses);?> latepasses.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="waivereqscore" id="waivereqscore" <?php if (($curwaive&1)==1) echo 'checked="checked"';?>/></span>
 		<span class="formright"><label for=waivereqscore>Waive "show based on an another assessment" requirements, if applicable</label>.</span><br class="form"/>
@@ -376,20 +376,20 @@ if ($aVer == 1) { // only allow this option for old assess UI for now. TODO
 				<option value="fixed" <?php if (empty($curepenaltyinterval)) echo 'selected';?>>fixed</option>
 				<option value="increasing" <?php if (!empty($curepenaltyinterval)) echo 'selected';?>>increasing</option>
 			</select>
-			<input type="input" name="newpenalty" size="2" value="<?php echo ($curepenalty===null)?0:Sanitize::onlyFloat($curepenalty);?>" aria-label="<?php echo _('exception penalty percent');?>"/>%
-			<span id="newpenaltyintervalwrap" <?php if (empty($curepenaltyinterval)) echo 'style="display:none"';?>>per <input type="input" name="newpenaltyinterval" size="3" value="<?php echo empty($curepenaltyinterval)?24:Sanitize::onlyInt($curepenaltyinterval);?>" aria-label="<?php echo _('exception penalty hours per increment');?>"/> hours</span>
+			<input type="number" name="newpenalty" size="3" value="<?php echo ($curepenalty===null)?0:Sanitize::onlyFloat($curepenalty);?>" aria-label="<?php echo _('exception penalty percent');?>" min="0" max="100"/>%
+			<span id="newpenaltyintervalwrap" <?php if (empty($curepenaltyinterval)) echo 'style="display:none"';?>>per <input type="number" name="newpenaltyinterval" size="4" value="<?php echo empty($curepenaltyinterval)?24:Sanitize::onlyInt($curepenaltyinterval);?>" aria-label="<?php echo _('exception penalty hours per increment');?>" min="0" max="999"/> hours</span>
 			for questions done while in exception.
 			<br/><label><input type="checkbox" name="alsolatepass" id="alsolatepass" <?php if ($curescope !== 'exception_only') echo 'checked="checked"';?>/> Also apply to questions done in LatePass.</label></span><br class="form"/>
 <?php
 if ($aVer > 1) { // only for new assess
 ?>
         <span class="form"><input type="checkbox" name="timelimitext" id="timelimitext" <?php if ($timeext > 0) echo 'checked';?> aria-label="allow extra time"/></span>
-        <span class=formright><label for="timelimitext">If time limit is active or expired, allow additional time:</label> <label><input size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> additional minutes.</label>
+        <span class=formright><label for="timelimitext">If time limit is active or expired, allow additional time:</label> <label><input type=number min=0 max=99999 size=2 name="timelimitextmin" value="<?php echo ($timeext>0) ? $timeext : 0; ?>"> additional minutes.</label>
         <span class="small" id="timelimitinfo" <?php if ($timeext == 0) { echo 'style="display:none"';}?>><br>Only applies to the most recent attempt. Be aware that depending on your settings, students may have already been shown the answers.
         <br>To give more time in advance, do not use this, use a Time Limit Multiplier (in the Roster, click the student's name).</span>
         </span><br class=form>
         <span class="form"><input type="checkbox" name="attemptext" id="attemptext" <?php if ($attemptext > 0) echo 'checked';?> aria-label="allow additional versions"/></span> 
-        <span class=formright><label for="attemptext" id="attlbl">Allow student additional versions:</label> <label><input size=2 name="attemptextnum" value="<?php echo $attemptext; ?>"> additional versions.</label></span>
+        <span class=formright><label for="attemptext" id="attlbl">Allow student additional versions:</label> <label><input type=number min=0 max=999 size=2 name="attemptextnum" value="<?php echo $attemptext; ?>"> additional versions.</label></span>
         <br class=form>
 
 <?php

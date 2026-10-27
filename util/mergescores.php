@@ -119,7 +119,7 @@ if (isset($_POST['assess'])) {
     $stm = $DBH->query($query); //presanitized
     echo '<p>';
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-        echo '<input type="input" size="1" name="assess['.Sanitize::encodeStringForDisplay($row[0]).']" />'.Sanitize::encodeStringForDisplay($row[1]).'<br/>';
+        echo '<input type="text" size="1" name="assess['.Sanitize::encodeStringForDisplay($row[0]).']" />'.Sanitize::encodeStringForDisplay($row[1]).'<br/>';
     }
     echo '</p>';
     echo '<p><input type="submit" value="Submit"/></p>';
