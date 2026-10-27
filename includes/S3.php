@@ -1991,7 +1991,6 @@ class S3
 				$type = explode(';', $type);
 				$type = trim(array_shift($type));
 			}
-			finfo_close($finfo);
 			if ($type !== false && strlen($type) > 0) return $type;
 		}
 
