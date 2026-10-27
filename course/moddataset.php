@@ -106,6 +106,13 @@
 			$newextref = array();
 			for ($i=0;$i<count($extref);$i++) {
 				if (!isset($_POST["delhelp-$i"])) {
+					if (!empty($_POST["forcecaptioned-$i"])) {
+						$extrefpt = explode('!!', $extref[$i]);
+						if ($extrefpt[0] == 'video' && count($extrefpt) > 2 && $extrefpt[2] == 0) {
+							$extrefpt[2] = 1;
+							$extref[$i] = implode('!!', $extrefpt);
+						}
+					}
 					$newextref[] = $extref[$i];
 				}
 			}
@@ -1240,11 +1247,15 @@ if (count($extref)>0) {
 		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
 			echo ' (cc)';
 		}
-    echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>. ";
-    if (!empty($extrefpt[3])) {
-        echo _('Description') . ': ' . Sanitize::encodeStringForDisplay($extrefpt[3]) . '. ';
-    }
-    echo "<label><input type=\"checkbox\" name=\"delhelp-$i\" ".($canedit?'':'disabled').'/> '._('Delete?').'</label></li>';
+		echo ', URL: <a href="'.Sanitize::url($extrefpt[1]).'">'.Sanitize::encodeStringForDisplay($extrefpt[1])."</a>. ";
+		if (!empty($extrefpt[3])) {
+			echo _('Description') . ': ' . Sanitize::encodeStringForDisplay($extrefpt[3]) . '. ';
+		}
+		echo "<label><input type=\"checkbox\" name=\"delhelp-$i\" ".($canedit?'':'disabled').'/> '._('Delete?').'</label>';
+		if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==0) {
+			echo "<input type=\"hidden\" name=\"forcecaptioned-$i\" id=\"forcecaptioned-$i\" value=\"0\" />";
+		}
+		echo '</li>';
 	}
 }
 echo '</ul></div>'; //helpbtnlist, helpbtnwrap
