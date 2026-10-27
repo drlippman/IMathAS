@@ -87,15 +87,15 @@ if ($assess_info->getSetting('available') === 'practice' && !empty($_POST['pract
 // load user's assessment record
 $assess_record = new AssessRecord($DBH, $assess_info, $in_practice);
 $assess_record->loadRecord($uid);
-// used to skip LTI update if score is unchanged
-$origGbScore = $assess_record->getGbScore()['gbscore'];
-$isFirstChange = ($assess_record->getLastChange() == 0);
-
 // make sure a record exists
 if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
   echo '{"error": "not_ready"}';
   exit;
 }
+
+// used to skip LTI update if score is unchanged
+$origGbScore = $assess_record->getGbScore()['gbscore'];
+$isFirstChange = ($assess_record->getLastChange() == 0);
 
 // reject start if has current attempt, time limit expired, and is kick out
 if (!$in_practice &&
