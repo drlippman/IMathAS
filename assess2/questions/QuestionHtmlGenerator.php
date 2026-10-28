@@ -498,6 +498,9 @@ class QuestionHtmlGenerator
                         }
                     }, $answeights);
                     ksort($answeights);
+                    if (array_sum($answeights) == 0) {
+                        $answeights = array_fill_keys(array_keys($anstypes), 1);
+                    }
                 } else {
                     if (count($anstypes)>1) {
                         $answeights = array_fill_keys(array_keys($anstypes), 1);

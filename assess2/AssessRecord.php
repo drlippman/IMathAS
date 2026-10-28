@@ -1932,6 +1932,9 @@ class AssessRecord
       $answeights = isset($curq['answeights']) ? $curq['answeights'] : array(1);
 
       $answeightTot = array_sum($answeights);
+      if ($answeightTot == 0) {
+        $answeightTot = 1; // avoid division by zero
+      }
 
       for ($pn = 0; $pn < count($answeights); $pn++) {
         // get part details
@@ -2302,6 +2305,9 @@ class AssessRecord
           $answeights[$pn] = 0;
         }
       }
+    }
+    if ($answeightTot == 0) {
+      $answeightTot = 1; // avoid division by zero
     }
     // loop over each part
     for ($pn = 0; $pn < count($answeights); $pn++) {
@@ -4004,6 +4010,9 @@ class AssessRecord
         $adjscore = round($score/$ptsposs + 1e-8, 5);
       } else {
         $answeightTot = array_sum($qdata['answeights']);
+        if ($answeightTot == 0) {
+          $answeightTot = 1; // avoid division by zero
+        }
         if ($qdata['answeights'][$pn] > 0) {
           $adjscore = round($score/($ptsposs * $qdata['answeights'][$pn]/$answeightTot) + 1e-8, 5);
         } else {
@@ -4919,6 +4928,9 @@ class AssessRecord
     $scoreonfirst = 0;
     $subsUsed = array();
     $answeightTot = array_sum($qdata['answeights']);
+    if ($answeightTot == 0) {
+      $answeightTot = 1; // avoid division by zero
+    }
 
     foreach ($qdata['tries'] as $pn=>$parttries) {
       if (!isset($parttries[0]['raw'])) { // no scored try on this part; don't record
