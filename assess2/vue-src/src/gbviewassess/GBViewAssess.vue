@@ -21,6 +21,13 @@
           {{ $t('gradebook-'+ (aData.timelimit_ext > 0 ? 'has_timeext' : 'used_timeext'),
             {n: Math.abs(aData.timelimit_ext)}) }}
         </span>
+        <span v-if="aData.multi_ip" class="noticetext">
+          <br/>
+          {{ $t('gradebook-multi_ip') }}
+          <span v-if="aData.multi_ip.blocked > 0">
+            {{ $t('gradebook-multi_ip_blocked', { n: aData.multi_ip.blocked }) }}
+          </span>
+        </span>
       </div>
 
       <div>

@@ -126,6 +126,24 @@ class AssessRecord
   }
 
   /**
+   * Get multiple-IP access info for the current user on this assessment.
+   * Only applies to timed or passworded assessments.
+   * @return array|null  ['ips'=>count, 'blocked'=>count], or null if not applicable
+   */
+  public function getMultiIPInfo() {
+    if (abs($this->assess_info->getSetting('timelimit')) == 0 &&
+      !$this->assess_info->hasPassword()
+    ) {
+      return null;
+    }
+    require_once __DIR__ . '/AssessClaim.php';
+    $res = AssessClaim::getMultiIPUsers(
+      $this->assess_info->getSetting('courseid'), $this->curAid, $this->curUid
+    );
+    return $res[$this->curUid] ?? null;
+  }
+
+  /**
    * Set if teacher in GB, for scores/answers
    * @param bool $val true if teacher/tutor
    */

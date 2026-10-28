@@ -89,6 +89,35 @@ class AssessClaim
     }
 
     /**
+     * Find students who accessed a timed or passworded assessment from more
+     * than one IP, using the access log. A claim row alone can't show this,
+     * since a student leaving cleanly releases their claim.
+     * @param  int $cid
+     * @param  int $aid
+     * @param  int $uid  limit to one user, or 0 for everyone
+     * @return array  userid => ['ips'=>distinct IP count, 'blocked'=>blocked attempts]
+     *                Empty if the assessment is neither timed nor passworded.
+     */
+    public static function getMultiIPUsers($cid, $aid, $uid = 0) {
+        global $DBH;
+        $query = "SELECT userid,COUNT(DISTINCT info),SUM(type='assessblocked') FROM imas_content_track
+            WHERE courseid=? AND typeid=? AND type IN ('assess','assesstakeover','assessblocked')";
+        $qarr = [$cid, $aid];
+        if ($uid > 0) {
+            $query .= ' AND userid=?';
+            $qarr[] = $uid;
+        }
+        $query .= ' GROUP BY userid HAVING COUNT(DISTINCT info)>1';
+        $stm = $DBH->prepare($query);
+        $stm->execute($qarr);
+        $out = [];
+        while ($r = $stm->fetch(PDO::FETCH_NUM)) {
+            $out[$r[0]] = ['ips' => (int) $r[1], 'blocked' => (int) $r[2]];
+        }
+        return $out;
+    }
+
+    /**
      * Release claims held by the current session, on logout or leaving the
      * page. Only touches this session's own claims, so another session
      * can't clear someone else's.

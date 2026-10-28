@@ -16,15 +16,16 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
     $now = time();
-    
-    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs,scoresingb,submitby,showscores FROM imas_assessments WHERE id=:id AND courseid=:cid");
+    require_once "../assess2/AssessClaim.php";
+
+    $stm = $DBH->prepare("SELECT minscore,timelimit,overtime_grace,deffeedback,startdate,enddate,LPcutoff,allowlate,name,itemorder,ver,deffeedbacktext,tutoredit,ptsposs,scoresingb,submitby,showscores,password FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));
 	$res = $stm->fetch(PDO::FETCH_NUM);
 	if ($res === false) {
 		echo "Invalid ID";
 		exit;
 	}
-	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible,$scoresingb,$submitby,$showscores) = $res;
+	list($minscore,$timelimit,$overtime_grace,$deffeedback,$startdate,$enddate,$LPcutoff,$allowlate,$name,$itemorder,$aver,$deffeedbacktext,$tutoredit,$totalpossible,$scoresingb,$submitby,$showscores,$assesspw) = $res;
     $canShowInProgress = ($aver > 1 && $submitby == 'by_assessment' && $showscores == 'during');
     $showInProgress = false;
     if ($canShowInProgress) {
@@ -323,6 +324,11 @@
 		}
 	}
 
+	$multiIP = [];
+	if (abs($timelimit) > 0 || $assesspw != '') {
+		$multiIP = AssessClaim::getMultiIPUsers($cid, $aid);
+	}
+
 	echo '<form method="post" id="sform" action="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">';
 
 	if ($hasUA > 0) {
@@ -552,6 +558,9 @@
 			if (!empty($excused[$line['userid']])) {
 				echo '<sup>x</sup>';
 			}
+			if (isset($multiIP[$line['userid']])) {
+				echo '<sup>MA</sup>';
+			}
 			echo '</td>';
 			if ($totalpossible>0) {
 				echo '<td>'.round(100*($total)/$totalpossible,1).'%</td>';
@@ -662,7 +671,12 @@
 		echo "<script> initSortTable('myTable',Array('S','N','P','D'$duedatesort,'N','S'),true,false);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), UA-Unsubmitted attempt, OT-overtime, PT-practice test, EC-extra credit, NC-no credit, NR-not manually released<br/>";
-	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass  </p>\n";
+	echo "<sup>e</sup> Has exception, <sup>x</sup> Excused grade, <sup>LP</sup> Used latepass ";
+	if (count($multiIP) > 0) {
+		echo '<br/><sup>MA</sup></span> ';
+		echo _('indicates the student accessed this assessment from more than one IP address, which could be a sign of the assessment being shared. It can also happen innocently, such as when switching between wifi and mobile data.');
+	}
+	echo "</p>\n";
 	echo '</form>';
 	require_once "../footer.php";
 

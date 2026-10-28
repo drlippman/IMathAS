@@ -237,6 +237,11 @@ if ($isActualTeacher || ($istutor && ($tutoredit&1) == 1)) {
     );
   }
   $assessInfoOut['can_message'] = ($coursemsgset < 4);
+  // flag access from multiple IPs on timed/passworded assessments
+  $multiIP = $assess_record->getMultiIPInfo();
+  if ($multiIP !== null) {
+    $assessInfoOut['multi_ip'] = $multiIP;
+  }
 } else {
   $assessInfoOut['can_edit_scores'] = false;
 }
