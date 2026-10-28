@@ -171,6 +171,9 @@ function delitembyid($itemid) {
 		$stm->execute(array(':assessmentid'=>$typeid));
 		$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$typeid));
+		// join on imas_students so the delete can use the (userid,assessmentid) key
+		$stm = $DBH->prepare("DELETE c FROM imas_assess_claims AS c JOIN imas_students AS s ON s.userid=c.userid WHERE s.courseid=? AND c.assessmentid=?");
+		$stm->execute(array($cid, $typeid));
 
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':assessmentid'=>$typeid));

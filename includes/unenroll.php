@@ -118,6 +118,8 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$DBH->query($query); //values already sanitized
 			$query = "DELETE FROM imas_assessment_records WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
+			$query = "DELETE FROM imas_assess_claims WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
+			$DBH->query($query); //values already sanitized
 			$query = "DELETE FROM imas_exceptions WHERE itemtype='A' AND assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			$DBH->query($query); //values already sanitized
 		}

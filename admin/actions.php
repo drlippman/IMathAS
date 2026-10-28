@@ -370,7 +370,8 @@ switch($_POST['action']) {
 
 		$toDelTable = array('user_prefs', 'students', 'teachers', 'tutors',
 			'assessment_sessions', 'assessment_records', 'exceptions', 'bookmarks',
-			'forum_views', 'forum_subscriptions', 'grades', 'ltiusers', 'stugroupmembers');
+			'forum_views', 'forum_subscriptions', 'grades', 'ltiusers', 'stugroupmembers',
+				'assess_claims');
 		foreach ($toDelTable as $table) {
 			$stm = $DBH->prepare("DELETE FROM imas_$table WHERE userid=:userid");
 			$stm->execute(array(':userid'=>$deluid));
@@ -1216,6 +1217,8 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE userid=:userid");
 				$stm->execute(array(':userid'=>$uid));
 				$stm = $DBH->prepare("DELETE FROM imas_assessment_records WHERE userid=:userid");
+				$stm->execute(array(':userid'=>$uid));
+				$stm = $DBH->prepare("DELETE FROM imas_assess_claims WHERE userid=:userid");
 				$stm->execute(array(':userid'=>$uid));
 				$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE userid=:userid");
 				$stm->execute(array(':userid'=>$uid));
