@@ -697,7 +697,8 @@ if ($hasusername) {
                 'index.php', 'gbviewassess.php', 'autosave.php', 'endassess.php', 'getscores.php', 'livepollstatus.php', 'loadassess.php',
                 'loadquestion.php', 'scorequestion.php', 'startassess.php', 'uselatepass.php', 'gbloadassess.php', 'gbloadassessver.php',
                 'gbloadquestionver.php', 'getquestions.php', 'savework.php', 'posts.php', 'thread.php', 'postsbyname.php',
-                'savetagged.php', 'recordlikes.php', 'listlikes.php', 'gbloadtexts.php', 'rectrack.php', 'submissionreview.php');
+                'savetagged.php', 'recordlikes.php', 'listlikes.php', 'gbloadtexts.php', 'rectrack.php', 'submissionreview.php',
+                'heartbeat.php', 'releaseclaim.php');
             //call hook, if defined
             if (function_exists('allowedInAssessment')) {
                 $allowedinLTI = array_merge($allowedinLTI, allowedInAssessment());
