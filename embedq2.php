@@ -451,7 +451,7 @@ echo '<div class="questionwrap">';
 if (!$state['jssubmit'] && $state['hidescoreval'] != 1) {
     echo '<div id="results'.$qn.'"></div>';
 }
-echo '<div class="questionpane">';
+echo '<div class="questionpane skipmathrender">';
 echo '<div class="question" id="questionwrap'.$qn.'">';
 echo '</div></div>';
 if (!$state['jssubmit']) {

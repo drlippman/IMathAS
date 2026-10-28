@@ -390,7 +390,7 @@ echo '<a href="embedq2prefs.php" target="_blank" class="sr-only">'._('Edit displ
 
 echo '<div><ul id="errorslist" style="display:none" class="small"></ul></div>';
 for ($qn=0; $qn < $numq; $qn++) {
-    echo '<div class="questionwrap">';
+    echo '<div class="questionwrap skipmathrender">';
     if (!$state['jssubmit']) {
         echo '<div id="results'.$qn.'"></div>';
     }
