@@ -21,9 +21,11 @@ export default {
     value: { default: '' },
     rows: { default: 2 }
   },
+  emits: ['input', 'blur', 'focus'],
   data: function () {
     return {
-      objTinymce: null
+      objTinymce: null,
+      lastEmitted: null
     };
   },
   computed: {
@@ -63,6 +65,8 @@ export default {
       });
     },
     updateValue: function (value) {
+      if (value === this.lastEmitted) { return; }
+      this.lastEmitted = value;
       this.$emit('input', value);
     },
     focus: function () {

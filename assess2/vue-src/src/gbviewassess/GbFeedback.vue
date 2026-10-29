@@ -49,7 +49,7 @@ export default {
   methods: {
     updateFeedback (evt) {
       let content;
-      if (this.useeditor) {
+      if (this.useeditor && typeof evt === 'string') {
         content = evt;
       } else {
         content = evt.target.value;
