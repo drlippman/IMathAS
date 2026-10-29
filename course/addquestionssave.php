@@ -59,7 +59,7 @@
             $qids[] = $DBH->lastInsertId();
         }
         //add to itemorder
-        if ($_POST['asgroup'] == 1) {
+        if (($_POST['asgroup'] ?? 0) == 1) {
             $newitems = '1|0~'.implode('~', $qids);
             $numnew = 1;
         } else {

@@ -68,7 +68,9 @@ function getAllNames($allactions) {
             }
         } else if ($action['action'] == 'Unenroll') {
             $data = json_decode($action['metadata'], true);
-            $uids = array_merge($uids, explode(',', $data['unenrolled']));
+            if (!empty($data['unenrolled'])) { // may be missing if metadata was truncated
+                $uids = array_merge($uids, explode(',', $data['unenrolled']));
+            }
         }
     }
     $uids = array_values(array_unique($uids));
@@ -108,6 +110,10 @@ function mapMetadata($action) {
         $action['metadata'] = json_encode($data);
     } else if ($action['action'] == 'Unenroll') {
         $data = json_decode($action['metadata'], true);
+        if (!is_array($data) || !isset($data['unenrolled'], $data['grades'])) {
+            // bad or truncated metadata; leave as raw text
+            return $action;
+        }
         $data['unenrolled'] = explode(',',$data['unenrolled']);
         foreach ($data['unenrolled'] as $k=>$v) {
             $data['unenrolled'][$k] = $stunames[$v] ?? $v;

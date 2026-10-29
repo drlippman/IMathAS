@@ -2939,7 +2939,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $ke
 				$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':section'=>$_SESSION['lti_context_label']));
 				require_once 'includes/TeacherAuditLog.php';
 				TeacherAuditLog::addTracking(
-					$destcid,
+					$cid,
 					"Roster Action",
 					null,
 					array(

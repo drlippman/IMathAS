@@ -714,7 +714,7 @@ require_once "includes/sanitize.php";
                 exit;
             }
         }
-		$oldpwok = password_verify($_POST['oldpw'],$line['password']);
+		$oldpwok = password_verify($_POST['oldpw'] ?? '',$line['password']);
 		if (!$oldpwok) {
 			login_recordFailure($userid, $line['jsondata']);
 		} else {
@@ -1062,7 +1062,7 @@ require_once "includes/sanitize.php";
                 require_once "footer.php";
                 exit;
             }
-            $oldpwok = password_verify($_POST['oldpw'],$oldpw);
+            $oldpwok = password_verify($_POST['oldpw'] ?? '',$oldpw);
             if ($oldpwok && $myrights>5) {
                 // pw ok; clear in DB, and in $jsondata so the later write doesn't restore it
                 login_resetFailures($userid, $jsondata);
