@@ -131,6 +131,18 @@ if (!isset($use_local_sessions)) {
 
 $staticroot = $imasroot;
 
+// set CORS headers if running on localhost
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+  // to help with development, while vue runs on 8080
+  // be sure to disable csrfp for vue dev
+  if (!empty($CFG['assess2-use-vue-dev'])) {
+    header('Access-Control-Allow-Origin: '. $CFG['assess2-use-vue-dev-address']);
+  }
+  header("Access-Control-Allow-Credentials: true");
+  header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+  header("Access-Control-Allow-Headers: Origin");
+}
+
 // Load validate.php?
 if (!isset($init_skip_validate) || (isset($init_skip_validate) && false == $init_skip_validate)) {
 	require_once __DIR__ . "/validate.php";
