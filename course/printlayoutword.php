@@ -43,6 +43,7 @@ if ($line === false) {
 }
 
 function getQuestions($line) {
+	global $qn;
 	$ioquestions = explode(",",$line['itemorder']);
 	$questions = array();
 	foreach($ioquestions as $k=>$q) {
@@ -126,7 +127,13 @@ function getQuestions($line) {
         array_push($questions, $lastq);
     }
 
-	return $questions;
+	$filtered = [];
+	foreach ($questions as $q) {
+		if (!empty($qn[$q])) {
+			$filtered[] = $q;
+		}
+	}
+	return $filtered;
 }
 
 $fixedn = array();
