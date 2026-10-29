@@ -287,17 +287,21 @@ var MQeditor = (function($) {
             config.onBlur();
         }
       });
-    $(mqel).on('click.mqeditor', function(e) {
-      // hack to handle MQ entries inside radio button labels
-      var p = $(e.target).closest("label");
-      if (p.length > 0) {
-        if (p.attr("for") !== 'undefined') {
-          $("#" + p.attr("for")).prop("checked",true);
-        }
+    $(mqel).on('click.mqeditor', checkRadioIfLabel);
+  }
+
+  function checkRadioIfLabel(e) {
+    // hack to handle MQ entries inside radio button labels
+    var p = $(e.target).closest("label");
+    if (p.length > 0) {
+      if (p.attr("for") !== 'undefined') {
+        $("#" + p.attr("for")).prop("checked",true);
+      }
+      if (e.stopPropagation) {
         e.stopPropagation();
         return false;
       }
-    });
+    }
   }
 
   /*
@@ -484,6 +488,8 @@ var MQeditor = (function($) {
       // handle nosolninf, since not traditional input
       if (latex != '') {
         $("#"+el.id.substring(8)).siblings("input[id^=qs][value=spec]").prop("checked",true);
+        // if MQ is in choices label, check choices option
+        checkRadioIfLabel({target: "#"+el.id.substring(8)});
       }
       if (curMQfield) {
         curMQfield.setAriaPostLabel('');

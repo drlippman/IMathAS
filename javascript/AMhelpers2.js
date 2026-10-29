@@ -351,6 +351,15 @@ function initqsclickchange() {
 			}
 		 });
 	});
+  // simulate nosoln behavior for inputs in choices label
+  $('input[id^=qn][type=radio]').each(function(i,qsel) {
+		$(qsel).siblings('label').find('input[id^=qn][type=text]').off('keyup.qsclickchange')
+		 .on('keyup.qsclickchange', function(e) {
+			if (e.keyCode != 8 && e.keyCode != 46) {
+				$(qsel).prop("checked",true);
+			}
+		 });
+	});
 }
 
 function clearScoreMarkers(e) {
