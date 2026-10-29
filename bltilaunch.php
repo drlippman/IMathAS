@@ -160,7 +160,7 @@ if (
 
 //check to see if accessiblity page is posting back
 if (isset($_GET['launch'])) {
-	if (empty($_SESSION['userid'])) {
+	if (empty($_SESSION['userid']) || empty($_SESSION['lti_key']) || !isset($_SESSION['ltiitemtype'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
@@ -227,7 +227,7 @@ if (isset($_GET['launch'])) {
 	}
 	exit;
 } else if (isset($_GET['accessibility'])) {
-	if (empty($_SESSION['userid'])) {
+	if (empty($_SESSION['userid']) || empty($_SESSION['lti_key']) || !isset($_SESSION['ltiitemtype'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
@@ -240,7 +240,7 @@ if (isset($_GET['launch'])) {
 	require_once "header.php";
 	echo "<h3>Connecting to $installname</h3>";
     echo "<form id=\"postbackform\" method=\"post\" action=\"" . $imasroot . "/bltilaunch.php?launch=true\" ";
-	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
+	if ($_SESSION['ltiitemtype']==0 && !empty($_SESSION['ltitlwrds'])) {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of "
             .Sanitize::encodeStringForJavascript($_SESSION['ltitlwrds'])
             .".  Click OK to start or continue working on the assessment.\")' >";
@@ -267,7 +267,7 @@ if (isset($_GET['launch'])) {
 			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
 			<?php
-			if ($_SESSION['ltiitemtype']!=0 || $_SESSION['ltitlwrds'] == '') {
+			if ($_SESSION['ltiitemtype']!=0 || empty($_SESSION['ltitlwrds'])) {
 				//auto submit the form
 				echo 'document.getElementById("postbackform").submit();';
 			}
@@ -1863,7 +1863,7 @@ if (!$promptforsettings && !$createnewsession && !($linkparts[0]=='aid' && $tlwr
 
 //check to see if accessiblity page is posting back
 if (isset($_GET['launch'])) {
-	if (empty($_SESSION['userid'])) {
+	if (empty($_SESSION['userid']) || empty($_SESSION['lti_key']) || !isset($_SESSION['ltiitemtype'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
@@ -1931,7 +1931,7 @@ if (isset($_GET['launch'])) {
 	}
 	exit;
 } else if (isset($_GET['accessibility'])) {
-	if (empty($_SESSION['userid'])) {
+	if (empty($_SESSION['userid']) || empty($_SESSION['lti_key']) || !isset($_SESSION['ltiitemtype'])) {
 		reporterror(_("No authorized session exists. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again. If you are using Safari, you may need to disable Prevent Cross-Site Tracking."));
 	}
 	$userid = $_SESSION['userid'];
@@ -1954,7 +1954,7 @@ if (isset($_GET['launch'])) {
 	require_once "header.php";
 	echo "<h3>Connecting to $installname</h3>";
     echo "<form id=\"postbackform\" method=\"post\" action=\"".$imasroot."/bltilaunch.php?launch=true\" ";
-	if ($_SESSION['ltiitemtype']==0 && $_SESSION['ltitlwrds'] != '') {
+	if ($_SESSION['ltiitemtype']==0 && !empty($_SESSION['ltitlwrds'])) {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".  Click OK to start or continue working on the assessment.\")' >";
 		echo "<p class=noticetext>This assessment has a time limit of ".Sanitize::encodeStringForDisplay($_SESSION['ltitlwrds']).".</p>";
 		echo '<div class="textright"><input type="submit" value="Continue" /></div>';
@@ -1979,7 +1979,7 @@ if (isset($_GET['launch'])) {
 			var tz = jstz.determine();
 			document.getElementById("tzname").value = tz.name();
 			<?php
-			if ($_SESSION['ltiitemtype']!=0 || $_SESSION['ltitlwrds'] == '') {
+			if ($_SESSION['ltiitemtype']!=0 || empty($_SESSION['ltitlwrds'])) {
 				//auto submit the form
 				echo 'document.getElementById("postbackform").submit();';
 			}
