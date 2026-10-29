@@ -394,6 +394,7 @@ function rewritePlusMinus($str) {
 function numfuncPrepShowanswer($string, $variables) {
     $greekletters = array('alpha', 'beta', 'chi', 'delta', 'epsilon', 'gamma', 'varphi', 'phi', 'psi', 'sigma', 'rho', 'theta', 'lambda', 'mu', 'nu', 'omega', 'tau');
 
+    $varstoquote = array();
     for ($i = 0; $i < count($variables); $i++) {
         if (strlen($variables[$i]) > 1) {
             $isgreek = false;
@@ -434,10 +435,18 @@ function numfuncPrepShowanswer($string, $variables) {
 				if ($chg) {
                     $string = str_replace($matches[0], $matches[1] . '(' . $matches[2] . ')', $string);
                 }
-			} else if (!$isgreek) {
-                $string = str_replace($variables[$i], '"' . $variables[$i] . '"', $string);
+			} else if (!$isgreek && strlen(preg_replace('/[^\w_]/', '', $variables[$i])) > 1) {
+                // as in AMnumfuncPrepVar, variables like y' or y'' are not quoted
+                $varstoquote[] = $variables[$i];
             }
         }
+    }
+    if (count($varstoquote) > 0) {
+        // quote in a single pass, longest first, so one variable's text
+        // doesn't get matched inside another's (e.g. y' inside y'')
+        usort($varstoquote, function ($a, $b) { return strlen($b) - strlen($a); });
+        $reg = '/(' . implode('|', array_map('preg_quote', $varstoquote, array_fill(0, count($varstoquote), '/'))) . ')/';
+        $string = preg_replace($reg, '"$1"', $string);
     }
     return $string;
 }
