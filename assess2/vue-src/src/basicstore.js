@@ -58,6 +58,7 @@ const lastLoadedTimes = [];
 let heartbeatTimer = null;
 let heartbeatCheckTimer = null;
 let heartbeatVisHandler = null;
+let heartbeatAjaxHandler = null;
 let heartbeatLeaveHandler = null;
 
 export const actions = {
@@ -1272,9 +1273,35 @@ export const actions = {
           lastOk = performance.now();
           store.claimOffline = false;
         })
-        .always(check);
+        .always(() => {
+          check();
+          schedule(); // retry after failures too
+        });
     };
-    heartbeatTimer = window.setInterval(beat, interval * 1000);
+    // (re)start the countdown to the next ping
+    const schedule = () => {
+      if (heartbeatAjaxHandler === null) {
+        return; // stopped
+      }
+      window.clearTimeout(heartbeatTimer);
+      heartbeatTimer = window.setTimeout(beat, interval * 1000);
+    };
+    // Successful requests to endpoints that verify the claim (common_start.php)
+    // refresh it server-side, so they count as a heartbeat and push back the
+    // next ping.
+    heartbeatAjaxHandler = (event, xhr, settings, data) => {
+      const url = settings.url || '';
+      if (url.indexOf(store.APIbase) === 0 &&
+        url.indexOf('loadassess.php') === -1 && // doesn't check the claim
+        data && typeof data === 'object' && !data.hasOwnProperty('error')
+      ) {
+        lastOk = performance.now();
+        store.claimOffline = false;
+        schedule();
+      }
+    };
+    window.$(document).on('ajaxSuccess', heartbeatAjaxHandler);
+    schedule();
     heartbeatCheckTimer = window.setInterval(check, 5000);
     // background tabs throttle timers, and sleeping devices stop them
     heartbeatVisHandler = () => {
@@ -1294,10 +1321,14 @@ export const actions = {
     window.addEventListener('pagehide', heartbeatLeaveHandler);
   },
   stopHeartbeat () {
-    window.clearInterval(heartbeatTimer);
+    window.clearTimeout(heartbeatTimer);
     window.clearInterval(heartbeatCheckTimer);
     heartbeatTimer = null;
     heartbeatCheckTimer = null;
+    if (heartbeatAjaxHandler !== null) {
+      window.$(document).off('ajaxSuccess', heartbeatAjaxHandler);
+      heartbeatAjaxHandler = null;
+    }
     if (heartbeatVisHandler !== null) {
       document.removeEventListener('visibilitychange', heartbeatVisHandler);
       heartbeatVisHandler = null;
