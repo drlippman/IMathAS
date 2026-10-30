@@ -478,42 +478,41 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			$qsmap[$line['replaceby']] = $endpoint;
 		}
 		$toget = array_keys($qsmap);
-		$ph = Sanitize::generateQueryPlaceholders($toget);
 
-		//look up any include___from's
-		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($ph)";
-		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		$stm = $DBH->prepare($query);
-		$stm->execute($toget);
-		$includedqs = array();
+		//look up any include___from's, following them transitively
 		$dependencies = array();
-		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$dependencies[$line['id']] = array();
-			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
-				$dependencies[$line['id']] = array_merge($dependencies[$line['id']], $matches[1]);
+		$tocheck = $toget;
+		while (count($tocheck) > 0) {
+			$cph = Sanitize::generateQueryPlaceholders($tocheck);
+			$query = "SELECT id,control,qtext,a11yalt,replaceby FROM imas_questionset WHERE id IN ($cph)";
+			$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%' OR a11yalt>0)";
+			$stm = $DBH->prepare($query);
+			$stm->execute($tocheck);
+			$includedqs = array();
+			while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+				$dependencies[$line['id']] = array();
+				if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
+					$dependencies[$line['id']] = array_merge($dependencies[$line['id']], $matches[1]);
+				}
+				if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
+					$includedqs = array_merge($includedqs,$matches[1]);
+					$dependencies[$line['id']] = array_merge($dependencies[$line['id']], $matches[1]);
+				}
+				if ($line['a11yalt'] > 0) {
+					$includedqs[] = $line['a11yalt'];
+					$dependencies[$line['id']][] = $line['a11yalt'];
+				}
+				$dependencies[$line['id']] = array_unique($dependencies[$line['id']]);
 			}
-			if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
-				$dependencies[$line['id']] = array_unique(array_merge($dependencies[$line['id']], $matches[1]));
+			$tocheck = array();
+			foreach (array_unique($includedqs) as $v) {
+				if (!isset($qsmap[$v])) {
+					$qsmap[$v] = $qscnt;
+					$qscnt++;
+					$tocheck[] = $v;
+				}
 			}
-		}
-		$query = "SELECT id,a11yalt FROM imas_questionset WHERE id IN ($ph) AND a11yalt>0";
-		$stm = $DBH->prepare($query);
-		$stm->execute($toget);
-		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if (!isset($dependencies[$line['id']])) {
-				$dependencies[$line['id']] = [];
-			}
-			$dependencies[$line['id']][] = $line['a11yalt'];
-			$includedqs[] = $line['a11yalt'];
-			$dependencies[$line['id']] = array_unique($dependencies[$line['id']]);
-		}
-
-		$qstoadd = array_diff(array_unique($includedqs),$toget);
-		foreach ($qstoadd as $v) {
-			$qsmap[$v] = $qscnt;
-			$qscnt++;
 		}
 
 		$toget = array_keys($qsmap);
