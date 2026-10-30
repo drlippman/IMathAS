@@ -331,6 +331,13 @@ export default {
     endAssess () {
       actions.endAssess();
     }
+  },
+  mounted () {
+    setTimeout(window.drawPics, 50);
+    if (this.$refs.summary) {
+      window.rendermathnode(this.$refs.summary);
+      window.initlinkmarkup(this.$refs.summary);
+    }
   }
 };
 </script>
