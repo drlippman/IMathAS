@@ -808,7 +808,7 @@ class AssessRecord
    * @return [type] [description]
    */
   public function getStatus() {
-    return $this->assessRecord['status'];
+    return $this->assessRecord['status'] ?? 0;
   }
 
   /**
@@ -816,7 +816,7 @@ class AssessRecord
    * @return [type] [description]
    */
   public function getStatus2() {
-    return $this->assessRecord['status2'];
+    return $this->assessRecord['status2'] ?? 0;
   }
 
   /**
