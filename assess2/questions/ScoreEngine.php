@@ -275,6 +275,10 @@ class ScoreEngine
         /*
 	     * Package local variables for scorepart().
 	     */
+        // don't allow un-indexed overridescore in multipart
+        if ($quesData['qtype'] == "multipart" && isset($overridescore) && !is_array($overridescore)) {
+            unset($overridescore);
+        }
 
         // These may have been defined by the question writer.
         $varsForScorepart = array();
@@ -316,7 +320,6 @@ class ScoreEngine
          *
          * FIXME: Need to handle conditional questions.
          */
-
         $scoreQuestionParams->setVarsForScorePart($varsForScorepart);
 
         if ($quesData['qtype'] == "multipart") {
@@ -651,6 +654,7 @@ class ScoreEngine
             echo '$anstypes not defined - will cause scoring issues';
             $anstypes = [];
         }
+
         /*
          * Begin scoring.
          */
