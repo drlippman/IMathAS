@@ -11,6 +11,7 @@ if (isset($courseUIver) && $courseUIver > 1) {
 	if (!isset($_GET['id'])) {
 		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid));
+			exit;
 	}
 }
 
@@ -62,6 +63,7 @@ if (isset($_GET['id'])) {
 		}
 		header(sprintf('Location: %s/course/addassessment2.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() ,
 			$GLOBALS['basesiteurl'], $cid, Sanitize::onlyInt($_GET['id'])));
+			exit;
 	}
 }
 
