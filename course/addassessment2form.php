@@ -28,7 +28,7 @@ $vueData = array(
 	'etime' => $etime,
 	'datesbylti' => intval($line['date_by_lti']),
 	'allowpractice' => $line['reviewdate']>0,
-	'displaymethod' => $line['displaymethod'],
+	'displaymethod' => ($line['displaymethod'] === 'drill') ? 'skip' : $line['displaymethod'],
 	'subtype' => ($line['displaymethod'] === 'drill') ? 'drill' : $line['submitby'],
 	'drillstyle' => $line['drilljson']['style'],
 	'drilln' => $line['drilljson']['n'],
