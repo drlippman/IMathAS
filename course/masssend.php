@@ -261,7 +261,10 @@ require_once '../includes/checkdata.php';
 		$stm->execute(array(':courseid'=>$_GET['cid']));
 		$hastutors = ($stm->fetchColumn(0)>0);
 
-		$sendtype = (isset($_POST['posted']))?$_POST['posted']:$_POST['submit']; //E-mail or Message
+		$sendtype = $_POST['posted'] ?? $_POST['submit'] ?? $_GET['masssend'] ?? 'Message'; //E-mail or Message
+		if ($sendtype !== 'E-mail') {
+			$sendtype = 'Message';
+		}
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require_once "../header.php";
