@@ -736,7 +736,8 @@ class ScoreEngine
             }
             if (isset($scorePartResult)) {
                 if (isset($overridescore) && is_array($overridescore) && 
-                    isset($overridescore[$partnum]) && $overridescore[$partnum] >= 0 && $overridescore[$partnum]<=1) {
+                    isset($overridescore[$partnum]) && is_numeric($overridescore[$partnum]) &&
+                    $overridescore[$partnum] >= 0 && $overridescore[$partnum]<=1) {
                     $raw[$partnum] = $overridescore[$partnum];
                 } else {
                     $raw[$partnum] = $scorePartResult->getRawScore();
@@ -830,6 +831,13 @@ class ScoreEngine
                                            array $qdata): array
     {
         $qnidx = $scoreQuestionParams->getQuestionNumber();
+        $optionsPack = $scoreQuestionParams->getVarsForScorePart();
+        // We need to "unpack" these into locally scoped variables.
+        foreach (['overridescore','scoremethod'] as $v) {
+            if (isset($optionsPack[$v])) {
+                ${$v} = $optionsPack[$v];
+            } 
+        }
 
         $scoreQuestionParams
             ->setAnswerType($qdata['qtype'])
@@ -856,6 +864,10 @@ class ScoreEngine
                 $score = 0;
             }
         }
+        if (isset($overridescore) && is_numeric($overridescore) && 
+            $overridescore >= 0 && $overridescore<=1) {
+            $score = $overridescore;
+        } 
         $returnData = array(
             'scores' => array(round($score, 3)),
             'rawScores' => array(round($score, 3)),

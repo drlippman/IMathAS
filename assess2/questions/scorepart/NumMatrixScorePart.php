@@ -35,7 +35,7 @@ class NumMatrixScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'answerformat',
             'answersize', 'scoremethod', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -123,6 +123,9 @@ class NumMatrixScorePart implements ScorePart
                 //this may not be backwards compatible
                 $scorePartResult->setLastAnswerAsNumber(implode('|',$givenanslistvals));
             }
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
         
         list($answerlist, $ansN) = parseMatrixToArray($answer);

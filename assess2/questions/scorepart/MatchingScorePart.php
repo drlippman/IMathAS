@@ -35,7 +35,7 @@ class MatchingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['matchlist', 'noshuffle', 'scoremethod'];
+        $optionkeys = ['overridescore', 'matchlist', 'noshuffle', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -109,6 +109,9 @@ class MatchingScorePart implements ScorePart
 
         // only store unrandomized
         $scorePartResult->setLastAnswerAsGiven(implode('|', $origla));
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
         if (!empty($scoremethod) && $scoremethod=='allornothing') {
             if ($score<.99) {
                 $score = 0;

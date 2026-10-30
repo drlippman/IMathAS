@@ -32,7 +32,7 @@ class ChemEquationScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'answerformat', 'requiretimes'];
+        $optionkeys = ['overridescore', 'answer', 'answerformat', 'requiretimes'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -43,6 +43,9 @@ class ChemEquationScorePart implements ScorePart
         $givenans = str_replace(['<->','<=>'], 'rightleftharpoons', $givenans);
         $givenans = str_replace(['to','rarr','implies'], '->', $givenans);
         $scorePartResult->setLastAnswerAsGiven($givenans);
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
 
         if ($requiretimes !== '' && checkreqtimes($givenans,$requiretimes)==0) {
             $scorePartResult->setRawScore(0);

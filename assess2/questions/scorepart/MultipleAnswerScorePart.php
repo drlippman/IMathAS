@@ -33,7 +33,7 @@ class MultipleAnswerScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answers', 'noshuffle', 'scoremethod', 'answerformat'];
+        $optionkeys = ['overridescore', 'answers', 'noshuffle', 'scoremethod', 'answerformat'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -128,6 +128,9 @@ class MultipleAnswerScorePart implements ScorePart
         // just store unrandomized last answers
         sort($origla);
         $scorePartResult->setLastAnswerAsGiven(implode('|',$origla));
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
         if (!empty($scoremethod)) {
             if ($scoremethod=='allornothing' && $bestscore<1) {
                 $bestscore = 0;

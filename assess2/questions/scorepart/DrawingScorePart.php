@@ -32,7 +32,7 @@ class DrawingScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['grid', 'snaptogrid', 'answerformat', 'scoremethod', 'reltolerance', 'abstolerance'];
+        $optionkeys = ['overridescore', 'grid', 'snaptogrid', 'answerformat', 'scoremethod', 'reltolerance', 'abstolerance'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -53,6 +53,9 @@ class DrawingScorePart implements ScorePart
 
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
         $scorePartResult->setLastAnswerAsGiven($givenans);
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
 
         if ($givenans=='') {
             $scorePartResult->setRawScore(0);

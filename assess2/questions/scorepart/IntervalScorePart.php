@@ -33,7 +33,7 @@ class IntervalScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'answerformat',
             'requiretimes', 'variables', 'ansprompt', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -179,6 +179,9 @@ class IntervalScorePart implements ScorePart
         if ($anstype == 'calcinterval' && !$hasNumVal) {
             $scorePartResult->setLastAnswerAsNumber(
                 parsedIntervalToString($gaarr, $ansformatsHasList));
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
         if ($gaarr === false && $givenans!=='DNE') {
             $scorePartResult->setRawScore(0);

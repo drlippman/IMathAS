@@ -35,7 +35,7 @@ class AlgebraicMatrixScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'answerformat',
             'answersize', 'scoremethod', 'ansprompt', 'domain', 'variables'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -76,6 +76,9 @@ class AlgebraicMatrixScorePart implements ScorePart
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
 
         //handle nosolninf case

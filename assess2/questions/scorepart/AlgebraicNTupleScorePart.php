@@ -33,7 +33,7 @@ class AlgebraicNTupleScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 
             'answerformat', 'requiretimes', 'requiretimeslistpart', 'ansprompt', 
             'scoremethod', 'partweights', 'domain', 'variables', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
@@ -64,6 +64,9 @@ class AlgebraicNTupleScorePart implements ScorePart
         }
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
 
         $givenans = str_replace(' ','',$givenans);
 

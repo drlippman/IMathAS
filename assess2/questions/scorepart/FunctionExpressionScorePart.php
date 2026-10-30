@@ -31,7 +31,7 @@ class FunctionExpressionScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'answerformat',
             'variables', 'domain', 'ansprompt', 'formatfeedbackon', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -62,6 +62,9 @@ class FunctionExpressionScorePart implements ScorePart
         }
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
 
         $correct = true;
 

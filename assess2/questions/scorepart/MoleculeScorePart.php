@@ -32,7 +32,7 @@ class MoleculeScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer'];
+        $optionkeys = ['overridescore', 'answer'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -40,6 +40,9 @@ class MoleculeScorePart implements ScorePart
         if ($multi) { $qn = ($qn+1)*1000+$partnum; }
 
         $scorePartResult->setLastAnswerAsGiven($givenans);
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
 
         $anarr = explode(' or ', $answer);
         $score = 0;

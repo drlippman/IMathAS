@@ -32,7 +32,7 @@ class CalculatedScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'reqsigfigs', 
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'reqsigfigs', 
             'requiretimeslistpart', 'ansprompt', 'formatfeedbackon', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -275,6 +275,9 @@ class CalculatedScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsNumber($givenansval);
         } else {
           $numvalarr = explode(',', $givenansval);
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
 
         if (in_array('exactlist',$ansformats)) {

@@ -33,7 +33,7 @@ class ChoicesScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'noshuffle'];
+        $optionkeys = ['overridescore', 'answer', 'noshuffle'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -84,6 +84,9 @@ class ChoicesScorePart implements ScorePart
             $scorePartResult->setLastAnswerAsGiven($givenans);
         } else {
             $scorePartResult->setLastAnswerAsGiven($randkeys[$givenans]);
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
 
         if (isset($GLOBALS['CFG']['hooks']['assess2/questions/scorepart/choices_score_part'])) {

@@ -32,7 +32,7 @@ class NumberScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'reqdecimals',
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'reqdecimals',
             'reqsigfigs', 'answerformat', 'requiretimeslistpart', 
             'ansprompt', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
@@ -83,6 +83,9 @@ class NumberScorePart implements ScorePart
                 } 
             }
             $scorePartResult->setLastAnswerAsNumber(implode(',', array_map('trim', $possiblenumvals)));
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
 
         if ($answer==='' && $givenans==='') {

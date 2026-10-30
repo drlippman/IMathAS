@@ -32,7 +32,7 @@ class StringScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'strflags', 'scoremethod', 'answerformat', 'variables', 'requiretimes', 'scoremethod'];
+        $optionkeys = ['overridescore', 'answer', 'strflags', 'scoremethod', 'answerformat', 'variables', 'requiretimes', 'scoremethod'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
@@ -47,6 +47,9 @@ class StringScorePart implements ScorePart
             $givenans = trim($givenans, " ,");
         }
         $scorePartResult->setLastAnswerAsGiven($givenans);
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
+        }
 
         if (!empty($scoremethod) &&
             (($scoremethod=='takeanything' && trim($givenans)!='') ||

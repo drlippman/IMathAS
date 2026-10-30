@@ -33,7 +33,7 @@ class ComplexScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'scoremethod', 
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'scoremethod', 
             'answerformat', 'requiretimes', 'requiretimeslistpart', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -219,6 +219,9 @@ class ComplexScorePart implements ScorePart
             }
             $givenansval = implode(',', $givenansval);
             $scorePartResult->setLastAnswerAsNumber($givenansval);
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
         $answer = makepretty($answer);
         $anarr = array_map('trim', explode(',', $answer));

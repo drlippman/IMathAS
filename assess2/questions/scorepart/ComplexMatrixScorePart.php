@@ -35,7 +35,7 @@ class ComplexMatrixScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'answerformat',
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'answerformat',
             'answersize', 'scoremethod', 'ansprompt'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -158,6 +158,9 @@ class ComplexMatrixScorePart implements ScorePart
                 }
             }
             $scorePartResult->setLastAnswerAsNumber(implode('|', $numarr));
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
 
         foreach ($answerlist as $k=>$v) {

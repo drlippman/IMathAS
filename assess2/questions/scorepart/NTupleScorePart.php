@@ -33,7 +33,7 @@ class NTupleScorePart implements ScorePart
 
         $defaultreltol = .0015;
 
-        $optionkeys = ['answer', 'reltolerance', 'abstolerance', 'scoremethod', 
+        $optionkeys = ['overridescore', 'answer', 'reltolerance', 'abstolerance', 'scoremethod', 
             'answerformat', 'requiretimes', 'requiretimeslistpart', 'ansprompt', 'scoremethod', 'partweights'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
@@ -85,6 +85,9 @@ class NTupleScorePart implements ScorePart
                 $gaarr = parseNtuple($givenans, false, true, $isComplex, $ansformats);
                 $scorePartResult->setLastAnswerAsNumber(ntupleToString($gaarr));
             }
+        }
+        if (isset($overridescore) && is_numeric($overridescore)) {
+            return $scorePartResult;
         }
         if ($givenans == null) {
             $scorePartResult->setRawScore(0);
