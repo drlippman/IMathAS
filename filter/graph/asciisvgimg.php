@@ -7,6 +7,7 @@ require_once __DIR__."/../../assessment/mathparser.php";
 //
 // Revised 3/08 to add angle to text
 // Revised 8/09 to add arc
+// Major rewrite 10/26 to make more consistent with JS
 //
 // Based on ASCIIsvg.js (c) Peter Jipsen
 // http://www.chapman.edu/~jipsen/svg/asciisvg.html
@@ -53,7 +54,7 @@ var $xmin = -5;
 var $xmax = 5;
 var $ymin = -5;
 var $ymax = 5;
-var $border = array(5,5,5,5);
+var $border = array(0,0,0,0);
 var $origin = array(0,0);
 var $width;
 var $height;
@@ -61,9 +62,9 @@ var $img;
 var $winxmax,$winxmin,$winymin,$winymax;
 var $white,$black,$red,$orange,$yellow,$green,$blue,$cyan,$purple,$gray;
 var $stroke = 'black', $fill = 'none', $curdash='', $isdashed=false, $marker='none';
-var $markerfill = 'green', $gridcolor = 'gray', $axescolor = 'black', $arrowrelsize = 1, $arrowoffset = 0;
+var $markerfill = 'yellow', $markerstroke = 'black',  $gridcolor = 'gray', $axescolor = 'black', $arrowrelsize = 1, $arrowoffset = 0;
 var $strokewidth = 1, $xunitlength, $yunitlength, $dotradius=8, $ticklength=4;
-var $fontsize = 12, $fontfile, $fontfill='', $fontbackground='';
+var $fontsize = 16, $fontfile, $fontfill='black', $fontbackground='';
 var $isinit = false;
 var $colors = array();
 var $isphp8 = false;
@@ -78,11 +79,11 @@ function __construct() {
 }
 
 function AStoIMG($w=200, $h=200) {
-	$this->xmin = -5; $this->xmax = 5; $this->ymin = -5; $this->ymax = 5; $this->border = array(5,5,5,5);
+	$this->xmin = -5; $this->xmax = 5; $this->ymin = -5; $this->ymax = 5; $this->border = array(0,0,0,0);
 	$this->stroke = 'black'; $this->fill = 'none'; $this->curdash=''; $this->isdashed=false; $this->marker='none';
-	$this->markerfill = 'green'; $this->gridcolor = 'gray'; $this->axescolor = 'black';
+	$this->markerfill = 'yellow'; $this->markerstroke = 'black';  $this->gridcolor = 'gray'; $this->axescolor = 'black';
 	$this->strokewidth = 1; $this->dotradius=8; $this->ticklength=4;
-	$this->fontsize = 12; $this->fontfill=''; $this->fontbackground='';
+	$this->fontsize = 16; $this->fontfill='black'; $this->fontbackground='';
 	$this->isinit = false;
 	$this->colors = array();
 
@@ -94,7 +95,7 @@ function AStoIMG($w=200, $h=200) {
 	if ($this->usegd2) {
 		$this->img = imagecreatetruecolor($w,$h);
 		$this->colors['transblue'] = imagecolorallocatealpha($this->img, 0,0,255,90);
-		$this->colors['transgreen'] = imagecolorallocatealpha($this->img, 0,255,0,90);
+		$this->colors['transgreen'] = imagecolorallocatealpha($this->img, 0,128,0,90);
 		$this->colors['transred'] = imagecolorallocatealpha($this->img, 255,0,0,90);
 		$this->colors['transwhite'] = imagecolorallocatealpha($this->img, 255,255,255,90);
 		$this->colors['transorange'] = imagecolorallocatealpha($this->img, 255,165,0,90);
@@ -116,7 +117,7 @@ function AStoIMG($w=200, $h=200) {
 	$this->colors['orange']= imagecolorallocate($this->img, 255,165,0);
 	$this->colors['yellow'] = imagecolorallocate($this->img, 255,255,0);
 	$this->colors['gold'] = imagecolorallocate($this->img, 255,215,0);
-	$this->colors['green'] = imagecolorallocate($this->img, 0,255,0);
+	$this->colors['green'] = imagecolorallocate($this->img, 0,155,0);
 	$this->colors['blue'] = imagecolorallocate($this->img, 0,0,255);
 	$this->colors['cyan'] = imagecolorallocate($this->img, 0,255,255);
 	$this->colors['purple'] = imagecolorallocate($this->img, 128,0,128);
@@ -132,12 +133,15 @@ function processShortScript($script) {
 
 	$sa = explode(',',$script);
 	if (count($sa)>10) {
-		$this->border = 5;
 		$this->AStoIMG($sa[9],$sa[10]);
+		$this->border = array(5,5,5,5);
 		$this->ASinitPicture(array_slice($sa,0,4));//$sa[0] .','. $sa[1] .','. $sa[2] .','. $sa[3]);
 		$this->ASaxes(array_slice($sa,4,5));//$sa[4] .','. $sa[5] .','. $sa[6] .','. $sa[7] .','. $sa[8]);
 		$inx = 11;
 		while (count($sa) > $inx+9) {
+			if ($sa[$inx+7] != 'none' && !isset($this->colors[$sa[$inx+7]])) {
+				$this->addcolor($sa[$inx+7]);
+			}
 			$this->stroke = $sa[$inx+7];
 			$this->strokewidth = $sa[$inx+8];
 			if (!is_numeric($this->strokewidth)) {
@@ -155,7 +159,10 @@ function processShortScript($script) {
 				$this->ASslopefield(array($sa[$inx+1],$sa[$inx+2],$sa[$inx+2]));
 			} else if ($sa[$inx]=='label') {
 				$sa[$inx+1] = str_replace(['&amp;x44;', '&x44;', '&amp;quot;', '&quot;'], [',', ',', '"', '"'], $sa[$inx+1]);
-				$this->AStext(array($sa[$inx+5].','.$sa[$inx+6],$sa[$inx+1]));
+				$origfontfill = $this->fontfill;
+				$this->fontfill = $sa[$inx+7];
+				$this->AStext(array('['.$sa[$inx+5].','.$sa[$inx+6].']',$sa[$inx+1]));
+				$this->fontfill = $origfontfill;
 			} else {
 				if ($sa[$inx]=='func') {
 					$eqn = $sa[$inx+1];
@@ -218,6 +225,75 @@ function commasToSemicolons($input) {
     return $result;
 }
 
+// splits a script into commands on top-level commas and semicolons,
+// leaving those inside strings or brackets alone
+function splitCommands($input) {
+	$out = array();
+	$cur = '';
+	$depth = 0;
+	$inString = false;
+	$stringChar = '';
+	$len = strlen($input);
+	for ($i = 0; $i < $len; $i++) {
+		$char = $input[$i];
+		if ($inString) {
+			$cur .= $char;
+			if ($char === '\\') {
+				if ($i + 1 < $len) {
+					$cur .= $input[++$i];
+				}
+			} elseif ($char === $stringChar) {
+				$inString = false;
+			}
+		} else if ($char === '"' || $char === "'") {
+			$inString = true;
+			$stringChar = $char;
+			$cur .= $char;
+		} else if ($char === '(' || $char === '[' || $char === '{') {
+			$depth++;
+			$cur .= $char;
+		} else if ($char === ')' || $char === ']' || $char === '}') {
+			$depth--;
+			$cur .= $char;
+		} else if (($char === ',' || $char === ';') && $depth <= 0) {
+			$out[] = $cur;
+			$cur = '';
+		} else {
+			$cur .= $char;
+		}
+	}
+	$out[] = $cur;
+	return $out;
+}
+
+// splits on $sep at the top level, ignoring separators inside (), [], or quotes
+function splitTop($str, $sep=',') {
+	$out = array();
+	$cur = '';
+	$depth = 0;
+	$q = '';
+	$len = strlen($str);
+	for ($i = 0; $i < $len; $i++) {
+		$c = $str[$i];
+		if ($q !== '') {
+			if ($c === $q) { $q = ''; }
+		} else if ($c === '"' || $c === "'") {
+			$q = $c;
+		} else if ($c === '(' || $c === '[') {
+			$depth++;
+		} else if ($c === ')' || $c === ']') {
+			$depth--;
+		} else if ($c === $sep && $depth <= 0) {
+			$out[] = $cur;
+			$cur = '';
+			continue;
+		}
+		$cur .= $c;
+	}
+	$out[] = $cur;
+	return $out;
+}
+
 function processScript($script) {
 	//$xmin = -5; $xmax = 5; $ymin = -5; $ymax = 5; $border = 5;
 	//$stroke = 'black'; $fill = 'none'; $curdash=''; $isdashed=false; $marker='none';
@@ -225,23 +301,45 @@ function processScript($script) {
 	//$strokewidth = 1; $dotradius=8; $ticklength=4; $fontfill = ''; $fontsize = 12;
 	//$script = preg_replace('/&[^\s]*;
 	$script = html_entity_decode($script, ENT_COMPAT, 'UTF-8');
-	$this->AScom =  explode(';', $this->commasToSemicolons($script));
+	$this->AScom = $this->splitCommands($script);
 	foreach ($this->AScom as $com) {
-		if (preg_match('/\s*(\w+)\s*=(.+)/',$com,$matches)) { //is assignment operator
+		if (preg_match('/^\s*(?:var\s+)?(\w+)\s*=(?!=)(.+)$/s',$com,$matches)) { //is assignment operator
 			$matches[2] = trim(str_replace(array('"','\''),'',$matches[2]));
 			switch($matches[1]) {
 				case 'border':
-				case 'xmin':
-				case 'xmax':
-				case 'ymin':
-				case 'ymax':
-				case 'marker':
-                case 'arrowrelsize':
-                case 'arrowoffset':
-					$this->{$matches[1]} = $matches[2];
-					break;
-				case 'fill':
-				case 'markerfill':
+						if ($matches[2] !== '' && $matches[2][0] == '[') {
+							$this->border = array_map(array($this,'evalifneeded'), $this->splitTop(trim($matches[2],'[]')));
+						} else {
+							$this->border = $this->evalifneeded($matches[2]);
+						}
+						break;
+					case 'xmin':
+					case 'xmax':
+					case 'ymin':
+					case 'ymax':
+					case 'arrowrelsize':
+					case 'arrowoffset':
+						$this->{$matches[1]} = $this->evalifneeded($matches[2]);
+						break;
+					case 'marker':
+						$this->marker = $matches[2];
+						break;
+					case 'fontsize':
+						$this->fontsize = $this->evalifneeded($matches[2]);
+						break;
+					case 'dotradius': //JS value is a radius, ours is a diameter
+						$this->dotradius = 2*$this->evalifneeded($matches[2]);
+						break;
+					case 'axesstroke':
+					case 'gridstroke':
+						if ($matches[2] != 'none' && !isset($this->colors[$matches[2]])) {
+							$this->addcolor($matches[2]);
+						}
+						$this->{$matches[1]=='axesstroke'?'axescolor':'gridcolor'} = $matches[2];
+						break;
+					case 'fill':
+					case 'markerfill':
+					case 'markerstroke':
 				case 'fontbackground':
 				case 'fontfill':
 					if ($matches[2] != 'none' && !isset($this->colors[$matches[2]])) {
@@ -265,12 +363,15 @@ function processScript($script) {
 					$matches[2] = $this->evalifneeded($matches[2]);
 					$this->strokewidth = (int) round($matches[2] > 0.5 ? $matches[2] : 1);
 					if ($this->usegd2) {
-						imagesetthickness($this->img,$this->strokewidth);
-					}
-					break;
+							imagesetthickness($this->img,$this->strokewidth);
+						}
+						if ($this->isdashed) {
+							$this->ASsetdash();
+						}
+						break;
 			}
 		}
-		if (preg_match('/\s*(\w+)\((.*)\)\s*$/',$com,$matches)) { //is function
+		if (preg_match('/^\s*(\w+)\s*\((.*)\)\s*$/s',$com,$matches)) { //is function
 			$argarr = $this->parseargs($matches[2]);
 			switch($matches[1]) {
 				case 'initPicture':
@@ -323,8 +424,23 @@ function processScript($script) {
 					$this->ASarc($argarr);
 					break;
 				case 'sector':
-					$this->ASsector($argarr);
-					break;
+						$this->ASsector($argarr);
+						break;
+					case 'curve':
+						$this->AScurve($argarr);
+						break;
+					case 'loop':
+						$this->ASloop($argarr);
+						break;
+					case 'grid':
+						$this->ASgrid($argarr);
+						break;
+					case 'noaxes':
+						if (!$this->isinit) {$this->ASinitPicture();}
+						break;
+					case 'setBackgroundColor':
+						$this->ASsetBackgroundColor($argarr);
+						break;
 				case 'arrowhead':
 					$this->ASarrowhead($argarr[0],$argarr[1]);
 					break;
@@ -342,6 +458,9 @@ function addcolor(&$origcolor) {
 		$alpha = 0;
 	}
 	if (strlen($color)>0 && $color[0]=='#') {
+		if (strlen($color)==4 || strlen($color)==5) { //#rgb or #rgba shorthand
+			$color = '#'.preg_replace('/(.)/', '$1$1', substr($color,1));
+		}
 		$r = hexdec(substr($color,1,2));
 		$g = hexdec(substr($color,3,2));
 		$b = hexdec(substr($color,5,2));
@@ -379,16 +498,15 @@ function ASsetdash() {
 		$dash = preg_replace('/\s+/',',',$dash);
 		$darr = explode(',',$dash);
 		$style = array();
+		// GD advances the dash pattern once per pixel of line thickness, so scale to keep SVG-like lengths
+		$thick = max(1,(int) round(is_numeric($this->strokewidth) && $this->strokewidth > 0.5 ? $this->strokewidth : 1));
 		$alt = 0;
 		$doagain = count($darr)%2;  //do twice if odd number
 		while ($doagain>-1) {
 			for ($i=0;$i<count($darr);$i++) {
-				if ($alt==0) {
-					$color = $this->stroke;
-				} else {
-					$color = 'white';
-				}
-				$style = array_pad($style,count($style)+$darr[$i],$this->colors[$color]);
+				$n = max(1,(int) round(floatval($darr[$i])))*$thick;
+				$color = $alt==0 ? $this->colors[$this->stroke] : IMG_COLOR_TRANSPARENT;
+				$style = array_pad($style,count($style)+$n,$color);
 				$alt = 1-$alt;
 			}
 			$doagain--;
@@ -458,9 +576,9 @@ function AStextAbs($arg) {
 			$angle = floatval($arg[3]);
 		}
 	}
-	$pt = str_replace(array('[',']'),'',$pt);
-	$pt = explode(',',$pt);
-	$pt[1] = $this->height - $pt[1];
+	$pt = $this->splitTop(trim(trim($pt),'[]'));
+		$pt[0] = $this->evalifneeded($pt[0]);
+		$pt[1] = $this->height - $this->evalifneeded($pt[1]);
 	$this->AStextInternal($pt,$st,$pos,$angle);
 }
 function AStextInternal($p,$st,$pos,$angle) {
@@ -495,8 +613,21 @@ function AStextInternal($p,$st,$pos,$angle) {
 		}
 	}*/
 
-	if ($this->usettf) {
-		$bb = imagettfbbox($this->fontsize,$angle,$this->fontfile,$st);
+	$st = (string) $st;
+		$st = preg_replace_callback('/<sub>(.*?)<\/sub>/i', function($m) {
+			return preg_replace_callback('/\d/', function($d) { return html_entity_decode('&#'.(8320+$d[0]).';', ENT_COMPAT, 'UTF-8'); }, $m[1]);
+		}, $st);
+		
+		$fcolor = $this->fontfill;
+		if ($fcolor == '' || $fcolor == 'none' || !isset($this->colors[$fcolor])) {
+			$fcolor = 'black';
+		}
+		$fbg = $this->fontbackground;
+		if ($fbg != '' && $fbg != 'none' && !isset($this->colors[$fbg])) {
+			$fbg = '';
+		}
+		if ($this->usettf) {
+			$bb = imagettfbbox($this->fontsize*0.75,$angle,$this->fontfile,$st);
 
 		$bbw = $bb[4]-$bb[0];
 		$bbh = -1*($bb[5]-$bb[1]);
@@ -516,19 +647,15 @@ function AStextInternal($p,$st,$pos,$angle) {
 		if ($pos=='right' || $pos=='aboveright' || $pos=='belowright') {
 			$p[0] = $p[0] + .5*(abs($bbw)) +$this->fontsize/2;
 		}
-		if ($this->fontfill != '') {
-			$color = $this->fontfill;
-		} else {
-			$color = $this->stroke;
-		}
-		if ($this->fontbackground != '' && $this->fontbackground != 'none') {
+		$color = $fcolor;
+		if ($fbg != '' && $fbg != 'none') {
 			$minX = min(array($bb[0],$bb[2],$bb[4],$bb[6]));
 			$maxX = max(array($bb[0],$bb[2],$bb[4],$bb[6]));
 			$minY = min(array($bb[1],$bb[3],$bb[5],$bb[7]));
 			$maxY = max(array($bb[1],$bb[3],$bb[5],$bb[7]));
-			imagefilledrectangle($this->img, (int) round($p[0]+$minX-2), (int) round($p[1]+$minY-1), (int) round($p[0]+$maxX+2), (int) round($p[1]+$maxY+1), $this->colors[$this->fontbackground]);
+			imagefilledrectangle($this->img, (int) round($p[0]+$minX-2), (int) round($p[1]+$minY-1), (int) round($p[0]+$maxX+2), (int) round($p[1]+$maxY+1), $this->colors[$fbg]);
 		}
-		imagettftext($this->img,$this->fontsize,$angle, (int) round($p[0]), (int) round($p[1]),$this->colors[$color],$this->fontfile,$st);
+		imagettftext($this->img,$this->fontsize*0.75,$angle, (int) round($p[0]), (int) round($p[1]),$this->colors[$color],$this->fontfile,$st);
 	} else {
 		if ($this->fontsize<9) {
 			$fs = 1;
@@ -560,13 +687,9 @@ function AStextInternal($p,$st,$pos,$angle) {
 		if ($pos=='right' || $pos=='aboveright' || $pos=='belowright') {
 			$p[0] = $p[0] + .5*$bb[0] + $fs*2;
 		}
-		if ($this->fontfill != '') {
-			$color = $this->fontfill;
-		} else {
-			$color = $this->stroke;
-		}
-		if ($this->fontbackground != '' && $this->fontbackground != 'none') {
-			imagefilledrectangle($this->img, (int) round($p[0]-2), (int) round($p[1]-2), (int) round($p[0]+$bb[0]+2), (int) round($p[1]+$bb[1]+2), $this->colors[$this->fontbackground]);
+		$color = $fcolor;
+		if ($fbg != '' && $fbg != 'none') {
+			imagefilledrectangle($this->img, (int) round($p[0]-2), (int) round($p[1]-2), (int) round($p[0]+$bb[0]+2), (int) round($p[1]+$bb[1]+2), $this->colors[$fbg]);
 		}
 		if ($angle==90 || $angle==270) {
 			imagestringup($this->img,$fs,(int) round($p[0]), (int) round($p[1]),$st,$this->colors[$color]);
@@ -577,6 +700,12 @@ function AStextInternal($p,$st,$pos,$angle) {
 }
 
 function ASinitPicture($arg=array()) {
+		for ($i=0;$i<4;$i++) {
+			if (isset($arg[$i]) && (trim($arg[$i])==='' || trim($arg[$i])==='null')) {
+				$arg[$i] = null;
+			}
+		}
+
 
 	//$arg = explode(',',$arg);
 	if (isset($arg[0]) && $arg[0]!='') { $this->xmin = $this->evalifneeded($arg[0]);}
@@ -696,8 +825,8 @@ function ASaxes($arg) {
 		$yscl *= -1;
 	}*/
 	if ($xgrid<0) {
-		$xgrid *= -1;
-	}
+			$xgrid *= -1;
+		}
 	if ($ygrid<0) {
 		$ygrid *= -1;
 	}
@@ -712,13 +841,13 @@ function ASaxes($arg) {
 		$yscl *= $this->yunitlength;
 	}
 	if (!$doy) {
-		$this->fontsize = min(abs($xscl)/2,12);
-	} else if (!$dox) {
-		$this->fontsize = min(abs($yscl)/2,12);
-	} else {
-		$this->fontsize = min(abs($xscl)/2,abs($yscl)/2,12);
-	}
-	$this->ticklength = max($this->fontsize/4,4);
+		$this->fontsize = floor(min(abs($xscl)/1.5,16));
+		} else if (!$dox) {
+			$this->fontsize = floor(min(abs($yscl)/1.5,16));
+		} else {
+			$this->fontsize = floor(min(abs($xscl)/1.5,abs($yscl)/1.5,16));
+		}
+		$this->ticklength = $this->fontsize/4;
 	if ($this->usegd2) {
 		imagesetthickness($this->img,1);
 	}
@@ -745,8 +874,8 @@ function ASaxes($arg) {
 		$yscl = ($this->winymax - $this->winymin);
 	}
 	if ($dogrid) {
-		$gc = $this->gridcolor;
-		if ($dox && $xgrid>0) {
+			$gc = $this->gridcolor;
+			if ($dox && $xgrid>0) {
 			for ($x=$this->origin[0]+($doy?$xgrid:0); $x<=$this->winxmax; $x += $xgrid) {
 				if ($x>=$this->winxmin) {
 					imageline($this->img, (int) round($x), (int) round($this->winymin), (int) round($x), (int) round(($fqonlyy?$this->height-$this->origin[1]:$this->winymax)), $this->colors[$gc]);
@@ -761,7 +890,7 @@ function ASaxes($arg) {
 			}
 		}
 		if ($doy && $ygrid>0) {
-			if (!$fqonlyy) {
+				if (!$fqonlyy) {
 				for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
 					if ($y>=$this->winymin) {
 						imageline($this->img, (int) round(($fqonlyx?$this->origin[0]:$this->winxmin)), (int) round($y), (int) round($this->winxmax), (int) round($y), $this->colors[$gc]);
@@ -848,6 +977,8 @@ function ASaxes($arg) {
 	if ($dolabels) {
 		$ldx = $xscl/$this->xunitlength;
 		$ldy = $yscl/$this->yunitlength;
+			$ddx = $ldx>0 ? max(0,floor(1-log10($ldx))+1) : 0;
+			$ddy = $ldy>0 ? max(0,floor(1-log10($ldy))+1) : 0;
 		if ($this->xmin>0 || $this->xmax<0) {
 			$lx = $this->xmin;
 			$lyp = 'right';
@@ -868,13 +999,13 @@ function ASaxes($arg) {
 		if ($dox && $ldx>0) {
 			for ($x=($doy?$ldx:0);$x<=$this->xmax; $x += $ldx) {
 				if ($x>=$this->xmin) {
-					$this->AStext("[$x,$ly]",$x,$lxp);
+					$this->AStext("[$x,$ly]",$this->rounddec($x,$ddx),$lxp);
 				}
 			}
 			if (!$fqonlyx) {
 				for ($x=-$ldx;$this->xmin<=$x; $x -= $ldx) {
 					if ($x<=$this->xmax) {
-						$this->AStext("[$x,$ly]",$x,$lxp);
+						$this->AStext("[$x,$ly]",$this->rounddec($x,$ddx),$lxp);
 					}
 				}
 			}
@@ -882,13 +1013,13 @@ function ASaxes($arg) {
 		if ($doy && $ldy>0) {
 			for ($y=($dox?$ldy:0);$y<=$this->ymax; $y += $ldy) {
 				if ($y>=$this->ymin) {
-					$this->AStext("[$lx,$y]",$y,$lyp);
+					$this->AStext("[$lx,$y]",$this->rounddec($y,$ddy),$lyp);
 				}
 			}
 			if (!$fqonlyy) {
 				for ($y=-$ldy;$this->ymin<=$y; $y -= $ldy) {
 					if ($y<=$this->ymax) {
-						$this->AStext("[$lx,$y]",$y,$lyp);
+						$this->AStext("[$lx,$y]",$this->rounddec($y,$ddy),$lyp);
 					}
 				}
 			}
@@ -900,69 +1031,157 @@ function ASaxes($arg) {
 	}
 }
 
-function ASline($arg) {
+function ptpx($x,$y) {
+	return array($x*$this->xunitlength + $this->origin[0], $this->height - $y*$this->yunitlength - $this->origin[1]);
+}
+// $mode: 'full' draws markers, 'dot' draws only dot markers, 'none' draws no markers
+function ASline($arg, $mode='full') {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	//$arg = explode('],[',$arg);
 	if (count($arg)<2) { return;}
-	$p = $this->pt2arr($arg[0]);
-	$q = $this->pt2arr($arg[1]);
-	if ($this->isdashed) {
-		imageline($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($q[0]), (int) round($q[1]), IMG_COLOR_STYLED);
-	} else {
-		$color = $this->stroke;
-		imageline($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($q[0]), (int) round($q[1]), $this->colors[$color]);
+	$this->ASlinePx($this->pt2arr($arg[0]), $this->pt2arr($arg[1]), $mode);
+}
+function ASlinePx($p, $q, $mode='full') {
+	if ($this->stroke != 'none' && isset($this->colors[$this->stroke])) {
+		if ($this->isdashed) {
+			imageline($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($q[0]), (int) round($q[1]), IMG_COLOR_STYLED);
+		} else {
+			imageline($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($q[0]), (int) round($q[1]), $this->colors[$this->stroke]);
+		}
 	}
+	if ($mode == 'none') { return; }
 	if ($this->marker=='dot' || $this->marker=='arrowdot') {
 		$this->ASdot($p,8);
+	}
+	if ($mode == 'full' && ($this->marker=='arrow' || $this->marker=='arrowdot')) {
+		$this->ASarrowheadPx($p,$q);
+	}
+	if ($this->marker=='dot' || $this->marker=='arrowdot') {
 		$this->ASdot($q,8);
 	}
-	if ($this->marker=='arrow' || $this->marker=='arrowdot') {
-		$this->ASarrowhead($arg[0],$arg[1]);
+}
+// parses "[[x1,y1],[x2,y2],...]" into an array of numeric [x,y] pairs in user units
+function parsePointList($str) {
+	$str = trim($str);
+	if ($str !== '' && $str[0] == '[') { $str = substr($str,1); }
+	if ($str !== '' && substr($str,-1) == ']') { $str = substr($str,0,-1); }
+	$pts = array();
+	foreach ($this->splitTop($str) as $ptstr) {
+		$xy = $this->splitTop(trim(trim($ptstr),'[]'));
+		if (count($xy) < 2) { continue; }
+		$pts[] = array($this->evalifneeded($xy[0]), $this->evalifneeded($xy[1]));
+	}
+	return $pts;
+}
+// draws a polyline (filled if fill is set) through points given in user units.
+// $dotpts: points to put dot markers on, if any (defaults to all)
+function ASdrawpoly($upts, $dotpts=null) {
+	$px = array();
+	foreach ($upts as $u) {
+		$px[] = $this->ptpx($u[0],$u[1]);
+	}
+	if ($this->fill != 'none' && count($px)>2 && isset($this->colors[$this->fill])) {
+		$flat = array();
+		foreach ($px as $p) {
+			$flat[] = (int) round($p[0]);
+			$flat[] = (int) round($p[1]);
+		}
+		if ($this->isphp8) {
+			imagefilledpolygon($this->img,$flat,$this->colors[$this->fill]);
+		} else {
+			imagefilledpolygon($this->img,$flat,count($flat)/2,$this->colors[$this->fill]);
+		}
+	}
+	for ($i=0; $i<count($px)-1; $i++) {
+		$this->ASlinePx($px[$i],$px[$i+1],'none');
+	}
+	if ($this->marker=='dot' || $this->marker=='arrowdot') {
+		if ($dotpts === null) { $dotpts = $upts; }
+		foreach ($dotpts as $u) {
+			$this->ASdot($this->ptpx($u[0],$u[1]),8);
+		}
 	}
 }
 function ASpath($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	$arg = str_replace(array('[',']'),'',$arg[0]);
-	$arg = explode(',',$arg);
-	if (count($arg)<4) { return;}
-
-	if (count($arg)>5 && $this->fill != 'none') {
-		$pt = array();
-		for ($i=0;$i<count($arg);$i++) {
-			if ($i%2==0) { //x coord
-				$pt[$i] = (int) round($this->evalifneeded($arg[$i])*$this->xunitlength + $this->origin[0]);
-			} else {
-				$pt[$i] = (int) round($this->height - $this->evalifneeded($arg[$i])*$this->yunitlength - $this->origin[1]);
-			}
+	$pts = $this->parsePointList($arg[0]);
+	if (count($pts)<2) { return;}
+	$this->ASdrawpoly($pts);
+}
+// smooth curve through points, like SVG "T" path commands
+function AScurve($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
+	$pts = $this->parsePointList($arg[0]);
+	if (count($pts)<2) { return;}
+	$n = 16;
+	$out = array($pts[0]);
+	$cur = $pts[0];
+	$ctrl = $pts[0];
+	for ($i=1; $i<count($pts); $i++) {
+		$end = $pts[$i];
+		for ($k=1; $k<=$n; $k++) {
+			$t = $k/$n;
+			$out[] = array((1-$t)*(1-$t)*$cur[0] + 2*(1-$t)*$t*$ctrl[0] + $t*$t*$end[0],
+				(1-$t)*(1-$t)*$cur[1] + 2*(1-$t)*$t*$ctrl[1] + $t*$t*$end[1]);
 		}
-		$color = $this->fill;
-        if ($this->isphp8) {
-		    imagefilledpolygon($this->img,$pt,$this->colors[$color]);
-        } else {
-            imagefilledpolygon($this->img,$pt,count($pt)/2,$this->colors[$color]);
-        }
+		$ctrl = array(2*$end[0]-$ctrl[0], 2*$end[1]-$ctrl[1]);
+		$cur = $end;
 	}
-	if ($this->stroke != 'none') {
-		for ($i=0; $i<count($arg)-2; $i += 2) {
-			//$this->ASline("[{$arg[$i]},{$arg[$i+1]}],[{$arg[$i+2]},{$arg[$i+3]}]");
-			$this->ASline(array("[{$arg[$i]},{$arg[$i+1]}]","[{$arg[$i+2]},{$arg[$i+3]}]"));
-		}
+	$dotpts = array();
+	foreach ($pts as $i=>$pt) {
+		if ($i != 1 && $i != 2) { $dotpts[] = $pt; }
+	}
+	$this->ASdrawpoly($out, $dotpts);
+}
+// loop starting at point p, in direction d (default [1,0])
+function ASloop($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
+	$p = $this->parsePointList($arg[0]);
+	if (count($p)<1) { return;}
+	$p = $p[0];
+	$d = array(1,0);
+	if (isset($arg[1]) && $arg[1] !== '' && $arg[1] !== 'null') {
+		$dd = $this->parsePointList($arg[1]);
+		if (count($dd)>0) { $d = $dd[0]; }
+	}
+	$c1 = array($p[0]+$d[0], $p[1]+$d[1]);
+	$c2 = array($p[0]-$d[1], $p[1]+$d[0]);
+	$n = 24;
+	$out = array($p);
+	for ($k=1; $k<=$n; $k++) {
+		$t = $k/$n; $u = 1-$t;
+		$out[] = array($u*$u*$u*$p[0] + 3*$u*$u*$t*$c1[0] + 3*$u*$t*$t*$c2[0] + $t*$t*$t*$p[0],
+			$u*$u*$u*$p[1] + 3*$u*$u*$t*$c1[1] + 3*$u*$t*$t*$c2[1] + $t*$t*$t*$p[1]);
+	}
+	$this->ASdrawpoly($out, array($p,$p));
+	if ($this->marker=='arrow' || $this->marker=='arrowdot') {
+		$a = array($p[0]+cos(1.4)*$d[0]-sin(1.4)*$d[1], $p[1]+sin(1.4)*$d[0]+cos(1.4)*$d[1]);
+		$this->ASarrowheadPx($this->ptpx($a[0],$a[1]), $this->ptpx($p[0],$p[1]));
+	}
+}
+function ASgrid($arg) {
+	$dy = isset($arg[1]) ? $arg[1] : $arg[0];
+	$this->ASaxes(array($arg[0], $dy, 'null', $arg[0], $dy));
+}
+function ASsetBackgroundColor($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
+	$c = $arg[0];
+	if ($c != 'none' && !isset($this->colors[$c])) {
+		$this->addcolor($c);
+	}
+	if (isset($this->colors[$c])) {
+		imagefilledrectangle($this->img, 0, 0, $this->width, $this->height, $this->colors[$c]);
 	}
 }
 function AScircle($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	//$arg = explode(',',$arg);
-	//$this->ASellipse("[{$arg[0]},{$arg[1]}],{$arg[2]},{$arg[2]}");
 	$this->ASellipse(array($arg[0],$arg[1],$arg[1]));
 }
 function ASellipse($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	//$arg = explode(',',$arg);
-	//$p = $this->pt2arr($arg[0].','.$arg[1]);
 	$p = $this->pt2arr($arg[0]);
 	$arg[1] = $this->evalifneeded($arg[1])*$this->xunitlength;
 	$arg[2] = $this->evalifneeded($arg[2])*$this->yunitlength;
-	if ($this->fill != 'none') {
+	if ($this->fill != 'none' && isset($this->colors[$this->fill])) {
 		$color = $this->fill;
 		if ($this->usegd2) {
 			imagefilledellipse($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($arg[1]*2), (int) round($arg[2]*2), $this->colors[$color]);
@@ -970,9 +1189,8 @@ function ASellipse($arg) {
 	}
 	if ($this->isdashed) {
 		imageellipse($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($arg[1]*2), (int) round($arg[2]*2), IMG_COLOR_STYLED);
-	} else {
-		$color = $this->stroke;
-		imageellipse($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($arg[1]*2), (int) round($arg[2]*2), $this->colors[$color]);
+	} else if ($this->stroke != 'none' && isset($this->colors[$this->stroke])) {
+		imageellipse($this->img, (int) round($p[0]), (int) round($p[1]), (int) round($arg[1]*2), (int) round($arg[2]*2), $this->colors[$this->stroke]);
 	}
 }
 function ASrect($arg) {
@@ -1033,7 +1251,6 @@ function ASarc($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
 	$p = $this->pt2arr($arg[0]);
 	$q = $this->pt2arr($arg[1]);
-	$r = $this->evalifneeded($arg[2]);
 	$po[0] = ($p[0]-$this->origin[0])/$this->xunitlength;
 	$qo[0] = ($q[0]-$this->origin[0])/$this->xunitlength;
 	$po[1] = ($this->height - $p[1] - $this->origin[1])/$this->yunitlength;
@@ -1042,6 +1259,13 @@ function ASarc($arg) {
 	$t[1] = ($po[1]+$qo[1])/2;
 
 	$m = sqrt(($po[0]-$qo[0])*($po[0]-$qo[0]) + ($po[1]-$qo[1])*($po[1]-$qo[1]));
+	if ($m < 0.000000001) { return; }
+	if (!isset($arg[2]) || trim($arg[2])==='' || trim($arg[2])==='null') {
+		$r = $m; //default radius is the chord length
+	} else {
+		$r = $this->evalifneeded($arg[2]);
+	}
+	if ($r*$r < $m*$m/4) { $r = $m/2; } //radius too small to span the points
 	$cxo = $t[0] + sqrt($r*$r-($m*$m/4))*($po[1]-$qo[1])/$m;
 	$cyo = $t[1] - sqrt($r*$r-($m*$m/4))*($po[0]-$qo[0])/$m;
 	$cx = round($cxo*$this->xunitlength + $this->origin[0]);
@@ -1051,24 +1275,47 @@ function ASarc($arg) {
 	$startt = atan2(-$qo[1]+$cyo,$qo[0]-$cxo);
 	$xdiam = 2*$r*$this->xunitlength;
 	$ydiam = 2*$r*$this->yunitlength;
-	if ($this->fill != 'none') {
-		$color = $this->fill;
-		imagefilledarc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), $this->colors[$color], IMG_ARC_PIE);
+	if ($this->fill != 'none' && isset($this->colors[$this->fill])) {
+		// fill the circular segment between the arc and its chord (GD's own chord fill isn't that)
+		$a1 = ($endt < $startt) ? $endt + 2*M_PI : $endt;
+		$flat = array();
+		for ($k=0; $k<=48; $k++) {
+			$a = $startt + ($a1-$startt)*$k/48;
+			$flat[] = (int) round($cx + $xdiam/2*cos($a));
+			$flat[] = (int) round($cy + $ydiam/2*sin($a));
+		}
+		if ($this->isphp8) {
+			imagefilledpolygon($this->img,$flat,$this->colors[$this->fill]);
+		} else {
+			imagefilledpolygon($this->img,$flat,count($flat)/2,$this->colors[$this->fill]);
+		}
 	}
 
 	if ($this->isdashed) {
 		imagearc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), IMG_COLOR_STYLED);
+	} else if ($this->stroke != 'none' && isset($this->colors[$this->stroke])) {
+		imagearc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), $this->colors[$this->stroke]);
+	}
+
+	if ($this->marker=='arrow' || $this->marker=='arrowdot') {
+		$u = array(($qo[1]-$po[1])/4, ($po[0]-$qo[0])/4);
+		$v = array(($qo[0]-$po[0])/2, ($qo[1]-$po[1])/2);
+		$v = array($po[0]+$v[0]+$u[0], $po[1]+$v[1]+$u[1]);
 	} else {
-		$color = $this->stroke;
-		if ($color != 'none') {
-			imagearc($this->img, (int) round($cx), (int) round($cy), (int) round($xdiam), (int) round($ydiam), (int) round($startt*180/M_PI), (int) round($endt*180/M_PI), $this->colors[$color]);
-		}
+		$v = $po;
+	}
+	if ($this->marker=='dot' || $this->marker=='arrowdot') {
+		$this->ASdot($p,8);
+		if ($this->marker=='arrowdot') { $this->ASarrowheadPx($this->ptpx($v[0],$v[1]),$q); }
+		$this->ASdot($q,8);
+	} else if ($this->marker=='arrow') {
+		$this->ASarrowheadPx($this->ptpx($v[0],$v[1]),$q);
 	}
 }
 
 function ASdot($pt,$r) {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	if ($this->markerfill!='none') {
+	if ($this->markerfill!='none' && isset($this->colors[$this->markerfill])) {
 		$color = $this->markerfill;
 		if ($this->usegd2) {
 			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($r), (int) round($r), $this->colors[$color]);
@@ -1076,19 +1323,39 @@ function ASdot($pt,$r) {
 			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->colors[$color]);
 		}
 	}
-	$color = $this->stroke;
-	imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($r), (int) round($r), $this->colors[$color]);
+	if ($this->markerstroke!='none' && isset($this->colors[$this->markerstroke])) {
+		imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($r), (int) round($r), $this->colors[$this->markerstroke]);
+	}
 }
-function ASdot2($arg) {
-	if (!$this->isinit) {$this->ASinitPicture();}
-	$pt = $this->pt2arr($arg[0]);
+// draws a dot of the given type at pixel point $pt
+function ASdotPx($pt,$type) {
 	$color = $this->stroke;
-	if (!isset($arg[1]) || $arg[1]!='open') {
-		if ($this->usegd2) {
-			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors[$color]);
-		} else {
-			$r = $this->dotradius;
-			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->colors[$color]);
+	if ($type=='+' || $type=='-' || $type=='|') {
+		$tl = $this->ticklength;
+		$x = (int) round($pt[0]); $y = (int) round($pt[1]);
+		if ($type=='+') {
+			$ac = $this->axescolor;
+			if ($ac != 'none' && isset($this->colors[$ac])) {
+				imageline($this->img, (int) round($x-$tl), $y, (int) round($x+$tl), $y, $this->colors[$ac]);
+				imageline($this->img, $x, (int) round($y-$tl), $x, (int) round($y+$tl), $this->colors[$ac]);
+			}
+		} else if ($color != 'none' && isset($this->colors[$color])) {
+			if ($type=='-') {
+				imageline($this->img, (int) round($x-$tl), $y, (int) round($x+$tl), $y, $this->colors[$color]);
+			} else {
+				imageline($this->img, $x, (int) round($y-$tl), $x, (int) round($y+$tl), $this->colors[$color]);
+			}
+		}
+		return;
+	}
+	if ($type!='open') {
+		if ($color != 'none' && isset($this->colors[$color])) {
+			if ($this->usegd2) {
+				imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors[$color]);
+			} else {
+				$r = $this->dotradius;
+				imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->colors[$color]);
+			}
 		}
 	} else {
 		if ($this->usegd2) {
@@ -1097,49 +1364,30 @@ function ASdot2($arg) {
 			$r = $this->dotradius;
 			imagefilledpolygon($this->img,array($pt[0]-$r,$pt[1],$pt[0],$pt[1]+$r,$pt[0]+$r,$pt[1],$pt[0],$pt[1]-$r),4,$this->colors['white']);
 		}
-		imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors[$color]);
-	}
-	if (isset($arg[2])) {
-		if (isset($arg[3])) {
-			$this->AStext(array($arg[0],$arg[2],$arg[3]));
-		} else {
-			$this->AStext(array($arg[0],$arg[2]));
+		if ($color != 'none' && isset($this->colors[$color])) {
+			imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->colors[$color]);
 		}
 	}
-	/*
-	if (preg_match('/\s*\[(.*?)\]\s*,\s*[\'"](.*?)[\'"]\s*(.*)/',$arg,$m)) {
-		$pt = $this->pt2arr($m[1]);
-		if ($m[2]=='closed') {
-			imagefilledellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
-		} else {
-			imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
-		}
-
-		if (strlen($m[3])>0) {
-			$this->AStext('['.$m[1].']'.$m[3]);
-		}
-	} else if (preg_match('/\s*\[(.*?)\]\s*,\s*,\s*(.*)/',$arg,$m)) {
-		$pt = $this->pt2arr($m[1]);
-		imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
-		if (strlen($m[3])>0) {
-			$this->AStext('['.$m[1].']'.$m[2]);
-		}
-	} else {
-		$pt = $this->pt2arr($arg);
-		imageellipse($this->img, (int) round($pt[0]), (int) round($pt[1]), (int) round($this->dotradius), (int) round($this->dotradius), $this->$color);
-	}
-	*/
 }
-//function ASarrowhead($v,$w) {
+function ASdot2($arg) {
+	if (!$this->isinit) {$this->ASinitPicture();}
+	$pt = $this->pt2arr($arg[0]);
+	$this->ASdotPx($pt, isset($arg[1])?$arg[1]:'closed');
+	if (isset($arg[2]) && $arg[2] !== '' && $arg[2] !== 'null') {
+		$pos = (isset($arg[3]) && $arg[3] !== '') ? $arg[3] : 'below';
+		$this->AStext(array($arg[0],$arg[2],$pos));
+	}
+}
 function ASarrowhead($p,$q) {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	$v = $this->pt2arr($p);
-	$w = $this->pt2arr($q);
+	$this->ASarrowheadPx($this->pt2arr($p),$this->pt2arr($q));
+}
+function ASarrowheadPx($v,$w) {
 	$u = array($w[0]-$v[0],$w[1]-$v[1]);
 	$d = sqrt($u[0]*$u[0]+$u[1]*$u[1]);
-    $rs = $this->arrowrelsize;
-    $off = $this->arrowoffset;
-	if ($d > 0.00000001) {
+	$rs = $this->arrowrelsize;
+	$off = $this->arrowoffset;
+	if ($d > 0.00000001 && $this->stroke != 'none' && isset($this->colors[$this->stroke])) {
 		$u = array($u[0]/$d, $u[1]/$d);
 		$up = array(-$u[1],$u[0]);
 		$arr = array(
@@ -1150,16 +1398,16 @@ function ASarrowhead($p,$q) {
 			(int) round($w[0]-$rs*15*$u[0]+$rs*4*$up[0]-$off*$u[0]),
 			(int) round($w[1]-$rs*15*$u[1]+$rs*4*$up[1]-$off*$u[1]));
 		$color = $this->stroke;
-        if ($this->isphp8) {
-		    imagefilledpolygon($this->img,$arr,$this->colors[$color]);
-        } else {
-		    imagefilledpolygon($this->img,$arr,count($arr)/2,$this->colors[$color]);
-        }
+		if ($this->isphp8) {
+			imagefilledpolygon($this->img,$arr,$this->colors[$color]);
+		} else {
+			imagefilledpolygon($this->img,$arr,count($arr)/2,$this->colors[$color]);
+		}
 	}
 }
 function ASslopefield($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	$func = $arg[0];
+	$func = str_replace('Math.','',$arg[0]);
 	if (count($arg)>1) {
 		$dx = $this->evalifneeded($arg[1]);
 		if ($dx*1==0) { $dx = 1;}
@@ -1172,28 +1420,123 @@ function ASslopefield($arg) {
 	} else {
 		$dy = 1;
 	}
-	/*preg_match_all('/[a-zA-Z]+/',$func,$matches,PREG_PATTERN_ORDER);
-	$okfunc = array('sin','cos','tan','sec','csc','cot','arcsin','arccos','arctan','x','y','log','ln','e','pi','abs','sqrt','safepow');
-	foreach ($matches[0] as $m) {
-		if (!in_array($m,$okfunc)) { echo "$m"; return;}
-	}
-	*/
 	$efunc = makeMathFunction($func, "x,y");
-    if ($efunc === false) { return; }
+	if ($efunc === false) { return; }
 	$dz = sqrt($dx*$dx + $dy*$dy)/6;
 	$x_min = $dx*ceil($this->xmin/$dx);
 	$y_min = $dy*ceil($this->ymin/$dy);
 	for ($x = $x_min; $x<= $this->xmax; $x+= $dx) {
 		for ($y = $y_min; $y<= $this->ymax; $y+= $dy) {
 			$gxy = @$efunc(['x'=>$x, 'y'=>$y]);
-			if ($gxy!=null && !is_infinite($gxy) && !is_nan($gxy)) {
-				if ($gxy===false) {
+			if (is_numeric($gxy) && !is_nan($gxy)) {
+				if (is_infinite($gxy)) {
 					$u = 0; $v = $dz;
 				} else {
 					$u = $dz/sqrt(1+$gxy*$gxy);
 					$v = $gxy*$u;
 				}
-				$this->ASline(array("[$x-1*$u,$y-1*$v]","[$x+$u,$y+$v]"));
+				$this->ASlinePx($this->ptpx($x-$u,$y-$v), $this->ptpx($x+$u,$y+$v));
+			}
+		}
+	}
+}
+
+// Adaptively samples $g(x) over [xa,xb].  Starts with a uniform grid, then
+// recursively bisects any interval whose midpoint is more than tol pixels from
+// the chord joining its endpoints (y clamped to [ylo,yhi] first).  Intervals
+// with an undefined endpoint or midpoint are also bisected to find domain edges
+// and asymptotes.  Jump discontinuities are flagged in $brk (index of a point
+// that should not be connected to the previous one).  Port of adaptiveSamples
+// in ASCIIsvg.js.
+function adaptiveSamples($g, $xa, $xb, $ylo, $yhi) {
+	$nseed = 47; $maxdepth = 7; $tol = 0.25; $maxpts = 2500; $jumppx = 3;
+	$yu = $this->yunitlength;
+	$xs = array($xa);
+	$ys = array($g($xa));
+	$brk = array();
+	$bad = function($y) { return is_nan($y) || is_infinite($y); };
+	$sy = function($y) use ($yu,$ylo,$yhi) { return $yu*min($yhi, max($ylo, $y)); };
+	$rec = function($x0,$y0,$x1,$y1,$d,$pgap) use (&$rec,&$xs,&$ys,&$brk,$g,$bad,$sy,$maxdepth,$tol,$maxpts,$jumppx,$ylo,$yhi) {
+		$nan0 = $bad($y0); $nan1 = $bad($y1);
+		$gap = ($nan0 || $nan1) ? 0 : abs($sy($y1) - $sy($y0));
+		if ($d < $maxdepth && count($xs) < $maxpts) {
+			$xm = ($x0 + $x1)/2;
+			$ym = $g($xm);
+			$nanm = $bad($ym);
+			if ($nan0 && $nan1 && $nanm) {
+				$split = false;
+			} else if ($nan0 || $nan1 || $nanm) {
+				$split = true;
+			} else {
+				$split = abs($sy($ym) - ($sy($y0) + $sy($y1))/2) > $tol;
+			}
+			if ($split) {
+				$rec($x0, $y0, $xm, $ym, $d+1, $gap);
+				$rec($xm, $ym, $x1, $y1, $d+1, $gap);
+				return;
+			}
+		} else if ($d >= $maxdepth && !$nan0 && !$nan1 && $gap > $jumppx && $gap >= 0.9*$pgap &&
+			$y0 >= $ylo && $y0 <= $yhi && $y1 >= $ylo && $y1 <= $yhi) {
+			$brk[count($xs)] = true;
+		}
+		$xs[] = $x1;
+		$ys[] = $y1;
+	};
+	$step = ($xb - $xa)/$nseed;
+	$x0 = $xa; $y0 = $ys[0];
+	for ($j = 1; $j <= $nseed; $j++) {
+		$x1 = ($j == $nseed) ? $xb : $xa + $step*$j;
+		$y1 = $g($x1);
+		$rec($x0, $y0, $x1, $y1, 0, 0);
+		$x0 = $x1;
+		$y0 = $y1;
+	}
+	return array($xs, $ys, $brk);
+}
+
+// clips the pixel-space segment p-q to the image; returns null if entirely outside
+function clipSegPx($p, $q) {
+	$xl = -2; $xh = $this->width + 2; $yl = -2; $yh = $this->height + 2;
+	$dx = $q[0]-$p[0]; $dy = $q[1]-$p[1];
+	$t0 = 0; $t1 = 1;
+	$ps = array(-$dx, $dx, -$dy, $dy);
+	$qs = array($p[0]-$xl, $xh-$p[0], $p[1]-$yl, $yh-$p[1]);
+	for ($i=0; $i<4; $i++) {
+		if ($ps[$i] == 0) {
+			if ($qs[$i] < 0) { return null; }
+		} else {
+			$r = $qs[$i]/$ps[$i];
+			if ($ps[$i] < 0) {
+				if ($r > $t1) { return null; }
+				if ($r > $t0) { $t0 = $r; }
+			} else {
+				if ($r < $t0) { return null; }
+				if ($r < $t1) { $t1 = $r; }
+			}
+		}
+	}
+	return array(array($p[0]+$t0*$dx, $p[1]+$t0*$dy), array($p[0]+$t1*$dx, $p[1]+$t1*$dy));
+}
+
+// draws a run of plot points (user units) as connected segments
+function ASplotpath($pth) {
+	$n = count($pth);
+	$prev = null;
+	for ($i=0; $i<$n; $i++) {
+		$cur = $this->ptpx($pth[$i][0],$pth[$i][1]);
+		if ($prev !== null) {
+			$seg = $this->clipSegPx($prev, $cur);
+			if ($seg !== null) {
+				$this->ASlinePx($seg[0], $seg[1], 'none');
+			}
+		}
+		$prev = $cur;
+	}
+	if ($this->marker=='dot' || $this->marker=='arrowdot') {
+		foreach ($pth as $pt) {
+			$px = $this->ptpx($pt[0],$pt[1]);
+			if ($px[0] > -10 && $px[0] < $this->width+10 && $px[1] > -10 && $px[1] < $this->height+10) {
+				$this->ASdot($px,8);
 			}
 		}
 	}
@@ -1201,179 +1544,125 @@ function ASslopefield($arg) {
 
 function ASplot($function) {
 	if (!$this->isinit) {$this->ASinitPicture();}
-	$funcstr = implode(',',$function);
-	/*  safety check now in mathphp
-	preg_match_all('/[a-zA-Z]+/',$funcstr,$matches,PREG_PATTERN_ORDER);
-	$okfunc = array('sin','cos','tan','sec','csc','cot','arcsin','arccos','arctan','x','t','log','ln','e','pi','abs','sqrt','safepow');
-	foreach ($matches[0] as $m) {
-		if (!in_array($m,$okfunc)) { echo "$m"; return;}
-	} //do safety check, as this will be eval'ed
-	*/
-	//$function = explode(',',str_replace(array('"','\'',';'),'',$function));
-	$function = str_replace(array('"','\'',';'),'',$function);
-	if (strpos($function[0],'[')===0) {
-		$funcp = explode(',',$function[0]);
-		$isparametric = true;
-		$xfunc = str_replace("[","",$funcp[0]);
-		$exfunc = makeMathFunction($xfunc, "t");
-		$yfunc = str_replace("]","",$funcp[1]);
-		$eyfunc = makeMathFunction($yfunc, "t");
-        if ($exfunc === false || $eyfunc === false) {
-            return;
-        }
+	$efunc = $exfunc = $eyfunc = null;
+	$function = str_replace(array('"','\'',';','Math.'),'',$function);
+	$f0 = trim($function[0]);
+	$isparametric = (strpos($f0,'[')===0);
+	if ($isparametric) {
+		if (substr($f0,-1)==']') { $f0 = substr($f0,0,-1); }
+		$funcp = $this->splitTop(substr($f0,1));
+		if (count($funcp)<2) { return; }
+		$exfunc = makeMathFunction($funcp[0], "t");
+		$eyfunc = makeMathFunction($funcp[1], "t");
+		if ($exfunc === false || $eyfunc === false) {
+			return;
+		}
 	} else {
-		$isparametric = false;
-		$efunc = makeMathFunction($function[0], "x");
-        if ($efunc === false) {
-            return;
-        }
+		$efunc = makeMathFunction($f0, "x");
+		if ($efunc === false) {
+			return;
+		}
 	}
 	$avoid = array();
-	if (isset($function[1]) && $function[1]!='' && $function[1]!='null') {
-		$xmin = $this->evalifneeded($function[1]);
+	if (isset($function[1]) && $function[1]!=='' && $function[1]!=='null') {
+		$min = $this->evalifneeded($function[1]);
 	} else {
-		$xmin = $this->xmin - min($this->border[0],5)/$this->xunitlength;
+		$min = $this->xmin;
 	}
-	if (isset($function[2]) && $function[2]!='' && $function[2]!='null') {
+	if (isset($function[2]) && $function[2]!=='' && $function[2]!=='null') {
 		$xmaxarr = explode('!',$function[2]);
-		$xmax = $this->evalifneeded($xmaxarr[0]);
-		$avoid = array_slice($xmaxarr,1);
+		$max = $this->evalifneeded($xmaxarr[0]);
+		foreach (array_slice($xmaxarr,1) as $av) {
+			$avoid[] = $this->evalifneeded($av);
+		}
 	} else {
-		$xmax = $this->xmax + min($this->border[2],5)/$this->xunitlength;
+		$max = $this->xmax;
 	}
-	$xmin += ($xmax - $xmin)/100000; //avoid divide by zero errors
-	if (isset($function[3]) && $function[3]!='' && $function[3]!='null') {
-		$stopat = $this->evalifneeded($function[3]);
-		$dx = ($xmax - $xmin)/($stopat-1);
+	if ($max <= $min) { return; }
+	$points = null;
+	if (isset($function[3]) && $function[3]!=='' && $function[3]!=='null') {
+		$points = $this->evalifneeded($function[3]);
+		if ($points < 1) { $points = null; }
+	}
+
+	// g gives y (or y(t) for parametric); f gives x(t) for parametric
+	$g = function($v) use ($isparametric,$efunc,$eyfunc,$avoid) {
+		if (in_array($v,$avoid)) { return NAN; }
+		$y = $isparametric ? @$eyfunc(['t'=>$v]) : @$efunc(['x'=>$v]);
+		return is_numeric($y) ? (float) $y : NAN;
+	};
+	$f = function($v) use ($isparametric,$exfunc) {
+		if (!$isparametric) { return $v; }
+		$x = @$exfunc(['t'=>$v]);
+		return is_numeric($x) ? (float) $x : NAN;
+	};
+
+	$brk = array();
+	if (!$isparametric && $this->ymax > $this->ymin) {
+		list($ts, $gs, $brk) = $this->adaptiveSamples($g, $min, $max-0.000001*($max-$min),
+			$this->ymin-($this->ymax-$this->ymin), $this->ymax+($this->ymax-$this->ymin));
 	} else {
-		$dx = ($xmax - $xmin)/100;
-		$stopat = 101;
+		$n = ($points===null) ? 200 : $points;
+		$inc = ($max-$min-0.000001*($max-$min))/$n;
+		$ts = array(); $gs = array();
+		for ($i=0; $i<=$n; $i++) {
+			$t = $min + $inc*$i;
+			if ($t > $max) { break; }
+			$ts[] = $t;
+			$gs[] = $g($t);
+		}
 	}
-	$yymax = $this->ymax + $this->border[3]/$this->yunitlength;
-	$yymin = $this->ymin - $this->border[1]/$this->yunitlength;
-	$px = null;
-	$py = null;
-	$lasty = 0;
-	$lastl = 0;
 
-	for ($i = 0; $i<$stopat;$i++) {
-
-		if ($isparametric) {
-			$t = $xmin + $dx*$i;
-			if (in_array($t,$avoid)) { continue;}
-			$x = $exfunc(['t'=>$t]);
-			$y = $eyfunc(['t'=>$t]);
-			if (is_infinite($x) || is_infinite($y) || is_nan($x) || is_nan($y)) { continue; }
-		} else {
-			$x = $xmin + $dx*$i;
-			if (in_array($x,$avoid)) { continue;}
-			$y = $efunc(['x'=>$x]);
-			if (is_infinite($y) || is_nan($y)) { continue;}
+	$pth = array();
+	$firstpts = array();
+	$yrange = $this->ymax - $this->ymin;
+	for ($i=0; $i<count($ts); $i++) {
+		$gt = $gs[$i];
+		$ft = $f($ts[$i]);
+		if (is_nan($gt) || is_infinite($gt) || is_nan($ft) || is_infinite($ft)) { continue; }
+		if (count($pth) > 0 && (isset($brk[$i]) || abs($gt - $pth[count($pth)-1][1]) > $yrange)) {
+			// jump or too steep to connect; end this path and start another
+			if (count($pth) > 1) { $this->ASplotpath($pth); }
+			$pth = array();
 		}
-		if ($i<2 || $i==$stopat-2) {
-			$fx[$i] = $x;
-			$fy[$i] = $y;
-		}
-		$lastx = $x;
-		/*if (abs($y-$lasty) > ($this->ymax-$this->ymin)) {
-			if ($lastl > 1) { $lastl = 0; }//break path
-			$lasty = $y;
-		} else {
-
-			$lasty = $y;
-			if ($lastl > 0) {
-				$this->ASline(array("[$px,$py]","[$x,$y]"));
-			}
-			$px = $x;
-			$py = $y;
-
-			$lastl++;
-		}*/
-		if ($py===null) { //starting line
-
-		} else if ($y>$yymax || $y<$yymin) { //going or still out of bounds
-			if ($py <= $yymax && $py >= $yymin) { //going out
-				if ($yymax-$py < .5*($yymax-$yymin)) { //closer to top
-					$iy = $yymax;
-					//if jumping from top of graph to bottom, change value
-					//for interpolation purposes
-					if ($y<$yymin) { $y = $yymax+.5*($yymax-$yymin);}
-				} else { //going down
-					$iy = $yymin;
-					if ($y>$yymax) { $y = $yymin-.5*($yymax-$yymin);}
-				}
-				$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
-				$this->ASline(array("[$px,$py]","[$ix,$iy]"));
-			} else { //still out
-
-			}
-		} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
-			if ($y <= $yymax && $y >= $yymin) { //coming in
-				if ($yymax-$y < .5*($yymax-$yymin)) { //closer to top
-					$iy = $yymax;
-					if ($py<$yymin) { $py = $yymax+.5*($yymax-$yymin);}
-				} else { //coming from bottom
-					$iy = $yymin;
-					if ($py>$yymax) { $py = $yymin-.5*($yymax-$yymin);}
-				}
-				$ix = ($x-$px)*($iy - $py)/($y-$py) + $px;
-				$this->ASline(array("[$ix,$iy]","[$x,$y]"));
-			} else { //still out
-
-			}
-		} else { //all in
-			$this->ASline(array("[$px,$py]","[$x,$y]"));
-		}
-		$px = $x;
-		$py = $y;
+		$pth[] = array($ft, $gt);
+		if (count($firstpts) < 2) { $firstpts[] = $pth[count($pth)-1]; }
 	}
-	if (isset($function[5]) && $function[5]!='' && $function[5]!='null') {
-		if ($function[5]==1) {
-			//need pt2arr for xunit adjust
-			$this->ASarrowhead("{$fx[1]},{$fy[1]}","{$fx[0]},{$fy[0]}");
+	if (count($pth) > 1) { $this->ASplotpath($pth); }
+
+	if (isset($function[5]) && $function[5]!=='' && $function[5]!=='null' && count($firstpts)>0) {
+		$p0 = $firstpts[0];
+		if ($function[5]==1 && count($firstpts)>1) {
+			$this->ASarrowheadPx($this->ptpx($firstpts[1][0],$firstpts[1][1]), $this->ptpx($p0[0],$p0[1]));
 		} else if ($function[5]==2) {
-			$this->ASdot2(array("[{$fx[0]},{$fy[0]}]","open"));
+			$this->ASdotPx($this->ptpx($p0[0],$p0[1]), 'open');
 		} else if ($function[5]==3) {
-			$this->ASdot2(array("[{$fx[0]},{$fy[0]}]","closed"));
+			$this->ASdotPx($this->ptpx($p0[0],$p0[1]), 'closed');
 		}
 	}
-	if (isset($function[6]) && $function[6]!='' && $function[6]!='null') {
-		if ($function[6]==1) {
-			$this->ASarrowhead("{$fx[$stopat-2]},{$fy[$stopat-2]}","$x,$y");
+	if (isset($function[6]) && $function[6]!=='' && $function[6]!=='null' && count($pth)>0) {
+		$pl = $pth[count($pth)-1];
+		if ($function[6]==1 && count($pth)>1) {
+			$pp = $pth[count($pth)-2];
+			$this->ASarrowheadPx($this->ptpx($pp[0],$pp[1]), $this->ptpx($pl[0],$pl[1]));
 		} else if ($function[6]==2) {
-			$this->ASdot2(array("[$x,$y]","open"));
+			$this->ASdotPx($this->ptpx($pl[0],$pl[1]), 'open');
 		} else if ($function[6]==3) {
-			$this->ASdot2(array("[$x,$y]","closed"));
+			$this->ASdotPx($this->ptpx($pl[0],$pl[1]), 'closed');
 		}
 	}
 }
+// converts a point like "[x,y]" or "x,y" (in user units) to pixel coordinates
 function pt2arr($pt) {
-	$pt = str_replace(array('[',']'),'',$pt);
-	$pt = explode(',',$pt);
-	//$pt[0] = round($this->evalifneeded($pt[0])*$this->xunitlength + $this->origin[0]);
-	//$pt[1] = round($this->height - $this->evalifneeded($pt[1])*$this->yunitlength - $this->origin[1]);
-	$pt[0] =$this->evalifneeded($pt[0])*$this->xunitlength + $this->origin[0];
-	$pt[1] = $this->height - $this->evalifneeded($pt[1])*$this->yunitlength - $this->origin[1];
-	return $pt;
+	$pt = trim($pt);
+	if ($pt !== '' && $pt[0] == '[') { $pt = substr($pt,1); }
+	if ($pt !== '' && substr($pt,-1) == ']') { $pt = substr($pt,0,-1); }
+	$pt = $this->splitTop($pt);
+	if (count($pt) < 2) { $pt[1] = 0; }
+	return $this->ptpx($this->evalifneeded($pt[0]), $this->evalifneeded($pt[1]));
 }
 function parseargs($str) {
-	$lp = 0; $qd = 0; $bd=0; $args = array();
-	for($i=0; $i<strlen($str); $i++) {
-		if ($str[$i]=='[' && $qd==0) { $bd++;}
-		if ($str[$i]==']' && $qd==0) { $bd--;}
-		if ($str[$i]=='"' || $str[$i]=='\'') {
-			$qd = 1-$qd;
-		}
-		if ($str[$i]==',' && $qd==0 && $bd==0) {
-			if ($i>$lp) {
-				$args[] = substr($str,$lp,$i-$lp);
-			} else {
-				$args[] = '';
-			}
-			$lp = $i+1;
-		}
-	}
-	$args[] = substr($str,$lp);
+	$args = $this->splitTop($str);
 	for ($i=0;$i<count($args);$i++) {
 		$args[$i] = trim(str_replace(array('"','\''),'',$args[$i]));
 	}
@@ -1387,24 +1676,43 @@ function outputimage() {
 		imagepng($this->img,null,8);
 	}
 }
+function rounddec($v,$dec) {
+	$dec = 2 + max(0,$dec-2);
+	$m = pow(10,$dec);
+	return (string) (round($v*$m)/$m + 0);
+}
+// handle the JS-isms that scripts use in numeric arguments
+function prepexpr($str) {
+	$str = str_replace('Math.','',$str);
+	$str = preg_replace(array('/\bPI\b/','/\bE\b/','/\bacos\(/','/\basin\(/','/\batan\(/','/\bwidth\b/','/\bheight\b/'),
+		array('pi','e','arccos(','arcsin(','arctan(',$this->width,$this->height), $str);
+	// functions the expression parser lacks; evaluate innermost calls first
+	$n = 0;
+	while ($n++ < 25 && preg_match('/\b(max|min|pow|floor|ceil)\(([^()]*)\)/', $str, $m, PREG_OFFSET_CAPTURE)) {
+		$a = array();
+		foreach ($this->splitTop($m[2][0]) as $part) {
+			$a[] = evalMathParser(trim($part));
+		}
+		switch ($m[1][0]) {
+			case 'max': $val = max($a); break;
+			case 'min': $val = min($a); break;
+			case 'pow': $val = (count($a)>1) ? pow($a[0],$a[1]) : NAN; break;
+			case 'floor': $val = floor($a[0]); break;
+			case 'ceil': $val = ceil($a[0]); break;
+		}
+		if (is_nan($val) || is_infinite($val)) { $val = 0; }
+		$str = substr_replace($str, '('.sprintf('%.14F',$val).')', $m[0][1], strlen($m[0][0]));
+	}
+	return $str;
+}
 function evalifneeded($str) {
-	//$str = str_replace('pi','3.141593', $str);
 	if (is_numeric($str)) {
 		return $str;
 	} else {
-        $val = evalMathParser($str);
-        if (is_nan($val)) { return 0;}
-        return $val;
-    }/*else if (trim($str)=='' || preg_match('/[^\(\)\d+\-\/\*\.]/',$str)) {
-		return 0; //return a value to prevent errors
-	} else {
-		try {
-			eval("\$ret = $str;");
-		} catch (Throwable $thrownerror) {
-			return 1;
-		}
-		return $ret;
-	}*/
+		$val = evalMathParser($this->prepexpr((string) $str));
+		if (is_nan($val)) { return 0;}
+		return $val;
+	}
 }
 } //end AStoIMG class
 

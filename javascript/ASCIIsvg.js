@@ -85,6 +85,7 @@ function prepWithMath(str) {
     if (strlit) { return m; }
     m = m.replace(/Ma(t|\(t\)\*)h\./g,'');
     m = m.replace(/\b(abs|acos|asin|atan|ceil|floor|sign|cos|sin|tan|sqrt|exp|max|min|pow)\(/g, 'Math.$1(');
+    m = m.replace(/\bPI\b/g,'Math.PI'); // bare PI, including what was Math.PI before the strip above
     m = m.replace(/\(E\)/g,'(Math.E)');
     m = m.replace(/\((PI|pi)\)/g,'(Math.PI)');
     return m;
@@ -566,14 +567,16 @@ function circle(center,radius,id) { // coordinates in units
   var node;
   if (id!=null) node = doc.getElementById(id);
   if (node==null) {
-    node = myCreateElementSVG("circle");
+    // an ellipse, so the circle is correct in graph units when the axes are unequal
+    node = myCreateElementSVG("ellipse");
     if (id!=null) node.setAttribute("id", id);
     svgpicture.appendChild(node);
   }
 
   node.setAttribute("cx",center[0]*xunitlength+origin[0]);
   node.setAttribute("cy",height-center[1]*yunitlength-origin[1]);
-  node.setAttribute("r",radius*xunitlength);
+  node.setAttribute("rx",radius*xunitlength);
+  node.setAttribute("ry",radius*yunitlength);
   setStrokeFill(node);
 }
 
