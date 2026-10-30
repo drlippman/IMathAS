@@ -176,9 +176,9 @@
 			$attempts[$ques] += $attp[$k];
 			$regens[$ques] += substr_count($bla[$k],'ReGen');
 			$qcnt[$ques] += 1;
-			$timeot[$k] = explode('~',$timeot[$k]);
+			$timeot[$k] = explode('~', $timeot[$k] ?? '');
 			$tcnt[$ques] += count($timeot[$k]);
-			$totsum = array_sum($timeot[$k]);
+			$totsum = array_sum(array_map('floatval', $timeot[$k]));
 			$timeontask[$ques] += $totsum;
 			$timeotthisstu += $totsum;
 
@@ -215,7 +215,7 @@
 	if ($notstarted==0) {
 		echo '<p>All students have started this assessment. ';
 	} else {
-		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
+		echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
 	}
 	echo '</p>';
 	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
