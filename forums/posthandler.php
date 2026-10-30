@@ -371,6 +371,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			echo '<div id="headerposthandler" class="pagetitle"><h1>Modify Post</h1></div>';
 		} else {
+            $line = array();
             $line['subject'] = "";
             $line['message'] = "";
             $line['posttype'] = 0;

@@ -696,8 +696,14 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         }
     }
 
+    $rawcount = count($res); // before filtering, for paging
+
     // do sorting if needed
     if ($searchtype == 'assess') {
+        // skip questions not in the assessment's itemorder (orphaned rows)
+        $res = array_values(array_filter($res, function ($v) use ($qidmap) {
+            return isset($qidmap[$v['qid']]);
+        }));
         foreach ($res as $k => $v) {
             $res[$k]['grp'] = $qidmap[$v['qid']][0];
             $res[$k]['qn'] = $qidmap[$v['qid']][1];
@@ -735,7 +741,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $out = ['qs' => $res, 'type'=>'all', 'names' => []];
     }
     $out['offset'] = $offset;
-    if (count($res) == $max) {
+    if ($rawcount == $max) {
         $out['next'] = $offset + $max;
     }
     if ($offset > 0) {

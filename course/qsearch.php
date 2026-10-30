@@ -24,10 +24,12 @@ if (isset($_POST['libs']) && $_POST['libs'] !== '') {
 } else {
     $libs = [];
 }
-$_SESSION['searchtype'.$searchcontext.$aid] = $_POST['searchtype'];
+$searchtype = $_POST['searchtype'] ?? 'libs';
+$searchstr = $_POST['search'] ?? '';
+$_SESSION['searchtype'.$searchcontext.$aid] = $searchtype;
 $_SESSION['searchin'.$searchcontext.$aid] = $libs;
-$_SESSION['lastsearch'.$searchcontext.$aid] = $_POST['search'];
-if ($_POST['searchtype'] == 'libs') {
+$_SESSION['lastsearch'.$searchcontext.$aid] = $searchstr;
+if ($searchtype == 'libs') {
     $_SESSION['lastsearchlibs'.$searchcontext.$aid] = $_POST['libs'];
 } else {
     unset($_SESSION['lastsearchlibs'.$searchcontext.$aid]);
@@ -76,8 +78,8 @@ if (isset($_GET['getassess']) && $cid > 0) {
 
 require_once '../includes/questionsearch.php';
 
-$search = parseSearchString($_POST['search']);
-$offset = intval($_POST['offset']);
+$search = parseSearchString($searchstr);
+$offset = intval($_POST['offset'] ?? 0);
 
 $options = [];
 if (!empty($search['unused']) && $searchcontext!='c') {
@@ -101,7 +103,7 @@ if ($_GET['cid'] === 'admin') {
         $options['isgroupadmin'] = $groupid;
     }
 }
-$res = searchQuestions($search, $userid, $_POST['searchtype'], $libs, $options, $offset);
+$res = searchQuestions($search, $userid, $searchtype, $libs, $options, $offset);
 
 echo json_encode($res, JSON_INVALID_UTF8_IGNORE);
 
