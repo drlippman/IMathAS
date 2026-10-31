@@ -225,10 +225,10 @@
 		td.innerHTML = \'<label>'.addslashes(_('Calc total:')).' <select name="calctype[new\'+addrowcnt+\']" id="calctypenew\'+addrowcnt+\'">\' +
 			\'<option value="0" selected="selected">'.addslashes(_('point total')).'</option>\' +
 			\'<option value="1">'.addslashes(_('averaged percents')).'</option></select></label><br/>\' +
-			\'<label><input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',0)">'.addslashes(_('Keep All')).'</label><br/>\' +
-			\'<label><input name="droptype[new\'+addrowcnt+\']" value="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">'.addslashes(_('Drop lowest')).'</label> \' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio">'.addslashes(_('Keep All')).'</label><br/>\' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="1" type="radio">'.addslashes(_('Drop lowest')).'</label> \' +
 			\'<label><input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> '.addslashes(_('scores')).'</label><br/> \' +
-			\'<label><input name="droptype[new\'+addrowcnt+\']" value="2" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">'.addslashes(_('Keep highest')).'</label> \' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="2" type="radio">'.addslashes(_('Keep highest')).'</label> \' +
 			\'<label><input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> '.addslashes(_('scores')).'</label>\';
 		tr.appendChild(td);
 
@@ -532,7 +532,7 @@
 	echo '<p class="small"><sup>*</sup>' . _('When a category is set to Expanded, both the category total and all items in the category are displayed.') . '<br/> ';
 	echo _('When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.') . '<br/>';
 	echo _('When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total.') . ' </p>';
-	echo '<p class="small"><sup>*</sup>' . _('If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.') . '</p>';
+	echo '<p class="small"><sup>*</sup>' . _('If you are using a points earned / possible scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.') . '</p>';
 
 	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
 
