@@ -489,16 +489,23 @@ class QuestionHtmlGenerator
                     }
                     $answeights = array_map('trim', $answeights);
                     if (count($answeights) != count($anstypes)) {
+                        echo 'Error: length $answeights and $anstypes do not match';
                         $answeights = array_fill_keys(array_keys($anstypes), 1); 
                     }
                     $answeights = array_map(function($v) {
                         if (is_numeric($v)) { 
                             return $v;
                         } else {
-                            return evalbasic($v);
+                            $v = evalbasic($v);
+                            return is_numeric($v) ? $v : 0;
                         }
                     }, $answeights);
                     ksort($answeights);
+                    if (count(array_diff_key($anstypes, $answeights)) > 0) {
+                        echo 'Error: length or keys of $answeights and $anstypes do not match';
+                        // keys of $answeights don't match keys of $anstypes
+                        $answeights = array_fill_keys(array_keys($anstypes), 1);
+                    }
                     if (array_sum($answeights) == 0) {
                         $answeights = array_fill_keys(array_keys($anstypes), 1);
                     }

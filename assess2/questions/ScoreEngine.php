@@ -680,10 +680,15 @@ class ScoreEngine
                 if (is_numeric($v)) { 
                     return $v;
                 } else {
-                    return evalbasic($v);
+                    $v = evalbasic($v);
+                    return is_numeric($v) ? $v : 0;
                 }
             }, $answeights);
             ksort($answeights);
+            if (count(array_diff_key($anstypes, $answeights)) > 0) {
+                // keys of $answeights don't match keys of $anstypes
+                $answeights = array_fill_keys(array_keys($anstypes), 1);
+            }
             if (array_sum($answeights)==0) {
                 $answeights = array_fill_keys(array_keys($anstypes), 1); 
             }
