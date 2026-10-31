@@ -20,7 +20,10 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 } elseif (!(isset($teacherid))) {  //there is a cid but the user isn't a teacher
 	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
+} elseif (!isset($_REQUEST['remove'])) {
+	$overwriteBody = 1;
+	$body = "You need to access this page from the link on the course page";
+} else { // a valid delete request loaded the page
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 

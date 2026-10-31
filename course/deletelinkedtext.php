@@ -23,6 +23,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
+} elseif (!isset($_REQUEST['remove'])) {
+	$overwriteBody=1;
+	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);

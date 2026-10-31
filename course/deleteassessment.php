@@ -20,7 +20,10 @@ if (!(isset($teacherid))) {
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody = 1;
 	$body = _("You need to access this page from the link on the course page");
-} elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
+} elseif (!isset($_REQUEST['remove'])) {
+	$overwriteBody = 1;
+	$body = "You need to access this page from the link on the course page";
+} else { // a valid delete request loaded the page
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
 	$aid = Sanitize::onlyInt($_GET['id']);
