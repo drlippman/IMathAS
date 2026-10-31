@@ -8,7 +8,7 @@
 
 	if (!(isset($teacherid))) {
 		require_once "../header.php";
-		echo "You need to log in as a teacher to access this page";
+		echo _("You need to log in as a teacher to access this page");
 		require_once "../footer.php";
 		exit;
 	}
@@ -201,35 +201,35 @@
 		tr.id = \'newrow\'+addrowcnt;
 		tr.className = "grid";
 		var td = document.createElement("td");
-		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" id="namenew\'+addrowcnt+\'" value="" type="text" aria-label="category name">\';
+		td.innerHTML = \'<input name="name[new\'+addrowcnt+\']" id="namenew\'+addrowcnt+\'" value="" type="text" aria-label="'.addslashes(_('category name')).'">\';
 		tr.appendChild(td);
         var useweights = !!document.getElementById("usew1").checked;
 
 		var td = document.createElement("td");
 		td.innerHTML = \'<select name="hide[new\'+addrowcnt+\']" aria-label="category display"> \' +
-			\'<option value="1">Hidden</option>\' +
-			\'<option value="0" selected="selected">Expanded</option>\' +
-			\'<option value="2">Collapsed</option>\' +
+			\'<option value="1">'.addslashes(_('Hidden')).'</option>\' +
+			\'<option value="0" selected="selected">'.addslashes(_('Expanded')).'</option>\' +
+			\'<option value="2">'.addslashes(_('Collapsed')).'</option>\' +
 			\'</select>\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
-		td.innerHTML = \'Scale <input size="3" name="scale[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="score to scale to perfect"> \' +
-		   \'<select name="st[new\'+addrowcnt+\']" aria-label="scale score type"><option value="0" selected>points</option>\' +
-		   \'<option value="1">percent</option></select><br/>\' +
-		   \'to perfect score<br/><input name="chop[new\'+addrowcnt+\']" value="1" checked="1" type="checkbox" aria-label="limit max score"> \' +
-		   \'<label>no total over <input size="3" name="chopto[new\'+addrowcnt+\']" value="100" type="text" pattern="[0-9]+" required>%</label>\';
+		td.innerHTML = \''.addslashes(_('Scale')).' <input size="3" name="scale[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="'.addslashes(_('score to scale to perfect')).'"> \' +
+		   \'<select name="st[new\'+addrowcnt+\']" aria-label="'.addslashes(_('scale score type')).'"><option value="0" selected>'.addslashes(_('points')).'</option>\' +
+		   \'<option value="1">'.addslashes(_('percent')).'</option></select><br/>\' +
+		   \''.addslashes(_('to perfect score')).'<br/><input name="chop[new\'+addrowcnt+\']" value="1" checked="1" type="checkbox" aria-label="'.addslashes(_('limit max score')).'"> \' +
+		   \'<label>'.addslashes(_('no total over')).' <input size="3" name="chopto[new\'+addrowcnt+\']" value="100" type="text" pattern="[0-9]+" required>%</label>\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
-		td.innerHTML = \'<label>Calc total: <select name="calctype[new\'+addrowcnt+\']" id="calctypenew\'+addrowcnt+\'">\' +
-			\'<option value="0" selected="selected">point total</option>\' +
-			\'<option value="1">averaged percents</option></select></label><br/>\' +
-			\'<label><input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',0)">Keep All</label><br/>\' +
-			\'<label><input name="droptype[new\'+addrowcnt+\']" value="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Drop lowest</label> \' +
-			\'<label><input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> scores</label><br/> \' +
-			\'<label><input name="droptype[new\'+addrowcnt+\']" value="2" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Keep highest</label> \' +
-			\'<label><input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> scores</label>\';
+		td.innerHTML = \'<label>'.addslashes(_('Calc total:')).' <select name="calctype[new\'+addrowcnt+\']" id="calctypenew\'+addrowcnt+\'">\' +
+			\'<option value="0" selected="selected">'.addslashes(_('point total')).'</option>\' +
+			\'<option value="1">'.addslashes(_('averaged percents')).'</option></select></label><br/>\' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',0)">'.addslashes(_('Keep All')).'</label><br/>\' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">'.addslashes(_('Drop lowest')).'</label> \' +
+			\'<label><input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> '.addslashes(_('scores')).'</label><br/> \' +
+			\'<label><input name="droptype[new\'+addrowcnt+\']" value="2" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">'.addslashes(_('Keep highest')).'</label> \' +
+			\'<label><input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> '.addslashes(_('scores')).'</label>\';
 		tr.appendChild(td);
 
         var td = document.createElement("td");
@@ -237,7 +237,7 @@
         if (useweights) {
             td.style.display = "none";
         }
-		td.innerHTML = \'<input size="3" name="fixedtot[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="category fixed total">\';
+		td.innerHTML = \'<input size="3" name="fixedtot[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="'.addslashes(_('category fixed total')).'">\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
@@ -245,18 +245,18 @@
         if (!useweights) {
             td.style.display = "none";
         }
-		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="category weighted total">\';
+		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="'.addslashes(_('category weighted total')).'">\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
-		td.innerHTML = \'<a href="#" onclick="removecat(\'+addrowcnt+\'); return false;" id="rn\'+addrowcnt+\'" aria-labelledby="rn\'+addrowcnt+\' namenew\'+addrowcnt+\'">Remove</a>\';
+		td.innerHTML = \'<a href="#" onclick="removecat(\'+addrowcnt+\'); return false;" id="rn\'+addrowcnt+\'" aria-labelledby="rn\'+addrowcnt+\' namenew\'+addrowcnt+\'">'.addslashes(_('Remove')).'</a>\';
 		tr.appendChild(td);
 
 		document.getElementById("cattbody").appendChild(tr);
 		$(tr).find("input").first().focus();
 	}
 	function removeexistcat(id) {
-		if (confirm("Are you SURE you want to delete this category?")) {
+		if (confirm("'.addslashes(_('Are you SURE you want to delete this category?')).'")) {
 			$.ajax({
 				type: "POST",
 				url: "gbsettings.php?cid='.$cid.'",
@@ -268,7 +268,7 @@
 					document.getElementById("cattbody").removeChild(torem);
 					prev.attr("tabindex",-1).focus();
 				} else {
-					alert("Error removing category");
+					alert("'.addslashes(_('Error removing category')).'");
 				}
 			});
 			return false;
@@ -282,11 +282,11 @@
 	}
 	function toggleadv(el) {
 		if ($("#viewfield").is(":hidden")) {
-			$(el).html("Hide view settings").attr("aria-expanded",true);
+			$(el).html("'.addslashes(_('Hide view settings')).'").attr("aria-expanded",true);
 			$("#viewfield").slideDown();
 
 		} else {
-			$(el).html("Edit view settings").attr("aria-expanded",false);
+			$(el).html("'.addslashes(_('Edit view settings')).'").attr("aria-expanded",false);
 			$("#viewfield").slideUp();
 		}
 	}
@@ -306,7 +306,7 @@
     if (empty($_COOKIE['fromltimenu'])) {
         echo " <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
     }
-    echo " <a href=\"gradebook.php?cid=$cid\">Gradebook</a> &gt; Settings</div>";
+    echo " <a href=\"gradebook.php?cid=$cid\">" . _('Gradebook') . "</a> &gt; " . _('Settings') . "</div>";
 	echo "<div id=\"headergbsettings\" class=\"pagetitle\"><h1>$pagetitle</h1></div>\n";
 	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,defgbmode,usersort,stugbmode,colorize FROM imas_gbscheme WHERE courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
@@ -346,15 +346,15 @@
 	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all, 3 past&attempted, 4 avail only
 
 	$colorval = array(0);
-	$colorlabel = array("No Color");
+	$colorlabel = array(_("No Color"));
 	for ($j=50;$j<90;$j+=($j<70?10:5)) {
 		for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
 			$colorval[] = "$j:$k";
-			$colorlabel[] = "red &lt; $j%, green &ge; $k%";
+			$colorlabel[] = sprintf(_('red < %d%%, green ≥ %d%%'), $j, $k);
 		}
 	}
 	$colorval[] = "-1:-1";
-	$colorlabel[] = "Active";
+	$colorlabel[] = _("Active");
 
 	$hideval = array(1,0,2);
 	$hidelabel = array(_("Hidden"),_("Expanded"),_("Collapsed"));
@@ -362,130 +362,130 @@
 ?>
 	<form id="theform" method=post action="gbsettings.php?cid=<?php echo $cid;?>" onsubmit="prepforsubmit()">
 
-	<span class=form id="calctotlbl">Calculate total using:</span>
+	<span class=form id="calctotlbl"><?php echo _('Calculate total using:'); ?></span>
 	<span class=formright role=group aria-labelledby=calctotlbl>
-		<input type=radio name=useweights value="0" id="usew0" <?php writeHtmlChecked($useweights,0);?> onclick="swapweighthdr(0)"/><label for="usew0">points earned / possible</label><br/>
-		<input type=radio name=useweights value="1" id="usew1" <?php writeHtmlChecked($useweights,1);?> onclick="swapweighthdr(1)"/><label for="usew1">category weights</label>
+		<input type=radio name=useweights value="0" id="usew0" <?php writeHtmlChecked($useweights,0);?> onclick="swapweighthdr(0)"/><label for="usew0"><?php echo _('points earned / possible'); ?></label><br/>
+		<input type=radio name=useweights value="1" id="usew1" <?php writeHtmlChecked($useweights,1);?> onclick="swapweighthdr(1)"/><label for="usew1"><?php echo _('category weights'); ?></label>
 	</span><br class=form />
 
-	<p><button type=button onclick="toggleadv(this);return false" aria-controls="viewfield" aria-expanded=false>Edit view settings</button></p>
-	<fieldset style="display:none;" id="viewfield"><legend>Default gradebook view:</legend>
+	<p><button type=button onclick="toggleadv(this);return false" aria-controls="viewfield" aria-expanded=false><?php echo _('Edit view settings'); ?></button></p>
+	<fieldset style="display:none;" id="viewfield"><legend><?php echo _('Default gradebook view:'); ?></legend>
 
-	<span class=form>Gradebook display:</span>
+	<span class=form><?php echo _('Gradebook display:'); ?></span>
 	<span class=formright>
 		<?php
 		$orderval = array(0,4,6,8,2,10,12);
-		$orderlabel = array('by end date, old to new', 'by end date, new to old', 'by start date, old to new', 'start date, new to old', 'alphabetically', 'by course page order, offline at end', 'by course page order reversed, offline at start');
-		echo '<label for=orderby>Order</label>: ';
+		$orderlabel = array(_('by end date, old to new'), _('by end date, new to old'), _('by start date, old to new'), _('start date, new to old'), _('alphabetically'), _('by course page order, offline at end'), _('by course page order reversed, offline at start'));
+		echo '<label for=orderby>' . _('Order') . '</label>: ';
 		writeHtmlSelect("orderby", $orderval, $orderlabel, $orderby&~1);
 		?>
 		<br/>
-		<input type="checkbox" name="grouporderby" value="1" id="grouporderby" <?php writeHtmlChecked($orderby&1,1);?>/><label for="grouporderby">Group by category first</label>
+		<input type="checkbox" name="grouporderby" value="1" id="grouporderby" <?php writeHtmlChecked($orderby&1,1);?>/><label for="grouporderby"><?php echo _('Group by category first'); ?></label>
 	</span><br class=form />
 
-	<label for="usersort" class=form>Default user order:</label>
+	<label for="usersort" class=form><?php echo _('Default user order:'); ?></label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1);
-		$orderlabel = array('Order by section (if used), then Last name','Order by Last name');
+		$orderlabel = array(_('Order by section (if used), then Last name'),_('Order by Last name'));
 		writeHtmlSelect("usersort", $orderval, $orderlabel, $usersort);
 		?>
 	</span><br class=form />
 
-	<label for="gbmode40000" class=form>Gradebook headers:</label>
+	<label for="gbmode40000" class=form><?php echo _('Gradebook headers:'); ?></label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode40000", array(0,1), array(_('Lock Headers'), _('Unlock Headers')), $headerlockeddef);
 		?>
 	</span><br class=form />
 
-	<label for="gbmode400000" class=form>Show scores as: </label>
+	<label for="gbmode400000" class=form><?php echo _('Show scores as:'); ?> </label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode400000", array(0,1), array(_('Points'), _('Percents')), $showpercents);
 		?>
 	</span><br class=form />
 	
-	<label for="gbmode100" class=form>Links show:</label>
+	<label for="gbmode100" class=form><?php echo _('Links show:'); ?></label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1);
         if ($courseUIver>1) {
-            $orderlabel = array('Full View/Edit','Summary');
+            $orderlabel = array(_('Full View/Edit'),_('Summary'));
         } else {
-            $orderlabel = array('Full View/Edit','Question Breakdown');
+            $orderlabel = array(_('Full View/Edit'),_('Question Breakdown'));
         }
 		writeHtmlSelect("gbmode100", $orderval, $orderlabel, $links);
 		?>
 	</span><br class=form />
 
-	<label for="gbmode1" class=form>Default show by availability: </label>
+	<label for="gbmode1" class=form><?php echo _('Default show by availability:'); ?> </label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,3,4,1,2);
-		$orderlabel = array('Past Due Items','Past &amp; Attempted Items','Available Items Only','Past &amp; Available Items','All Items');
+		$orderlabel = array(_('Past Due Items'),_('Past & Attempted Items'),_('Available Items Only'),_('Past & Available Items'),_('All Items'));
 		writeHtmlSelect("gbmode1", $orderval, $orderlabel, $availshow);
 		?>
 	</span><br class=form>
 
-	<label for="gbmode10" class=form>Not Counted (NC) items: </label>
+	<label for="gbmode10" class=form><?php echo _('Not Counted (NC) items:'); ?> </label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1,2);
-		$orderlabel = array('Show NC items','Show NC items not hidden from students','Hide NC items');
+		$orderlabel = array(_('Show NC items'),_('Show NC items not hidden from students'),_('Hide NC items'));
 		writeHtmlSelect("gbmode10", $orderval, $orderlabel, $hidenc);
 		?>
 	</span><br class=form>
 
-	<label for="gbmode200" class=form>Locked Students:</label>
+	<label for="gbmode200" class=form><?php echo _('Locked Students:'); ?></label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode200", array(0,2), array(_('Show'), _('Hide')), $hidelocked);
 		?>
 	</span><br class=form />
 
-	<label for="colorize" class=form>Default Colorization:</label>
+	<label for="colorize" class=form><?php echo _('Default Colorization:'); ?></label>
 	<span class=formright>
 	<?php writeHtmlSelect("colorize",$colorval,$colorlabel,$colorize); ?>
 	</span><br class=form />
 
-	<label for="gbmode1000" class=form>Totals columns show on:</label>
+	<label for="gbmode1000" class=form><?php echo _('Totals columns show on:'); ?></label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode1000", array(0,1), array(_('Right'), _('Left')), $totonleft);
 		?>
 	</span><br class=form />
 
-	<label for="gbmode1002" class=form>Average row shows on:</label>
+	<label for="gbmode1002" class=form><?php echo _('Average row shows on:'); ?></label>
 	<span class=formright>
 		<?php
 		writeHtmlSelect("gbmode1002", array(0,2), array(_('Bottom'), _('Top')), $avgontop);
 		?>
 	</span><br class=form />
 
-	<span class=form id="detlbl">Include details:</span>
+	<span class=form id="detlbl"><?php echo _('Include details:'); ?></span>
 	<span class=formright role=group aria-labelledby=detlbl>
-		<input type="checkbox" name="gbmode100000" value="1" id="secshow" <?php writeHtmlChecked($hidesection,false);?>/><label for="secshow">Section column (if used)</label><br/>
-		<input type="checkbox" name="gbmode200000" value="2" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow">Code column (if used)</label><br/>
-		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol">Last Login column</label><br/>
-			<span style="display:none;"><input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate">Due Date in column headers, and column in single-student view</label><br/>
-			<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg">Last Change column in single-student view</label><br/></span>
-		<input type="checkbox" name="gbmode1000000" value="1" id="shortenhdr" <?php writeHtmlChecked($shortenheaders,true);?>/><label for="shortenhdr">Try to shorten header names</label>
+		<input type="checkbox" name="gbmode100000" value="1" id="secshow" <?php writeHtmlChecked($hidesection,false);?>/><label for="secshow"><?php echo _('Section column (if used)'); ?></label><br/>
+		<input type="checkbox" name="gbmode200000" value="2" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow"><?php echo _('Code column (if used)'); ?></label><br/>
+		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol"><?php echo _('Last Login column'); ?></label><br/>
+			<span style="display:none;"><input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate"><?php echo _('Due Date in column headers, and column in single-student view'); ?></label><br/>
+			<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg"><?php echo _('Last Change column in single-student view'); ?></label><br/></span>
+		<input type="checkbox" name="gbmode1000000" value="1" id="shortenhdr" <?php writeHtmlChecked($shortenheaders,true);?>/><label for="shortenhdr"><?php echo _('Try to shorten header names'); ?></label>
 	
 	</span><br class=form />
 
-	<span class="form" id="totlbl">Totals to show students:</span>
+	<span class="form" id="totlbl"><?php echo _('Totals to show students:'); ?></span>
 	<span class=formright role=group aria-labelledby=totlbl>
-		<input type="checkbox" name="stugbmode1" value="1" id="totshow1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/><label for="totshow1">Past Due</label><br/>
-		<input type="checkbox" name="stugbmode2" value="2" id="totshow2" <?php writeHtmlChecked(($stugbmode)&2,2);?>/><label for="totshow2">Past Due and Attempted</label><br/>
-		<input type="checkbox" name="stugbmode4" value="4" id="totshow4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/><label for="totshow4">Past Due and Available</label><br/>
-		<input type="checkbox" name="stugbmode8" value="8" id="totshow8" <?php writeHtmlChecked(($stugbmode)&8,8);?>/><label for="totshow8">All (including future)</label><br/>
+		<input type="checkbox" name="stugbmode1" value="1" id="totshow1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/><label for="totshow1"><?php echo _('Past Due'); ?></label><br/>
+		<input type="checkbox" name="stugbmode2" value="2" id="totshow2" <?php writeHtmlChecked(($stugbmode)&2,2);?>/><label for="totshow2"><?php echo _('Past Due and Attempted'); ?></label><br/>
+		<input type="checkbox" name="stugbmode4" value="4" id="totshow4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/><label for="totshow4"><?php echo _('Past Due and Available'); ?></label><br/>
+		<input type="checkbox" name="stugbmode8" value="8" id="totshow8" <?php writeHtmlChecked(($stugbmode)&8,8);?>/><label for="totshow8"><?php echo _('All (including future)'); ?></label><br/>
 	</span><br class="form" />
 	</fieldset>
-	<fieldset><legend>Gradebook Categories</legend>
+	<fieldset><legend><?php echo _('Gradebook Categories'); ?></legend>
 <?php
 	$r = explode(',',$defaultcat);
-	$row['name'] = 'Default';
+	$row['name'] = _('Default');
 	$row['scale'] = $r[0];
 	$row['scaletype'] = $r[1];
 	$row['chop'] = $r[2];
@@ -499,21 +499,21 @@
 	}
 
 	echo "<table class=gb><thead>";
-	echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops &amp; Category total</th>";
+	echo "<tr><th>" . _('Category Name') . "</th><th>" . _('Display') . "<sup>*</sup></th><th>" . _('Scale (optional)') . "</th><th>" . _('Drops & Category total') . "</th>";
 	if ($useweights==0) {
 		echo '<th class=fixedtotcell>';
 	} else {
 		echo '<th class=fixedtotcell style="display:none">';
 	}
-	echo "Fixed Category Point Total (optional)<br/>Blank to use point sum";
+	echo _('Fixed Category Point Total (optional)') . '<br/>' . _('Blank to use point sum');
 	echo '</th>';
 	if ($useweights==0) {
 		echo '<th class=weightcell style="display:none">';
 	} else {
 		echo '<th class=weightcell>';
 	}
-	echo "Category Weight (%)";
-	echo '</th><th>Remove</th></tr></thead><tbody id="cattbody">';
+	echo _('Category Weight (%)');
+	echo '</th><th>' . _('Remove') . '</th></tr></thead><tbody id="cattbody">';
 
 	disprow(0,$row);
 	$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid");
@@ -525,15 +525,14 @@
 
 	echo "</tbody></table>";
 	//echo "<p><input type=submit name=addnew value=\"Add New Category\"/></p>";
-	echo '<p><input type="button" value="Add New Category" onclick="addcat()" /></p>';
+	echo '<p><input type="button" value="' . _('Add New Category') . '" onclick="addcat()" /></p>';
 	echo '</fieldset>';
 	echo '<div class="submit"><input type=submit name=submit value="'._('Save Changes').'"/></div>';
 	echo "</form>";
-	echo '<p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br/> ';
-	echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br/>';
-	echo 'When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>';
-	echo '<p class="small"><sup>*</sup>If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible ';
-	echo 'scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.</p>';
+	echo '<p class="small"><sup>*</sup>' . _('When a category is set to Expanded, both the category total and all items in the category are displayed.') . '<br/> ';
+	echo _('When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.') . '<br/>';
+	echo _('When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total.') . ' </p>';
+	echo '<p class="small"><sup>*</sup>' . _('If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.') . '</p>';
 
 	//echo "<p><a href=\"gbsettings.php?cid=$cid&addnew=1\">Add New Category</a></p>";
 
@@ -542,28 +541,28 @@
 		//name,scale,scaletype,chop,drop,weight
 		echo "<tr class=grid id=\"catrow$id\"><td>";
 		if ($id>0) {
-			echo "<input type=text name=\"name[$id]\" id=\"name$id\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\" aria-label=\"category name\"/>";
+			echo "<input type=text name=\"name[$id]\" id=\"name$id\" value=\"" . Sanitize::encodeStringForDisplay($row['name']) . "\" aria-label=\"" . _('category name') . "\"/>";
 		} else {
 			echo Sanitize::encodeStringForDisplay($row['name']);
 		}
 		"</td>";
 
 		echo '<td>';
-		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row['hidden'],null,null,'aria-label="category display"');
+		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row['hidden'],null,null,'aria-label="' . _('category display') . '"');
 		echo '</td>';
 
-		echo "<td>Scale <input type=text size=3 pattern=\"[0-9]*\" name=\"scale[$id]\" value=\"";
+		echo "<td>" . _('Scale') . " <input type=text size=3 pattern=\"[0-9]*\" name=\"scale[$id]\" value=\"";
 		if ($row['scale']>0) {
 			echo Sanitize::encodeStringForDisplay($row['scale']);
 		}
-		echo "\" aria-label=\"score to scale to perfect\"/> ";
-		writeHtmlSelect("st[$id]",[0,1],['points','percent'],$row['scaletype'],null,null,'aria-label="scale score type"');
-		echo "<br/>to perfect score<br/>";
+		echo "\" aria-label=\"" . _('score to scale to perfect') . "\"/> ";
+		writeHtmlSelect("st[$id]",[0,1],[_('points'),_('percent')],$row['scaletype'],null,null,'aria-label="' . _('scale score type') . '"');
+		echo "<br/>" . _('to perfect score') . "<br/>";
 		echo "<input type=checkbox name=\"chop[$id]\" value=1 ";
 		if ($row['chop']>0) {
 			echo "checked=1 ";
 		}
-		echo " aria-label=\"limit max score\"/> <label>no total over <input type=text size=3 pattern=\"[0-9]+\" required name=\"chopto[$id]\" value=\"";
+		echo " aria-label=\"" . _('limit max score') . "\"/> <label>" . _('no total over') . " <input type=text size=3 pattern=\"[0-9]+\" required name=\"chopto[$id]\" value=\"";
 		if ($row['chop']>0) {
 			echo round($row['chop']*100);
 		} else {
@@ -571,29 +570,29 @@
 		}
 		echo "\"/>%</label></td>";
 		echo "<td>";
-		echo '<label>Calc total: <select name="calctype['.$id.']" id="calctype'.$id.'" ';
+		echo '<label>' . _('Calc total:') . ' <select name="calctype['.$id.']" id="calctype'.$id.'" ';
 		echo '><option value="0" ';
 		if ($row['calctype']==0) {echo 'selected="selected"';}
-		echo '>point total</option><option value="1" ';
+		echo '>' . _('point total') . '</option><option value="1" ';
 		if ($row['calctype']==1) {echo 'selected="selected"';}
-		echo '>averaged percents</option></select></label><br/>';
+		echo '>' . _('averaged percents') . '</option></select></label><br/>';
 
 		echo "<label><input type=radio name=\"droptype[$id]\" value=0 ";
 		if ($row['dropn']==0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep All</label><br/>";
+		echo "/>" . _('Keep All') . "</label><br/>";
 		echo "<label><input type=radio name=\"droptype[$id]\" value=1 ";
 		if ($row['dropn']>0) {
 			echo "checked=1 ";
 		}
 		$absr4=abs($row['dropn']);
-		echo "/>Drop lowest</label> <label><input type=text size=2 pattern=\"[0-9]+\" required name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores</label><br/>";
+		echo "/>" . _('Drop lowest') . "</label> <label><input type=text size=2 pattern=\"[0-9]+\" required name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> " . _('scores') . "</label><br/>";
 		echo "<label><input type=radio name=\"droptype[$id]\" value=2 ";
 		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep highest</label> <label><input type=text size=2 pattern=\"[0-9]+\" required name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</label></td>";
+		echo "/>" . _('Keep highest') . "</label> <label><input type=text size=2 pattern=\"[0-9]+\" required name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> " . _('scores') . "</label></td>";
 		if ($useweights==0) {
 			echo '<td class=fixedtotcell>';
 		} else {
@@ -603,7 +602,7 @@
 		if ($useweights==0 && $row['weight']>-1) {
 			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
-		echo '" aria-label="category fixed total"/></td>';
+		echo '" aria-label="' . _('category fixed total') . '"/></td>';
 		if ($useweights==1) {
 			echo '<td class=weightcell>';
 		} else {
@@ -613,9 +612,9 @@
 		if ($useweights==1 && $row['weight']>-1) {
 			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
-		echo "\" aria-label=\"category weighted total\"/></td>";
+		echo "\" aria-label=\"" . _('category weighted total') . "\"/></td>";
 		if ($id!=0) {
-			echo "<td><a href=\"#\" onclick=\"removeexistcat($id);return false;\" id=\"r$id\" aria-labelledby=\"r$id name$id\">Remove</a></td></tr>";
+			echo "<td><a href=\"#\" onclick=\"removeexistcat($id);return false;\" id=\"r$id\" aria-labelledby=\"r$id name$id\">" . _('Remove') . "</a></td></tr>";
 		} else {
 			echo "<td></td></tr>";
 		}
