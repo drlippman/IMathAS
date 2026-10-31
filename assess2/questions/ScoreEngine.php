@@ -195,6 +195,7 @@ class ScoreEngine
             foreach ($defaults as $kidx => $atIdx) {
                 if (!in_array($kidx, self::VARS_FOR_SCOREPART_EVALS)) { continue; }
                 if ($quesData['qtype'] == "multipart" && is_array($anstypes)) {
+                    if (isset(${$kidx}) && !is_array(${$kidx})) { continue; } // scalar applies to all parts
                     for ($_pnidx=0; $_pnidx < count($anstypes); $_pnidx++) {
                         if (!isset(${$kidx}[$_pnidx]) && 
                             ($anstypes[$_pnidx] !== 'draw' || ($kidx !== 'abstolerance' && $kidx !== 'reltolerance'))

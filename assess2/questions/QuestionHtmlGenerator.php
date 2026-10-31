@@ -401,6 +401,7 @@ class QuestionHtmlGenerator
             foreach ($defaults as $kidx => $atIdx) {
                 if (!in_array($kidx, self::ALLOWED_QUESTION_WRITER_VARS)) { continue; }
                 if ($quesData['qtype'] == "multipart" && is_array($anstypes)) {
+                    if (isset(${$kidx}) && !is_array(${$kidx})) { continue; } // scalar applies to all parts
                     for ($_pnidx=0; $_pnidx < count($anstypes); $_pnidx++) {
                         if (!isset(${$kidx}[$_pnidx])) {
                             ${$kidx}[$_pnidx] = $atIdx;
