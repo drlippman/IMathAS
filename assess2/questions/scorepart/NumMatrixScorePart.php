@@ -105,7 +105,7 @@ class NumMatrixScorePart implements ScorePart
     
             //this may not be backwards compatible
             $scorePartResult->setLastAnswerAsGiven($givenans);
-            if ($givenanslist === false) { // invalid answer
+            if ($givenanslist === false || $givenans === '') { // invalid answer or empty
                 $scorePartResult->setRawScore(0);
                 return $scorePartResult;
             }
