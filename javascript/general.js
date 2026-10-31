@@ -100,14 +100,16 @@ function tipshow(el,tip, e) {
 	}
 
     x += scrOfX;
-	if ((p[0] + tipobj.offsetWidth)>x-10) {
+	if ((p[0] + 15 + tipobj.offsetWidth)>x-10) {
 		p[0] = x - tipobj.offsetWidth - 30;
 		$(tipobj).addClass("tipright");
 	} else {
 		$(tipobj).removeClass("tipright");
 	}
+	tipobj.style.left = Math.max(5, p[0]+15) + "px";
+	// measure height only after final horizontal placement, since the
+	// available width (and so line wrapping) depends on left position
 	var tiptop = p[1] - tipobj.offsetHeight;
-	tipobj.style.left = (p[0]+15) + "px";
 	var scrY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
 	if (tiptop - scrY < 5) { // not enough room above in the visible viewport
 		tipobj.style.top = (p[1]+20) + "px";
