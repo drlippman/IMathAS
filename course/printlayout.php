@@ -50,6 +50,9 @@ if ($overwriteBody==1) {
 	} else if (isset ($_POST['pw'])) {
 		$ph = Sanitize::onlyFloat($_POST['ph']);
 		$pw = Sanitize::onlyFloat($_POST['pw']);
+	} else {
+		echo 'Invalid data';
+		exit;
 	}
 	$isfinal = isset($_GET['final']);
 	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id AND courseid=:cid");
