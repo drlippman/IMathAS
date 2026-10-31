@@ -6075,7 +6075,8 @@ $answerboxsize = 3
 		If you want to change the default value for most parts but have a different value for some, set
 		<code>$defaults['variable'] = value</code>, like <code>$defaults['answerboxsize'] = 5</code>,
 		and that will change the default value for that variable, and you can still override that 
-		default for specific parts, like <code>$answerboxsize[2]=3</code>.  Be aware that using
+		default for specific parts, like <code>$answerboxsize[2]=3</code>.  Do not use $defaults for 
+		$anstypes. Be aware that using
 		$defaults will generally apply the variable for ALL parts, which may cause some unexpected behavior. 
 		Note that defaults for abstolerance or reltolerance will not be applied to Drawing question parts, since 
 		those variables have special meaning in that context.</dd>
