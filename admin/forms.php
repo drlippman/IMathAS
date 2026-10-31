@@ -723,6 +723,11 @@ switch($_GET['action']) {
 						exit;
 					}
 					//check permissions
+					if ($ctcinfo['copyrights']<0 && $ctcinfo['ownerid'] != $userid) {
+						echo '<p>',_('This course is not available for copying'),'. <a href="addcourse.php">'._('Try again').'</a></p>';
+						require_once "../footer.php";
+						exit;
+					}
 					if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $userid) ||
 						($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
 						if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ekey']) {

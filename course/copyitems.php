@@ -45,6 +45,11 @@ if (!(isset($teacherid))) {
 			list($ekey, $copyrights, $termsurl) = $stm->fetch(PDO::FETCH_NUM);
 			if ($copyrights<2) {
 				$oktocopy = 0;
+				if ($copyrights<0) {
+					// copying by others not allowed
+					$overwriteBody = 1;
+					$body = _("This course is not available for copying.")."  <a href=\"copyitems.php?cid=$cid\">"._("Try Again")."</a>";
+				}
 				if ($copyrights==1) {
 					$query = "SELECT imas_users.groupid FROM imas_courses,imas_users,imas_teachers WHERE imas_courses.id=imas_teachers.courseid ";
 					$query .= "AND imas_teachers.userid=imas_users.id AND imas_courses.id=:id";
@@ -57,8 +62,8 @@ if (!(isset($teacherid))) {
 						}
 					}
 				}
-				if ($oktocopy==0) {
-					if (!isset($_POST['ekey']) || strtolower(trim($ekey)) != strtolower(trim($_POST['ekey']))) {
+				if ($oktocopy==0 && $copyrights>=0) {
+					if (trim($ekey)=='' || !isset($_POST['ekey']) || strtolower(trim($ekey)) != strtolower(trim($_POST['ekey']))) {
 						$overwriteBody = 1;
 						$body = _("Invalid enrollment key entered.")."  <a href=\"copyitems.php?cid=$cid\">"._("Try Again")."</a>";
 					} else {

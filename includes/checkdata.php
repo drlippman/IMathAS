@@ -40,3 +40,19 @@ function check_user_in_course($uid, $course) {
     $stm->execute([$uid,$course,$uid,$course,$uid,$course]);
     return ($stm->fetchColumn(0) !== false);
 }
+
+
+/*
+ * For tutors limited to a section, checks that $uid is a student in that section.
+ * Always true for anyone who is not a section-limited tutor.
+ */
+function tutor_can_access_user($uid, $course) {
+    global $DBH, $tutorid, $tutorsection;
+    if (!isset($tutorid) || !isset($tutorsection) || $tutorsection === '') {
+        return true;
+    }
+    $stm = $DBH->prepare("SELECT section FROM imas_students WHERE userid=? AND courseid=?");
+    $stm->execute([$uid, $course]);
+    $sec = $stm->fetchColumn(0);
+    return ($sec !== false && strtolower(trim((string) $sec)) === strtolower($tutorsection));
+}

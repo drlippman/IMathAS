@@ -25,6 +25,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$asid = 'new';
 	} else {
 		$asid = Sanitize::onlyInt($_GET['asid']);
+		require_once "../includes/checkdata.php";
 		$stm = $DBH->prepare("SELECT ias.userid,ia.courseid 
 			FROM imas_assessment_sessions AS ias
 			JOIN imas_assessments AS ia ON ia.id=ias.assessmentid
@@ -33,7 +34,8 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 		$testdata = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($testdata === false ||
 			(isset($studentid) && $testdata['userid'] != $userid) ||
-			(!isset($studentid) && $testdata['courseid'] != $cid)
+			(!isset($studentid) && $testdata['courseid'] != $cid) ||
+			(isset($tutorid) && !tutor_can_access_user($testdata['userid'], $cid))
 		) {
 			echo 'Invalid asid';
 			exit;
@@ -85,8 +87,8 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	if ($asid=="new" && $isteacher) {
 		$aid = Sanitize::onlyInt($_GET['aid']);
 		//student could have started, so better check to make sure it still doesn't exist
-		$stm = $DBH->prepare("SELECT id FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid ORDER BY id");
-		$stm->execute(array(':userid'=>$get_uid, ':assessmentid'=>$aid));
+		$stm = $DBH->prepare("SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid WHERE ias.userid=:userid AND ias.assessmentid=:assessmentid AND ia.courseid=:courseid ORDER BY ias.id");
+		$stm->execute(array(':userid'=>$get_uid, ':assessmentid'=>$aid, ':courseid'=>$cid));
 		$asid = $stm->fetchColumn(0);
 		if ($asid !== false) {
 		} else {
@@ -154,7 +156,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 			}
 		}
 		header('Location: ' . $GLOBALS['basesiteurl'] ."/course/gb-viewasid.php?stu=$stu&asid=$asid&from=$from&cid=$cid&uid=$get_uid");
-
+		exit;
 	}
 	//PROCESS ANY TODOS
 	if (isset($_REQUEST['clearattempt']) && $isteacher) {

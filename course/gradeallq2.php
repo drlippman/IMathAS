@@ -176,7 +176,9 @@
 		$updatedata = array();
 		$changesToLog = array();
 
+		require_once "../includes/checkdata.php";
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+			if (isset($tutorid) && !tutor_can_access_user($line['userid'], $cid)) { continue; }
 
 			$GLOBALS['assessver'] = $line['ver'];
 

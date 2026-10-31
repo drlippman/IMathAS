@@ -7,6 +7,11 @@
 
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	$cid = Sanitize::courseId($_GET['cid']);
+
+	if (!isset($teacherid)) {
+		echo _('No access');
+		exit;
+	}
     if (!empty($_GET['from']) && $_GET['from'] == 'addq2') {
         $addq = 'addquestions2';
         $from = 'addq2';

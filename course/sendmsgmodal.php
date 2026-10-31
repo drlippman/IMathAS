@@ -28,6 +28,36 @@ if (isset($_POST['message'])) {
 	}
 	$sendlist = array(array('to'=>$_POST['sendto'], 'sendtype'=>$_POST['sendtype'], 'checkcourse'=>true));
 
+	if (!isset($teacherid) && !isset($tutorid)) {
+		// students: messages only (no email), and only to recipients allowed by the course message settings
+		$stuTo = Sanitize::onlyInt($_POST['sendto']);
+		$allowed = false;
+		if ($_POST['sendtype'] === 'msg') {
+			$stm = $DBH->prepare("SELECT msgset FROM imas_courses WHERE id=?");
+			$stm->execute([$cid]);
+			$msgset = $stm->fetchColumn(0) % 5;
+			$stm = $DBH->prepare("SELECT COUNT(userid) FROM (SELECT userid FROM imas_teachers WHERE courseid=? AND userid=? UNION ALL SELECT userid FROM imas_tutors WHERE courseid=? AND userid=?) AS t");
+			$stm->execute([$cid, $stuTo, $cid, $stuTo]);
+			$toStaff = ($stm->fetchColumn(0) > 0);
+			$stm = $DBH->prepare("SELECT COUNT(userid) FROM imas_students WHERE courseid=? AND userid=?");
+			$stm->execute([$cid, $stuTo]);
+			$toStudent = ($stm->fetchColumn(0) > 0);
+			if (isset($_POST['iserrreport'])) {
+				$allowed = false;
+			} else if ($msgset == 0) {
+				$allowed = $toStaff || $toStudent;
+			} else if ($msgset == 1) {
+				$allowed = $toStaff;
+			} else if ($msgset == 2) {
+				$allowed = $toStudent;
+			}
+		}
+		if (!$allowed) {
+			echo _('You are not permitted to send a message to that user in this course.');
+			exit;
+		}
+	}
+
 	//if it's an error report, and we've said we want a copy elsewhere, add that to the send list
 	if (isset($_POST['iserrreport']) && isset($CFG['GEN']['qerrorsendto']) && !empty($CFG['GEN']['qerrorsendto'][3])) {
 		$sendlist[] = array('to'=>$CFG['GEN']['qerrorsendto'][0], 'sendtype'=>$CFG['GEN']['qerrorsendto'][1], 'checkcourse'=>false);

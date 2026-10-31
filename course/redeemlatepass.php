@@ -38,8 +38,8 @@
 			echo ' <a href="gradebook.php?cid='.$cid.'">'._('Gradebook').'</a> &gt; ';
 		}
 		echo "Un-use LatePass</div>";
-		$stm = $DBH->prepare("SELECT enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
+		$stm = $DBH->prepare("SELECT enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A' AND assessmentid IN (SELECT id FROM imas_assessments WHERE id=:aid2 AND courseid=:cid)");
+		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid, ':aid2'=>$aid, ':cid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($row === false) {
 			echo '<p>Invalid</p>';

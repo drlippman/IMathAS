@@ -885,7 +885,9 @@ switch($_POST['action']) {
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':id'=>intval($_POST['usetemplate'])));
 				$ctcinfo = $stm->fetch(PDO::FETCH_ASSOC);
-				if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $courseownerid) ||
+				if ($ctcinfo['copyrights']<0 && $ctcinfo['ownerid'] != $courseownerid) {
+					$_POST['usetemplate'] = 0; //copying not allowed
+				} else if (($ctcinfo['copyrights']==0 && $ctcinfo['ownerid'] != $courseownerid) ||
 					($ctcinfo['copyrights']==1 && $ctcinfo['groupid']!=$groupid)) {
 					if ($ctcinfo['enrollkey'] != '' && $ctcinfo['enrollkey'] != $_POST['ctcekey']) {
 						//did not provide valid enrollment key

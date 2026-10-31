@@ -43,6 +43,11 @@ if ($istutor) {
     echo '{"error": "no_access"}';
     exit;
   }
+  require_once '../includes/checkdata.php';
+  if (!tutor_can_access_user($uid, $cid)) {
+    echo '{"error": "no_access"}';
+    exit;
+  }
 }
 if ($practicever) {
   $assess_info->overridePracticeSettings();

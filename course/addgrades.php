@@ -133,6 +133,22 @@
 		}
 		$tutoredit = intval($_POST['tutoredit']);
 		$rubric = intval($_POST['rubric']);
+		if ($rubric != 0) {
+			// must be a rubric available to this course (same list as the rubric selector)
+			$stm = $DBH->prepare("SELECT id FROM imas_rubrics WHERE id=:id AND (ownerid IN (SELECT userid FROM imas_teachers WHERE courseid=:cid) OR groupid=:groupid)");
+			$stm->execute(array(':id'=>$rubric, ':cid'=>$cid, ':groupid'=>$groupid));
+			if ($stm->fetchColumn(0) === false) {
+				$rubric = 0;
+			}
+		}
+		$post_gbcat = intval($_POST['gbcat']);
+		if ($post_gbcat > 0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_gbcats WHERE id=:id AND courseid=:cid");
+			$stm->execute(array(':id'=>$post_gbcat, ':cid'=>$cid));
+			if ($stm->fetchColumn(0) === false) {
+				$post_gbcat = 0;
+			}
+		}
 		$outcomes = array();
 		if (isset($_POST['outcomes'])) {
 			foreach ($_POST['outcomes'] as $o) {
@@ -148,14 +164,14 @@
 			$query .= "(:courseid, :name, :points, :showdate, :gbcategory, :cntingb, :tutoredit, :rubric, :outcomes) ";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':points'=>$post_points, ':showdate'=>$showdate,
-				':gbcategory'=>$_POST['gbcat'], ':cntingb'=>$_POST['cntingb'], ':tutoredit'=>$tutoredit, ':rubric'=>$rubric, ':outcomes'=>$outcomes));
+				':gbcategory'=>$post_gbcat, ':cntingb'=>$_POST['cntingb'], ':tutoredit'=>$tutoredit, ':rubric'=>$rubric, ':outcomes'=>$outcomes));
 			$gbItem = $DBH->lastInsertId();
 			$isnewitem = true;
 		} else {
 			$query = "UPDATE imas_gbitems SET name=:name,points=:points,showdate=:showdate,gbcategory=:gbcategory,cntingb=:cntingb,";
 			$query .= "tutoredit=:tutoredit,rubric=:rubric,outcomes=:outcomes WHERE id=:id";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':name'=>$_POST['name'], ':points'=>$post_points, ':showdate'=>$showdate, ':gbcategory'=>$_POST['gbcat'],
+			$stm->execute(array(':name'=>$_POST['name'], ':points'=>$post_points, ':showdate'=>$showdate, ':gbcategory'=>$post_gbcat,
 				':cntingb'=>$_POST['cntingb'], ':tutoredit'=>$tutoredit, ':rubric'=>$rubric, ':outcomes'=>$outcomes, ':id'=>$gbItem));
 			$isnewitem = false;
 		}
@@ -271,6 +287,12 @@
 		$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=?");
 		$stm->execute([$cid]);
 		$allstusincourse = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+		if (isset($tutorsection) && $tutorsection !== '') {
+			// section-limited tutors can only grade students in their section
+			$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE courseid=? AND section=?");
+			$stm->execute([$cid, $tutorsection]);
+			$allstusincourse = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+		}
 
 		$submittedexcusals = array();
 		$submittedstu = array();

@@ -28,7 +28,7 @@ if (php_sapi_name() == "cli") {
 } else if (!isset($CFG['LTI']['authcode'])) {
 	echo 'You need to set $CFG[\'LTI\'][\'authcode\'] in config.php';
 	exit;
-} else if (!isset($_GET['authcode']) || $CFG['LTI']['authcode']!=$_GET['authcode']) {
+} else if (!isset($_GET['authcode']) || !hash_equals((string) $CFG['LTI']['authcode'], (string) $_GET['authcode'])) {
 	echo 'No authcode or invalid authcode provided';
 	exit;
 }
