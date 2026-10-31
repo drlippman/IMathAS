@@ -100,7 +100,8 @@
 				$weight = $_POST['fixedtot'][$id];
 			}
 			$calctype = intval($_POST['calctype'][$id]);
-			if (trim($weight)=='') {
+			$weight = preg_replace('/[^\d.\-]/', '', $weight); // strip non-numeric chars
+			if (trim($weight)=='' || !is_numeric($weight)) {
 				if ($useweights==0) {
 					$weight = -1;
 				} else {
@@ -213,11 +214,11 @@
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
-		td.innerHTML = \'Scale <input size="3" name="scale[new\'+addrowcnt+\']" value="" type="text" aria-label="score to scale to perfect"> \' +
+		td.innerHTML = \'Scale <input size="3" name="scale[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="score to scale to perfect"> \' +
 		   \'<select name="st[new\'+addrowcnt+\']" aria-label="scale score type"><option value="0" selected>points</option>\' +
 		   \'<option value="1">percent</option></select><br/>\' +
 		   \'to perfect score<br/><input name="chop[new\'+addrowcnt+\']" value="1" checked="1" type="checkbox" aria-label="limit max score"> \' +
-		   \'<label>no total over <input size="3" name="chopto[new\'+addrowcnt+\']" value="100" type="text">%</label>\';
+		   \'<label>no total over <input size="3" name="chopto[new\'+addrowcnt+\']" value="100" type="text" pattern="[0-9]+" required>%</label>\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
@@ -226,9 +227,9 @@
 			\'<option value="1">averaged percents</option></select></label><br/>\' +
 			\'<label><input name="droptype[new\'+addrowcnt+\']" value="0" checked="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',0)">Keep All</label><br/>\' +
 			\'<label><input name="droptype[new\'+addrowcnt+\']" value="1" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Drop lowest</label> \' +
-			\'<label><input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text"> scores</label><br/> \' +
+			\'<label><input size="2" name="dropl[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> scores</label><br/> \' +
 			\'<label><input name="droptype[new\'+addrowcnt+\']" value="2" type="radio" onclick="calctypechange(\\\'new\'+addrowcnt+\'\\\',1)">Keep highest</label> \' +
-			\'<label><input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text"> scores</label>\';
+			\'<label><input size="2" name="droph[new\'+addrowcnt+\']" value="0" type="text" pattern="[0-9]+" required> scores</label>\';
 		tr.appendChild(td);
 
         var td = document.createElement("td");
@@ -236,7 +237,7 @@
         if (useweights) {
             td.style.display = "none";
         }
-		td.innerHTML = \'<input size="3" name="fixedtot[new\'+addrowcnt+\']" value="" type="text" aria-label="category fixed total">\';
+		td.innerHTML = \'<input size="3" name="fixedtot[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="category fixed total">\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
@@ -244,7 +245,7 @@
         if (!useweights) {
             td.style.display = "none";
         }
-		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text" aria-label="category weighted total">\';
+		td.innerHTML = \'<input size="3" name="weight[new\'+addrowcnt+\']" value="" type="text" pattern="[0-9]*" aria-label="category weighted total">\';
 		tr.appendChild(td);
 
 		var td = document.createElement("td");
@@ -551,7 +552,7 @@
 		writeHtmlSelect("hide[$id]",$hideval,$hidelabel,$row['hidden'],null,null,'aria-label="category display"');
 		echo '</td>';
 
-		echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
+		echo "<td>Scale <input type=text size=3 pattern=\"[0-9]*\" name=\"scale[$id]\" value=\"";
 		if ($row['scale']>0) {
 			echo Sanitize::encodeStringForDisplay($row['scale']);
 		}
@@ -562,7 +563,7 @@
 		if ($row['chop']>0) {
 			echo "checked=1 ";
 		}
-		echo " aria-label=\"limit max score\"/> <label>no total over <input type=text size=3 name=\"chopto[$id]\" value=\"";
+		echo " aria-label=\"limit max score\"/> <label>no total over <input type=text size=3 pattern=\"[0-9]+\" required name=\"chopto[$id]\" value=\"";
 		if ($row['chop']>0) {
 			echo round($row['chop']*100);
 		} else {
@@ -587,18 +588,18 @@
 			echo "checked=1 ";
 		}
 		$absr4=abs($row['dropn']);
-		echo "/>Drop lowest</label> <label><input type=text size=2 name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores</label><br/>";
+		echo "/>Drop lowest</label> <label><input type=text size=2 pattern=\"[0-9]+\" required name=\"dropl[$id]\" value=\"".Sanitize::encodeStringForDisplay($absr4)."\"/> scores</label><br/>";
 		echo "<label><input type=radio name=\"droptype[$id]\" value=2 ";
 		if ($row['dropn']<0) {
 			echo "checked=1 ";
 		}
-		echo "/>Keep highest</label> <label><input type=text size=2 name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</label></td>";
+		echo "/>Keep highest</label> <label><input type=text size=2 pattern=\"[0-9]+\" required name=\"droph[$id]\" value=\"" . Sanitize::encodeStringForDisplay($absr4) . "\"/> scores</label></td>";
 		if ($useweights==0) {
 			echo '<td class=fixedtotcell>';
 		} else {
 			echo '<td class=fixedtotcell style="display:none">';
 		}
-		echo "<input type=text size=3 name=\"fixedtot[$id]\" value=\"";
+		echo "<input type=text size=3 pattern=\"[0-9]*\" name=\"fixedtot[$id]\" value=\"";
 		if ($useweights==0 && $row['weight']>-1) {
 			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}
@@ -608,7 +609,7 @@
 		} else {
 			echo '<td class=weightcell style="display:none">';
 		}
-		echo "<input type=text size=3 name=\"weight[$id]\" value=\"";
+		echo "<input type=text size=3 pattern=\"[0-9]*\" name=\"weight[$id]\" value=\"";
 		if ($useweights==1 && $row['weight']>-1) {
 			echo Sanitize::encodeStringForDisplay($row['weight']);
 		}

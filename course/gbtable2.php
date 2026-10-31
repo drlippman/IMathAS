@@ -617,6 +617,9 @@ function gbtable() {
 	//Pull Categories:  Name, scale, scaletype, chop, drop, weight, hidden, calctype
 	if (in_array(0,$category)) {  //define default category, if used
 		$cats[0] = explode(',',$defaultcat);
+		if (!isset($cats[0][4]) || !is_numeric($cats[0][4])) { // guard against bad weight
+			$cats[0][4] = ($useweights==0) ? -1 : 0;
+		}
 		if (!isset($cats[0][6])) {
 			$cats[0][6] = ($cats[0][3]==0)?0:1;
 		}
