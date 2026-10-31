@@ -104,7 +104,7 @@ if ($myrights<20) {
 	} else {
 		$onlychk = 0;
 	}
-  	$qsetid = Sanitize::onlyInt($_GET['qsetid']);
+  	$qsetid = Sanitize::onlyInt($_GET['qsetid'] ?? 0);
 	if (empty($qsetid)) {
 		echo 'Missing qsetid';
 		exit;
