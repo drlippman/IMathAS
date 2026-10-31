@@ -363,8 +363,10 @@ class ScoreEngine
             // only log if hasn't been edited in a few hours
             $errortolog = implode('; ', $this->errors);
             
+            // only log if the question is not deleted
             $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error, ownerid)
-                VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
+                SELECT ?,?,?,?,?,? FROM imas_questionset WHERE id=? AND deleted=0
+                ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
             $stm = $this->dbh->prepare($query);
             $stm->execute([
                 $scoreQuestionParams->getDbQuestionSetId(),
@@ -372,7 +374,8 @@ class ScoreEngine
                 time(),
                 md5($errortolog),
                 $errortolog,
-                $quesData['ownerid']
+                $quesData['ownerid'],
+                $scoreQuestionParams->getDbQuestionSetId()
             ]);
             
         }

@@ -108,8 +108,10 @@ class QuestionGenerator
             
             $qdata = $this->questionParams->getQuestionData();
 
+            // only log if the question is not deleted
             $query = 'INSERT INTO imas_questionerrorlog (qsetid, seed, etime, ehash, error, ownerid)
-                VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
+                SELECT ?,?,?,?,?,? FROM imas_questionset WHERE id=? AND deleted=0
+                ON DUPLICATE KEY UPDATE etime=VALUES(etime)';
             $stm = $this->dbh->prepare($query);
             $stm->execute([
                 $this->questionParams->getDbQuestionSetId(),
@@ -117,7 +119,8 @@ class QuestionGenerator
                 time(),
                 md5($errortolog),
                 $errortolog,
-                $qdata['ownerid']
+                $qdata['ownerid'],
+                $this->questionParams->getDbQuestionSetId()
             ]);
         }
 
