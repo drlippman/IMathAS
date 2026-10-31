@@ -35,6 +35,13 @@
 	$isreview = false;
 	if (isset($teacherid) && isset($_GET['actas'])) {
 		$userid = Sanitize::onlyInt($_GET['actas']);
+		// make sure the user being acted as is a student in this course
+		$stm = $DBH->prepare("SELECT 1 FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+		if ($stm->fetchColumn() === false) {
+			echo "<html><body>", _('Error. Invalid user for this course.'), "</body></html>";
+			exit;
+		}
 		unset($teacherid);
 		$actas = true;
 	}
@@ -67,6 +74,10 @@
 		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,LPcutoff,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod,id,reqscorejson FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$adata = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($adata === false || $adata['courseid'] != $cid) {
+			echo "<html><body>", _('Error. Assessment not found in this course.'), "</body></html>";
+			exit;
+		}
 		$now = time();
 		$assessmentclosed = false;
 		if ($adata['enddate']==2000000000 && $courseenddate<2000000000) {
@@ -1302,18 +1313,31 @@ if (!isset($_REQUEST['embedpostback']) && empty($_POST['backgroundsaveforlater']
 			$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);
 			$loginfo = "$userfullname creating group. ";
 			require_once "../includes/password.php";
-			
+
+			// users who may be added: students in the course not already in a group in this groupset
+			$stm = $DBH->prepare('SELECT i_sgm.userid FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid WHERE i_sg.groupsetid=:groupsetid');
+			$stm->execute(array(':groupsetid'=>$testsettings['groupsetid']));
+			$curingrp = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+			$stm = $DBH->prepare('SELECT userid FROM imas_students WHERE courseid=:courseid');
+			$stm->execute(array(':courseid'=>$testsettings['courseid']));
+			$eligible = array_diff($stm->fetchAll(PDO::FETCH_COLUMN, 0), $curingrp);
+			$addedusers = array();
+
 			for ($i=1;$i<$testsettings['groupmax'];$i++) {
 				if (isset($_POST['user'.$i]) && $_POST['user'.$i]!=0) {
+					$_POST['user'.$i] = Sanitize::onlyInt($_POST['user'.$i]);
+					if (!in_array($_POST['user'.$i], $eligible) || in_array($_POST['user'.$i], $addedusers)) {
+						continue;
+					}
+					$addedusers[] = $_POST['user'.$i];
 					$stm = $DBH->prepare("SELECT password,LastName,FirstName FROM imas_users WHERE id=:id");
 					$stm->execute(array(':id'=>$_POST['user'.$i]));
 					$thisuser = $stm->fetch(PDO::FETCH_ASSOC);
 					$thisusername = $thisuser['FirstName'] . ' ' . $thisuser['LastName'];
 					if ($testsettings['isgroup']==1) {
 						$actualpw = $thisuser['password'];
-						if (password_verify($_POST['pw'.$i],$actualpw)) {
+						if (!password_verify($_POST['pw'.$i] ?? '',$actualpw)) {
 							echo "<p>" . Sanitize::encodeStringForDisplay($thisusername) . ": ", _('password incorrect'), "</p>";
-							$errcnt++;
 							continue;
 						}
 					}

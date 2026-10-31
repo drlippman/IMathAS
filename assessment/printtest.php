@@ -66,6 +66,32 @@
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($line === false) {
+		echo "<html><body>Error. Invalid assessment session.</body></html>\n";
+		exit;
+	}
+	$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$line['assessmentid']));
+	$testsettings = $stm->fetch(PDO::FETCH_ASSOC);
+	if ($testsettings === false) {
+		echo "<html><body>Error. Invalid assessment.</body></html>\n";
+		exit;
+	}
+	if ($isteacher && isset($_GET['asid'])) {
+		// teacher must be a teacher of the course the assessment belongs to
+		// cid may not be in the query string; fall back to session courseid
+		if (isset($teacherid) && !empty($cid)) {
+			$teachercid = $cid;
+		} else if (!empty($_SESSION['isteacher']) && !empty($_SESSION['courseid'])) {
+			$teachercid = $_SESSION['courseid'];
+		} else {
+			$teachercid = 0;
+		}
+		if ($teachercid == 0 || $testsettings['courseid'] != $teachercid) {
+			echo "<html><body>Error. Not authorized to view this assessment.</body></html>\n";
+			exit;
+		}
+	}
 
 	if (extension_loaded('newrelic')) { // Ensure PHP agent is available
 		// Record custom data about this web transaction
@@ -110,9 +136,6 @@
 		}
 		$userid= $line['userid'];
 	}
-	$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
-	$stm->execute(array(':id'=>$line['assessmentid']));
-	$testsettings = $stm->fetch(PDO::FETCH_ASSOC);
 	list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 
 	$now = time();
