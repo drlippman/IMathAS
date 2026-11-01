@@ -174,7 +174,7 @@ $include_from_assess_info = array(
   'scoresingb', 'viewingb', 'latepass_status', 'help_features', 'attemptext',
   'displaymethod', 'drillsettings'
 );
-if ($_REQUEST['loadtexts'] == 1) {
+if (!empty($_REQUEST['loadtexts'])) {
     $include_from_assess_info[] = 'intro';
     $include_from_assess_info[] = 'interquestion_text';
     $include_from_assess_info[] = 'resources';
