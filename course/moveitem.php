@@ -33,9 +33,17 @@ if (isset($_POST['newblock'])) {
 	$blocktree = explode('-',$curblock);
 	$sub =& $items;
 	for ($i=1;$i<count($blocktree)-1;$i++) {
+		if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+			echo 'Block not found; please reload and try again';
+			exit;
+		}
 		$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	}
 	if (count($blocktree)>1) {
+		if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+			echo 'Block not found; please reload and try again';
+			exit;
+		}
 		$curblockitems =& $sub[$blocktree[$i]-1]['items'];
 	} else {
 		$curblockitems =& $sub;
@@ -44,9 +52,17 @@ if (isset($_POST['newblock'])) {
 	$blocktree = explode('-',$_POST['newblock']);
 	$sub =& $items;
 	for ($i=1;$i<count($blocktree)-1;$i++) {
+		if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+			echo 'Block not found; please reload and try again';
+			exit;
+		}
 		$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	}
 	if (count($blocktree)>1) {
+		if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+			echo 'Block not found; please reload and try again';
+			exit;
+		}
 		$newblockitems =& $sub[$blocktree[$i]-1]['items'];
 	} else {
 		$newblockitems =& $sub;

@@ -262,18 +262,55 @@ function removeItemFromItemorder($cid,$itemid,$block) {
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
 	$items = unserialize($stm->fetchColumn(0));
+	if (!is_array($items)) {
+		return;
+	}
 
+	$found = false;
+	// try the expected location first
 	$blocktree = explode('-',$block);
 	$sub =& $items;
+	$validpath = true;
 	for ($i=1;$i<count($blocktree);$i++) {
+		if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+			$validpath = false;
+			break;
+		}
 		$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 	}
-	$key = array_search($itemid,$sub);
-	if ($key!==false) {
-		array_splice($sub,$key,1);
+	if ($validpath) {
+		$key = array_search($itemid,$sub);
+		if ($key!==false) {
+			array_splice($sub,$key,1);
+			$found = true;
+		}
+	}
+	unset($sub);
+
+	// item may have moved since the page was loaded; search the whole tree
+	if (!$found) {
+		$found = removeItemFromItemorderRecurse($items,$itemid);
+	}
+	if ($found) {
 		$itemorder = serialize($items);
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
 		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 	}
+}
+
+function removeItemFromItemorderRecurse(&$arr,$itemid) {
+	foreach ($arr as $k=>$v) {
+		if (is_array($v)) {
+			if (isset($arr[$k]['items']) && is_array($arr[$k]['items']) &&
+				removeItemFromItemorderRecurse($arr[$k]['items'],$itemid)
+			) {
+				return true;
+			}
+		} else if ($v == $itemid) {
+			array_splice($arr,$k,1);
+			return true;
+		}
+	}
+	return false;
 }
 ?>

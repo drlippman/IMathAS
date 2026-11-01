@@ -64,9 +64,17 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$blocktree = explode('-',$block);
 		$sub =& $items;
 		for ($i=1;$i<count($blocktree)-1;$i++) {
+			if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+				echo _('Uh oh, something changed.  Please go back and try again');
+				exit;
+			}
 			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
 		if (count($blocktree)>1) {
+			if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+				echo _('Uh oh, something changed.  Please go back and try again');
+				exit;
+			}
 			$curblock =& $sub[$blocktree[$i]-1]['items'];
 			$blockloc = $blocktree[$i]-1;
 		} else {
@@ -163,8 +171,16 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		$blocktree = explode('-',$_GET['togglenewflag']);
 		if (count($blocktree)>1) {
 			for ($i=1;$i<count($blocktree)-1;$i++) {
+				if (!isset($sub[$blocktree[$i]-1]['items']) || !is_array($sub[$blocktree[$i]-1]['items'])) {
+					echo _('Uh oh, something changed.  Please go back and try again');
+					exit;
+				}
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
+		}
+		if (!isset($sub[$blocktree[$i]-1]) || !is_array($sub[$blocktree[$i]-1])) {
+			echo _('Uh oh, something changed.  Please go back and try again');
+			exit;
 		}
 		$sub =& $sub[$blocktree[$i]-1];
 		if (!isset($sub['newflag']) || $sub['newflag']==0) {

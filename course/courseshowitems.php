@@ -2181,6 +2181,8 @@ function quickview($items, $parent, $showdates = false, $showlinks = true)
             }
             echo '</ul>';
             echo '</li>';
+        } else if (!isset($itemtypes[$items[$i]])) {
+            continue; // item in itemorder with no imas_items row; skip it
         } else if ($itemtypes[$items[$i]][0] == 'Calendar') {
             if (!isset($CFG['CPS']['miniicons']['calendar'])) {
                 $icon = '<span class=icon style="background-color:#0f0;">C</span>';
