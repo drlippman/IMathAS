@@ -747,7 +747,7 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 	for ($i=0;$i<count($rows[0]);$i++) {
 		$out .= '<tr>';  $sa .= '<tr>';
 		for ($j=0;$j<count($rows);$j++) {
-			if ($rows[$j][$i][0]==' ') { $rows[$j][$i] = '&nbsp;'.$rows[$j][$i];}
+			if (substr($rows[$j][$i],0,1)==' ') { $rows[$j][$i] = '&nbsp;'.$rows[$j][$i];}
 			$out .= '<td>'.$rows[$j][$i].'</td>';
 			$sa .= '<td>'.$rows[$j][$i].'</td>';
 		}
