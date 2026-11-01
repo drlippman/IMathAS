@@ -309,7 +309,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 			// additional display options
 			$toset['caltag'] = Sanitize::stripHtmlTags($_POST['caltag']);
-			if ($_POST['caltagradio'] == 'usename') {
+			if (($_POST['caltagradio'] ?? '') == 'usename') {
 				$toset['caltag'] = 'use_name';
 			}
 			$toset['shuffle'] = Sanitize::onlyInt($_POST['shuffle']);
