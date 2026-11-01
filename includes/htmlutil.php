@@ -47,7 +47,7 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 				$ingrp = true;
 			} else {
                 if ($ingrp && $oc[1]==0) { echo '</optgroup>';}
-				if (!isset($labelList[$oc[0]])) { continue; }
+				if ($oc[0] === null || !isset($labelList[$oc[0]])) { continue; }
 				echo '<option value="'.Sanitize::encodeStringForDisplay($oc[0]).'">'.Sanitize::encodeStringForDisplay($labelList[$oc[0]]).'</option>';
 			}
 		}
@@ -62,7 +62,7 @@ function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$d
 	echo '</select><input type="button" value="Add Another" onclick="addmultiselect(this,\''.$name.'\')"/>';
 	if (count($selectedVals)>0) {
 		foreach ($selectedVals as $v) {
-            if ($v === '' || 
+            if ($v === '' || $v === null ||
 				(!is_array($valList[0]) && !isset($val[$v])) ||
 				(is_array($valList[0]) && !isset($labelList[$v]))
 			 ) { continue; }
