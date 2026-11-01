@@ -194,7 +194,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		}
 		$DBH->commit();
-		if ($_FILES['userfile']['name']!='') {
+		if (!empty($_FILES['userfile']['name'])) {
 			$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 			$userfilename = Sanitize::sanitizeFilenameAndCheckBlacklist(basename(str_replace('\\','/',$_FILES['userfile']['name'])));
 			$filename = $userfilename;
