@@ -343,9 +343,10 @@ $placeinhead .= '<style>
  }
  ul.inlineul li::after { content: ", "; }
  ul.inlineul li:last-child::after { content: ""; }
+ button.prevnext { margin: 0; padding: 2px 6px;}
  </style>';	
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=071225"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=110126"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -783,6 +784,7 @@ function gbstudisp($stu) {
 			} else {
 				$query .= "ORDER BY iu.LastName,iu.FirstName";
 			}
+			$query .= " LIMIT 200";
 			$stm = $DBH->prepare($query);
 			if ($hidelocked) {
 				$stm->execute(array(':courseid'=>$cid, ':uid'=>$stu));
@@ -790,9 +792,16 @@ function gbstudisp($stu) {
 				$stm->execute(array(':courseid'=>$cid));
 			}
 
+			$stulist = $stm->fetchAll(PDO::FETCH_NUM);
+			if (count($stulist) >= 200) {
+				// too many students for a select; just show the name
+				echo '<span class="pii-full-name">'.Sanitize::encodeStringForDisplay($gbt[1][0][0]).'</span>';
+			} else {
+			$stuidx = array_search($stu, array_column($stulist, 0));
+			echo '<button type="button" class="plain prevnext" id="prevstu"'.($stuidx===0?' disabled':'').' onclick="stepstu(-1)" title="'._('Previous student').'" aria-label="'._('Previous student').'">&lt;</button> ';
 			echo '<select id="userselect" class="pii-full-name" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)" aria-label="'._('Student to display. Will reload the page.') .'">';
 			$lastsec = '';
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			foreach ($stulist as $row) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
 					if ($lastsec=='') {echo '</optgroup>';}
 					echo '<optgroup label="Section '.Sanitize::encodeStringForDisplay($row[3]).'">';
@@ -806,6 +815,8 @@ function gbstudisp($stu) {
 			}
 			if ($lastsec!='') {echo '</optgroup>';}
 			echo '</select>';
+			echo ' <button type="button" class="plain prevnext" id="nextstu"'.($stuidx===count($stulist)-1?' disabled':'').' onclick="stepstu(1)" title="'._('Next student').'" aria-label="'._('Next student').'">&gt;</button>';
+			}
 			echo '<img id="updatingicon" style="display:none" src="'.$staticroot.'/img/updating.gif" alt="Updating..."/>';
 			echo ' <span class="small">('.Sanitize::encodeStringForDisplay($gbt[1][0][1]).')</span>';
 		} else {

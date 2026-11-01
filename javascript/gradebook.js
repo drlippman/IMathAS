@@ -17,6 +17,13 @@ function chgstu(el) {
 	var toopen = basesite+"?cid="+cid+"&stu="+el.value;
 	window.location = toopen;
 }
+function stepstu(dir) {
+	var sel = document.getElementById("userselect");
+	var newidx = sel.selectedIndex + dir;
+	if (newidx < 0 || newidx >= sel.options.length) { return; }
+	sel.selectedIndex = newidx;
+	chgstu(sel);
+}
 function chggbfilters() {
 	var gbmode = gbmodebase - 10*gbmod.hidenc - 1*gbmod.availshow;
 	gbmode += 10*$("#hidenc").val() + 1*$("#availshow").val();
