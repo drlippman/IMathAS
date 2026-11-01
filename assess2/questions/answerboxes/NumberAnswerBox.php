@@ -226,7 +226,7 @@ class NumberAnswerBox implements AnswerBox
         $out .= "<span id=p$qn></span>";
         if ($displayformat == 'hidden') {
             //TODO: What's this for? Maybe virtual manipulatives?
-            $out .= '<script type="text/javascript">imasprevans[' . $qstr . '] = "' . $la . '";</script>';
+            //$out .= '<script type="text/javascript">imasprevans[' . $qstr . '] = "' . $la . '";</script>';
         }
 
         if (in_array('nosoln', $ansformats) || in_array('nosolninf', $ansformats)) {
