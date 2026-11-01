@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drawing Question Answer Helper</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 960px; margin: 1em auto; padding: 0 1em; line-height: 1.4; }
+fieldset { margin: 1em 0; border: 1px solid #ccc; border-radius: 4px; }
+label { display: inline-block; margin: 2px 12px 2px 0; }
+input[type=text] { width: 9ch; }
+input.wide { width: 22em; }
+button { padding: 4px 12px; margin-right: 8px; }
+.note { color: #555; font-size: 90%; }
+details.dd { display: inline-block; position: relative; margin: 2px 12px 2px 0; vertical-align: top; }
+details.dd > summary { cursor: pointer; border: 1px solid #999; border-radius: 4px; padding: 2px 10px; background: #fff; }
+.ddpanel { position: absolute; z-index: 20; background: #fff; border: 1px solid #999; border-radius: 4px; padding: 6px 10px; max-height: 320px; overflow-y: auto; min-width: 12em; box-shadow: 1px 3px 8px rgba(0,0,0,.25); }
+.ddpanel label { display: block; margin: 2px 0; }
+#errs, #warns { color: #900; }
+#warns { color: #a60; }
+textarea { width: 100%; box-sizing: border-box; font-family: monospace; }
+.drawtools { margin-left: 8px; }
+.drawtools > span { display: inline-block; }
+.drawtools img { vertical-align: middle; }
+.drawtools [data-drawaction] { cursor: pointer; border: 1px solid #ccc; padding: 2px; }
+.drawtools span[data-drawaction] { padding: 2px 8px; }
+.drawtools [data-drawaction]:hover { background-color: #edf4fc; }
+.drawtools [data-drawaction].sel { background-color: #e6f0f9; }
+.drawcanvas { margin-bottom: 5px; }
+.drawcanvas img { max-width: 100%; }
+</style>
+</head>
+<body>
+<h1>Drawing Question Answer Helper</h1>
+<p class="note">Set up the drawing window below, draw the correct answer, then generate the
+<code>$grid</code>, <code>$snaptogrid</code>, <code>$answerformat</code> and <code>$answers</code> lines to paste into your question code.
+</p>
+
+<fieldset>
+<legend>Question type</legend>
+<label>This drawing is for:
+<select id="partsel">
+  <option value="">A single-part question</option>
+  <option value="0">Part 0 of a multipart question</option>
+  <option value="1">Part 1</option>
+  <option value="2">Part 2</option>
+  <option value="3">Part 3</option>
+  <option value="4">Part 4</option>
+  <option value="5">Part 5</option>
+  <option value="6">Part 6</option>
+  <option value="7">Part 7</option>
+  <option value="8">Part 8</option>
+  <option value="9">Part 9</option>
+</select></label>
+</fieldset>
+
+<fieldset>
+<legend>Grid (<code>$grid</code>)</legend>
+<label>xmin <input type="text" id="xmin" value="-5"></label>
+<label>xmax <input type="text" id="xmax" value="5"></label>
+<label>ymin <input type="text" id="ymin" value="-5"></label>
+<label>ymax <input type="text" id="ymax" value="5"></label><br>
+<label>x label/grid spacing <input type="text" id="xscl" value="1"></label>
+<label>y label/grid spacing <input type="text" id="yscl" value="1"></label>
+<label>width <input type="text" id="gwidth" value="300"></label>
+<label>height <input type="text" id="gheight" value="300"></label>
+<p class="note">Spacing can be a single value or <code>label:grid</code> (e.g. <code>1:2</code>), or <code>label:smalltick</code> for numberline.<br/>
+Fraction/pi axis labels are shown as decimals in this preview.<br/>
+A leading <code>0:</code> on xmin/ymin (e.g. <code>0:-1</code>) gives first-quadrant-style axes.</p>
+</fieldset>
+
+<fieldset>
+<legend>Options</legend>
+<label>Snap to grid (<code>$snaptogrid</code>) <input type="text" id="snap" value="1"></label><br/>
+<label>Drawing tools (<code>$answerformat</code>)
+<select id="atype">
+  <option value="twopoint" selected>twopoint</option>
+  <option value="inequality">inequality</option>
+  <option value="numberline">numberline</option>
+  <option value="polygon">polygon</option>
+  <option value="closedpolygon">closedpolygon</option>
+</select></label>
+<details id="asubwrap" class="dd" style="display:none"><summary>Tools</summary><div id="asublist" class="ddpanel"></div></details><br/>
+<label>Decimal places for points <input type="text" id="dec" value="2" style="width:3em"></label>
+<p class="note">Leave snap blank for no snapping.<br/>
+After setting grid and changing options and tools, click Create drawing window to build the drawing tool.</p>
+<button type="button" id="genbtn">Create drawing window</button>
+</fieldset>
+
+<div id="errs"></div>
+<div id="drawarea"></div>
+
+<div id="outarea" style="display:none">
+<p><button type="button" id="outbtn">Generate $answers</button>
+<button type="button" id="copybtn">Copy to clipboard</button></p>
+<div id="warns"></div>
+<textarea id="outtext" rows="8" readonly></textarea>
+<details><summary class="note">Raw encoded drawing</summary><pre id="rawdraw" style="white-space:pre-wrap"></pre></details>
+</div>
+
+<script src="../../javascript/jquery.min.js"></script>
+<script>
+var imasroot = '../..';
+var staticroot = '../..';
+function _(t) { return t; }
+</script>
+<script src="../../javascript/ASCIIsvg_min.js"></script>
+<script src="../../javascript/drawing_min.js"></script>
+<script src="../../javascript/mathparser_min.js"></script>
+<script>
+(function() {
+var QN = 1;
+var S = null; // current settings
+
+// ---------- helpers ----------
+function evalNum(s) {
+  s = String(s).trim();
+  if (s === '') { return NaN; }
+  if (!/^[0-9a-z+\-*\/().^\s]*$/i.test(s)) { return NaN; }
+  var js = s.replace(/\^/g, '**').replace(/\bpi\b/gi, '(Math.PI)').replace(/\bsqrt\b/g, 'Math.sqrt').replace(/\babs\b/g, 'Math.abs');
+  if (/[a-z]/i.test(js.replace(/Math\.(PI|sqrt|abs)/g, ''))) { return NaN; }
+  js = js.replace(/(\d|\))\s*(\(|Math)/g, '$1*$2');
+  try {
+    var v = Function('"use strict";return (' + js + ')')();
+    return isFinite(v) ? v : NaN;
+  } catch (e) { return NaN; }
+}
+function rnd(n, d) { var f = Math.pow(10, d); var r = Math.round(n * f) / f; return r === 0 ? 0 : r; }
+function rc(n) { return rnd(n, S.dec); }       // coordinates
+function rd(n) { return rnd(n, S.dec + 2); }   // derived values
+function fmt(n) { return String(n); }
+function fc(n) { return fmt(rc(n)); }
+function fd(n) { return fmt(rd(n)); }
+// reduced fraction {p,q} for a derived non-integer value, only when the denominator is small
+function fracInfo(n) {
+  if (Math.abs(n - Math.round(n)) < 1e-6) { return null; }
+  for (var q = 2; q <= 12; q++) {
+    var p = Math.round(n * q);
+    if (Math.abs(n - p / q) < 1e-6) { return { p: p, q: q }; }
+  }
+  return null;
+}
+function cst(n) { var f = fracInfo(n); return f ? Math.abs(f.p) + '/' + f.q : fmt(Math.abs(rd(n))); }
+function pm(k) { var r = rd(k); return r === 0 ? '' : (r < 0 ? '-' : '+') + cst(k); }
+function xs(h) { var r = rd(h); return r === 0 ? 'x' : (r > 0 ? '(x-' + fmt(r) + ')' : '(x+' + fmt(-r) + ')'); }
+function ys(h) { var r = rd(h); return r === 0 ? 'y' : (r > 0 ? '(y-' + fmt(r) + ')' : '(y+' + fmt(-r) + ')'); }
+function xp(h) { var r = rd(h); return r === 0 ? '(x)' : xs(h); }
+function xminus(h) { var r = rd(h); return r === 0 ? 'x' : (r > 0 ? 'x-' + fmt(r) : 'x+' + fmt(-r)); }
+function minusx(h) { var r = rd(h); return r === 0 ? '-x' : (r > 0 ? fmt(r) + '-x' : '-x-' + fmt(-r)); }
+function coef(a, body) {
+  var r = rd(a);
+  if (r === 1) { return body; }
+  if (r === -1) { return '-' + body; }
+  var mult = /^[(x]/.test(body) ? '' : '*';
+  var f = fracInfo(a);
+  if (f) { return (f.p < 0 ? '-' : '') + '(' + Math.abs(f.p) + '/' + f.q + ')' + mult + body; }
+  return fmt(r) + mult + body;
+}
+function lineExpr(x1, y1, x2, y2) {
+  var mraw = (y2 - y1) / (x2 - x1), braw = y1 - mraw * x1;
+  var b = rd(braw);
+  if (rd(mraw) === 0) { return (b < 0 ? '-' : '') + cst(braw); }
+  return coef(mraw, 'x') + pm(braw);
+}
+function piDiv(n) { return n < 0 ? 'pi/(' + fd(n) + ')' : 'pi/' + fd(n); }
+
+// ---------- settings ----------
+function parseScl(str) {
+  var p = String(str).split(':');
+  var lbl = evalNum(p[0]), grid = p.length > 1 ? evalNum(p[1]) : lbl;
+  return { lbl: lbl, grid: grid, name: p.length > 2 ? p[2] : '' };
+}
+function readSettings() {
+  var errs = [];
+  function num(id, label) {
+    var v = evalNum($('#' + id).val());
+    if (isNaN(v)) { errs.push('Invalid ' + label); }
+    return v;
+  }
+  var s = {};
+  var fm = getFormat();
+  s.af = fm.af; s.afOut = fm.out;
+  if (s.af.length === 0) { s.af = ['line', 'dot', 'opendot']; }
+  s.numberline = s.af[0] === 'numberline';
+  var xminS = $('#xmin').val().trim(), yminS = $('#ymin').val().trim();
+  s.fqx = xminS.indexOf('0:') === 0; s.fqy = yminS.indexOf('0:') === 0;
+  if (s.fqx) { $('#xmin').data('v', xminS.substring(2)); }
+  var xminV = evalNum(s.fqx ? xminS.substring(2) : xminS), yminV = evalNum(s.fqy ? yminS.substring(2) : yminS);
+  s.xmin = xminV; s.ymin = yminV;
+  if (isNaN(xminV)) { errs.push('Invalid xmin'); }
+  if (isNaN(yminV)) { errs.push('Invalid ymin'); }
+  s.xmax = num('xmax', 'xmax'); s.ymax = num('ymax', 'ymax');
+  s.W = num('gwidth', 'width'); s.H = num('gheight', 'height');
+  s.dec = parseInt($('#dec').val(), 10);
+  if (isNaN(s.dec) || s.dec < 0 || s.dec > 8) { s.dec = 2; }
+  if (s.numberline) { s.ymin = 0; s.ymax = 0; }
+  if (!(s.xmax > s.xmin)) { errs.push('xmax must be greater than xmin'); }
+  if (!s.numberline && !(s.ymax > s.ymin)) { errs.push('ymax must be greater than ymin'); }
+  s.xscl = parseScl($('#xscl').val()); s.yscl = parseScl($('#yscl').val());
+  if (isNaN(s.xscl.lbl) || isNaN(s.yscl.lbl) || isNaN(s.xscl.grid) || isNaN(s.yscl.grid)) { errs.push('Invalid label/grid spacing'); }
+  var snapTxt = $('#snap').val().trim();
+  s.snapRaw = snapTxt;
+  if (snapTxt === '') { s.snap = 0; s.snapx = 0; s.snapy = 0; } else {
+    var sp = snapTxt.split(':').map(evalNum);
+    if (sp.some(isNaN) || sp.some(function(v) { return v < 0; })) { errs.push('Invalid snap to grid'); sp = [0]; }
+    s.snapx = sp[0]; s.snapy = sp.length > 1 ? sp[1] : sp[0];
+    s.snap = sp.length > 1 ? sp[0] + ':' + sp[1] : sp[0];
+  }
+  s.errs = errs;
+  if (errs.length) { return s; }
+  // snap-adjusted canvas size, as in getsnapwidthheight()
+  s.cw = s.W; s.ch = s.H;
+  if (s.snap !== 0) {
+    var nw = (s.snapx && s.xmax - s.xmin > 0) ? (s.xmax - s.xmin) * (Math.round(s.snapx * (s.W - 10) / (s.xmax - s.xmin)) / s.snapx) + 10 : s.W;
+    var nh = (s.snapy && s.ymax - s.ymin > 0) ? (s.ymax - s.ymin) * (Math.round(s.snapy * (s.H - 10) / (s.ymax - s.ymin)) / s.snapy) + 10 : s.H;
+    if (Math.abs(nw - s.W) / s.W < 0.1) { s.cw = nw; }
+    if (Math.abs(nh - s.H) / s.H < 0.1) { s.ch = nh; }
+  }
+  s.pixperx = (s.cw - 10) / (s.xmax - s.xmin);
+  s.pixpery = s.numberline ? 1 : (s.ch - 10) / (s.ymax - s.ymin);
+  return s;
+}
+
+function buildBg(s) {
+  var wymin = s.ymin, wymax = s.ymax, noy = false, nox = false;
+  if (s.numberline || (wymin === 0 && wymax === 0)) { wymin = -0.5; wymax = 0.5; noy = true; }
+  var xl = s.xscl.lbl, yl = s.yscl.lbl, xg = s.xscl.grid, yg = s.yscl.grid;
+  if (s.numberline) {
+    yl = 1;
+    if (isNaN(xg) || String($('#xscl').val()).indexOf(':') < 0) {
+      xg = (xl > 1 && xl < 6 && (s.xmax - s.xmin) < 10 * xl) ? 1 : 0;
+    }
+    yg = xg;
+  }
+  if (xl === 0) { xl = 1; nox = true; }
+  if (yl === 0) { yl = 1; noy = true; }
+  var cmd = 'axes(' + xl + ',' + yl + ',1,' + xg + ',' + yg;
+  if (nox || noy) { cmd += ',' + (nox ? 0 : 1) + ',' + (noy ? 0 : 1) + ',1);'; }
+  else if (s.fqx || s.fqy) { cmd += ',' + (s.fqx ? '"fq"' : 1) + ',' + (s.fqy ? '"fq"' : 1) + ');'; }
+  else { cmd += ');'; }
+  if (!s.numberline) {
+    if (s.xscl.name !== '' && s.xscl.name !== 'off') { cmd += 'text([' + s.xmax + ',0],"' + s.xscl.name + '","aboveleft");'; }
+    if (s.yscl.name !== '') { cmd += 'text([0,' + s.ymax + '],"' + s.yscl.name + '","belowright");'; }
+  }
+  return 'setBorder(5); initPicture(' + s.xmin + ',' + s.xmax + ',' + wymin + ',' + wymax + ');' + cmd;
+}
+
+// ---------- toolbar ----------
+var TP_TOOLS = [
+  ['line', 5, 'tpline.svg', 'Line', 1], ['dashedline', 5.1, 'tplinedash.svg', 'Dashed Line'],
+  ['lineseg', 5.3, 'tpline3.svg', 'Line segment'], ['ray', 5.2, 'tpline2.svg', 'Ray'],
+  ['vector', 5.4, 'tpvec.svg', 'Vector'], ['parab', 6, 'tpparab.svg', 'Parabola', 1],
+  ['3pointparab', 6.7, 'tp3pparab.svg', '3 Point Parabola'], ['horizparab', 6.1, 'tphorizparab.svg', 'Horizontal parabola'],
+  ['halfparab', 6.2, 'tphalfparab.svg', 'Half Parabola'], ['cubic', 6.3, 'tpcubic.svg', 'Cubic'],
+  ['sqrt', 6.5, 'tpsqrt.svg', 'Square root'], ['cuberoot', 6.6, 'tpcuberoot.svg', 'Cube Root'],
+  ['abs', 8, 'tpabs.svg', 'Absolute value', 1], ['rational', 8.2, 'tprat.svg', 'Rational'],
+  ['exp', 8.3, 'tpexp.svg', 'Exponential'], ['genexp', 8.5, 'tpgenexp.svg', 'General Exponential'],
+  ['log', 8.4, 'tplog.svg', 'Logarithm'], ['genlog', 8.6, 'tpgenlog.svg', 'General Logarithm'],
+  ['circle', 7, 'tpcirc.svg', 'Circle', 1], ['ellipse', 7.2, 'tpellipse.svg', 'Ellipse'],
+  ['hyperbola', 7.4, 'tpverthyper.svg', 'Vertical hyperbola', 0, [7.5, 'tphorizhyper.svg', 'Horizontal hyperbola']],
+  ['rect', 5.9, 'tprect.svg', 'Rectangle'], ['trapapprox', 5.8, 'tptrapa.svg', 'Trapezoid'],
+  ['trig', 9, 'tpcos.svg', 'Cosine', 0, [9.1, 'tpsin.svg', 'Sine']],
+  ['tan', 9.2, 'tptan.svg', 'Tangent'], ['sec', 9.3, 'tpsec.svg', 'Secant'],
+  ['dot', 1, 'tpdot.svg', 'Dot', 1], ['opendot', 2, 'tpodot.svg', 'Open dot'],
+  ['triangledot', 4.1, 'tptridot.svg', 'Triangle marker'], ['squaredot', 4.2, 'tpsqdot.svg', 'Square marker']
+];
+function imgTool(file, val, alt, sel) {
+  return '<img src="../../img/tpsvg/' + file + '" data-drawaction="settool" data-qn="' + QN + '" data-val="' + val + '"' +
+    (sel ? ' class="sel"' : '') + ' alt="' + alt + '" title="' + alt + '"/>';
+}
+function spanTool(val, label, sel) {
+  return '<span' + (sel ? ' class="sel"' : '') + ' data-drawaction="settool" data-qn="' + QN + '" data-val="' + val + '">' + label + '</span>';
+}
+function buildTools(s) {
+  var af = s.af.slice(), out = '', def = 0, dotline = 0, locky = 0, i;
+  var first = af[0];
+  if (first === 'inequality') {
+    var tools = {}, order = [];
+    function add(v, f, a) { if (!(v in tools)) { tools[v] = [f, a]; order.push(v); } }
+    var both = af.indexOf('both') >= 0, lines = af.length === 1 || af.indexOf('line') >= 0;
+    if (both || lines) { add(10, 'tpineq.svg', 'Linear inequality, solid line'); add(10.2, 'tpineqdash.svg', 'Linear inequality, dashed line'); }
+    if (both || af.indexOf('parab') >= 0) { add(10.3, 'tpineqparab.svg', 'Quadratic inequality, solid line'); add(10.4, 'tpineqparabdash.svg', 'Quadratic inequality, dashed line'); }
+    if (af.indexOf('abs') >= 0) { add(10.5, 'tpineqabs.svg', 'Absolute Value inequality, solid line'); add(10.6, 'tpineqabsdash.svg', 'Absolute Value inequality, dashed line'); }
+    def = order[0];
+    if (af[1] === 'parab') { def = 10.3; } else if (af[1] === 'abs') { def = 10.5; }
+    order.forEach(function(v) { out += imgTool(tools[v][0], v, tools[v][1], v === def); });
+  } else if (first === 'twopoint') {
+    var selKey = af.length === 1 ? 'line' : af[1];
+    def = 5;
+    TP_TOOLS.forEach(function(t) {
+      if (!((af.length === 1 && t[4]) || af.indexOf(t[0]) >= 0)) { return; }
+      var sel = t[0] === selKey;
+      if (sel) { def = t[1]; }
+      out += imgTool(t[2], t[1], t[3], sel);
+      if (t[5]) { out += imgTool(t[5][1], t[5][0], t[5][2], false); }
+    });
+  } else if (first === 'numberline') {
+    locky = 1; def = 0.5;
+    if (af.length === 1) { af = ['numberline', 'lineseg', 'dot', 'opendot']; }
+    s.af = af;
+    var nm = { lineseg: [0.5, 'numlines.svg', 'Line segments and rays'], dot: [1, 'tpdot.svg', 'Closed dot'], opendot: [2, 'tpodot.svg', 'Open dot'] };
+    var selk = af[1];
+    ['lineseg', 'dot', 'opendot'].forEach(function(k) {
+      if (af.indexOf(k) < 0) { return; }
+      if (k === selk) { def = nm[k][0]; }
+      out += imgTool(nm[k][1], nm[k][0], nm[k][2], k === selk);
+    });
+  } else {
+    var names = { line: [0, 'Line'], lineseg: [0.5, 'Line Segment'], freehand: [0.7, 'Freehand Draw'], dot: [1, 'Dot'], opendot: [2, 'Open Dot'], polygon: [0, 'Polygon'], closedpolygon: [0, 'Polygon'] };
+    for (i = 0; i < af.length; i++) {
+      var n = names[af[i]];
+      if (!n) { continue; }
+      if (af[i] === 'polygon') { dotline = 1; }
+      if (af[i] === 'closedpolygon') { dotline = 2; af[i] = 'polygon'; }
+      out += spanTool(n[0], n[1], i === 0);
+    }
+    def = names[af[0]] ? names[af[0]][0] : 0;
+    s.af = af;
+  }
+  if (['inequality', 'twopoint', 'numberline'].indexOf(first) >= 0) {
+    out += imgTool('tperaser.svg', -1, 'Eraser', false);
+  } else {
+    out += spanTool(-1, 'Eraser', false);
+  }
+  return { html: out, def: def, dotline: dotline, locky: locky };
+}
+
+// ---------- create drawing window ----------
+function createDrawing() {
+  var s = readSettings();
+  $('#errs').html('');
+  if (s.errs.length) { $('#errs').text(s.errs.join('; ')); return; }
+  S = s;
+  var t = buildTools(s);
+  var bg = buildBg(s);
+  imathasDraw.reset();
+  canvases.length = 0;
+  drawla.length = 0;
+  var w = s.cw, h = s.ch;
+  var html = '<div class="drawcanvas" style="position:relative;width:' + w + 'px;height:' + h + 'px">' +
+    '<div class="canvasbg" style="position:absolute;top:0px;left:0px;"><embed type="image/svg+xml" align="middle" data-nomag="1" width="' + w + '" height="' + h + '"></div>' +
+    '<div class="drawcanvasholder" style="position:relative;top:0;left:0;z-index:2"><canvas id="canvas' + QN + '" width="' + w + '" height="' + h + '"></canvas></div></div>' +
+    '<div><span id="drawtools' + QN + '" class="drawtools"><span data-drawaction="clearcanvas" data-qn="' + QN + '">Clear All</span> Draw: ' + t.html + '</span></div>' +
+    '<input type="hidden" id="qn' + QN + '" name="qn' + QN + '" value="" autocomplete="off">';
+  $('#drawarea').html(html);
+  $('#drawarea embed').attr('script', bg);
+  document.getElementById('drawtools' + QN).addEventListener('click', function(ev) {
+    var el = ev.target;
+    if (!el.hasAttribute('data-drawaction')) { return; }
+    if (el.getAttribute('data-drawaction') === 'clearcanvas') { imathasDraw.clearcanvas(String(QN)); }
+    else { imathasDraw.settool(el, String(QN), el.getAttribute('data-val')); }
+  });
+  canvases[0] = [QN, bg, s.xmin, s.xmax, s.ymin, s.ymax, 5, w, h, t.def, t.dotline, t.locky, s.snap, ''];
+  imathasDraw.initCanvases();
+  $('#outarea').show();
+  $('#outtext').val('');
+}
+
+// ---------- decode ----------
+function parsePts(str) {
+  if (!str) { return []; }
+  return str.replace(/^\(/, '').replace(/\)$/, '').split('),(').map(function(p) { return p.split(',').map(Number); });
+}
+function decode(str) {
+  var p = str.split(';;');
+  return {
+    lines: p[0] ? p[0].split(';').map(parsePts) : [],
+    dots: parsePts(p[1]), odots: parsePts(p[2]),
+    tp: parsePts(p[3]), ineq: parsePts(p[4])
+  };
+}
+function toX(px) {
+  var x = S.xmin + (px - 5) / S.pixperx;
+  if (S.snapx > 0) { x = Math.round(x / S.snapx) * S.snapx; }
+  return rc(x);
+}
+function toY(py) {
+  if (S.numberline) { return 0; }
+  var y = S.ymax - (py - 5) / S.pixpery;
+  if (S.snapy > 0) { y = Math.round(y / S.snapy) * S.snapy; }
+  return rc(y);
+}
+function pts(arr, from) { // arr = [type, x1,y1,x2,y2,...] pixels -> coordinate pairs
+  var out = [];
+  for (var i = from; i + 1 < arr.length; i += 2) { out.push([toX(arr[i]), toY(arr[i + 1])]); }
+  return out;
+}
+
+// ---------- converters ----------
+var warns = [];
+function convTwoPoint(a) {
+  var t = String(a[0]), c = pts(a, 1);
+  var p1 = c[0], p2 = c[1], p3 = c[2];
+  var x1 = p1[0], y1 = p1[1], x2 = p2 ? p2[0] : 0, y2 = p2 ? p2[1] : 0;
+  var same = p2 && x1 === x2 && y1 === y2;
+  if (t !== '4.1' && t !== '4.2' && t !== '5.4' && same) { return []; }
+  var a_, b_, k, h, e;
+  switch (t) {
+    case '4.1': return [fc(x1) + ',' + fc(y1) + ',triangle'];
+    case '4.2': return [fc(x1) + ',' + fc(y1) + ',square'];
+    case '5': case '5.1':
+      e = x1 === x2 ? 'x=' + fc(x1) : lineExpr(x1, y1, x2, y2);
+      return [(t === '5.1' ? 'dashedline,' : '') + e];
+    case '5.2':
+      if (x1 === x2) { return ['x=' + fc(x1) + (y2 > y1 ? ',' + fc(y1) + ',oo' : ',-oo,' + fc(y1))]; }
+      return [lineExpr(x1, y1, x2, y2) + (x2 > x1 ? ',' + fc(x1) + ',oo' : ',-oo,' + fc(x1))];
+    case '5.3':
+      if (x1 === x2) { return ['x=' + fc(x1) + ',' + fc(Math.min(y1, y2)) + ',' + fc(Math.max(y1, y2))]; }
+      return [lineExpr(x1, y1, x2, y2) + ',' + fc(Math.min(x1, x2)) + ',' + fc(Math.max(x1, x2))];
+    case '5.4': return ['vector,' + fc(x1) + ',' + fc(y1) + ',' + fc(x2) + ',' + fc(y2)];
+    case '5.9': return ['rect,' + fc(x1) + ',' + fc(y1) + ',' + fc(x2) + ',' + fc(y2)];
+    case '5.8': return ['trapapprox,' + fc(x1) + ',' + fc(y1) + ',' + fc(x2) + ',' + fc(y2)];
+    case '6': case '6.2': case '6.3':
+      if (x1 === x2 || y1 === y2) { warns.push('Skipped a degenerate parabola/cubic (control points share an x or y value).'); return []; }
+      if (t === '6.3') { return [coef((y2 - y1) / Math.pow(x2 - x1, 3), xs(x1) + '^3') + pm(y1)]; }
+      e = coef((y2 - y1) / Math.pow(x2 - x1, 2), xs(x1) + '^2') + pm(y1);
+      if (t === '6.2') { e += ',' + (x2 > x1 ? '>' : '<') + fc(x1); }
+      return [e];
+    case '6.1':
+      if (x1 === x2 || y1 === y2) { warns.push('Skipped a degenerate horizontal parabola.'); return []; }
+      return ['x=' + coef((x2 - x1) / Math.pow(y2 - y1, 2), ys(y1) + '^2') + pm(x1)];
+    case '6.7':
+      var q = parab3(p1, p2, p3);
+      if (!q) { warns.push('Skipped a 3-point parabola that is degenerate or a straight line.'); return []; }
+      return [coef(q.a, xs(q.h) + '^2') + pm(q.k)];
+    case '6.5':
+      if (x1 === x2) { return []; }
+      return [coef((y2 - y1) / Math.sqrt(Math.abs(x2 - x1)), 'sqrt(' + (x2 > x1 ? xminus(x1) : minusx(x1)) + ')') + pm(y1)];
+    case '6.6':
+      if (x1 === x2) { return []; }
+      return [coef((y2 - y1) / Math.cbrt(x2 - x1), 'root(3)' + xp(x1)) + pm(y1)];
+    case '7': return ['circle,' + fc(x1) + ',' + fc(y1) + ',' + fd(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)))];
+    case '7.2': return ['ellipse,' + fc(x1) + ',' + fc(y1) + ',' + fc(Math.abs(x2 - x1)) + ',' + fc(Math.abs(y2 - y1))];
+    case '7.4': return ['verthyperbola,' + fc(x1) + ',' + fc(y1) + ',' + fc(Math.abs(y2 - y1)) + ',' + fc(Math.abs(x2 - x1))];
+    case '7.5': return ['horizhyperbola,' + fc(x1) + ',' + fc(y1) + ',' + fc(Math.abs(x2 - x1)) + ',' + fc(Math.abs(y2 - y1))];
+    case '8':
+      if (x1 === x2) { return []; }
+      return [coef((y2 - y1) / Math.abs(x2 - x1), 'abs' + xp(x1)) + pm(y1)];
+    case '8.2':
+      if (x1 === x2 || y1 === y2) { return []; }
+      return [fd((x2 - x1) * (y2 - y1)) + '/' + (rd(x1) === 0 ? 'x' : xs(x1)) + pm(y1)];
+    case '8.3': case '8.5':
+      var P = t === '8.3' ? [[0, 0], p1, p2] : [p1, p2, p3];
+      k = t === '8.3' ? 0 : P[0][1];
+      var ex1 = P[1][0], ey1 = P[1][1] - k, ex2 = P[2][0], ey2 = P[2][1] - k;
+      if (ex1 === ex2 || ey1 * ey2 <= 0) { warns.push('Skipped an exponential whose control points are on opposite sides of (or on) the asymptote.'); return []; }
+      b_ = Math.pow(ey2 / ey1, 1 / (ex2 - ex1)); a_ = ey1 / Math.pow(b_, ex1);
+      return [coef(a_, fd(b_) + '^x') + pm(k)];
+    case '8.4': case '8.6':
+      h = t === '8.4' ? 0 : p1[0];
+      var Q = t === '8.4' ? [p1, p2] : [p2, p3];
+      var lx1 = Q[0][0] - h, ly1 = Q[0][1], lx2 = Q[1][0] - h, ly2 = Q[1][1];
+      if (ly1 === ly2 || lx1 * lx2 <= 0) { warns.push('Skipped a logarithm whose control points are on opposite sides of (or on) the asymptote.'); return []; }
+      b_ = Math.pow(lx2 / lx1, 1 / (ly2 - ly1)); a_ = lx1 / Math.pow(b_, ly1);
+      var B = Math.log(b_), num = a_ > 0 ? xminus(h) : minusx(h), aa = Math.abs(a_);
+      if (rd(aa) !== 1) { num = (rd(h) === 0 ? num : '(' + num + ')') + '/' + fd(aa); }
+      return ['ln(' + num + ')/' + (B < 0 ? '(' + fd(B) + ')' : fd(B))];
+    case '9': case '9.3':
+      var dx = Math.abs(x2 - x1);
+      if (dx === 0 || y1 === y2) { return []; }
+      return [coef((y1 - y2) / 2, (t === '9' ? 'cos(' : 'sec(') + '(' + piDiv(dx) + ')*' + xp(x1) + ')') + pm((y1 + y2) / 2)];
+    case '9.1':
+      var qq = x2 - x1, A = y2 - y1;
+      if (qq === 0 || A === 0) { return []; }
+      if (qq < 0) { A = -A; qq = -qq; }
+      return [coef(A, 'sin((' + piDiv(2 * qq) + ')*' + xp(x1) + ')') + pm(y1)];
+    case '9.2':
+      var dx2 = Math.abs(x2 - x1), tv = Math.tan(Math.PI / (2 * dx2) * (p3[0] - x1));
+      if (dx2 === 0 || p3[0] === x1 || !isFinite(tv) || Math.abs(tv) < 1e-9) { return []; }
+      return [coef((p3[1] - y1) / tv, 'tan((' + piDiv(2 * dx2) + ')*' + xp(x1) + ')') + pm(y1)];
+  }
+  warns.push('Unsupported drawing type ' + t + ' was skipped.');
+  return [];
+}
+function parab3(p1, p2, p3) {
+  var x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1], x3 = p3[0], y3 = p3[1];
+  if (x1 === x2 || x1 === x3 || x2 === x3) { return null; }
+  var a = (x1 * (y3 - y2) + x2 * (y1 - y3) + x3 * (y2 - y1)) / ((x1 - x2) * (x1 - x3) * (x2 - x3));
+  if (Math.abs(a) < 1e-9) { return null; }
+  var b = (y2 - y1) / (x2 - x1) - a * (x1 + x2), c = y1 - a * x1 * x1 - b * x1;
+  return { a: a, h: -b / (2 * a), k: c - b * b / (4 * a) };
+}
+function convIneq(a) {
+  var t = a[0], c = pts(a, 1), p1 = c[0], p2 = c[1], p3 = c[2];
+  var solid = (t === 10 || t === 10.3 || t === 10.5);
+  var x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1], e, yline;
+  if (t < 10.3) {
+    if (x1 === x2) {
+      if (y1 === y2) { return []; }
+      return ['x' + (p3[0] > x1 ? '>' : '<') + (solid ? '=' : '') + fc(x1)];
+    }
+    e = lineExpr(x1, y1, x2, y2);
+    yline = y1 + (y2 - y1) / (x2 - x1) * (p3[0] - x1);
+  } else if (t < 10.5) {
+    if (x1 === x2 || y1 === y2) { warns.push('Skipped a degenerate parabola inequality.'); return []; }
+    var aa = (y2 - y1) / Math.pow(x2 - x1, 2);
+    e = coef(aa, xs(x1) + '^2') + pm(y1);
+    yline = aa * Math.pow(p3[0] - x1, 2) + y1;
+  } else {
+    if (x1 === x2) { return []; }
+    var ab = (y2 - y1) / Math.abs(x2 - x1);
+    e = coef(ab, 'abs' + xp(x1)) + pm(y1);
+    yline = ab * Math.abs(p3[0] - x1) + y1;
+  }
+  return [(p3[1] > yline ? '>' : '<') + (solid ? '=' : '') + e];
+}
+function convNumberline(d) {
+  var out = [];
+  d.dots.forEach(function(p) { out.push(fc(toX(p[0])) + ',0'); });
+  d.odots.forEach(function(p) { out.push(fc(toX(p[0])) + ',0,open'); });
+  d.lines.forEach(function(l) {
+    var a = Math.min(l[0][0], l[l.length - 1][0]), b = Math.max(l[0][0], l[l.length - 1][0]);
+    var lo = a <= 5.5 ? '-oo' : fc(toX(a)), hi = b >= S.cw - 5.5 ? 'oo' : fc(toX(b));
+    if (lo === hi) { return; }
+    out.push('0,' + lo + ',' + hi);
+  });
+  return out;
+}
+function uniq(a) { return a.filter(function(v, i) { return a.indexOf(v) === i; }); }
+
+function convertAll(str) {
+  warns = [];
+  var d = decode(str), ans = [], af0 = S.af[0], i;
+  if (S.numberline) {
+    ans = convNumberline(d);
+  } else if (af0 === 'polygon' || af0 === 'closedpolygon') {
+    if (d.lines.length) {
+      d.lines[0].forEach(function(p) { ans.push(fc(toX(p[0])) + ',' + fc(toY(p[1]))); });
+      if (af0 === 'closedpolygon' && ans.length > 1 && ans[0] !== ans[ans.length - 1]) { ans.push(ans[0]); }
+      if (d.lines.length > 1) { warns.push('Only the first polygon was used.'); }
+    }
+  } else {
+    d.dots.forEach(function(p) { ans.push(fc(toX(p[0])) + ',' + fc(toY(p[1]))); });
+    d.odots.forEach(function(p) { ans.push(fc(toX(p[0])) + ',' + fc(toY(p[1])) + ',open'); });
+    if (d.lines.length) { warns.push('Line/freehand drawings from the older tools are not converted.'); }
+    d.tp.forEach(function(a) { ans = ans.concat(convTwoPoint(a)); });
+    d.ineq.forEach(function(a) { ans = ans.concat(convIneq(a)); });
+  }
+  if (af0 === 'polygon' || af0 === 'closedpolygon') { return ans; } // uniq would strip the closing point
+  return uniq(ans);
+}
+
+function q(s) { return '"' + s.replace(/"/g, '\\"') + '"'; }
+function generate() {
+  if (!S) { return; }
+  var cur = readSettings();
+  if (cur.errs.length || cur.cw !== S.cw || cur.ch !== S.ch || cur.xmin !== S.xmin || cur.xmax !== S.xmax ||
+      cur.ymin !== S.ymin || cur.ymax !== S.ymax || cur.snapRaw !== S.snapRaw) {
+    $('#errs').text('Settings changed since the drawing window was created. Click "Create drawing window" again.');
+    return;
+  }
+  $('#errs').text('');
+  S.dec = cur.dec;
+  var str = $('#qn' + QN).val() || '';
+  $('#rawdraw').text(str);
+  var ans = convertAll(str);
+  var part = $('#partsel').val();
+  var idx = part === '' ? '' : '[' + part + ']';
+  var gridv = [$('#xmin').val().trim(), $('#xmax').val().trim(), S.numberline ? 0 : $('#ymin').val().trim(),
+    S.numberline ? 0 : $('#ymax').val().trim(), $('#xscl').val().trim(), $('#yscl').val().trim(), $('#gwidth').val().trim(), $('#gheight').val().trim()];
+  var lines = ['$grid' + idx + ' = ' + q(gridv.join(','))];
+  if (S.snapRaw !== '') { lines.push('$snaptogrid' + idx + ' = ' + q(S.snapRaw)); }
+  if (S.afOut) { lines.push('$answerformat' + idx + ' = ' + q(S.afOut)); }
+  if (ans.length === 1) { lines.push('$answers' + idx + ' = ' + q(ans[0])); }
+  else if (ans.length > 1) { lines.push('$answers' + idx + ' = [' + ans.map(q).join(',') + ']'); }
+  else { lines.push('$answers' + idx + ' = ""'); warns.push('Nothing was drawn (or nothing could be converted).'); }
+  $('#outtext').val(lines.join('\n'));
+  $('#warns').html(uniq(warns).map(function(w) { return $('<div>').text(w).html(); }).join('<br>'));
+}
+
+// numberline convenience: adjust y settings when switching formats
+var SUBS = {
+  twopoint: TP_TOOLS.map(function(t) { return [t[0], t[3].replace(/^Vertical hyperbola$/, 'Hyperbola').replace(/^Cosine$/, 'Sine/Cosine')]; }),
+  inequality: [['line', 'Linear'], ['parab', 'Parabola'], ['abs', 'Absolute value']]
+};
+var SUB_DEFAULTS = { twopoint: ['line', 'parab', 'abs', 'circle', 'dot'], inequality: ['line'] };
+function getFormat() {
+  var type = $('#atype').val();
+  if (type === '') { return { af: [], out: null }; }
+  if (!SUBS[type]) { return { af: [type], out: type }; }
+  var checked = $('#asublist input:checked').map(function() { return this.value; }).get();
+  var def = SUB_DEFAULTS[type];
+  var isDef = checked.length === 0 || (checked.length === def.length && def.every(function(v) { return checked.indexOf(v) >= 0; }));
+  if (isDef) { return { af: [type].concat(checked.length ? checked : def), out: type }; }
+  return { af: [type].concat(checked), out: [type].concat(checked).join(',') };
+}
+function renderSubs() {
+  var type = $('#atype').val(), $w = $('#asublist').empty();
+  if (!SUBS[type]) { $('#asubwrap').hide().prop('open', false); return; }
+  $w.append($('<div>').append($('<a href="#">Clear all</a>').on('click', function(ev) {
+    ev.preventDefault();
+    $w.find('input').prop('checked', false);
+  })));
+  SUBS[type].forEach(function(t) {
+    var $l = $('<label>').append($('<input type="checkbox">').val(t[0]).prop('checked', SUB_DEFAULTS[type].indexOf(t[0]) >= 0)).append(' ' + t[1]);
+    $w.append($l);
+  });
+  $('#asubwrap').show();
+}
+$(document).on('click', function(ev) {
+  if (!$(ev.target).closest('#asubwrap').length) { $('#asubwrap').prop('open', false); }
+});
+renderSubs();
+$('#atype').on('change', function() {
+  renderSubs();
+  var nl = $(this).val() === 'numberline';
+  if (nl && $('#ymin').val() === '-5' && $('#ymax').val() === '5' && $('#gheight').val() === '300') {
+    $('#ymin').val('0'); $('#ymax').val('0'); $('#yscl').val('0'); $('#gheight').val('50');
+  } else if (!nl && $('#ymin').val() === '0' && $('#ymax').val() === '0' && $('#gheight').val() === '50') {
+    $('#ymin').val('-5'); $('#ymax').val('5'); $('#yscl').val('1'); $('#gheight').val('300');
+  }
+});
+$('#genbtn').on('click', createDrawing);
+$('#outbtn').on('click', generate);
+$('#copybtn').on('click', function() {
+  var ta = document.getElementById('outtext');
+  ta.select();
+  if (navigator.clipboard) { navigator.clipboard.writeText(ta.value); } else { document.execCommand('copy'); }
+});
+})();
+</script>
+</body>
+</html>
