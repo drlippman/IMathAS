@@ -293,7 +293,7 @@ if ($overwriteBody==1) {
             echo '<tr class="'.$c.'">';
             echo '<td>' . formatdate($action['created_at']) . '</td>';
             echo "<td><span class='pii-full-name'>";
-						echo Sanitize::encodeStringForDisplay($stunames[$action['userid']]);
+						echo Sanitize::encodeStringForDisplay($stunames[$action['userid']] ?? _('Unknown'));
 						echo " (" . Sanitize::onlyInt($action['userid']) . ')</span></td>';
             echo '<td>' . Sanitize::encodeStringForDisplay($action['action']) . '</td>';
             echo '<td>' . Sanitize::onlyInt($action['itemid']) . '</td>';
