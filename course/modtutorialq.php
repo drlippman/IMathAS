@@ -883,7 +883,9 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
                 }
             }
             if ($qtype[$n]=="number" || $qtype[$n]=="calculated" || $qtype[$n]=="numfunc") {
-                $answer[$n] = $answerloc[$n];
+                if (isset($answerloc[$n])) {
+                    $answer[$n] = $answerloc[$n];
+                }
             }
         }
 	}
