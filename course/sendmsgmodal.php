@@ -42,7 +42,7 @@ if (isset($_POST['message'])) {
 			$stm = $DBH->prepare("SELECT COUNT(userid) FROM imas_students WHERE courseid=? AND userid=?");
 			$stm->execute([$cid, $stuTo]);
 			$toStudent = ($stm->fetchColumn(0) > 0);
-			if (isset($_POST['iserrreport'])) {
+			if (isset($_POST['iserrreport']) && $myrights < 20) {
 				$allowed = false;
 			} else if ($msgset == 0) {
 				$allowed = $toStaff || $toStudent;
