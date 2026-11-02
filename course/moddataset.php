@@ -21,6 +21,9 @@
 		exit;
 	}
 
+	// variable names question code and image variables may not use (keep in sync with interpret5.php)
+	$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','laarr','shanspt','GLOBALS','laparts','anstype','kidx','iidx','tips','optionsPack','partla','partnum','score','disallowedvar','allowedmacros','allowedConstants','wherecount','whilecount','forloopcnt','_forends','countcnt','myrights','myspecialrights','this','quesData','toevalsoln','doShowAnswer','doShowAnswerParts','teacherInGb','_SERVER','_POST','_GET','_FILES','_REQUEST','_SESSION','_COOKIE','_ENV','DBH','stm');
+
 	// Determine if this is an AJAX quicksave call
 	$quicksave = isset($_GET['quick']) ? true : false;
 
@@ -297,7 +300,6 @@
 					} else if ($row[2]!=$_POST['imgvar-'.$row[0]] || $row[3]!=$_POST['imgalt-'.$row[0]]) {
 						$newvar = preg_replace('/[^\w\[\]]/','', $_POST['imgvar-'.$row[0]]);
 						$newalt = Sanitize::stripHtmlTags($_POST['imgalt-'.$row[0]]);
-						$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','laarr','shanspt','GLOBALS','laparts','anstype','kidx','iidx','tips','optionsPack','partla','partnum','score','disallowedvar','allowedmacros','wherecount','countcnt','myrights','myspecialrights');
 						if (in_array($newvar,$disallowedvar)) {
 							$errmsg .= "<p>".Sanitize::encodeStringForDisplay($newvar)." is not an allowed variable name</p>";
 						} else {
@@ -366,7 +368,6 @@
 						if ($row[0]!=$_POST['imgvar-'.$row[3]] || $row[2]!=$_POST['imgalt-'.$row[3]]) {
 							$newvar = $_POST['imgvar-'.$row[3]]; // sanitized above
 							$newalt = Sanitize::stripHtmlTags($_POST['imgalt-'.$row[3]]);
-							$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','laarr','shanspt','GLOBALS','laparts','anstype','kidx','iidx','tips','optionsPack','partla','partnum','score','disallowedvar','allowedmacros','wherecount','countcnt','myrights','myspecialrights');
 							if (!in_array($newvar,$disallowedvar)) {
 								$row[0] = $newvar;
 							}
@@ -393,7 +394,6 @@
 		if ($isok) {
 			//upload image files if attached
 			if (!empty($_FILES['imgfile']['name'])) {
-				$disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
 				$newvar = preg_replace('/[^\w\[\]]/','', $_POST['newimgvar']);
 				if (!is_uploaded_file($_FILES['imgfile']['tmp_name'])) {
 					switch($_FILES['imgfile']['error']){

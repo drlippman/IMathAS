@@ -9,38 +9,38 @@ if ($myrights < 100) {
 
 echo '<style>.resG { color: #0c0;} .resB { color: #c00; }</style>';
 $tests = json_decode('[
-{"in":"$a=0\n$a = 1 if $b==2\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif ($b==2) { $a=1 ; };\n$c=1;\n;"},
-{"in":"$a=0\n$a = 1 if ($b==2)\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif (($b==2)) { $a=1 ; };\n$c=1;\n;"},
-{"in":"$a=0\nif ($a==0) {$b = 1}\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif (($a==0)) { {$b=1;} ;};\n$c=1;\n;"},
-{"in":"$a=0\nif $a==0 {$b = 1}\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif ($a==0) { {$b=1;} ;};\n$c=1;\n;"},
-{"in":"$a=0\nif ($a==0) $b = 1\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif (($a==0)) { $b=1 ;};\n$c=1;\n;"},
-{"in":"$a=0\nif $a==0 $b = 1\n$c=1","out":"error;"},
-{"in":"$a=0\nif ($a==0) $b = 1; $c = 1\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif (($a==0)) { $b=1 ;};\n$c=1;\n$c=1;\n;"},
-{"in":"$a=0\nif ($a==0) $b = 1 else if ($a==1) $b = 2 else $b =3\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif (($a==0)) { $b=1 ;} else if (($a==1)) { $b=2 ;} else { $b=3 };\n$c=1;\n;"},
-{"in":"$a=0\nif ($a==0) $b = 1 elseif ($a==1) $b = 2 else $b =3\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif (($a==0)) { $b=1 ;} else if (($a==1)) { $b=2 ;} else { $b=3 };\n$c=1;\n;"},
-{"in":"$a=0\nif $a==0 {$b = 1 } else if $a==1 {$b = 2 } else {$b = 3}\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\nif ($a==0) { {$b=1;} ;} else if ($a==1) { {$b=2;} ;} else { {$b=3;} };\n$c=1;\n;"},
-{"in":"if ($a+3)\/4==3 { $c = 1 }","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;if (($a+3)\/4==3) { {$c=1;} ;};\n;"},
-{"in":"if ($a+3)\/4==3 $c = 1 ","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;if (($a+3)) { \/4==3*$c=1 ;};\n;"},
-{"in":"{$a=0\n$b = 1 } if $c==1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;if ($c==1) { {$a=0;\n$b=1;} ; };\n;"},
-{"in":"$a=0\n for ($i=0..2) {$a++}\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$forloopcnt[0]=0;if (is_nan(2) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($i=(int)ceil(round(floatval(0),4)),$forloopcnt[1]=0;$i<=(int)floor(round(floatval(2),4)) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; $i++, $forloopcnt[1]++, $forloopcnt[0]++) {{$a++;};};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n$c=1;\n;"},
-{"in":"$a=0\n for ($i=0..2) $a++\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$forloopcnt[0]=0;if (is_nan(2) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($i=(int)ceil(round(floatval(0),4)),$forloopcnt[1]=0;$i<=(int)floor(round(floatval(2),4)) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; $i++, $forloopcnt[1]++, $forloopcnt[0]++) {$a++;};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n$c=1;\n;"},
-{"in":"$a=0\n for $i=0..2 {$a++}\n$c=1","out":"error;"},
-{"in":"$a=0\n foreach ($arr as $k=>$v) {$a++}\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($arr)){$arr=null;}if (!isset($k)){$k=null;}if (!isset($v)){$v=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$forloopcnt[0]=0;if (!is_array($arr)) {echo \'input of foreach must be an array\';} else {\r\n                        $forloopcnt[1]=0; \r\n                        foreach ($arr as $k=>$v) { \r\n                            $forloopcnt[1]++;$forloopcnt[0]++;\r\n                            if ($forloopcnt[1]==1000 || $forloopcnt[0]>=12000) { break; }\r\n                            { {$a++;} ;}\r\n                        }; \r\n                        if ($forloopcnt[1]>=1000) {echo \"foreach loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested foreach exceeded 10000 iterations - giving up\";};\n$c=1;\n;"},
-{"in":"$a=0\n foreach ($arr as $k=>$v) $a++\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($arr)){$arr=null;}if (!isset($k)){$k=null;}if (!isset($v)){$v=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$forloopcnt[0]=0;if (!is_array($arr)) {echo \'input of foreach must be an array\';} else {\r\n                        $forloopcnt[1]=0; \r\n                        foreach ($arr as $k=>$v) { \r\n                            $forloopcnt[1]++;$forloopcnt[0]++;\r\n                            if ($forloopcnt[1]==1000 || $forloopcnt[0]>=12000) { break; }\r\n                            { $a++ ;}\r\n                        }; \r\n                        if ($forloopcnt[1]>=1000) {echo \"foreach loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested foreach exceeded 10000 iterations - giving up\";};\n$c=1;\n;"},
-{"in":"$a=0\n foreach $arr as $k=>$v {$a++}\n$c=1","out":"error;"},
-{"in":"$a=0\n$a = 1 where $a%2==0\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$wherecount[0]=0;$wherecount[1]=0;do{$wherecount[1]++;$wherecount[0]++;$a=1;} while (!($a%2==0) && $wherecount[1]<200 && $wherecount[0]<1000); if ($wherecount[1]==200) {echo \"where not met in 200 iterations\";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo \"nested where not met in 1000 iterations\";};\n$c=1;\n;"},
-{"in":"$a=0\n$a = 1 where ($a%2==0)\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$wherecount[0]=0;$wherecount[1]=0;do{$wherecount[1]++;$wherecount[0]++;$a=1;} while (!(($a%2==0)) && $wherecount[1]<200 && $wherecount[0]<1000); if ($wherecount[1]==200) {echo \"where not met in 200 iterations\";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo \"nested where not met in 1000 iterations\";};\n$c=1;\n;"},
-{"in":"{$a=0\n$b = 1 } where $c==1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$wherecount[0]=0;$wherecount[1]=0;do{$wherecount[1]++;$wherecount[0]++;{$a=0;\n$b=1;};} while (!($c==1) && $wherecount[1]<200 && $wherecount[0]<1000); if ($wherecount[1]==200) {echo \"where not met in 200 iterations\";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo \"nested where not met in 1000 iterations\";};\n;"},
-{"in":"  for ($i=0..20) { for ($j=0..11) { $a[] = $j }}","out":"if (!isset($i)){$i=null;}if (!isset($j)){$j=null;}if (!isset($a)){$a=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$forloopcnt[0]=0;if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($i=(int)ceil(round(floatval(0),4)),$forloopcnt[1]=0;$i<=(int)floor(round(floatval(20),4)) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; $i++, $forloopcnt[1]++, $forloopcnt[0]++) {{if (is_nan(11) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($j=(int)ceil(round(floatval(0),4)),$forloopcnt[2]=0;$j<=(int)floor(round(floatval(11),4)) && $forloopcnt[2]<1000 && $forloopcnt[0]<12000; $j++, $forloopcnt[2]++, $forloopcnt[0]++) {{$a[]=$j;};};\r\n\t\t\t\t\t\tif ($forloopcnt[2]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}};};};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n;"},
-{"in":"$a=0\nfor ($i=2..0) {$a++}\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$forloopcnt[0]=0;if (is_nan(0) || is_nan(2)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($i=(int)ceil(round(floatval(2),4)),$forloopcnt[1]=0;$i<=(int)floor(round(floatval(0),4)) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; $i++, $forloopcnt[1]++, $forloopcnt[0]++) {{$a++;};};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n$c=1;\n;"},
-{"in":"$a=0\nfor ($i=0;$i<5;$i++) {$a++}\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$a=0;\n$forloopcnt[0]=0;for ($i=0,$forloopcnt[1]=0;($i<5) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; ($i++), $forloopcnt[1]++, $forloopcnt[0]++) {{$a++;};};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n$c=1;\n;"},
-{"in":"  for ($i=0..20) { if $i==4 { $b = $i }}","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$forloopcnt[0]=0;if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($i=(int)ceil(round(floatval(0),4)),$forloopcnt[1]=0;$i<=(int)floor(round(floatval(20),4)) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; $i++, $forloopcnt[1]++, $forloopcnt[0]++) {{if ($i==4) { {$b=$i;} ;};};};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n;"},
-{"in":"  for ($i=0..20) { if ($i==4) { $b = $i }}","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$forloopcnt[0]=0;if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($i=(int)ceil(round(floatval(0),4)),$forloopcnt[1]=0;$i<=(int)floor(round(floatval(20),4)) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; $i++, $forloopcnt[1]++, $forloopcnt[0]++) {{if (($i==4)) { {$b=$i;} ;};};};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n;"},
-{"in":"  for ($i=0..20) { if ($i==4)  $b = $i }","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;$forloopcnt[0]=0;if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\r\n\t\t\t\t\t\tfor ($i=(int)ceil(round(floatval(0),4)),$forloopcnt[1]=0;$i<=(int)floor(round(floatval(20),4)) && $forloopcnt[1]<1000 && $forloopcnt[0]<12000; $i++, $forloopcnt[1]++, $forloopcnt[0]++) {{if (($i==4)) { $b=$i ;};};};\r\n\t\t\t\t\t\tif ($forloopcnt[1]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}} if ($forloopcnt[0]>=12000) {echo \"nested for loops exceeded 10000 iterations - giving up\";};\n;"},
-{"in":"if ($a==1) || $a==5 { $b = 1 } else if ($a==2) || ($a==3) { $b = 2 } else { $b = 3}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;if (($a==1)||$a==5) { {$b=1;} ;} else if (($a==2)||($a==3)) { {$b=2;} ;} else { {$b=3;} };\n;"},
-{"in":"if $a==1 {$b=1} else if $a==2 {$b=2} else if $a==3 {$b=3} else {$b=4}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;if ($a==1) { {$b=1;} ;} else if ($a==2) { {$b=2;} ;} else if ($a==3) { {$b=3;} ;} else { {$b=4;} };\n;"},
-{"in":"if ($a==1) $b=1 else if ($a==2) $b=2 else if ($a==3) $b=3 else $b=4","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;if (($a==1)) { $b=1 ;} else if (($a==2)) { $b=2 ;} else if (($a==3)) { $b=3 ;} else { $b=4 };\n;"},
-{"in":"if $a==1 { $b = 1 } else if ($a==2) || ($a==3) { $b = 2 } else { $b = 3}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;if ($a==1) { {$b=1;} ;} else if (($a==2)||($a==3)) { {$b=2;} ;} else { {$b=3;} };\n;"}
+{"in":"$a=0\\n$a = 1 if $b==2\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif ($b==2) { $a=1 ; };\\n$c=1;\\n;"},
+{"in":"$a=0\\n$a = 1 if ($b==2)\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (($b==2)) { $a=1 ; };\\n$c=1;\\n;"},
+{"in":"$a=0\\nif ($a==0) {$b = 1}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (($a==0)) { {$b=1;} ;};\\n$c=1;\\n;"},
+{"in":"$a=0\\nif $a==0 {$b = 1}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif ($a==0) { {$b=1;} ;};\\n$c=1;\\n;"},
+{"in":"$a=0\\nif ($a==0) $b = 1\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (($a==0)) { $b=1 ;};\\n$c=1;\\n;"},
+{"in":"$a=0\\nif $a==0 $b = 1\\n$c=1","out":"error;"},
+{"in":"$a=0\\nif ($a==0) $b = 1; $c = 1\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (($a==0)) { $b=1 ;};\\n$c=1;\\n$c=1;\\n;"},
+{"in":"$a=0\\nif ($a==0) $b = 1 else if ($a==1) $b = 2 else $b =3\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (($a==0)) { $b=1 ;} else if (($a==1)) { $b=2 ;} else { $b=3 ;};\\n$c=1;\\n;"},
+{"in":"$a=0\\nif ($a==0) $b = 1 elseif ($a==1) $b = 2 else $b =3\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (($a==0)) { $b=1 ;} else if (($a==1)) { $b=2 ;} else { $b=3 ;};\\n$c=1;\\n;"},
+{"in":"$a=0\\nif $a==0 {$b = 1 } else if $a==1 {$b = 2 } else {$b = 3}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif ($a==0) { {$b=1;} ;} else if ($a==1) { {$b=2;} ;} else { {$b=3;} ;};\\n$c=1;\\n;"},
+{"in":"if ($a+3)\\/4==3 { $c = 1 }","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (($a+3)\\/4==3) { {$c=1;} ;};\\n;"},
+{"in":"if ($a+3)\\/4==3 $c = 1 ","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (($a+3)) { \\/4==3*$c=1 ;};\\n;"},
+{"in":"{$a=0\\n$b = 1 } if $c==1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if ($c==1) { {$a=0;\\n$b=1;} ; };\\n;"},
+{"in":"$a=0\\n for ($i=0..2) {$a++}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (is_nan(2) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(2),4)) && loopstep(\'for\',1); $i++) {{$a++;};};};\\n$c=1;\\n;"},
+{"in":"$a=0\\n for ($i=0..2) $a++\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (is_nan(2) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(2),4)) && loopstep(\'for\',1); $i++) {$a++;};};\\n$c=1;\\n;"},
+{"in":"$a=0\\n for $i=0..2 {$a++}\\n$c=1","out":"error;"},
+{"in":"$a=0\\n foreach ($arr as $k=>$v) {$a++}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($arr)){$arr=null;}if (!isset($k)){$k=null;}if (!isset($v)){$v=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (!is_array($arr)) {echo \'input of foreach must be an array\';} else {\\r\\n                        loopstart(\'for\',1);\\r\\n                        foreach ($arr as $k=>$v) {\\r\\n                            if (!loopstep(\'for\',1)) { break; }\\r\\n                            { {$a++;} ;}\\r\\n                        };\\r\\n                        };\\n$c=1;\\n;"},
+{"in":"$a=0\\n foreach ($arr as $k=>$v) $a++\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($arr)){$arr=null;}if (!isset($k)){$k=null;}if (!isset($v)){$v=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (!is_array($arr)) {echo \'input of foreach must be an array\';} else {\\r\\n                        loopstart(\'for\',1);\\r\\n                        foreach ($arr as $k=>$v) {\\r\\n                            if (!loopstep(\'for\',1)) { break; }\\r\\n                            { $a++ ;}\\r\\n                        };\\r\\n                        };\\n$c=1;\\n;"},
+{"in":"$a=0\\n foreach $arr as $k=>$v {$a++}\\n$c=1","out":"error;"},
+{"in":"$a=0\\n$a = 1 where $a%2==0\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nloopstart(\'where\',1);do{$a=1;} while (!($a%2==0) && loopstep(\'where\',1));;\\n$c=1;\\n;"},
+{"in":"$a=0\\n$a = 1 where ($a%2==0)\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nloopstart(\'where\',1);do{$a=1;} while (!(($a%2==0)) && loopstep(\'where\',1));;\\n$c=1;\\n;"},
+{"in":"{$a=0\\n$b = 1 } where $c==1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{{$a=0;\\n$b=1;};} while (!($c==1) && loopstep(\'where\',1));;\\n;"},
+{"in":"  for ($i=0..20) { for ($j=0..11) { $a[] = $j }}","out":"if (!isset($i)){$i=null;}if (!isset($j)){$j=null;}if (!isset($a)){$a=null;}loopreset();if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(20),4)) && loopstep(\'for\',1); $i++) {{if (is_nan(11) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($j=(int)ceil(round(floatval(0),4)),loopstart(\'for\',2);$j<=(int)floor(round(floatval(11),4)) && loopstep(\'for\',2); $j++) {{$a[]=$j;};};};};};};\\n;"},
+{"in":"$a=0\\nfor ($i=2..0) {$a++}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nif (is_nan(0) || is_nan(2)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(2),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(0),4)) && loopstep(\'for\',1); $i++) {{$a++;};};};\\n$c=1;\\n;"},
+{"in":"$a=0\\nfor ($i=0;$i<5;$i++) {$a++}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}loopreset();$a=0;\\nfor ($i=0,loopstart(\'for\',1);($i<5) && loopstep(\'for\',1); ($i++)) {{$a++;};};;\\n$c=1;\\n;"},
+{"in":"  for ($i=0..20) { if $i==4 { $b = $i }}","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}loopreset();if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(20),4)) && loopstep(\'for\',1); $i++) {{if ($i==4) { {$b=$i;} ;};};};};\\n;"},
+{"in":"  for ($i=0..20) { if ($i==4) { $b = $i }}","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}loopreset();if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(20),4)) && loopstep(\'for\',1); $i++) {{if (($i==4)) { {$b=$i;} ;};};};};\\n;"},
+{"in":"  for ($i=0..20) { if ($i==4)  $b = $i }","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}loopreset();if (is_nan(20) || is_nan(0)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(20),4)) && loopstep(\'for\',1); $i++) {{if (($i==4)) { $b=$i ;};};};};\\n;"},
+{"in":"if ($a==1) || $a==5 { $b = 1 } else if ($a==2) || ($a==3) { $b = 2 } else { $b = 3}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if (($a==1)||$a==5) { {$b=1;} ;} else if (($a==2)||($a==3)) { {$b=2;} ;} else { {$b=3;} ;};\\n;"},
+{"in":"if $a==1 {$b=1} else if $a==2 {$b=2} else if $a==3 {$b=3} else {$b=4}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if ($a==1) { {$b=1;} ;} else if ($a==2) { {$b=2;} ;} else if ($a==3) { {$b=3;} ;} else { {$b=4;} ;};\\n;"},
+{"in":"if ($a==1) $b=1 else if ($a==2) $b=2 else if ($a==3) $b=3 else $b=4","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if (($a==1)) { $b=1 ;} else if (($a==2)) { $b=2 ;} else if (($a==3)) { $b=3 ;} else { $b=4 ;};\\n;"},
+{"in":"if $a==1 { $b = 1 } else if ($a==2) || ($a==3) { $b = 2 } else { $b = 3}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if ($a==1) { {$b=1;} ;} else if (($a==2)||($a==3)) { {$b=2;} ;} else { {$b=3;} ;};\\n;"}
 ]', true);
 
 foreach ($tests as $k=>$item) {
@@ -158,6 +158,21 @@ foreach ($mustaccept as $code) {
     sec_report('accept: '.$code, sec_interpret($code) !== 'error;');
 }
 
+echo '<b>Generated code must be valid PHP</b><br>';
+//inputs that are themselves malformed, so the output is expected not to parse
+$knownbad = ['if ($a+3)/4==3 $c = 1 '];
+foreach ($tests as $item) {
+    $out = sec_interpret($item['in']);
+    if ($out === 'error;' || in_array($item['in'], $knownbad, true)) { continue; }
+    try {
+        token_get_all('<?php ' . $out, TOKEN_PARSE);
+        $parses = true;
+    } catch (ParseError $pe) {
+        $parses = false;
+    }
+    sec_report('parses: ' . str_replace("\n", ' ', $item['in']), $parses);
+}
+
 echo '<b>validateInterpretedCode() must reject</b><br>';
 $badphp = [
     'system("ls");',
@@ -185,9 +200,14 @@ $badphp = [
     '$a = "{$a}";',
     'while (1) { $a = 1; }',
     'for (;;) { }',
-    'for ($i=0; $i<5 || $forloopcnt[1]<5; $i++) { }',
-    'for ($i=0; $i<5, $forloopcnt[1]<5; $i++) { }',
-    'while (($a) || $whilecount[1] < 200) { $a = 1; }',
+    'for ($i=0; $i<5 || loopstep("for",1); $i++) { }',
+    'for ($i=0; $i<5, loopstep("for",1); $i++) { }',
+    'while (($a) || loopstep("while",1)) { $a = 1; }',
+    'while ($a) { $b = 1; }',
+    'while (loopstep("while",1) || $a) { $b = 1; }',
+    'foreach ($a as $k=>$v) { $b = 1; if (!loopstep("for",1)) { break; } }',
+    '$forloopcnt[1] = 0;',
+    '$whilecount[1] = 0;',
     'foreach ($a as $k=>$v) { $b = 1; }',
     '$a = ${"x"};',
     '${checkvarvarname("a")}("ls");',
@@ -235,6 +255,34 @@ ob_start();
 $qt = interpret('qtext', '', 'a ${b} c ${$d}');
 ob_end_clean();
 sec_report('varvar: removed from qtext', strpos($qt, '${') === false);
+
+echo '<b>Loop budgets</b><br>';
+sec_report('sibling loops each get their own budget', sec_runcontrol('for ($j=0..999) { $i++ }'."
+".'for ($j=0..999) { $i++ }') === 2000);
+sec_report('sibling while loops each get their own budget', sec_runcontrol('while (1) { $i++ }'."
+".'while (1) { $i++ }') === 400);
+sec_report('nested loops share an overall cap', sec_runcontrol('for ($j=0..999) { for ($k=0..999) { $i++ } }') <= 12000);
+sec_report('nested while loops share an overall cap', sec_runcontrol('while (1) { while (1) { $i++ } }') <= 1000);
+sec_report('where..else runs the else branch when cut off', sec_runcontrol('$a = 1 where $a==2 else $i = 7') === 7);
+sec_report('where finds a value', sec_runcontrol('$i = $i + 1 where $i==3') === 3);
+sec_report('budget is reset for each block of code', sec_runcontrol('while (1) { $i++ }') === 200 && sec_runcontrol('while (1) { $i++ }') === 200);
+
+//runs question code, returns what it echoed
+function sec_runout($code) {
+    ob_start();
+    eval(interpret('control', '', $code));
+    return ob_get_clean();
+}
+$o = sec_runout('for ($i=1..100) { $a = 3 where $b>1 }');
+sec_report('nested where that never succeeds: each message once', substr_count($o, 'where not met') === 1 && substr_count($o, 'nested where') === 1);
+$o = sec_runout('for ($i=1..100) { while (1) { $a = 1 } }');
+sec_report('nested while that never ends: each message once', substr_count($o, 'while not terminated') === 1 && substr_count($o, 'nested while') === 1);
+$o = sec_runout('for ($i=1..20) { for ($j=1..1000) { $a = 1 } }');
+sec_report('nested for that blows the total reports once', substr_count($o, 'nested for') === 1);
+sec_report('nested loop hitting its limit does not stop its siblings', sec_runcontrol('for ($j=1..3) { while (1) { $i++ } }') === 600);
+sec_report('adjacent nested loops each get a full per-loop budget', sec_runcontrol('for ($j=1..1) { while (1) { $i++ }'."\n".'while (1) { $i++ } }') === 400);
+$n = sec_runcontrol('for ($j=1..100) { while (1) { $i++ } }');
+sec_report('shared total still stops nested loops of that kind', $n > 900 && $n <= 1000);
 
 echo '<b>Run-time checks</b><br>';
 sec_report('while loop is capped', sec_runcontrol('while (1) { $i++ }') <= 200);

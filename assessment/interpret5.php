@@ -47,7 +47,9 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
 		if ($r === 'error;') { 
 			return $r;
 		}
-        $r = '$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;' . $r;
+        if ($countcnt==1) {
+            $r = 'loopreset();' . $r;
+        }
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
         }
@@ -209,22 +211,17 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 						return 'error';
 					}
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
-						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && \$forloopcnt[{$countcnt}]<1000 && \$forloopcnt[0]<12000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++, \$forloopcnt[0]++) {".$todo.";};
-						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}}");
+						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),loopstart('for',{$countcnt});{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && loopstep('for',{$countcnt}); {$forcond[0]}++) {".$todo.";};}");
 				} else if (preg_match('/^\s*\(\s*([^;]*?);\s*([^;]*?);\s*([^;]*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					if (!interpretParensBalanced($forcond[0]) || !interpretParensBalanced($forcond[1]) || !interpretParensBalanced($forcond[2])) {
 						echo _('error with for code.. parentheses must be balanced within each part of the for loop');
 						return 'error';
 					}
-					$bits = array( "for ({$forcond[0]},\$forloopcnt[{$countcnt}]=0;({$forcond[1]}) && \$forloopcnt[{$countcnt}]<1000 && \$forloopcnt[0]<12000; ({$forcond[2]}), \$forloopcnt[{$countcnt}]++, \$forloopcnt[0]++) {".$todo.";};
-						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
+					$bits = array( "for ({$forcond[0]},loopstart('for',{$countcnt});({$forcond[1]}) && loopstep('for',{$countcnt}); ({$forcond[2]})) {".$todo.";};");
 				} else {
 					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
 					return 'error';
-				}
-				if ($countcnt == 1) {
-					$bits[0] = '$forloopcnt[0]=0;' . $bits[0] . ' if ($forloopcnt[0]>=12000) {echo "nested for loops exceeded 10000 iterations - giving up";}';
 				}
 			} else if ($foreachloc===0) {
 				//convert foreach($arr AS $k=>$v) {todo}
@@ -249,16 +246,12 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				if (preg_match('/^\s*\(\s*(\$\w+)\*?\s*as\s*(\$\w+)\s*=>\s*(\$\w+)\s*\)\s*$/i',$cond,$matches)) {
 					$foreachcond = array_slice($matches,1,3);
 					$bits = array("if (!is_array({$foreachcond[0]})) {echo 'input of foreach must be an array';} else {
-                        \$forloopcnt[{$countcnt}]=0; 
-                        foreach ({$foreachcond[0]} as {$foreachcond[1]}=>{$foreachcond[2]}) { 
-                            \$forloopcnt[{$countcnt}]++;\$forloopcnt[0]++;
-                            if (\$forloopcnt[{$countcnt}]==1000 || \$forloopcnt[0]>=12000) { break; }
+                        loopstart('for',{$countcnt});
+                        foreach ({$foreachcond[0]} as {$foreachcond[1]}=>{$foreachcond[2]}) {
+                            if (!loopstep('for',{$countcnt})) { break; }
                             { $todo ;}
-                        }; 
-                        if (\$forloopcnt[{$countcnt}]>=1000) {echo \"foreach loop exceeded 1000 iterations - giving up\";}}");
-					if ($countcnt == 1) {
-						$bits[0] = '$forloopcnt[0]=0;' . $bits[0] . ' if ($forloopcnt[0]>=12000) {echo "nested foreach exceeded 10000 iterations - giving up";}';
-					}
+                        };
+                        }");
 				} else {
 					echo _('error with foreach code.. must be "foreach ($arr as $a=>$b) {todo}" where $arr, $a and $b are variables only');
 					return 'error';
@@ -283,11 +276,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				}
 
                 if ($todo !== '' && $cond !== '') {
-					if ($countcnt==1) {
-						$bits = array('$whilecount[0]=0;$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {$whilecount['.$countcnt.']++;$whilecount[0]++;'.$todo.';}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";}; if ($whilecount[0]>=1000 && $whilecount[0]<2000 ) {echo "nested while not terminated in 1000 iterations";}');
-					} else {
-						$bits = array('$whilecount['.$countcnt.']=0;while (('.$cond.') && $whilecount['.$countcnt.']<200 && $whilecount[0]<1000) {$whilecount['.$countcnt.']++;$whilecount[0]++;'.$todo.';}; if ($whilecount['.$countcnt.']==200) {echo "while not terminated in 200 iterations";$whilecount[0]=5000;}; ');
-					}
+					$bits = array("loopstart('while',{$countcnt});while (({$cond}) && loopstep('while',{$countcnt})) {{$todo};};");
 				} else {
 					echo _('error with for code.. must be "while(condition) {todo}"');
 					return 'error';
@@ -358,7 +347,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 								echo _('need condition for elseif');
 								return 'error';
 							}
-							$out .= " else { $todo }";
+							$out .= " else { $todo ;}";
 						} else { //has condition
 							$cond = implode('',array_slice($bits,$elseloc[$i][0]+1,$j-$elseloc[$i][0]-1));
 							$out .= " else if ($cond) { $todo ;}";
@@ -383,26 +372,14 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					//handle $a = rand() where ($a==b) if ($c==0)
 					$wherecond = implode('',array_slice($bits,$whereloc+1,$ifloc-$whereloc-1));
 					$ifcond = implode('',array_slice($bits,$ifloc+1));
-					if ($countcnt==1) { //if outermost
-						$bits = array('if ('.$ifcond.') {$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000) {echo "nested where not met in 1000 iterations";}}');
-					} else {
-						$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;} }');
-					}
+						$bits = array("if ({$ifcond}) {loopstart('where',{$countcnt});do{{$wheretodo};} while (!({$wherecond}) && loopstep('where',{$countcnt}));}");
 				} else if (count($elseloc)==1 && $elseloc[0][1]=='else' && $elseloc[0][0]>$whereloc) {
                     $wherecond = implode('',array_slice($bits,$whereloc+1,$elseloc[0][0]-$whereloc-1));
                     $elsetodo = implode('',array_slice($bits, $elseloc[0][0]+1));
-                    if ($countcnt==1) {
-						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200 || $wherecount[0]>=1000) {'.$elsetodo.';};');
-					} else {
-						$bits = array('$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {'.$elsetodo.';}; ');
-					}
+                    $bits = array("loopstart('where',{$countcnt},true);do{{$wheretodo};} while (!({$wherecond}) && loopstep('where',{$countcnt})); if (loopcut('where',{$countcnt})) {{$elsetodo};};");
                 } else {
 					$wherecond = implode('',array_slice($bits,$whereloc+1));
-					if ($countcnt==1) {
-						$bits = array('$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000 ) {echo "nested where not met in 1000 iterations";}');
-					} else {
-						$bits = array('$wherecount['.$countcnt.']=0;do{$wherecount['.$countcnt.']++;$wherecount[0]++;'.$wheretodo.';} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;}; ');
-					}
+						$bits = array("loopstart('where',{$countcnt});do{{$wheretodo};} while (!({$wherecond}) && loopstep('where',{$countcnt}));");
 				}
 
 			} else if ($ifloc > 0) {
@@ -1112,6 +1089,75 @@ function setseed($ns,$ref=0) {
 	}
 }
 
+//Loop budgets.  State lives in a static, so question code cannot see or alter it.
+//  loopstart($kind,$depth[,$quiet]) - call when a loop begins; resets that loop's count
+//     (and the shared total, if it's an outermost loop)
+//  loopstep($kind,$depth) - call before each iteration; false means stop looping
+//  loopcut($kind,$depth) - true if the last loop at that depth was cut off
+//  loopreset() - clear everything; call at the start of each block of question code
+function &loopstate() {
+	static $state = ['n'=>[], 'tot'=>[], 'cut'=>[], 'quiet'=>[], 'dead'=>[], 'told'=>[]];
+	return $state;
+}
+function loopreset() {
+	$st = &loopstate();
+	$st = ['n'=>[], 'tot'=>[], 'cut'=>[], 'quiet'=>[], 'dead'=>[], 'told'=>[]];
+	return true;
+}
+function loopstart($kind, $depth, $quiet = false) {
+	$st = &loopstate();
+	$st['n'][$kind][$depth] = 0;
+	$st['cut'][$kind][$depth] = false;
+	$st['quiet'][$kind][$depth] = $quiet;
+	if ($depth == 1) {
+		$st['tot'][$kind] = 0;
+		$st['dead'][$kind] = false;
+		$st['told'][$kind] = [];
+	}
+	return true;
+}
+function loopstep($kind, $depth) {
+	//per-loop limit, shared limit across nested loops, message
+	static $limits = [
+		'for' => [1000, 12000, 'for loop exceeded 1000 iterations - giving up'],
+		'while' => [200, 1000, 'while not terminated in 200 iterations'],
+		'where' => [199, 1000, 'where not met in 200 iterations'],
+	];
+	if (!isset($limits[$kind])) { return false; }
+	$st = &loopstate();
+	if (!empty($st['dead'][$kind])) {
+		//shared budget already used up earlier in this outermost loop; stop quietly
+		$st['cut'][$kind][$depth] = true;
+		return false;
+	}
+	$st['n'][$kind][$depth] = ($st['n'][$kind][$depth] ?? 0) + 1;
+	$st['tot'][$kind] = ($st['tot'][$kind] ?? 0) + 1;
+	if ($st['n'][$kind][$depth] <= $limits[$kind][0] && $st['tot'][$kind] <= $limits[$kind][1]) {
+		return true;
+	}
+	$st['cut'][$kind][$depth] = true;
+	if ($st['n'][$kind][$depth] > $limits[$kind][0]) {
+		//this loop ran too long.  Other loops, including siblings, are unaffected,
+		//but only report it once per outermost loop.
+		$why = 'loop';
+		$msg = _($limits[$kind][2]);
+	} else {
+		//shared budget used up: no more loops of this kind in this outermost loop
+		$why = 'total';
+		$msg = sprintf(_('nested %s loops exceeded %d iterations - giving up'), $kind, $limits[$kind][1]);
+		$st['dead'][$kind] = true;
+	}
+	if (empty($st['quiet'][$kind][$depth]) && empty($st['told'][$kind][$why])) {
+		echo $msg;
+	}
+	$st['told'][$kind][$why] = true;
+	return false;
+}
+function loopcut($kind, $depth) {
+	$st = &loopstate();
+	return !empty($st['cut'][$kind][$depth]);
+}
+
 function interpretAllowedConstants() {
 	return ['PREG_SET_ORDER','PREG_PATTERN_ORDER'];
 }
@@ -1120,7 +1166,8 @@ function interpretAllowedConstants() {
 function interpretInternalFunctions() {
 	return ['is_nan','floatval','ceil','floor','round','is_array','exp','safepow','factorial',
 		'is_nicenumber','log10','log','safeasin','safeacos','atan','asec','acsc','acot',
-		'asinh','acosh','atanh','asech','acsch','acoth','checkvarvarname'];
+		'asinh','acosh','atanh','asech','acsch','acoth','checkvarvarname',
+		'loopreset','loopstart','loopstep','loopcut'];
 }
 
 //true if parens/brackets/braces in $s are balanced, ignoring quoted strings
@@ -1162,7 +1209,6 @@ function validateInterpretedCode($code) {
 		}
 	}
 	$okChars = '+-*/%=<>!.,;:?&|^~';
-	$internalVars = ['$forloopcnt','$whilecount','$wherecount']; //used by loop templates
 	$funcs = interpretInternalFunctions();
 	$consts = array_merge(interpretAllowedConstants(), ['M_PI']);
 
@@ -1220,7 +1266,7 @@ function validateInterpretedCode($code) {
 				}
 				return 'disallowed variable $GLOBALS';
 			}
-			if (!in_array($txt, $internalVars, true) && in_array($txt, $disallowedvar, true)) {
+			if (in_array($txt, $disallowedvar, true)) {
 				return 'disallowed variable '.$txt;
 			}
 			$isValue = true;
@@ -1299,9 +1345,8 @@ function qtextEvalCode($varname, $text) {
 	return $code;
 }
 
-//Loops must carry the counters the transpiler adds.  The counter has to be
-//ANDed at the top level of the loop condition (no ||, ?:, etc. there), and
-//foreach must increment its counter first thing in the body.
+//Loops must call loopstep().  It has to be ANDed at the top level of the loop
+//condition (no ||, ?:, etc. there), and foreach must call it first thing in the body.
 function interpretCheckLoopGuard($toks, $i) {
 	$id = $toks[$i][0];
 	$n = count($toks);
@@ -1320,11 +1365,15 @@ function interpretCheckLoopGuard($toks, $i) {
 			$segs[] = [];
 			continue;
 		}
-		$segs[count($segs)-1][] = [$depth, $toks[$j]];
+		$segs[count($segs)-1][] = [$depth, $toks[$j], $toks[$j+1][0] ?? null];
 	}
 	if ($j >= $n) { return 'unterminated loop header'; }
 	if ($id === T_FOREACH) {
-		if (($toks[$j+1][0] ?? null) === '{' && ($toks[$j+2][1] ?? '') === '$forloopcnt') {
+		// body must start:  { if ( ! loopstep (
+		if (($toks[$j+1][0] ?? null) === '{' && ($toks[$j+2][0] ?? null) === T_IF &&
+			($toks[$j+3][0] ?? null) === '(' && ($toks[$j+4][0] ?? null) === '!' &&
+			($toks[$j+5][1] ?? '') === 'loopstep' && ($toks[$j+6][0] ?? null) === '('
+		) {
 			return '';
 		}
 		return 'unguarded foreach loop';
@@ -1332,15 +1381,13 @@ function interpretCheckLoopGuard($toks, $i) {
 	if ($id === T_FOR) {
 		if (count($segs) !== 3) { return 'malformed for loop'; }
 		$cond = $segs[1];
-		$guards = ['$forloopcnt'];
 	} else {
 		$cond = $segs[0];
-		$guards = ['$whilecount','$wherecount'];
 	}
 	$found = false;
-	foreach ($cond as list($d, $tk)) {
+	foreach ($cond as list($d, $tk, $nextId)) {
 		if ($d !== 1) { continue; }
-		if ($tk[0] === T_VARIABLE && in_array($tk[1], $guards, true)) {
+		if ($tk[0] === T_STRING && $tk[1] === 'loopstep' && $nextId === '(') {
 			$found = true;
 		} else if (in_array($tk[0], [T_BOOLEAN_OR, T_LOGICAL_OR, T_LOGICAL_XOR, T_COALESCE, '?', ','], true)) {
 			return 'unguarded loop condition';
