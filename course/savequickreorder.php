@@ -24,13 +24,16 @@
  $allCourseItems = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 
  $order = json_decode($_POST['order'], true);
- $newblocks = [];
- $newitems = additems2($order);
-
- if (md5($itemorder)!=$_POST['checkhash']) {
+ if (!isset($_POST['checkhash']) || md5($itemorder)!=$_POST['checkhash']) {
  	 echo '0:'._('Error: Items have changed in the course, perhaps in another window, since this page was loaded. Refresh the page to load changes and try again.');
  	 exit;
- } else if (countitems($items) != countitems($newitems) - count($newblocks)) {
+ }
+
+ $newblocks = [];
+ $badstructure = false;
+ $newitems = additems2($order);
+
+ if ($badstructure || countitems($items) != countitems($newitems) - count($newblocks)) {
  	 echo '0:'._('Error: Some item data was not sent correctly. Please try again.');
  	 exit;
  }
@@ -81,17 +84,22 @@
  }
 
 function additems2($arr) {
-  global $items, $blockcnt, $newblocks, $allCourseItems;
+  global $items, $blockcnt, $newblocks, $allCourseItems, $badstructure;
   $outitems = array();
   foreach ($arr as $id=>$item) {
     if (strpos($item['id'],'-')!==false) { //is block
       $blocktree = explode('-',$item['id']);
       $sub = $items;
       for ($i=1;$i<count($blocktree)-1;$i++) {
-        $sub = $sub[$blocktree[$i]-1]['items'];
+        $sub = $sub[$blocktree[$i]-1]['items'] ?? null;
+        if (!is_array($sub)) { break; }
       }
 
-      $block = $sub[$blocktree[count($blocktree)-1]-1];
+      $block = is_array($sub) ? ($sub[$blocktree[count($blocktree)-1]-1] ?? null) : null;
+      if (!is_array($block)) { // block not found; course structure out of sync
+        $badstructure = true;
+        continue;
+      }
       if (!empty($_POST['B' . $item['id']])) {
         $block['name'] = htmlentities($_POST['B' . $item['id']]);
       }
