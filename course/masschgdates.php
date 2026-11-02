@@ -560,6 +560,7 @@ if ($overwriteBody==1) {
 					    flattenitems($item['items'],$addto,$parent.'-'.($k+1),$pre.' ');
                     }
 				} else {
+					if (!isset($itemsassoc[$item])) { continue; } // orphaned item id
 					$addto[] = $itemsassoc[$item];
 					$prefix[$itemsassoc[$item]] = $pre;
 				}
@@ -596,7 +597,7 @@ if ($overwriteBody==1) {
 			$avails[] = $row[5];
 			$LPcutoffs[] = $row[6]*1;
 			if (isset($prefix['Assessment'.$row[4]])) {$pres[] = $prefix['Assessment'.$row[4]];} else {$pres[] = '';}
-			if ($orderby==3) {$courseorder[] = $itemscourseorder['Assessment'.$row[4]];}
+			if ($orderby==3) {$courseorder[] = ($itemscourseorder['Assessment'.$row[4]] ?? PHP_INT_MAX);}
 		}
 	}
 	if ($filter=='all' || $filter=='inlinetext') {
@@ -613,7 +614,7 @@ if ($overwriteBody==1) {
 			$avails[] = $row[4];
 			$LPcutoffs[] = -1;
 			if (isset($prefix['InlineText'.$row[3]])) {$pres[] = $prefix['InlineText'.$row[3]];} else {$pres[] = '';}
-			if ($orderby==3) {$courseorder[] = $itemscourseorder['InlineText'.$row[3]];}
+			if ($orderby==3) {$courseorder[] = ($itemscourseorder['InlineText'.$row[3]] ?? PHP_INT_MAX);}
 		}
 	}
 	if ($filter=='all' || $filter=='linkedtext') {
@@ -630,7 +631,7 @@ if ($overwriteBody==1) {
 			$avails[] = $row[4];
 			$LPcutoffs[] = -1;
 			if (isset($prefix['LinkedText'.$row[3]])) {$pres[] = $prefix['LinkedText'.$row[3]];} else {$pres[] = '';}
-			if ($orderby==3) {$courseorder[] = $itemscourseorder['LinkedText'.$row[3]];}
+			if ($orderby==3) {$courseorder[] = ($itemscourseorder['LinkedText'.$row[3]] ?? PHP_INT_MAX);}
 		}
 	}
 	if ($filter=='all' || $filter=='forums') {
@@ -648,7 +649,7 @@ if ($overwriteBody==1) {
 			$avails[] = $row[4];
 			$LPcutoffs[] = -1;
 			if (isset($prefix['Forum'.$row[3]])) {$pres[] = $prefix['Forum'.$row[3]];} else {$pres[] = '';}
-			if ($orderby==3) {$courseorder[] = $itemscourseorder['Forum'.$row[3]];}
+			if ($orderby==3) {$courseorder[] = ($itemscourseorder['Forum'.$row[3]] ?? PHP_INT_MAX);}
 		}
 	}
 	if ($filter=='all' || $filter=='wikis') {
@@ -665,7 +666,7 @@ if ($overwriteBody==1) {
 			$avails[] = $row[4];
 			$LPcutoffs[] = -1;
 			if (isset($prefix['Wiki'.$row[3]])) {$pres[] = $prefix['Wiki'.$row[3]];} else {$pres[] = '';}
-			if ($orderby==3) {$courseorder[] = $itemscourseorder['Wiki'.$row[3]];}
+			if ($orderby==3) {$courseorder[] = ($itemscourseorder['Wiki'.$row[3]] ?? PHP_INT_MAX);}
 		}
 	}
 	if ($filter=='all' || $filter=='blocks') {
@@ -679,7 +680,7 @@ if ($overwriteBody==1) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1).'-'.$item['id'];
 					$types[] = "Block";
-					if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
+					if ($orderby==3) {$courseorder[] = ($itemscourseorder['Block'.$parent.'-'.($k+1)] ?? PHP_INT_MAX);}
 					$names[] = $item['name'];
 					$startdates[] = $item['startdate'];
 					$enddates[] = $item['enddate'];
