@@ -28,7 +28,7 @@ $istutor = isset($tutorid);
 $cansendmsgs = false;
 $threadsperpage = intval($listperpage);
 
-$cid = Sanitize::courseId($_GET['cid']);
+$cid = Sanitize::courseId($_GET['cid'] ?? 0);
 
 if (!isset($_GET['page']) || $_GET['page'] == '') {
 	$page = 1;

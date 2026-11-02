@@ -496,8 +496,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 	//echo $toevalqtext;
 	try {
-		eval("\$evaledqtext = \"$toevalqtxt\";");
-		eval("\$evaledsoln = \"$toevalsoln\";");
+		eval(qtextEvalCode('evaledqtext', $toevalqtxt));
+		eval(qtextEvalCode('evaledsoln', $toevalsoln));
 	} catch (Throwable $t) {
 		if ($myrights>10) {
 			echo '<p>Caught error in evaluating the question text or solution text in this question: ';

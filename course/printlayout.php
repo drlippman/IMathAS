@@ -513,7 +513,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	echo "</div>\n";//end qnum div
 	echo "<div class=floatl><div>\n";
 	//echo $toevalqtext;
-	eval("\$evaledqtext = \"$toevalqtxt\";");
+	eval(qtextEvalCode('evaledqtext', $toevalqtxt));
 	echo printfilter(filter($evaledqtext));
 	echo "</div>\n"; //end question div
 

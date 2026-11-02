@@ -317,7 +317,7 @@ if ($overwriteBody==1) {
 
 			for ($i=0; $i<$numq; $i++) {
                 if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
-                if (!empty($_REQUEST['showtexts'])) {
+                if (!empty($_REQUEST['showtexts']) && !empty($line['texts'])) {
                     foreach ($line['texts'] as $k=>$v) {
                         if ($v['displayBefore'] == $i) {
                             if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
@@ -334,7 +334,7 @@ if ($overwriteBody==1) {
 				}
 				$out .= $newout;
 			}
-			if (!empty($_REQUEST['showtexts'])) {
+			if (!empty($_REQUEST['showtexts']) && !empty($line['texts'])) {
 				foreach ($line['texts'] as $k=>$v) {
 					if ($v['displayBefore'] >= $numq) {
 						if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
@@ -393,7 +393,7 @@ if ($overwriteBody==1) {
 		$out .= "</div>\n";
 		for ($i=0; $i<$numq; $i++) {
             if ($i>0) { $out .= '<p>'.$_REQUEST['qsep'].'</p>';}
-            if (!empty($_REQUEST['showtexts'])) {
+            if (!empty($_REQUEST['showtexts']) && !empty($line['texts'])) {
                 foreach ($line['texts'] as $k=>$v) {
                     if ($v['displayBefore'] == $i) {
                         if (!empty($v['ispage']) && !empty($v['pagetitle'])) {
@@ -737,7 +737,7 @@ function printq($qn,$qsetid,$seed,$pts,$showqn,$showpts) {
 	}
 	$retstrout .= "<div>\n";
 	//$retstrout .= $toevalqtext;
-	eval("\$evaledqtext = \"$toevalqtxt\";");
+	eval(qtextEvalCode('evaledqtext', $toevalqtxt));
   // fix [AB] fields
   if (strpos($evaledqtext,'[AB')!==false) {
 		if (is_array($answerbox)) {

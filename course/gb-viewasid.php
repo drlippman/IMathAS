@@ -21,6 +21,7 @@ if (isset($CFG['hooks']['course/gb-viewasid'])) {
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($_GET['asid'])) {
 		echo '<html>Error - invalid assessment session ID</html>';
+		exit;
 	} else if ($_GET['asid']=='new' && $isteacher) {
 		$asid = 'new';
 	} else {

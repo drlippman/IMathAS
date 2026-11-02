@@ -810,7 +810,11 @@ class QuestionHtmlGenerator
         $GLOBALS['qgenbreak1'] = __LINE__;
         try {
           $prep = \genVarInit($qtextvars);
-          eval($prep . "\$evaledqtext = \"$toevalqtxt\";"); // This creates $evaledqtext.
+          $evalcode = $prep . "\$evaledqtext = \"$toevalqtxt\";";
+          if (($evalerr = \validateInterpretedCode($evalcode)) !== '') {
+              throw new \RuntimeException($evalerr);
+          }
+          eval($evalcode); // This creates $evaledqtext.
 
         /*
          * Eval the solution code.
@@ -819,7 +823,11 @@ class QuestionHtmlGenerator
          */
          $GLOBALS['qgenbreak2'] = __LINE__;
          $prep = \genVarInit($solnvars);
-         eval($prep . "\$evaledsoln = \"$toevalsoln\";"); // This creates $evaledsoln.
+         $evalcode = $prep . "\$evaledsoln = \"$toevalsoln\";";
+         if (($evalerr = \validateInterpretedCode($evalcode)) !== '') {
+             throw new \RuntimeException($evalerr);
+         }
+         eval($evalcode); // This creates $evaledsoln.
        } catch (\Throwable $t) {
           $this->addError(
               _('Caught error while evaluating the text in this question: ')

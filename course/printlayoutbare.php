@@ -501,7 +501,7 @@ function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	}
 	echo "<div>\n";
 	//echo $toevalqtext;
-	eval("\$evaledqtext = \"$toevalqtxt\";");
+	eval(qtextEvalCode('evaledqtext', $toevalqtxt));
   // fix [AB] fields
   if (strpos($evaledqtext,'[AB')!==false) {
 		if (is_array($answerbox)) {

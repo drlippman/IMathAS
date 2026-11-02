@@ -18,7 +18,7 @@ array_push($GLOBALS['allowedmacros'],"loadlibrary","importcodefrom","includecode
 $GLOBALS['disallowedvar'] = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la',
   '$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips',
   '$optionsPack','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$allowedConstants',
-  '$wherecount','$forloopcnt','$_forends','$countcnt','$myrights','$myspecialrights',
+  '$wherecount','$whilecount','$forloopcnt','$_forends','$countcnt','$myrights','$myspecialrights',
   '$this', '$quesData', '$toevalsoln', '$doShowAnswer', '$doShowAnswerParts','$teacherInGb',
   '$_SERVER','$_POST','$_GET','$_FILES','$_REQUEST','$_SESSION','$_COOKIE','$_ENV','$DBH','$stm');
 
@@ -50,6 +50,15 @@ function interpret($blockname,$anstype,$str,$countcnt=1,$included_qs=[])
         $r = '$wherecount[0]=0;$whilecount[0]=0;$forloopcnt[0]=0;' . $r;
         if ($countcnt==1 && count($GLOBALS['interpretcurvars']) > 0) {
             $r = genVarInit(array_unique($GLOBALS['interpretcurvars'])) . $r;
+        }
+        if ($countcnt==1) {
+            // independent check of the final PHP, in case the transpiler
+            // above emitted something it should not have
+            $err = validateInterpretedCode($r);
+            if ($err !== '') {
+                echo sprintf(_('Eeek.. unsafe code: %s'), Sanitize::encodeStringForDisplay($err));
+                return 'error;';
+            }
         }
 		return $r;
 	}
@@ -195,11 +204,19 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				//if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
                 if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
+					if (!interpretParensBalanced($forcond[1]) || !interpretParensBalanced($forcond[2])) {
+						echo _('error with for code.. parentheses must be balanced within each part of the for loop');
+						return 'error';
+					}
 					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
 						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),\$forloopcnt[{$countcnt}]=0;{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && \$forloopcnt[{$countcnt}]<1000 && \$forloopcnt[0]<12000; {$forcond[0]}++, \$forloopcnt[{$countcnt}]++, \$forloopcnt[0]++) {".$todo.";};
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}}");
 				} else if (preg_match('/^\s*\(\s*([^;]*?);\s*([^;]*?);\s*([^;]*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
+					if (!interpretParensBalanced($forcond[0]) || !interpretParensBalanced($forcond[1]) || !interpretParensBalanced($forcond[2])) {
+						echo _('error with for code.. parentheses must be balanced within each part of the for loop');
+						return 'error';
+					}
 					$bits = array( "for ({$forcond[0]},\$forloopcnt[{$countcnt}]=0;({$forcond[1]}) && \$forloopcnt[{$countcnt}]<1000 && \$forloopcnt[0]<12000; ({$forcond[2]}), \$forloopcnt[{$countcnt}]++, \$forloopcnt[0]++) {".$todo.";};
 						if (\$forloopcnt[{$countcnt}]>=1000) {echo \"for loop exceeded 1000 iterations - giving up\";}");
 				} else {
@@ -489,7 +506,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 	global $DBH, $allowedmacros;
 	global $mathfuncs;
 	global $disallowedvar;
-	$allowedConstants = ['PREG_SET_ORDER','PREG_PATTERN_ORDER'];
+	$allowedConstants = interpretAllowedConstants();
 	$i = 0;
 	$connecttolast = 0;
 	$len = strlen($str);
@@ -907,7 +924,10 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
 				}
 			} else if (strlen($out)>0 && $out[0]=='{' && $lastsym[0]=='$') { //var var
 				//conditional value based on if allowed
-				$syms[count($syms)-1][0] = '((checkvarvarisallowed('.substr($out,1,-1).'))?$'.$out.':0)';
+				// the name expression is evaluated once, inside checkvarvarname
+                    $syms[count($syms)-1][0] = '${checkvarvarname('.substr($out,1,-1).')}';
+					// placeholder returned for disallowed names; make sure it's initialized
+					$GLOBALS['interpretcurvars'][] = '$invalidvariable';
 				$connecttolast = 0;
 			} else {
 				$syms[count($syms)-1][0] .= $out;
@@ -1045,13 +1065,28 @@ function checkvarvarisallowed($inside) {
 	return false;
 }
 
+//variable-variable support: returns the variable name if it is a plain word
+//that isn't disallowed, otherwise a harmless placeholder name.
+function checkvarvarname($inside) {
+	global $disallowedvar;
+	if (is_scalar($inside) && preg_match('/^\w+$/', (string)$inside) &&
+		!in_array('$'.$inside, $disallowedvar, true)
+	) {
+		return (string)$inside;
+	}
+	echo _('Invalid variable: ') . Sanitize::encodeStringForDisplay(is_scalar($inside) ? (string)$inside : '');
+	return 'invalidvariable';
+}
+
 //loads a macro library
 function loadlibrary($str) {
-	$str = str_replace(array("/",".",'"'),"",$str);
+	$str = str_replace('"',"",$str);
 	$libs = explode(",",$str);
 	$libdir = rtrim(dirname(__FILE__), '/\\') .'/libs/';
 	foreach ($libs as $lib) {
-		if (is_file($libdir . $lib.".php")) {
+		if (!preg_match('/^[A-Za-z0-9_]+$/', $lib)) {
+			echo sprintf(_("Error loading library %s\n"), Sanitize::encodeStringForDisplay($lib));
+		} else if (is_file($libdir . $lib.".php")) {
 			require_once $libdir.$lib.".php";
 		} else {
 			echo sprintf(_("Error loading library %s\n"), Sanitize::encodeStringForDisplay($lib));
@@ -1075,6 +1110,243 @@ function setseed($ns,$ref=0) {
 	} else {
 		$RND->srand($ns);
 	}
+}
+
+function interpretAllowedConstants() {
+	return ['PREG_SET_ORDER','PREG_PATTERN_ORDER'];
+}
+
+//functions the transpiler itself emits (beyond $allowedmacros)
+function interpretInternalFunctions() {
+	return ['is_nan','floatval','ceil','floor','round','is_array','exp','safepow','factorial',
+		'is_nicenumber','log10','log','safeasin','safeacos','atan','asec','acsc','acot',
+		'asinh','acosh','atanh','asech','acsch','acoth','checkvarvarname'];
+}
+
+//true if parens/brackets/braces in $s are balanced, ignoring quoted strings
+function interpretParensBalanced($s) {
+	$stack = [];
+	$pairs = [')'=>'(', ']'=>'[', '}'=>'{'];
+	$len = strlen($s);
+	for ($i=0; $i<$len; $i++) {
+		$c = $s[$i];
+		if ($c=='"' || $c=="'") {
+			for ($i++; $i<$len && $s[$i]!=$c; $i++) {
+				if ($s[$i]=='\\') { $i++; }
+			}
+		} else if ($c=='(' || $c=='[' || $c=='{') {
+			$stack[] = $c;
+		} else if (isset($pairs[$c])) {
+			if (array_pop($stack) !== $pairs[$c]) { return false; }
+		}
+	}
+	return count($stack)==0;
+}
+
+//Second line of defense.  Takes PHP code about to be eval'd and checks it with
+//PHP's own tokenizer against an allowlist, independent of how the code was
+//generated.  Returns '' if OK, otherwise a short description of the problem.
+function validateInterpretedCode($code) {
+	global $allowedmacros, $disallowedvar;
+	static $okIds = null;
+	if ($okIds === null) {
+		$okIds = [];
+		foreach (['T_LNUMBER','T_DNUMBER','T_CONSTANT_ENCAPSED_STRING','T_IF','T_ELSE','T_ELSEIF',
+			'T_DO','T_AS','T_BREAK','T_CONTINUE','T_ECHO','T_LIST','T_ARRAY','T_ISSET','T_DOUBLE_ARROW',
+			'T_INC','T_DEC','T_BOOLEAN_AND','T_BOOLEAN_OR','T_LOGICAL_AND','T_LOGICAL_OR','T_LOGICAL_XOR',
+			'T_IS_EQUAL','T_IS_NOT_EQUAL','T_IS_IDENTICAL','T_IS_NOT_IDENTICAL','T_IS_SMALLER_OR_EQUAL',
+			'T_IS_GREATER_OR_EQUAL','T_PLUS_EQUAL','T_MINUS_EQUAL','T_MUL_EQUAL','T_DIV_EQUAL',
+			'T_CONCAT_EQUAL','T_MOD_EQUAL','T_POW','T_POW_EQUAL','T_SL','T_SR','T_SPACESHIP',
+			'T_COALESCE','T_INT_CAST'] as $name) {
+			if (defined($name)) { $okIds[] = constant($name); }
+		}
+	}
+	$okChars = '+-*/%=<>!.,;:?&|^~';
+	$internalVars = ['$forloopcnt','$whilecount','$wherecount']; //used by loop templates
+	$funcs = interpretInternalFunctions();
+	$consts = array_merge(interpretAllowedConstants(), ['M_PI']);
+
+	$toks = [];
+	foreach (token_get_all('<?php '.$code) as $k=>$t) {
+		if ($k === 0) { continue; } //open tag
+		if (is_array($t)) {
+			if ($t[0] === T_WHITESPACE) { continue; }
+			$toks[] = [$t[0], $t[1]];
+		} else {
+			$toks[] = [$t, $t];
+		}
+	}
+	$n = count($toks);
+	$stack = [];
+	$inDq = false;
+	$prevId = null;
+	$prevIsValue = false; //previous token ends a value, so a following ( would be a dynamic call
+	for ($i=0; $i<$n; $i++) {
+		list($id, $txt) = $toks[$i];
+		$nextId = $toks[$i+1][0] ?? null;
+		if ($id === '"') { //start/end of an interpolated string
+			$inDq = !$inDq;
+			$prevIsValue = !$inDq;
+			$prevId = $id;
+			continue;
+		}
+		if ($inDq) {
+			if ($id === T_ENCAPSED_AND_WHITESPACE || $id === T_NUM_STRING || $id === '[' || $id === ']' || $id === '-') {
+				//ok
+			} else if ($id === T_VARIABLE) {
+				if (in_array($txt, $disallowedvar, true)) { return 'disallowed variable '.$txt; }
+			} else if ($id === T_STRING && ($prevId === '[' || $prevId === T_OBJECT_OPERATOR)) {
+				//ok: "$a[key]" or "$a->prop"
+			} else if ($id === T_OBJECT_OPERATOR && $prevId === T_VARIABLE && $nextId === T_STRING) {
+				//ok
+			} else {
+				return 'unexpected '.(is_int($id) ? token_name($id) : $id).' in string';
+			}
+			$prevId = $id;
+			continue;
+		}
+		$isValue = false;
+		if ($id === T_VARIABLE) {
+			if ($txt === '$GLOBALS') {
+				//only allowed as the rand() rewrite:  $GLOBALS['RND']->rand(
+				if (($toks[$i+1][0] ?? null) === '[' && ($toks[$i+2][1] ?? '') === "'RND'" &&
+					($toks[$i+3][0] ?? null) === ']' && ($toks[$i+4][0] ?? null) === T_OBJECT_OPERATOR &&
+					($toks[$i+5][1] ?? '') === 'rand' && ($toks[$i+6][0] ?? null) === '('
+				) {
+					$i += 5;
+					$prevId = T_STRING;
+					$prevIsValue = false;
+					continue;
+				}
+				return 'disallowed variable $GLOBALS';
+			}
+			if (!in_array($txt, $internalVars, true) && in_array($txt, $disallowedvar, true)) {
+				return 'disallowed variable '.$txt;
+			}
+			$isValue = true;
+		} else if ($id === '$') {
+			//only the variable-variable rewrite:  ${checkvarvarname(
+			if (($toks[$i+1][0] ?? null) === '{' && ($toks[$i+2][0] ?? null) === T_STRING &&
+				$toks[$i+2][1] === 'checkvarvarname' && ($toks[$i+3][0] ?? null) === '('
+			) {
+				$stack[] = '{vv';
+				$stack[] = '(vv';
+				$i += 3;
+				$prevId = '(';
+				$prevIsValue = false;
+				continue;
+			}
+			return 'variable variable';
+		} else if ($id === T_STRING) {
+			if ($nextId === '(') {
+				if (!in_array($txt, $allowedmacros, true) && !in_array($txt, $funcs, true)) {
+					return 'function not allowed: '.$txt;
+				}
+			} else {
+				if (!in_array(strtolower($txt), ['true','false','null'], true) && !in_array($txt, $consts, true)) {
+					return 'constant not allowed: '.$txt;
+				}
+				$isValue = true;
+			}
+		} else if ($id === T_FOR || $id === T_FOREACH || $id === T_WHILE) {
+			$err = interpretCheckLoopGuard($toks, $i);
+			if ($err !== '') { return $err; }
+		} else if ($id === '(') {
+			if ($prevIsValue) { return 'dynamic function call'; }
+			$stack[] = '(';
+		} else if ($id === ')') {
+			$top = array_pop($stack);
+			if ($top === '(vv') {
+				if ($nextId !== '}') { return 'malformed variable variable'; }
+			} else if ($top !== '(') {
+				return 'unbalanced parentheses';
+			}
+			$isValue = true;
+		} else if ($id === '[') {
+			$stack[] = '[';
+		} else if ($id === ']') {
+			if (array_pop($stack) !== '[') { return 'unbalanced brackets'; }
+			$isValue = true;
+		} else if ($id === '{') {
+			$stack[] = '{';
+		} else if ($id === '}') {
+			$top = array_pop($stack);
+			if ($top !== '{' && $top !== '{vv') { return 'unbalanced braces'; }
+			$isValue = ($top === '{vv');
+		} else if (in_array($id, $okIds, true) || (is_string($id) && strpos($okChars, $id) !== false)) {
+			$isValue = ($id === T_LNUMBER || $id === T_DNUMBER || $id === T_CONSTANT_ENCAPSED_STRING);
+		} else {
+			return 'not allowed: '.(is_int($id) ? token_name($id) : $id);
+		}
+		$prevId = $id;
+		$prevIsValue = $isValue;
+	}
+	if ($inDq || count($stack) > 0) {
+		return 'unbalanced code';
+	}
+	return '';
+}
+
+//Builds the code to eval qtext/solution text into variable $varname
+//(without the $), after checking it.  Use as: eval(qtextEvalCode('evaledqtext', $toevalqtxt));
+//The eval must happen in the caller's scope, so this returns code rather than running it.
+function qtextEvalCode($varname, $text) {
+	$code = "\$$varname = \"$text\";";
+	$err = validateInterpretedCode($code);
+	if ($err !== '') {
+		return "\$$varname = " . var_export(sprintf(_('Eeek.. unsafe code: %s'), Sanitize::encodeStringForDisplay($err)), true) . ';';
+	}
+	return $code;
+}
+
+//Loops must carry the counters the transpiler adds.  The counter has to be
+//ANDed at the top level of the loop condition (no ||, ?:, etc. there), and
+//foreach must increment its counter first thing in the body.
+function interpretCheckLoopGuard($toks, $i) {
+	$id = $toks[$i][0];
+	$n = count($toks);
+	if (($toks[$i+1][0] ?? null) !== '(') { return 'loop without condition'; }
+	$depth = 0;
+	$segs = [[]];
+	for ($j = $i+1; $j < $n; $j++) {
+		$t = $toks[$j][0];
+		if ($t === '(' || $t === '[' || $t === '{') {
+			$depth++;
+			if ($depth === 1) { continue; }
+		} else if ($t === ')' || $t === ']' || $t === '}') {
+			$depth--;
+			if ($depth === 0) { break; }
+		} else if ($depth === 1 && $t === ';' && $id === T_FOR) {
+			$segs[] = [];
+			continue;
+		}
+		$segs[count($segs)-1][] = [$depth, $toks[$j]];
+	}
+	if ($j >= $n) { return 'unterminated loop header'; }
+	if ($id === T_FOREACH) {
+		if (($toks[$j+1][0] ?? null) === '{' && ($toks[$j+2][1] ?? '') === '$forloopcnt') {
+			return '';
+		}
+		return 'unguarded foreach loop';
+	}
+	if ($id === T_FOR) {
+		if (count($segs) !== 3) { return 'malformed for loop'; }
+		$cond = $segs[1];
+		$guards = ['$forloopcnt'];
+	} else {
+		$cond = $segs[0];
+		$guards = ['$whilecount','$wherecount'];
+	}
+	$found = false;
+	foreach ($cond as list($d, $tk)) {
+		if ($d !== 1) { continue; }
+		if ($tk[0] === T_VARIABLE && in_array($tk[1], $guards, true)) {
+			$found = true;
+		} else if (in_array($tk[0], [T_BOOLEAN_OR, T_LOGICAL_OR, T_LOGICAL_XOR, T_COALESCE, '?', ','], true)) {
+			return 'unguarded loop condition';
+		}
+	}
+	return $found ? '' : 'unguarded loop';
 }
 
 function genVarInit($vars) {

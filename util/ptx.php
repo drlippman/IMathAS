@@ -143,7 +143,7 @@ function mbxproc($qn,$qsetid,$seed) {
 	} else {
 		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
 	}
-  eval("\$evaledqtext = \"$toevalqtxt\";");
+  eval(qtextEvalCode('evaledqtext', $toevalqtxt));
   $statement = mbxfilter($evaledqtext);
 
   if (strpos($toevalqtxt,'$answerbox')===false) {
