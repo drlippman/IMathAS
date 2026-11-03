@@ -103,7 +103,7 @@ else if (isset($_GET['getsubs']) && isset($_GET['cid']) && $_GET['cid']=="admin"
         echo json_encode($out, JSON_INVALID_UTF8_IGNORE);
     }
     exit;
-} else if ($myrights<20) {
+} else if (!isset($myrights) || $myrights<20) {
     exit;
 }
 
