@@ -507,7 +507,7 @@ function tokenize($str,$anstype,$countcnt,$included_qs=[]) {
                 }
             }
         }
-		if ($c=='/' && $str[$i+1]=='/') { //comment
+		if (($c=='/' && $str[$i+1]=='/') || $c=='#') { //comment
 			while ($c!="\n" && $i<$len) {
                 $i++;
                 if ($i<$len) {
@@ -1204,12 +1204,12 @@ function validateInterpretedCode($code) {
 			'T_IS_EQUAL','T_IS_NOT_EQUAL','T_IS_IDENTICAL','T_IS_NOT_IDENTICAL','T_IS_SMALLER_OR_EQUAL',
 			'T_IS_GREATER_OR_EQUAL','T_PLUS_EQUAL','T_MINUS_EQUAL','T_MUL_EQUAL','T_DIV_EQUAL',
 			'T_CONCAT_EQUAL','T_MOD_EQUAL','T_POW','T_POW_EQUAL','T_SL','T_SR','T_SPACESHIP',
-			'T_COALESCE','T_INT_CAST'] as $name) {
+			'T_COALESCE','T_INT_CAST','T_AMPERSAND_FOLLOWED_BY_VAR_OR_VARARG',
+				'T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG'] as $name) {
 			if (defined($name)) { $okIds[] = constant($name); }
 		}
 	}
-	$okChars = '+-*/%=<>!.,;:?&|^~';
-	$funcs = interpretInternalFunctions();
+	$okChars = '+-*/%=<>!.,;:?&|^~';	$funcs = interpretInternalFunctions();
 	$consts = array_merge(interpretAllowedConstants(), ['M_PI']);
 
 	$toks = [];
@@ -1217,6 +1217,11 @@ function validateInterpretedCode($code) {
 		if ($k === 0) { continue; } //open tag
 		if (is_array($t)) {
 			if ($t[0] === T_WHITESPACE) { continue; }
+			if ($t[0] === T_NAME_FULLY_QUALIFIED && substr_count($t[1], '\\') === 1) {
+				//\round( is the same as round(; the checks below still apply to the bare name
+				$t[0] = T_STRING;
+				$t[1] = substr($t[1], 1);
+			}
 			$toks[] = [$t[0], $t[1]];
 		} else {
 			$toks[] = [$t, $t];
