@@ -77,6 +77,107 @@
             el.innerHTML = "`" + myAM + "`";
         }
 
+        // Cache of rendered SVG data URIs, keyed by AsciiMath string. Content is
+        // un-rendered and re-rendered on every exec command, so avoid reconverting.
+        var svgCache = new Map();
+        var SVGCACHEMAX = 500;
+
+        // Build a standalone <img> from cached {src, va}
+        function cachedToImg(entry, str) {
+            var img = document.createElement('img');
+            img.className = 'AMimg';
+            img.src = entry.src;
+            img.title = str;
+            img.alt = str;
+            if (entry.va) {
+                img.style.verticalAlign = entry.va;
+            }
+            return img;
+        }
+
+        // In-flight conversions keyed by AsciiMath string, so duplicates queued
+        // before the first finishes share one conversion
+        var svgPending = new Map();
+
+        // Build a cache entry {src, va} from MathJax's SVG output, and cache it
+        function mjSvgToEntry(svg, str) {
+            svg = svg.cloneNode(true);
+            svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            // glyphs may reference a shared global cache that an <img> can't see
+            var cache = document.querySelector('svg defs[id$="global-cache"]');
+            if (cache && svg.querySelector('use')) {
+                svg.insertBefore(cache.cloneNode(true), svg.firstChild);
+            }
+            // an <img> doesn't inherit text color
+            var svgText = new XMLSerializer().serializeToString(svg)
+                .replace(/currentColor/g, '#000000');
+            var entry = {
+                src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText),
+                va: svg.style.verticalAlign
+            };
+            if (svgCache.size >= SVGCACHEMAX) {
+                svgCache.delete(svgCache.keys().next().value);
+            }
+            svgCache.set(str, entry);
+            return entry;
+        }
+
+        // Render via MathJax SVG if available. Returns a promise, or null if unavailable
+        function renderWithMathJaxSVG(outnode, str) {
+            if (typeof MathJax === 'undefined') {
+                return null;
+            }
+            var cached = svgCache.get(str);
+            if (cached) {
+                // apply synchronously; no need to wait on MathJax
+                outnode.innerHTML = '';
+                outnode.appendChild(cachedToImg(cached, str));
+                outnode.title = str;
+                return Promise.resolve();
+            }
+            function convert() {
+                // the asciimath2svg helpers use whatever output jax the page configured
+                var oj = MathJax.startup && MathJax.startup.output;
+                if (!oj || oj.name !== 'SVG') {
+                    throw new Error('MathJax is not using SVG output');
+                }
+                // MJ4 promise version waits on dynamic font loading
+                var conv = MathJax.asciimath2svgPromise ||
+                    (MathJax.asciimath2svg && function (s) { return Promise.resolve(MathJax.asciimath2svg(s)); });
+                if (!conv) {
+                    throw new Error('MathJax asciimath2svg not available');
+                }
+                return conv(cleanmath(str));
+            }
+            var ready;
+            if (MathJax.asciimath2svgPromise || MathJax.asciimath2svg) {
+                ready = Promise.resolve();
+            } else if (MathJax.startup && MathJax.startup.promise) {
+                // MathJax still loading; convenience methods get defined at startup
+                ready = MathJax.startup.promise;
+            } else {
+                return null;
+            }
+            var pending = svgPending.get(str);
+            if (!pending) {
+                pending = ready.then(convert).then(function (container) {
+                    var svg = container.querySelector('svg');
+                    if (!svg) {
+                        throw new Error('no svg in MathJax output');
+                    }
+                    return mjSvgToEntry(svg, str);
+                });
+                svgPending.set(str, pending);
+                var clear = function () { svgPending.delete(str); };
+                pending.then(clear, clear);
+            }
+            return pending.then(function (entry) {
+                outnode.innerHTML = '';
+                outnode.appendChild(cachedToImg(entry, str));
+                outnode.title = str;
+            });
+        }
+
         // Convert node to AM
         function nodeToAM(outnode) {
             var str = outnode.innerHTML.replace(/`/g, "");
@@ -85,6 +186,18 @@
                 .replace(/<img[^>]*title="(.*?)".*?>/g, "$1");
             str = str.replace(/[\u200B-\u200D\uFEFF]/g, '');
             
+            var mjpromise = renderWithMathJaxSVG(outnode, str);
+            if (mjpromise) {
+                mjpromise.catch(function () {
+                    legacyNodeToAM(outnode, str);
+                });
+                return;
+            }
+            legacyNodeToAM(outnode, str);
+        }
+
+        // Render via ASCIIMathTeXImg.js and an external image service
+        function legacyNodeToAM(outnode, str) {
             if (tinymce.Env.ie) {
                 var newAM = document.createElement("span");
                 newAM.className = "AM";
