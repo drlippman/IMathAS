@@ -257,7 +257,7 @@ if ($myrights<20) {
 		SELECT l.id, l.name, l.parent, a.depth + 1, a.root_libid
 		FROM imas_libraries l
 		INNER JOIN ancestors a ON l.id = a.parent
-		WHERE a.parent != 0
+		WHERE a.parent != 0 AND a.depth < 20
 		),
 		breadcrumbs AS (
 		SELECT root_libid AS libid,
