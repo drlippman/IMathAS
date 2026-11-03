@@ -40,7 +40,45 @@ $tests = json_decode('[
 {"in":"if ($a==1) || $a==5 { $b = 1 } else if ($a==2) || ($a==3) { $b = 2 } else { $b = 3}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if (($a==1)||$a==5) { {$b=1;} ;} else if (($a==2)||($a==3)) { {$b=2;} ;} else { {$b=3;} ;};\\n;"},
 {"in":"if $a==1 {$b=1} else if $a==2 {$b=2} else if $a==3 {$b=3} else {$b=4}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if ($a==1) { {$b=1;} ;} else if ($a==2) { {$b=2;} ;} else if ($a==3) { {$b=3;} ;} else { {$b=4;} ;};\\n;"},
 {"in":"if ($a==1) $b=1 else if ($a==2) $b=2 else if ($a==3) $b=3 else $b=4","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if (($a==1)) { $b=1 ;} else if (($a==2)) { $b=2 ;} else if (($a==3)) { $b=3 ;} else { $b=4 ;};\\n;"},
-{"in":"if $a==1 { $b = 1 } else if ($a==2) || ($a==3) { $b = 2 } else { $b = 3}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if ($a==1) { {$b=1;} ;} else if (($a==2)||($a==3)) { {$b=2;} ;} else { {$b=3;} ;};\\n;"}
+{"in":"if $a==1 { $b = 1 } else if ($a==2) || ($a==3) { $b = 2 } else { $b = 3}","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}loopreset();if ($a==1) { {$b=1;} ;} else if (($a==2)||($a==3)) { {$b=2;} ;} else { {$b=3;} ;};\\n;"},
+{"in":"if ($a==2) $b=4\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { $b=4 ;};\\n$c=1;\\n;"},
+{"in":"if $a==2 {$b=4}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if ($a==2) { {$b=4;} ;};\\n$c=1;\\n;"},
+{"in":"if ($a==2) {$b=4}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { {$b=4;} ;};\\n$c=1;\\n;"},
+{"in":"if (($a-1)\\/2==1) $c=($b-3)\\/2\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}if (!isset($b)){$b=null;}loopreset();if ((($a-1)\\/2==1)) { $c=($b-3)\\/2 ;};\\n$c=1;\\n;"},
+{"in":"$a=1 if $b==3\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if ($b==3) { $a=1 ; };\\n$c=1;\\n;"},
+{"in":"$a=1 if ($b==3)\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($b==3)) { $a=1 ; };\\n$c=1;\\n;"},
+{"in":"{$a=1} if ($b==3)\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($b==3)) { {$a=1;} ; };\\n$c=1;\\n;"},
+{"in":"{$a=1} if $b==3\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if ($b==3) { {$a=1;} ; };\\n$c=1;\\n;"},
+{"in":"if ($a==2) $b=4 else if ($a==3) $b=5\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { $b=4 ;} else if (($a==3)) { $b=5 ;};\\n$c=1;\\n;"},
+{"in":"if ($a==2) {$b=4} else if ($a==3) {$b=5}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { {$b=4;} ;} else if (($a==3)) { {$b=5;} ;};\\n$c=1;\\n;"},
+{"in":"if $a==2 {$b=4} else if $a==3 {$b=5}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if ($a==2) { {$b=4;} ;} else if ($a==3) { {$b=5;} ;};\\n$c=1;\\n;"},
+{"in":"if ($a==2) {$b=4} elseif ($a==3) {$b=5}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { {$b=4;} ;} else if (($a==3)) { {$b=5;} ;};\\n$c=1;\\n;"},
+{"in":"if ($a==2) {$b=4} else {$b=5}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { {$b=4;} ;} else { {$b=5;} ;};\\n$c=1;\\n;"},
+{"in":"if ($a==2) $b=4 else $b=5\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { $b=4 ;} else { $b=5 ;};\\n$c=1;\\n;"},
+{"in":"$a = rand(1,5) where $a>2\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!($a>2) && loopstep(\'where\',1));;\\n$c=1;\\n;"},
+{"in":"$a = rand(1,5) where ($a>2)\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!(($a>2)) && loopstep(\'where\',1));;\\n$c=1;\\n;"},
+{"in":"{$a = rand(1,5) } where $a>2\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{{$a=$GLOBALS[\'RND\']->rand(1,5);};} while (!($a>2) && loopstep(\'where\',1));;\\n$c=1;\\n;"},
+{"in":"{$a = rand(1,5) } where ($a>2)\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{{$a=$GLOBALS[\'RND\']->rand(1,5);};} while (!(($a>2)) && loopstep(\'where\',1));;\\n$c=1;\\n;"},
+{"in":"$a = rand(1,5) where $a>6 else $a=6\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1,true);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!($a>6) && loopstep(\'where\',1)); if (loopcut(\'where\',1)) {$a=6;};;\\n$c=1;\\n;"},
+{"in":"$a = rand(1,5) where $a>6 else {$a=6}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1,true);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!($a>6) && loopstep(\'where\',1)); if (loopcut(\'where\',1)) {{$a=6;};};;\\n$c=1;\\n;"},
+{"in":"while $a<5 {$a++}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'while\',1);while (($a<5) && loopstep(\'while\',1)) {{$a++;};};;\\n$c=1;\\n;"},
+{"in":"while ($a<5) {$a++}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'while\',1);while ((($a<5)) && loopstep(\'while\',1)) {{$a++;};};;\\n$c=1;\\n;"},
+{"in":"while ($a<5) $a++\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'while\',1);while ((($a<5)) && loopstep(\'while\',1)) {$a++;};;\\n$c=1;\\n;"},
+{"in":"for ($i=1..3) $a++\\n$c=1","out":"if (!isset($i)){$i=null;}if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (is_nan(3) || is_nan(1)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(1),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(3),4)) && loopstep(\'for\',1); $i++) {$a++;};};\\n$c=1;\\n;"},
+{"in":"for ($i = 1 .. 3) $a++\\n$c=1","out":"if (!isset($i)){$i=null;}if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (is_nan(3) || is_nan(1)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(1),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(3),4)) && loopstep(\'for\',1); $i++) {$a++;};};\\n$c=1;\\n;"},
+{"in":"for ($i=1..3) {$a++}\\n$c=1","out":"if (!isset($i)){$i=null;}if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (is_nan(3) || is_nan(1)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval(1),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(3),4)) && loopstep(\'for\',1); $i++) {{$a++;};};};\\n$c=1;\\n;"},
+{"in":"for ($i=$b..$d) {$a++}\\n$c=1","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}if (!isset($d)){$d=null;}if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (is_nan($d) || is_nan($b)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval($b),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval($d),4)) && loopstep(\'for\',1); $i++) {{$a++;};};};\\n$c=1;\\n;"},
+{"in":"for ($i=$b+1..($b+1)*2) $a++\\n$c=1","out":"if (!isset($i)){$i=null;}if (!isset($b)){$b=null;}if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (is_nan(($b+1)*2) || is_nan($b+1)) {echo \'part of for loop is not a number\';} else {\\r\\n\\t\\t\\t\\t\\t\\tfor ($i=(int)ceil(round(floatval($b+1),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(($b+1)*2),4)) && loopstep(\'for\',1); $i++) {$a++;};};\\n$c=1;\\n;"},
+{"in":"for ($i=0; $i<5; $i++) {$a++}\\n$c=1","out":"if (!isset($i)){$i=null;}if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();for ($i=0,loopstart(\'for\',1);($i<5) && loopstep(\'for\',1); ($i++)) {{$a++;};};;\\n$c=1;\\n;"},
+{"in":"foreach($a as $b=>$c) {$d++}\\n$c=1","out":"if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}if (!isset($d)){$d=null;}loopreset();if (!is_array($a)) {echo \'input of foreach must be an array\';} else {\\r\\n                        loopstart(\'for\',1);\\r\\n                        foreach ($a as $b=>$c) {\\r\\n                            if (!loopstep(\'for\',1)) { break; }\\r\\n                            { {$d++;} ;}\\r\\n                        };\\r\\n                        };\\n$c=1;\\n;"},
+{"in":"foreach($a as $b) {$d++}\\n$c=1","out":"error;"},
+{"in":"$f = \'die\'\\n$g = $f(3)","out":"if (!isset($f)){$f=null;}if (!isset($g)){$g=null;}loopreset();$f=\'die\';\\n$g=$f*(3);\\n;"},
+{"in":"$b=5$a","out":"if (!isset($b)){$b=null;}if (!isset($a)){$a=null;}loopreset();$b=5*$a;\\n;"},
+{"in":"$b=5sin(3)","out":"if (!isset($b)){$b=null;}loopreset();$b=5*sin(3);\\n;"},
+{"in":"$b=sin(3)sqrt(4)","out":"if (!isset($b)){$b=null;}loopreset();$b=sin(3)*sqrt(4);\\n;"},
+{"in":"$b=$a$c","out":"if (!isset($b)){$b=null;}if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();$b=$a*$c;\\n;"},
+{"in":"$b=$a($b+1)","out":"if (!isset($b)){$b=null;}if (!isset($a)){$a=null;}loopreset();$b=$a*($b+1);\\n;"},
+{"in":"$b=($a-1)($b+1)","out":"if (!isset($b)){$b=null;}if (!isset($a)){$a=null;}loopreset();$b=($a-1)*($b+1);\\n;"}
 ]', true);
 
 foreach ($tests as $k=>$item) {
@@ -57,6 +95,12 @@ foreach ($tests as $k=>$item) {
 
 
 $newtests = json_decode('[
+{"in":"$b=5$a"},
+{"in":"$b=5sin(3)"},
+{"in":"$b=sin(3)sqrt(4)"},
+{"in":"$b=$a$c"},
+{"in":"$b=$a($b+1)"},
+{"in":"$b=($a-1)($b+1)"}
 ]', true);
 
 
@@ -69,7 +113,7 @@ foreach ($newtests as $k=>$item) {
 
 echo '<pre>';
 foreach ($newtests as $k) {
-echo str_replace("'", "\\'", json_encode($k)).",\n";
+echo str_replace(["\\","'"], ["\\\\","\\'"], json_encode($k)).",\n";
 }
 echo '</pre><br/>';
 
