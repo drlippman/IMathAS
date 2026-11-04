@@ -99,6 +99,8 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
     $foreachloc = -1;
 	$whereloc = -1;
 	$whileloc = -1;
+	$hdrat = array(); //bit indexes of (...) tokens directly following a control word
+	$braceat = array(); //bit indexes of {...} tokens
 	$lastsym = '';
 	$lasttype = -1;
 	$closeparens = 0;
@@ -185,23 +187,13 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			//check for for, if, where and rearrange bits if needed
 			if ($forloc===0) {
 				//convert for($i=a..b) {todo}
-				$j = $forloc;
-				while ($j<count($bits) && $bits[$j][0]!='{') {
-					$j++;
+				$split = interpretSplitBlock($bits, $forloc, count($bits), $hdrat, $braceat);
+				if ($split === false) {
+					echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
+					return 'error';
 				}
-				if ($j == count($bits)) {
-					if ($bits[1][0] == '(' && count($bits)>2  && strlen($bits[1])>7) {
-						$cond = $bits[1];
-						$todo = implode('', array_slice($bits, $bits[2]=='*'?3:2));
-					} else {
-						echo _('error with for code.. must be "for ($var=a..b) {todo}" where a and b are whole numbers or variables only');
-						return 'error';
-					}
-				} else {
-					$cond = implode('',array_slice($bits,$forloc+1,$j-$forloc-1));
-					$todo = implode('',array_slice($bits,$j));
-				}
-				
+				list($cond, $todo) = $split;
+
 				//might be $a..$b or 3.*.4  (remnant of implicit handling)
 				//if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(-?\d+|\$[\w\[\]]+)\s*\.\s?\.\s*(-?\d+|\$[\w\[\]]+)\s*\)\s*$/',$cond,$matches)) {
                 if (preg_match('/^\s*\(\s*(\$\w+)\s*\=\s*(.*?)\s*\.\s?\.\s*(.*?)\s*\)\s*$/',$cond,$matches)) {
@@ -210,8 +202,7 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 						echo _('error with for code.. parentheses must be balanced within each part of the for loop');
 						return 'error';
 					}
-					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {
-						for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),loopstart('for',{$countcnt});{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && loopstep('for',{$countcnt}); {$forcond[0]}++) {".$todo.";};}");
+					$bits = array( "if (is_nan({$forcond[2]}) || is_nan({$forcond[1]})) {echo 'part of for loop is not a number';} else {for ({$forcond[0]}=(int)ceil(round(floatval({$forcond[1]}),4)),loopstart('for',{$countcnt});{$forcond[0]}<=(int)floor(round(floatval({$forcond[2]}),4)) && loopstep('for',{$countcnt}); {$forcond[0]}++) {".$todo.";};}");
 				} else if (preg_match('/^\s*\(\s*([^;]*?);\s*([^;]*?);\s*([^;]*?)\s*\)\s*$/',$cond,$matches)) {
 					$forcond = array_slice($matches,1,3);
 					if (!interpretParensBalanced($forcond[0]) || !interpretParensBalanced($forcond[1]) || !interpretParensBalanced($forcond[2])) {
@@ -225,55 +216,29 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				}
 			} else if ($foreachloc===0) {
 				//convert foreach($arr AS $k=>$v) {todo}
-				$j = $foreachloc;
-				while ($j<count($bits) && $bits[$j][0]!='{') {
-					$j++;
+				$split = interpretSplitBlock($bits, $foreachloc, count($bits), $hdrat, $braceat);
+				if ($split === false) {
+					echo _('error with foreach code.. must be "foreach ($arr as $a=>$b) {todo}" where $arr, $a and $b are variables only');
+					return 'error';
 				}
-				if ($j == count($bits)) {
-					if ($bits[1][0] == '(' && count($bits)>2 && strlen($bits[1])>7) {
-						$cond = $bits[1];
-						$todo = implode('', array_slice($bits, $bits[2]=='*'?3:2));
-					} else {
-						echo _('error with foreach code.. must be "foreach ($arr as $a=>$b) {todo}" where $arr, $a and $b are variables only');
-						return 'error';
-					}
-				} else {
-					$cond = implode('',array_slice($bits,$foreachloc+1,$j-$foreachloc-1));
-					$todo = implode('',array_slice($bits,$j));
-				}
-				
+				list($cond, $todo) = $split;
+
 				//should be $arr as $k=>$v
 				if (preg_match('/^\s*\(\s*(\$\w+)\*?\s*as\s*(\$\w+)\s*=>\s*(\$\w+)\s*\)\s*$/i',$cond,$matches)) {
 					$foreachcond = array_slice($matches,1,3);
-					$bits = array("if (!is_array({$foreachcond[0]})) {echo 'input of foreach must be an array';} else {
-                        loopstart('for',{$countcnt});
-                        foreach ({$foreachcond[0]} as {$foreachcond[1]}=>{$foreachcond[2]}) {
-                            if (!loopstep('for',{$countcnt})) { break; }
-                            { $todo ;}
-                        };
-                        }");
+					$bits = array("if (!is_array({$foreachcond[0]})) {echo 'input of foreach must be an array';} else {loopstart('for',{$countcnt});foreach ({$foreachcond[0]} as {$foreachcond[1]}=>{$foreachcond[2]}) {if (!loopstep('for',{$countcnt})) { break; }{ $todo ;}};}");
 				} else {
 					echo _('error with foreach code.. must be "foreach ($arr as $a=>$b) {todo}" where $arr, $a and $b are variables only');
 					return 'error';
 				}
 			} else if ($whileloc === 0) {
 				//convert while(cond) {todo}
-				$j = $whileloc;
-				while ($j<count($bits) && $bits[$j][0]!='{') {
-					$j++;
+				$split = interpretSplitBlock($bits, $whileloc, count($bits), $hdrat, $braceat);
+				if ($split === false) {
+					echo _('error with for code.. must be "while(condition) {todo}"');
+					return 'error';
 				}
-				if ($j == count($bits)) {
-					if ($bits[1][0] == '(' && count($bits)>2 && strlen($bits[1])>2) {
-						$cond = $bits[1];
-						$todo = implode('', array_slice($bits, $bits[2]=='*'?3:2));
-					} else {
-						echo _('error with for code.. must be "while(condition) {todo}"');
-						return 'error';
-					}
-				} else {
-					$cond = implode('',array_slice($bits,$whileloc+1,$j-$whileloc-1));
-					$todo = implode('',array_slice($bits,$j));
-				}
+				list($cond, $todo) = $split;
 
                 if ($todo !== '' && $cond !== '') {
 					$bits = array("loopstart('while',{$countcnt});while (({$cond}) && loopstep('while',{$countcnt})) {{$todo};};");
@@ -283,75 +248,40 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				}
 			} else if ($ifloc == 0) {
 				//this is if at beginning of line, form:  if ($a==3) {todo}
-				$j = 0;
-				while ($j<count($bits) && $bits[$j][0]!='{') {
-					$j++;
+				$end = count($elseloc)==0 ? count($bits) : $elseloc[0][0];
+				$split = interpretSplitBlock($bits, 0, $end, $hdrat, $braceat);
+				if ($split === false) {
+					echo _('need curlys for if statement at beginning of line');
+					return 'error';
 				}
-				if ($j==count($bits)) {
-					if ($bits[1][0]=='(' && count($bits)>2 && strlen($bits[1])>2 ) {
-						// is if (cond); don't need to worry about braces
-						$cond = $bits[1];
-						if (count($elseloc)==0) {
-							$todo = implode('', array_slice($bits, $bits[2]=='*'?3:2));
-						} else {
-							$todo = implode('',array_slice($bits, $bits[2]=='*'?3:2 , $elseloc[0][0]- ($bits[2]=='*'?3:2)));
-						}
-					} else {
-						echo _('need curlys for if statement at beginning of line');
-						return 'error';
-					}
-				} else {
-					$cond = implode('',array_slice($bits,1,$j-1));
-					if (count($elseloc)==0) {
-						$todo = implode('',array_slice($bits,$j));
-					} else {
-						$todo = implode('',array_slice($bits,$j,$elseloc[0][0]-$j));
-					}
-				}
+				list($cond, $todo) = $split;
 				$out = "if ($cond) { $todo ;}";
 
 				for ($i=0; $i<count($elseloc); $i++) {
-					$j = $elseloc[$i][0];
-					while ($j<count($bits) && $bits[$j][0]!='{') {
-						$j++;
-					}
-					$_elsehandled = false;
-					if ($j==count($bits)) {
-						$j = $elseloc[$i][0];
-						if ($elseloc[$i][1]=='elseif' && count($bits)>$j+1 && $bits[$j+1][0]=='(' && strlen($bits[$j+1])>2) { 
-							$cond = $bits[$j+1];
-							if ($i==count($elseloc)-1) {
-								$todo = implode('', array_slice($bits, $bits[$j+2]=='*'?($j+3):($j+2)));
-							} else {
-								$todo = implode('',array_slice($bits, $bits[$j+2]=='*'?($j+3):($j+2) , $elseloc[$i+1][0]- ($bits[$j+2]=='*'?($j+3):($j+2))));
-							}
-							$out .= " else if ($cond) { $todo ;}";
-							$_elsehandled = true;
-						} else {
-							if ($elseloc[$i][1]=='elseif') {
-								echo _('need curlys for elseif statement');
-								return 'error';
-							} else {
-								$j = $elseloc[$i][0] + 1;
-							}
+					$kw = $elseloc[$i][0];
+					$end = ($i==count($elseloc)-1) ? count($bits) : $elseloc[$i+1][0];
+					if ($elseloc[$i][1]=='elseif') {
+						$split = interpretSplitBlock($bits, $kw, $end, $hdrat, $braceat);
+						if ($split === false) {
+							echo _('need curlys for elseif statement');
+							return 'error';
 						}
-					}
-					if (!$_elsehandled) {
-						if ($i==count($elseloc)-1) {
-							$todo = implode('',array_slice($bits,$j));
-						} else {
-							$todo = implode('',array_slice($bits,$j,$elseloc[$i+1][0]-$j));
+						list($cond, $todo) = $split;
+						if ($cond === '') {
+							echo _('need condition for elseif');
+							return 'error';
 						}
-						if ($j-$elseloc[$i][0]==1 || $elseloc[$i][1]!='elseif') { //no condition
-							if ($elseloc[$i][1]=='elseif') {
-								echo _('need condition for elseif');
-								return 'error';
-							}
-							$out .= " else { $todo ;}";
-						} else { //has condition
-							$cond = implode('',array_slice($bits,$elseloc[$i][0]+1,$j-$elseloc[$i][0]-1));
-							$out .= " else if ($cond) { $todo ;}";
+						$out .= " else if ($cond) { $todo ;}";
+					} else { //else: no condition, so the body starts at a { if there is one
+						$j = $kw + 1;
+						while ($j<$end && !isset($braceat[$j])) {
+							$j++;
 						}
+						if ($j == $end) {
+							$j = $kw + 1;
+						}
+						$todo = implode('',array_slice($bits,$j,$end-$j));
+						$out .= " else { $todo ;}";
 					}
 				}
 				$bits = array($out);
@@ -367,6 +297,10 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 					return 'error';
 				}
 				$wheretodo = implode('',array_slice($bits,0,$whereloc));
+				if ($whereloc+1 >= count($bits)) {
+					echo _('missing condition after where');
+					return 'error';
+				}
 
 				if ($ifloc>-1) {
 					//handle $a = rand() where ($a==b) if ($c==0)
@@ -386,7 +320,11 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				//handle $a = b if ($c==0)
 				$todo = implode('',array_slice($bits,0,$ifloc));
 				$cond = implode('',array_slice($bits,$ifloc+1));
-
+				if ($cond === '') {
+					//also happens if the if follows a for/foreach/while statement
+					echo _('missing condition after if');
+					return 'error';
+				}
 
 				$bits = array("if ($cond) { $todo ; }");
 			}
@@ -396,6 +334,8 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			$ifloc = -1;
 			$whereloc = -1;
 			$whileloc = -1;
+			$hdrat = array();
+			$braceat = array();
 			$sawequals = false;
 			$elseloc = array();
 			//collapse bits to a line, add to lines array
@@ -430,7 +370,12 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 			//implicit 3(4) (5)(3)  $v(2)
 			if ($lasttype==3 || $lasttype==4 || $lasttype==1) {
 				$bits[] = '*';
+			} else if ($lasttype==8) {
+				//possible header of a control statement: if (cond), for (...), etc.
+				$hdrat[count($bits)] = true;
 			}
+		} else if ($type==5) { //is curly
+			$braceat[count($bits)] = true;
 		} else if ($type==8) { //is control
 			//mark location of control symbol
 			if ($sym=='if') {
@@ -472,6 +417,38 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 	}
 	//collapse to string
 	return implode(";\n",$lines);
+}
+
+//Splits the bits of a block statement (if, elseif, for, foreach, while) into
+//its condition and its body.
+//  $bits: bits of the line, $kw: index of the keyword bit,
+//  $end: index just past the last bit of this statement (or branch of an if),
+//  $hdrat, $braceat: sets of bit indexes of (...) tokens that directly follow a
+//    control word, and of {...} tokens
+//Returns array($cond, $todo), or false if the statement has no usable form.
+//If there is a {...} body, then the condition is everything between the keyword and
+//the {, and can be any expression:  if $a==1 {todo}  or  if ($a)||($b) {todo}
+//If not, the condition has to be the single (...) token after the keyword, and the
+//body is the rest:  if ($a==1) todo
+function interpretSplitBlock($bits, $kw, $end, $hdrat, $braceat) {
+	$j = $kw + 1;
+	while ($j<$end && !isset($braceat[$j])) {
+		$j++;
+	}
+	if ($j < $end) {
+		return array(
+			implode('',array_slice($bits,$kw+1,$j-$kw-1)),
+			implode('',array_slice($bits,$j,$end-$j))
+		);
+	}
+	if (isset($hdrat[$kw+1]) && $kw+2<$end && strlen($bits[$kw+1])>2) {
+		$j = $kw + 2;
+		if ($bits[$j]=='*') { //implicit multiplication between header and body
+			$j++;
+		}
+		return array($bits[$kw+1], implode('',array_slice($bits,$j,$end-$j)));
+	}
+	return false;
 }
 
 //get tokens
