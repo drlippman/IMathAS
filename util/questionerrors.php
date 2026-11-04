@@ -34,13 +34,13 @@ if ($isadmin) {
             JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
             JOIN imas_users AS iu ON iqs.ownerid=iu.id
             WHERE iqs.userights>0 AND iu.lastaccess<'.$old.'
-            ORDER BY iqe.qsetid';
+            ORDER BY iqe.qsetid LIMIT 300';
     } else if (!empty($_GET['public'])) {
         $query = 'SELECT iqe.* FROM imas_questionerrorlog AS iqe
             JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
-            WHERE iqs.userights>0 ORDER BY iqe.qsetid';
+            WHERE iqs.userights>0 ORDER BY iqe.qsetid LIMIT 300';
     } else {
-        $query = 'SELECT * FROM imas_questionerrorlog ORDER BY qsetid';
+        $query = 'SELECT * FROM imas_questionerrorlog ORDER BY qsetid LIMIT 300';
     }
 
     $stm = $DBH->query($query);
