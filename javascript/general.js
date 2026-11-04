@@ -585,7 +585,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		selector: selectorstr,
 		inline: inlinemode,
 		license_key: 'gpl',
-		cache_suffix: '?v=110326',
+		cache_suffix: '?v=110426',
 		plugins: "lists advlist autolink image charmap anchor searchreplace code link media table rollups asciimath asciisvg attach snippet emoticons accordion ableplayer drawing mathquill" + (usertype>0?" courselink":""),
 		menubar: false,
 		toolbar1: "myEdit myInsert styles | bold italic underline subscript superscript | forecolor backcolor | snippet code",
@@ -806,6 +806,12 @@ function getEditorUploadCtx() {
 	return '';
 }
 const image_upload_handler = (blobInfo, progress, isattach) => new Promise((resolve, reject) => {
+  // Inline SVGs (e.g. asciimath plugin's rendered equations) must stay as data: URIs.
+  // Resolving with the same data URI leaves the img src unchanged.
+  if (!isattach && blobInfo.blob().type === 'image/svg+xml') {
+	resolve('data:image/svg+xml;base64,' + blobInfo.base64());
+	return;
+  }
   const xhr = new XMLHttpRequest();
 
   xhr.withCredentials = false;

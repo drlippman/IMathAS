@@ -103,6 +103,17 @@
         function mjSvgToEntry(svg, str) {
             svg = svg.cloneNode(true);
             svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            // strip semantic/speech enrichment and node metadata; unused in an <img>
+            svg.querySelectorAll('*').forEach(function (el) {
+                Array.from(el.attributes).forEach(function (a) {
+                    if (/^data-(semantic|speech|mml-node)/.test(a.name)) {
+                        el.removeAttribute(a.name);
+                    }
+                });
+            });
+            svg.removeAttribute('aria-hidden');
+            svg.removeAttribute('role');
+            svg.removeAttribute('focusable');
             // glyphs may reference a shared global cache that an <img> can't see
             var cache = document.querySelector('svg defs[id$="global-cache"]');
             if (cache && svg.querySelector('use')) {
@@ -147,7 +158,13 @@
                 if (!conv) {
                     throw new Error('MathJax asciimath2svg not available');
                 }
-                return conv(cleanmath(str));
+                // Stop the render pipeline at TYPESET so the a11y explorer (which runs
+                // later, and fails on this detached node) never attaches.
+                var opts = {};
+                try {
+                    opts.end = MathJax._.core.MathItem.STATE.TYPESET;
+                } catch (e) {}
+                return conv(cleanmath(str), opts);
             }
             var ready;
             if (MathJax.asciimath2svgPromise || MathJax.asciimath2svg) {
