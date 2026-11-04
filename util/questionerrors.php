@@ -23,27 +23,45 @@ if (!empty($_POST['checked'])) {
     exit;
 }
 
+$timesused = [];
+$stm = null;
 if ($isadmin) {
+    // build the FROM/WHERE used to identify erroring questions
     if (!empty($_GET['limited'])) {
         if (isset($CFG['GEN']['qerroronold'])) {
             $old = time() - 60*60*24*$CFG['GEN']['qerroronold'][0];
         } else {
             $old = time() - 60*60*24*30;
         }
-        $query = 'SELECT iqe.* FROM imas_questionerrorlog AS iqe
+        $from = 'imas_questionerrorlog AS iqe
             JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
             JOIN imas_users AS iu ON iqs.ownerid=iu.id
-            WHERE iqs.userights>0 AND iu.lastaccess<'.$old.'
-            ORDER BY iqe.qsetid LIMIT 300';
-    } else if (!empty($_GET['public'])) {
-        $query = 'SELECT iqe.* FROM imas_questionerrorlog AS iqe
-            JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
-            WHERE iqs.userights>0 ORDER BY iqe.qsetid LIMIT 300';
+            WHERE iqs.userights>0 AND iu.lastaccess<'.intval($old);
+    } else if (!empty($_GET['all'])) {
+        $from = 'imas_questionerrorlog AS iqe WHERE 1=1';
     } else {
-        $query = 'SELECT * FROM imas_questionerrorlog ORDER BY qsetid LIMIT 300';
+        $from = 'imas_questionerrorlog AS iqe
+            JOIN imas_questionset AS iqs ON iqe.qsetid=iqs.id
+            WHERE iqs.userights>0';
     }
-
-    $stm = $DBH->query($query);
+    if ($sort === 'recent') {
+        $stm = $DBH->query('SELECT iqe.* FROM '.$from.' ORDER BY iqe.etime DESC LIMIT 300');
+    } else {
+        // pick the most used questions among ALL erroring questions.
+        // Count is a correlated lookup on the questionsetid index, run once per distinct qsetid.
+        $stm = $DBH->query('SELECT e.qsetid,
+            (SELECT COUNT(*) FROM imas_questions AS iq WHERE iq.questionsetid=e.qsetid) AS used
+            FROM (SELECT DISTINCT iqe.qsetid FROM '.$from.') AS e
+            ORDER BY used DESC, e.qsetid LIMIT 100');
+        while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+            $timesused[$row[0]] = $row[1];
+        }
+        $stm = null;
+        if (count($timesused) > 0) {
+            $ids = implode(',', array_map('intval', array_keys($timesused)));
+            $stm = $DBH->query("SELECT * FROM imas_questionerrorlog WHERE qsetid IN ($ids)");
+        }
+    }
 } else {
     $query = 'SELECT * FROM imas_questionerrorlog WHERE ownerid=? ORDER BY qsetid';
 
@@ -52,24 +70,20 @@ if ($isadmin) {
 }
 
 $allrows = [];
-$allids = [];
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-    if (!isset($allrows[$row['qsetid']])) {
-        $allrows[$row['qsetid']] = [];
+if ($stm) {
+    while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+        $allrows[$row['qsetid']][] = $row;
     }
-    $allrows[$row['qsetid']][] = $row;
 }
 foreach ($allrows as $k=>$v) {
     usort($allrows[$k], function($a,$b) {
         return $b['etime'] <=> $a['etime'];
     });
 }
-$timesused = [];
 $allids = array_keys($allrows);
-if (count($allids)>0) {
-    $allqids = implode(',', array_map('intval', array_unique($allids)));
+if (count($timesused) == 0 && count($allids)>0) {
+    $allqids = implode(',', array_map('intval', $allids));
     $stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allqids) GROUP BY questionsetid");
-    $timesused = [];
     while ($row = $stm->fetch(PDO::FETCH_NUM)) {
         $timesused[$row[0]] = $row[1];
     }
@@ -83,6 +97,7 @@ if ($sort === 'recent') {
     arsort($timesused);
     $qorder = array_keys($timesused);
     $qorder = array_merge($qorder, array_diff($allids,$qorder));
+    $qorder = array_values(array_intersect($qorder, $allids));
 }
 
 $placeinhead = '<style type="text/css"> 
