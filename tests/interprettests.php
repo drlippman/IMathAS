@@ -1,7 +1,7 @@
 <?php
 
 require_once "../init.php";
-require_once "interpret5.php";
+require_once "../assessment/interpret5.php";
 
 if ($myrights < 100) {
     exit;

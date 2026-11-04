@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <script src="../javascript/mathparser.js"></script>
+        <script>
+            function go() {
+                var inp = document.getElementById('in').value;
+
+                const res = evalMathParser(inp,true);
+                console.log(res);
+                document.getElementById('out').textContent = res;
+            }
+        </script>
+    </head>
+    <body>
+        <textarea id="in">3+4</textarea>
+        <button onclick="go()">Go</button>
+        <div id="out"></div>
+    </body>
+</html>
