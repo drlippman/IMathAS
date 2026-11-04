@@ -54,7 +54,7 @@ function getprime($digits = 0) {
 		$c4 = count($primes[4]);
 		$c5 = count($primes[5]);
 		$c6 = count($primes[6]);
-		$r = $RND->rand(0,$c1+$c2+$c3+$c4+$c5+$c6);
+		$r = $RND->rand(0,$c1+$c2+$c3+$c4+$c5+$c6-1);
 		if ($r<$c1) {
 			return $primes[1][$r];
 		} else if ($r < $c1+$c2) {
