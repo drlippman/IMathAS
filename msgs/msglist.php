@@ -469,7 +469,7 @@ if (isset($_GET['add'])) {
 			}
 			$message = preg_replace('/(`[^`]*`)/', "<span class=\"AM\">$1</span>", $message);
 			$qinfo = _('Question ID') . ' ' . Sanitize::onlyInt($parts[1]);
-			if ($parts[3] === 'reperr') {
+			if ($parts[3] === 'reperr' || isset($teacherid) || isset($tutorid)) {
 				$qinfo .= ', seed ' . Sanitize::onlyInt($parts[2]);
 			}
 			$message = '<br/><hr/><p class="small msgmarker"><em>' . _('Write your message above this line.') . '</em></p><p>' . $qinfo . '</p><br/>' . $message;

@@ -55,6 +55,7 @@ $tests = [
     ['in' => 'if ($a==2) {$b=4} elseif ($a==3) {$b=5}' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { {$b=4;} ;} else if (($a==3)) { {$b=5;} ;};' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => 'if ($a==2) {$b=4} else {$b=5}' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { {$b=4;} ;} else { {$b=5;} ;};' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => 'if ($a==2) $b=4 else $b=5' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { $b=4 ;} else { $b=5 ;};' . "\n" . '$c=1;' . "\n" . ';'],
+    ['in' => 'if ($a-3)/4 > ($a-5)/7 { $c=1 }', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (($a-3)/4>($a-5)/7) { {$c=1;} ;};' . "\n" . ';'],
     ['in' => '$a = rand(1,5) where $a>2' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!($a>2) && loopstep(\'where\',1));;' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => '$a = rand(1,5) where ($a>2)' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!(($a>2)) && loopstep(\'where\',1));;' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => '{$a = rand(1,5) } where $a>2' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{{$a=$GLOBALS[\'RND\']->rand(1,5);};} while (!($a>2) && loopstep(\'where\',1));;' . "\n" . '$c=1;' . "\n" . ';'],
@@ -99,7 +100,7 @@ foreach ($tests as $k=>$item) {
 
 
 $newtests = [
-    ['in' => ''],
+    ['in' => 'if ($a-3)/4 > ($a-5)/7 { $c=1 }'],
 ];
 
 
