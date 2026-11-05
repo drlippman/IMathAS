@@ -20,7 +20,8 @@ $tests = [
     ['in' => '$a=0' . "\n" . 'if ($a==0) $b = 1 elseif ($a==1) $b = 2 else $b =3' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;' . "\n" . 'if (($a==0)) { $b=1 ;} else if (($a==1)) { $b=2 ;} else { $b=3 ;};' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => '$a=0' . "\n" . 'if $a==0 {$b = 1 } else if $a==1 {$b = 2 } else {$b = 3}' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();$a=0;' . "\n" . 'if ($a==0) { {$b=1;} ;} else if ($a==1) { {$b=2;} ;} else { {$b=3;} ;};' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => 'if ($a+3)/4==3 { $c = 1 }', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (($a+3)/4==3) { {$c=1;} ;};' . "\n" . ';'],
-    ['in' => 'if ($a+3)/4==3 $c = 1 ', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (($a+3)) { /4==3*$c=1 ;};' . "\n" . ';'],
+    // invalid
+    ['in' => 'if ($a+3)/4==3 $c = 1', 'out' => 'error;'],    
     ['in' => '{$a=0' . "\n" . '$b = 1 } if $c==1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if ($c==1) { {$a=0;' . "\n" . '$b=1;} ; };' . "\n" . ';'],
     ['in' => '$a=0' . "\n" . ' for ($i=0..2) {$a++}' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}loopreset();$a=0;' . "\n" . 'if (is_nan(2) || is_nan(0)) {echo \'part of for loop is not a number\';} else {for ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(2),4)) && loopstep(\'for\',1); $i++) {{$a++;};};};' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => '$a=0' . "\n" . ' for ($i=0..2) $a++' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($i)){$i=null;}if (!isset($c)){$c=null;}loopreset();$a=0;' . "\n" . 'if (is_nan(2) || is_nan(0)) {echo \'part of for loop is not a number\';} else {for ($i=(int)ceil(round(floatval(0),4)),loopstart(\'for\',1);$i<=(int)floor(round(floatval(2),4)) && loopstep(\'for\',1); $i++) {$a++;};};' . "\n" . '$c=1;' . "\n" . ';'],
@@ -56,6 +57,19 @@ $tests = [
     ['in' => 'if ($a==2) {$b=4} else {$b=5}' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { {$b=4;} ;} else { {$b=5;} ;};' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => 'if ($a==2) $b=4 else $b=5' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==2)) { $b=4 ;} else { $b=5 ;};' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => 'if ($a-3)/4 > ($a-5)/7 { $c=1 }', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (($a-3)/4>($a-5)/7) { {$c=1;} ;};' . "\n" . ';'],
+    // handle brace on newline
+    ['in' => 'if ($a==3)  $c=1 ' . "\n" . '{ $c = 3 } if ($b==3)', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}if (!isset($b)){$b=null;}loopreset();if (($a==3)) { $c=1 ;};' . "\n" . 'if (($b==3)) { {$c=3;} ; };' . "\n" . ';'],
+    ['in' => 'if ($a==3) ' . "\n" . '{ $c = 3 }', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if (($a==3)) { {$c=3;} ;};' . "\n" . ';'],
+    ['in' => 'if ($a==($b-3)/5) ' . "\n" . '{ $c = 3 }', 'out' => 'if (!isset($a)){$a=null;}if (!isset($b)){$b=null;}if (!isset($c)){$c=null;}loopreset();if (($a==($b-3)/5)) { {$c=3;} ;};' . "\n" . ';'],
+    ['in' => 'if (($a-3) > ($a-5))  $c=1 ', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();if ((($a-3)>($a-5))) { $c=1 ;};' . "\n" . ';'],
+    // a likely typo, but interpreted reasonably
+    ['in' => 'if ($a==3) ' . "\n" . '{ $c = 3 } if ($b==3)', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}if (!isset($b)){$b=null;}loopreset();if (($b==3)) { if($a==3){$c=3;} ; };' . "\n" . ';'],
+    // ambiguous; error
+    ['in' => 'if ($a-3) > ($a-5) $c=1', 'out' => 'error;'],
+    // ambiguous; gets marked as error
+    ['in' => 'if $a==3  $c=1 ', 'out' => 'error;'],
+    // brace on newline with parens around header not supported
+    ['in' => 'if $a==3 ' . "\n" . '{ $c = 3 }', 'out' => 'error;'],
     ['in' => '$a = rand(1,5) where $a>2' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!($a>2) && loopstep(\'where\',1));;' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => '$a = rand(1,5) where ($a>2)' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{$a=$GLOBALS[\'RND\']->rand(1,5);} while (!(($a>2)) && loopstep(\'where\',1));;' . "\n" . '$c=1;' . "\n" . ';'],
     ['in' => '{$a = rand(1,5) } where $a>2' . "\n" . '$c=1', 'out' => 'if (!isset($a)){$a=null;}if (!isset($c)){$c=null;}loopreset();loopstart(\'where\',1);do{{$a=$GLOBALS[\'RND\']->rand(1,5);};} while (!($a>2) && loopstep(\'where\',1));;' . "\n" . '$c=1;' . "\n" . ';'],
@@ -95,12 +109,12 @@ foreach ($tests as $k=>$item) {
         ob_clean();
     }
     $res = ($item['out'] == $out)? 'G' : 'B';
-    echo '<code class="res'.$res.'">'.$item['in'].'</code><br>';
+    echo '<code class="res'.$res.'">'.($res=='G' ? 'PASS' : 'FAIL').': '.$item['in'].'</code><br>';
 }
 
 
 $newtests = [
-    ['in' => 'if ($a-3)/4 > ($a-5)/7 { $c=1 }'],
+    ['in' => ''],
 ];
 
 

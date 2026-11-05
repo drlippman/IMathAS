@@ -184,6 +184,25 @@ function interpretline($str,$anstype,$countcnt,$included_qs=[]) {
 				continue;
 			}
     
+			//a line that is just "if (cond)", "for (...)", etc. with nothing after the
+			//header, followed by a { on the next line: join the lines.
+			//Does not apply if there's already a body, so "if ($a) $b=3 \n {$c=3}" is left alone.
+			if (count($bits)==2 && isset($hdrat[1]) &&
+				($forloc===0 || $foreachloc===0 || $whileloc===0 || $ifloc===0)
+			) {
+				$m = $k + 1;
+				while ($m<$symlen && $syms[$m][1]==7) {
+					$m++;
+				}
+				if ($m<$symlen && $syms[$m][1]==5) {
+					$lastsym = $sym;
+					$lasttype = $type;
+					$cnt++;
+					$k = $m; //skip the end-of-line tokens
+					continue;
+				}
+			}
+
 			//check for for, if, where and rearrange bits if needed
 			if ($forloc===0) {
 				//convert for($i=a..b) {todo}
@@ -445,6 +464,11 @@ function interpretSplitBlock($bits, $kw, $end, $hdrat, $braceat) {
 		$j = $kw + 2;
 		if ($bits[$j]=='*') { //implicit multiplication between header and body
 			$j++;
+		}
+		if ($j>=$end || strpos('/*+-%<>=&|^.,?:', $bits[$j][0]) !== false) {
+			//body starts with an operator, so the (...) was only part of the condition:
+			//if ($a-3) > ($a-5) $c=1  needs curlys or a fully parenthesized condition
+			return false;
 		}
 		return array($bits[$kw+1], implode('',array_slice($bits,$j,$end-$j)));
 	}
