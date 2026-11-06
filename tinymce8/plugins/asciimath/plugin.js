@@ -99,18 +99,37 @@
         // before the first finishes share one conversion
         var svgPending = new Map();
 
+        // Styles MathJax's SVG output needs, inlined into each standalone SVG
+        // since an <img> can't see the page's stylesheets
+        var MJ_SVG_CSS = [
+            'svg a{fill:blue;stroke:blue}',
+            '[data-mml-node="merror"]>g{fill:red;stroke:red}',
+            '[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}',
+            '[data-frame],[data-line]{stroke-width:70px;fill:none}',
+            '.mjx-dashed{stroke-dasharray:140}',
+            '.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}',
+            'use[data-c],path[data-c]{stroke-width:3px}'
+        ].join('');
+
         // Build a cache entry {src, va} from MathJax's SVG output, and cache it
         function mjSvgToEntry(svg, str) {
             svg = svg.cloneNode(true);
             svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            // strip semantic/speech enrichment and node metadata; unused in an <img>
+            // strip semantic/speech enrichment; unused in an <img>.
+            // Keep data-mml-node / data-table / data-line, which MathJax's
+            // stylesheet selectors rely on.
             svg.querySelectorAll('*').forEach(function (el) {
                 Array.from(el.attributes).forEach(function (a) {
-                    if (/^data-(semantic|speech|mml-node)/.test(a.name)) {
+                    if (/^data-(semantic|speech)/.test(a.name)) {
                         el.removeAttribute(a.name);
                     }
                 });
             });
+            // An <img> doesn't see the page's stylesheets, so copy over the MathJax
+            // rules that target SVG internals
+            var styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            styleEl.textContent = MJ_SVG_CSS;
+            svg.insertBefore(styleEl, svg.firstChild);
             svg.removeAttribute('aria-hidden');
             svg.removeAttribute('role');
             svg.removeAttribute('focusable');
