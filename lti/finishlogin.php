@@ -85,8 +85,8 @@ if ($localuserid === false) {
       } else {
         $err = _('Existing username or password is not valid');
         login_recordFailure($tmpuserid, $jsondata);
-        if (isset($CFG['cloudwatch_loginlog'])) {
-            require_once __DIR__.'/../includes/CloudWatchLogger.php';
+        if (isset($CFG['keep_loginlog'])) {
+            require_once __DIR__.'/../includes/LoginLogger.php';
             addLoginLog('login_failure', $tmpuserid, [
                 'reason' => 'bad_pw',
                 'via' => 'LTI1.3',
@@ -187,8 +187,8 @@ if (!isset($_SESSION['userid'])) {
   session_regenerate_id(true);
   // identity here is asserted by the LMS, not by password/MFA; see validate.php
   $_SESSION['is_lti_login'] = true;
-  if (isset($CFG['cloudwatch_loginlog'])) {
-      require_once __DIR__.'/../includes/CloudWatchLogger.php';
+  if (isset($CFG['keep_loginlog'])) {
+      require_once __DIR__.'/../includes/LoginLogger.php';
       addLoginLog('login_success', $localuserid, [
           'via' => 'LTI1.3',
           'ltiuser' => [$ltiuserid, $platform_id]

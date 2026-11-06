@@ -346,8 +346,8 @@ if (isset($_GET['launch'])) {
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 						login_recordFailure($tmpuserid, $jsondata);
-						if (isset($CFG['cloudwatch_loginlog'])) {
-							require_once __DIR__.'/includes/CloudWatchLogger.php';
+						if (isset($CFG['keep_loginlog'])) {
+							require_once __DIR__.'/includes/LoginLogger.php';
 							addLoginLog('login_failure', $tmpuserid, [
 								'reason' => 'bad_pw',
 								'via' => 'LTI1.1',
@@ -1812,8 +1812,8 @@ $_SESSION['started'] = $now;
 if ($createnewsession) {
 	// identity here is asserted by the LMS, not by password/MFA; see validate.php
 	$_SESSION['is_lti_login'] = true;
-	if (isset($CFG['cloudwatch_loginlog'])) {
-		require_once __DIR__.'/includes/CloudWatchLogger.php';
+	if (isset($CFG['keep_loginlog'])) {
+		require_once __DIR__.'/includes/LoginLogger.php';
 		addLoginLog('login_success', $userid, [
 			'via' => 'LTI1.1',
 			'ltiuser' => [$_SESSION['ltiuserid'], $_SESSION['lti_key']]
@@ -2056,8 +2056,8 @@ if (isset($_GET['launch'])) {
 					} else {
 						$infoerr = 'Existing username/password provided are not valid.';
 						login_recordFailure($queryuserid, $jsondata);
-						if (isset($CFG['cloudwatch_loginlog'])) {
-							require_once __DIR__.'/includes/CloudWatchLogger.php';
+						if (isset($CFG['keep_loginlog'])) {
+							require_once __DIR__.'/includes/LoginLogger.php';
 							addLoginLog('login_failure', $queryuserid, [
 								'reason' => 'bad_pw',
 								'via' => 'LTI1.1',
@@ -3119,8 +3119,8 @@ $_SESSION['started'] = $now;
 if ($createnewsession) {
 	// identity here is asserted by the LMS, not by password/MFA; see validate.php
 	$_SESSION['is_lti_login'] = true;
-	if (isset($CFG['cloudwatch_loginlog'])) {
-		require_once __DIR__.'/includes/CloudWatchLogger.php';
+	if (isset($CFG['keep_loginlog'])) {
+		require_once __DIR__.'/includes/LoginLogger.php';
 		addLoginLog('login_success', $userid, [
 			'via' => 'LTI1.1',
 			'ltiuser' => [$_SESSION['ltiuserid'], $_SESSION['lti_key']]

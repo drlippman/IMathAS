@@ -131,9 +131,8 @@ to the new assessment interface.
 - `$CFG['newrelic_log_question_errors']`: Enable to log question errors to newrelic, if extension is installed
 - `$CFG['GEN']['sessionmaxlife']`: Overrides session.gc_maxlifetime.
 - `$CFG['GEN']['gc_divisor']`: Overrides session.gc_divisor.
-- `$CFG['cloudwatch_loginlog']`: Enable login logging to AWS Cloudwatch.  Set to array with keys 
-    `region, logGroup, logStream, accessKey, secretKey`. See `includes/CloudWatchLogger.php` for details on 
-    Cloudwatch setup.
+- `$CFG['keep_loginlog']`: Enable login logging to a file. See `includes/LoginLogger.php` for details on 
+    setup.
 
 ### Additional Validation
 These provide additional validation options beyond `$loginformat`.

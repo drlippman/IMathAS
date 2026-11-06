@@ -414,8 +414,8 @@ if ($haslogin && !$hasusername) {
             unset($_SESSION['google_pending_profile']);
         }
 
-        if (isset($CFG['cloudwatch_loginlog'])) {
-            require_once __DIR__.'/includes/CloudWatchLogger.php';
+        if (isset($CFG['keep_loginlog'])) {
+            require_once __DIR__.'/includes/LoginLogger.php';
             addLoginLog('login_success', $userid);
         }
         //call hook, if defined
@@ -465,8 +465,8 @@ if ($haslogin && !$hasusername) {
         if ($line != false) {
             require_once __DIR__ . '/includes/loginlimit.php';
             login_recordFailure($line['id'], $line['jsondata']);
-            if (isset($CFG['cloudwatch_loginlog'])) {
-                require_once __DIR__.'/includes/CloudWatchLogger.php';
+            if (isset($CFG['keep_loginlog'])) {
+                require_once __DIR__.'/includes/LoginLogger.php';
                 if ($badsession) {
                     $reason = 'bad_session';
                 } else if ($_SESSION['challenge'] != ($_POST['challenge'] ?? '')) {

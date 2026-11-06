@@ -72,8 +72,8 @@ function mfa_checkCode(&$mfadata, $code, $uid = 0, $save = true) {
         $mfadata['failcnt'] = ($mfadata['failcnt'] ?? 0) + 1;
         $stm = $DBH->prepare("UPDATE imas_users SET mfa = :mfa WHERE id = :uid");
         $stm->execute(array(':uid'=>$uid, ':mfa'=>json_encode($mfadata)));
-        if (isset($CFG['cloudwatch_loginlog'])) {
-            require_once __DIR__.'/CloudWatchLogger.php';
+        if (isset($CFG['keep_loginlog'])) {
+            require_once __DIR__.'/LoginLogger.php';
             addLoginLog('login_failure', $uid, [
                 'reason' => 'bad_mfa',
                 'mfafailcnt' => $mfadata['failcnt']
