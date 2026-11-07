@@ -62,7 +62,6 @@ function Viewer3D(paramObj, targetel) {
 	} else if (paramObj['curves'] != undefined) {
 		t.iscurve = true;
 	}
-	console.log(paramObj);
 	if (paramObj['showaxes'] === 0) {
 		t.showaxes = false;
 	}
