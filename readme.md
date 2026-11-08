@@ -230,19 +230,23 @@ By default, emails are sent using the built-in PHP `mail()` function.  This can 
 
 ### Push Notifications
 
-If you wish to enable users to request browser push notifications (does not work in all browsers), you'll need to setup an a project with [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/), and define these values.
+If you wish to enable users to request browser push notifications (does not work in all browsers), you'll need to setup an a project with [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging).
 
-- `$CFG['FCM']['SenderId']`: Your SenderId, from the Firebase project console.
-- `$CFG['FCM']['webApiKey']`: Your web API key, from the Firebase project console.
-- `$CFG['FCM']['icon']`: an absolute web path to an icon to show on notifications.
-- `$CFG['FCM']['project_id']`: your Project ID, from the Firebase project console.
-- `$CFG['FCM']['app_id']`: your appId, from the Firebase project console.
-- `$CFG['FCM']['vapidKey']`: this is the public key, found under 
-  Project Settings, Cloud Messaging, Web configuration, in the Key pair column.
-- Go to the Firebase console, click on your project, go to Project Settings, click on Service Accounts,
-  and click Generate new private key. This will download a .json file to your computer.
-- In the Project Settings, click on Cloud Messaging, and ensure Firebase Cloud Messaging API (V1) is
-  enabled (you may need to go to the Google Cloud Console to enable it)
+- In the [Firebase Console](https://console.firebase.google.com/), create a Firebase project
+- Under Settings, Cloud Messaging, make sure Firebase Cloud Messaging API (V1) is
+  enabled (you may need to click the icon to Manage API to the Google Cloud Console to enable it)
+- Under Settings, Service Accounts, click Generate new private key. This will download a .json file to your computer.
+- Under Settings, General, Your apps, click the </> web app button. Give it a name and Register app. Click continue to console.
+  Under the SDK setup, click Config and copy the values shown for later reference.
+- Under Settings, Cloud Messaging, Web configuration, click Generate key pair.
+- Edit your config.php, and add:
+    - `$CFG['FCM']['SenderId']`: Your `messagingSenderId`, from the Firebase project console config
+    - `$CFG['FCM']['webApiKey']`: Your `apiKey` key, from the Firebase project console config.
+    - `$CFG['FCM']['project_id']`: your `projectId`, from the Firebase project console config.
+    - `$CFG['FCM']['app_id']`: your `appId`, from the Firebase project console config.
+    - `$CFG['FCM']['vapidKey']`: the value under Key pair on the Cloud Messaging, Web configuration page 
+    - `$CFG['FCM']['icon']` (optional): an absolute URL to an icon to show on notifications.
+    - `$CFG['FCM']['badge']` (optional): an absolute URL to an icon to show as the badge on notifications.
 - In your IMathAS install, while logged in as an admin, go to Admin Page, click Utilities, then click
   Set up FCM for push notifications.  Here, paste the contents of the .json file you downloaded, and Save.
 
