@@ -349,7 +349,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
             $query .= "AND (imas_users.groupid=? OR il.userights>2 OR il.groupid=?)";
             $libqarr = [$groupid,$groupid];
         } else {
-            $query .= "AND ((ownerid=? OR userights>2) OR (userights>0 AND groupid=?))";
+            $query .= "AND ((il.ownerid=? OR il.userights>2) OR (il.userights>0 AND il.groupid=?))";
             $libqarr = [$userid, $groupid];
         }
         $stm = $DBH->prepare($query);
@@ -408,7 +408,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
         $rightsand[] = 'iq.userights>0';
         $rightsand2[] = 'iq.userights>0';
     }
-    if (isset($search['public']) && $search['public'] == 0) {
+    if (isset($search['public']) && $search['public'] == 0) { // no public
         $rightsand[] = 'iq.userights=0';
         $rightsand2[] = 'iq.userights=0';
     }
