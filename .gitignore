@@ -6,3 +6,7 @@
 *.js~
 mathjax-b
 HTMLPurifier
+admin/import/
+!admin/import/.htaccess
+assessment/qimages/
+filter/graph/imgs/
