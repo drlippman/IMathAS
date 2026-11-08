@@ -48,11 +48,11 @@ public function scan($content, $field, $type, $itemname, $link='',$hasa11yalt=fa
         $addederror = true;
     }
     if (!$hasa11yalt && strpos($content,'jsxgraph') !== false && strpos($content,'graphdispmode')===false) {
-        $this->adderror($errorlevel,_('Potential issue: question may use jsxgraph; check for accessible alt'), $field, $type, $itemname, $link, $link2); 
+        $this->adderror($errorlevel,_('Potential issue: question may use jsxgraph'), $field, $type, $itemname, $link, $link2); 
         $addederror = true;
     }
     if (!$hasa11yalt && strpos($content,'geogebra') !== false && strpos($content,'graphdispmode')===false) {
-        $this->adderror($errorlevel,_('Potential issue: question may use geogebra; check for accessible alt'), $field, $type, $itemname, $link, $link2); 
+        $this->adderror($errorlevel,_('Potential issue: question may use geogebra'), $field, $type, $itemname, $link, $link2); 
         $addederror = true;
     }
     // look for youtube videos
