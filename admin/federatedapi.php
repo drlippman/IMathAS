@@ -105,12 +105,16 @@ if ($type === 'libs') {
 } else if ($type === 'questions') {
 	// questions in at least one shared library (library items of any deleted state, so
 	// that a question's own deleted flag keeps flowing after it is removed from a library)
-	$query = 'SELECT iq.* FROM imas_questionset AS iq WHERE ' . FED_QUESTION_SHARED_SQL . ' ';
-	$query .= 'AND EXISTS (SELECT 1 FROM imas_library_items AS ili JOIN imas_libraries AS il ON il.id=ili.libid AND ' . FED_LIB_SHARED_SQL;
+	// Walk imas_questionset in lastmoddate order via the index and probe EXISTS per
+	// row, stopping after limit+1 matches. The hints stop MySQL from turning the
+	// EXISTS into a materialized semijoin (which scans/sorts every federated question),
+	// and the >= form of the cursor lets the lastmoddate index be used as a range.
+	$query = 'SELECT /*+ NO_SEMIJOIN(@fedsub) */ iq.* FROM imas_questionset AS iq FORCE INDEX (lastmoddate) WHERE ' . FED_QUESTION_SHARED_SQL . ' ';
+	$query .= 'AND EXISTS (SELECT /*+ QB_NAME(fedsub) */ 1 FROM imas_library_items AS ili JOIN imas_libraries AS il ON il.id=ili.libid AND ' . FED_LIB_SHARED_SQL;
 	$query .= ' WHERE ili.qsetid=iq.id) ';
-	$query .= 'AND ' . sprintf($cursorsql, 'iq.lastmoddate', 'iq.id');
+	$query .= 'AND iq.lastmoddate>=:lm0 AND ' . sprintf($cursorsql, 'iq.lastmoddate', 'iq.id');
 	$stm = $DBH->prepare($query);
-	$stm->execute($cursorparams);
+	$stm->execute($cursorparams + array(':lm0' => $req['lm']));
 	$rows = $stm->fetchAll(PDO::FETCH_ASSOC);
 	$more = count($rows) > $limit;
 	if ($more) { array_pop($rows); }
