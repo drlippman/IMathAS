@@ -22,7 +22,7 @@
 function diff($old, $new){
     $maxlen = 0;
 	foreach($old as $oindex => $ovalue){
-		$nkeys = array_keys($new, $ovalue);
+		$nkeys = array_keys($new, $ovalue, true);   // strict: numeric strings like "1" and "1.0" must not match
 		foreach($nkeys as $nindex){
 			$matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1]) ?
 				$matrix[$oindex - 1][$nindex - 1] + 1 : 1;

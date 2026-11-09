@@ -200,7 +200,7 @@ function fed_resolve_lib_parents(&$ctx, &$warnings) {
 }
 
 function fed_question_write_fields() {
-	return array('author', 'description', 'qtype', 'control', 'qcontrol', 'qtext', 'answer', 'extref',
+	return array('author', 'description', 'qtype', 'control', 'qtext', 'extref',
 		'solution', 'solutionopts', 'license', 'ancestorauthors', 'otherattribution', 'deleted', 'a11yalttype');   // isrand is derived locally, see fed_resolve_question_refs
 }
 
@@ -213,6 +213,11 @@ function fed_write_question($rec, &$ctx) {
 	global $DBH;
 	$now = $ctx['now'];
 	$fields = fed_question_write_fields();
+	// qcontrol/answer are obsolete: store them empty, folding any value (e.g. from a payload
+	// staged before this rule) into control first
+	$rec['control'] = fed_merge_legacy_control($rec['control'], $rec['qcontrol'] ?? '', $rec['answer'] ?? '');
+	$rec['qcontrol'] = ''; $rec['answer'] = '';
+	$fields[] = 'qcontrol'; $fields[] = 'answer';
 	$ids = fed_ids_by_uid('imas_questionset', array($rec['uid']));
 	if (isset($ids[$rec['uid']])) {
 		$id = $ids[$rec['uid']];

@@ -67,8 +67,13 @@ function fed_verify_sig($secret, $p, $sig) {
 // Content hashing
 // ---------------------------------------------------------------------
 
+// Text as compared for sync purposes: CRLF becomes LF, spaces/tabs at the end of each line are
+// dropped, and trailing newlines are ignored, so versions differing only in line endings or
+// trailing whitespace are "the same".
 function fed_norm_text($s) {
-	return str_replace("\r\n", "\n", (string) $s);
+	$s = str_replace("\r\n", "\n", (string) $s);
+	$s = preg_replace('/[ \t]+$/m', '', $s);
+	return rtrim($s, "\n");
 }
 
 function fed_hash_values($vals) {
@@ -124,8 +129,18 @@ function fed_image_key($name) {
 	return $stem . '.' . $ext;
 }
 
+/**
+ * qcontrol and answer are obsolete; their code is folded into control (as course/moddataset.php
+ * does on edit) and they are neither compared nor sent.
+ */
+function fed_merge_legacy_control($control, $qcontrol, $answer) {
+	if (trim((string) $qcontrol) != '') { $control .= "\n\n" . $qcontrol; }
+	if (trim((string) $answer) != '') { $control .= "\n\n" . $answer; }
+	return $control;
+}
+
 function fed_question_hash_fields() {
-	return array('description', 'author', 'qtype', 'control', 'qcontrol', 'qtext', 'answer',
+	return array('description', 'author', 'qtype', 'control', 'qtext',
 		'extref', 'solution', 'solutionopts', 'license', 'ancestorauthors', 'otherattribution',
 		'deleted', 'a11yalttype', 'a11yalt', 'replaceby');
 }
@@ -251,10 +266,9 @@ function fed_serialize_questions($rows) {
 			'author' => $row['author'],
 			'description' => $row['description'],
 			'qtype' => $row['qtype'],
-			'control' => preg_replace_callback('/includecodefrom\((\d+)\)/', $cb_code, $row['control']),
-			'qcontrol' => $row['qcontrol'],
+			'control' => preg_replace_callback('/includecodefrom\((\d+)\)/', $cb_code,
+				fed_merge_legacy_control($row['control'], $row['qcontrol'], $row['answer'])),
 			'qtext' => preg_replace_callback('/includeqtextfrom\((\d+)\)/', $cb_text, $row['qtext']),
-			'answer' => $row['answer'],
 			'extref' => $row['extref'],
 			'solution' => $row['solution'],
 			'solutionopts' => (int) $row['solutionopts'],
@@ -368,13 +382,19 @@ function fed_normalize_record($type, $raw) {
 	} else if ($type == FED_TYPE_QUESTION) {
 		$spec = array('uid' => 'uid', 'adddate' => array('int', 0, 4294967295), 'lastmoddate' => array('int', 0, 4294967295),
 			'author' => 'text', 'description' => array('text', 254), 'qtype' => array('text', 20),
-			'control' => 'text', 'qcontrol' => 'text', 'qtext' => 'text', 'answer' => 'text', 'extref' => 'text',
+			'control' => 'text', 'qtext' => 'text', 'extref' => 'text',
 			'solution' => 'text', 'solutionopts' => array('int', 0, 255), 'license' => array('int', 0, 255),
 			'ancestorauthors' => 'text', 'otherattribution' => 'text', 'deleted' => array('int', 0, 1),
 			'isrand' => array('int', 0, 1), 'a11yalttype' => array('int', 0, 255),
 			'a11yalt' => 'ref', 'replaceby' => 'ref');
 	} else {
 		return null;
+	}
+	if ($type == FED_TYPE_QUESTION && isset($raw['control']) && is_string($raw['control'])) {
+		// a peer that still sends the obsolete qcontrol/answer fields: fold them into control
+		$raw['control'] = fed_merge_legacy_control($raw['control'],
+			is_string($raw['qcontrol'] ?? null) ? $raw['qcontrol'] : '',
+			is_string($raw['answer'] ?? null) ? $raw['answer'] : '');
 	}
 	foreach ($spec as $key => $rule) {
 		if (!array_key_exists($key, $raw)) { return null; }

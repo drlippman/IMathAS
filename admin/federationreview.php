@@ -20,16 +20,21 @@ if ($peer === false) {
 	exit;
 }
 
+// list filters, carried through the detail view so "back" returns to the same list
+$kindfilter = intval($_GET['kind'] ?? 0);
+$typefilter = intval($_GET['type'] ?? 0);
+$keepq = ($typefilter > 0 ? '&type=' . $typefilter : '') . ($kindfilter > 0 ? '&kind=' . $kindfilter : '');
+
 $typenames = array(FED_TYPE_LIB => _('Library'), FED_TYPE_QUESTION => _('Question'), FED_TYPE_LIBITEM => _('Library assignment'));
 
 // fields shown / compared / mergeable, by record type
 $fieldsets = array(
 	FED_TYPE_LIB => array('name', 'parent', 'sortorder', 'deleted'),
-	FED_TYPE_QUESTION => array('description', 'author', 'qtype', 'control', 'qcontrol', 'qtext', 'answer', 'extref',
+	FED_TYPE_QUESTION => array('description', 'author', 'qtype', 'control', 'qtext', 'extref',
 		'solution', 'solutionopts', 'license', 'ancestorauthors', 'otherattribution', 'deleted', 'a11yalttype', 'a11yalt', 'replaceby'),
 	FED_TYPE_LIBITEM => array('junkflag', 'deleted'),
 );
-$textfields = array('name', 'description', 'author', 'control', 'qcontrol', 'qtext', 'answer', 'extref', 'solution', 'ancestorauthors', 'otherattribution');
+$textfields = array('name', 'description', 'author', 'control', 'qtext', 'extref', 'solution', 'ancestorauthors', 'otherattribution');
 
 function fed_row_label($type, $rec) {
 	if ($type == FED_TYPE_LIB) {
@@ -57,15 +62,17 @@ function fed_value_text($field, $rec) {
 
 /** Line diff from old to new as escaped HTML */
 function fed_diff_html($old, $new) {
-	$old = str_replace("\r\n", "\n", $old);
-	$new = str_replace("\r\n", "\n", $new);
+	// same normalization as the sync hash: line endings, trailing line whitespace, trailing newlines
+	$old = fed_norm_text($old);
+	$new = fed_norm_text($new);
 	$ol = $old === '' ? array() : explode("\n", $old);
 	$nl = $new === '' ? array() : explode("\n", $new);
 	$out = '';
 	foreach (diff($ol, $nl) as $part) {
 		if (is_array($part)) {
-			foreach ($part['d'] as $line) { $out .= '<del>' . Sanitize::encodeStringForDisplay($line) . "</del>\n"; }
-			foreach ($part['i'] as $line) { $out .= '<ins>' . Sanitize::encodeStringForDisplay($line) . "</ins>\n"; }
+			// an empty block has no height, so mark blank lines to keep them visible
+				foreach ($part['d'] as $line) { $out .= '<del>' . ($line === '' ? '&para;' : Sanitize::encodeStringForDisplay($line)) . "</del>\n"; }
+			foreach ($part['i'] as $line) { $out .= '<ins>' . ($line === '' ? '&para;' : Sanitize::encodeStringForDisplay($line)) . "</ins>\n"; }
 		} else {
 			$out .= Sanitize::encodeStringForDisplay($part) . "\n";
 		}
@@ -158,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 $pagetitle = _('Federation Review');
 $curBreadcrumb = '<a href="../index.php">Home</a> &gt; <a href="admin2.php">Admin</a> &gt; '
 	. '<a href="federationpull.php?peer=' . $peerid . '">' . _('Federation pull') . '</a> &gt; '
-	. '<a href="federationreview.php?peer=' . $peerid . '">' . _('Review') . '</a>';
+	. '<a href="federationreview.php?peer=' . $peerid . $keepq . '">' . _('Review') . '</a>';
 $placeinhead = '<style type="text/css">ins {background-color:#d4fcbc; text-decoration:none; display:block;} del {background-color:#fbb6c2; display:block;} '
 	. 'pre.fed {white-space:pre-wrap; max-width:60em; margin:0; padding:.3em; border:1px solid #ccc;} '
 	. 'table.fedcmp td {vertical-align:top; padding:.3em;}</style>';
@@ -201,15 +208,15 @@ if (isset($_GET['id'])) {
 	}
 
 	if ($pending) {
-		printf('<form method="post" action="federationreview.php?peer=%d&id=%d%s">', $peerid, $rid, $fullparam);
+		printf('<form method="post" action="federationreview.php?peer=%d&id=%d%s%s">', $peerid, $rid, $fullparam, $keepq);
 		echo '<input type="hidden" name="action" value="resolve"><input type="hidden" name="id" value="' . $rid . '">';
 	}
 	$isconflict = in_array($row['kind'], array(FED_KIND_CONFLICT, FED_KIND_DELVEDIT));
 	$fields = $fieldsets[$type];
 	if ($type == FED_TYPE_QUESTION) { $fields[] = 'imgs'; }
 	if ($mine !== null) {
-		printf('<p><a href="federationreview.php?peer=%d&id=%d%s">%s</a></p>', $peerid, $rid,
-			$showall ? '' : '&full=1',
+		printf('<p><a href="federationreview.php?peer=%d&id=%d%s%s">%s</a></p>', $peerid, $rid,
+			$showall ? '' : '&full=1', $keepq,
 			$showall ? _('Show only the fields that differ') : _('Show all fields, with changes highlighted in context'));
 	}
 	echo '<table class="fedcmp"><tbody>';
@@ -217,18 +224,33 @@ if (isset($_GET['id'])) {
 	foreach ($fields as $f) {
 		$theirs = fed_value_text($f, $rec);
 		$mineval = $mine === null ? '' : fed_value_text($f, $mine);
-		$same = ($mine !== null && $theirs === $mineval);
+		$same = ($mine !== null && fed_norm_text($theirs) === fed_norm_text($mineval));   // same rule as the sync hash
 		if ($same && (!$showall || $theirs === '')) { continue; }
 		if ($mine === null && $theirs === '') { continue; }
 		if (!$same) { $shown++; }
 		echo '<tr><td><b>' . Sanitize::encodeStringForDisplay($f === 'imgs' ? _('images') : $f) . '</b>';
 		if ($same) { echo '<br><span class="small">' . _('unchanged') . '</span>'; }
 		echo '</td><td>';
+		$eolonly = (!$same && $mine !== null &&
+			str_replace("\r\n", "\n", $theirs) === str_replace("\r\n", "\n", $mineval));
 		if ($mine === null || $same) {
 			echo '<pre class="fed">' . Sanitize::encodeStringForDisplay($theirs) . '</pre>';
+		} else if ($eolonly) {
+			echo '<pre class="fed">' . Sanitize::encodeStringForDisplay($theirs) . '</pre>';
+			echo '<span class="small">' . _('The two versions differ only in line endings (CR/LF).') . '</span>';
 		} else {
-			echo '<pre class="fed">' . fed_diff_html($mineval, $theirs) . '</pre>';
+			$dh = fed_diff_html($mineval, $theirs);
+			echo '<pre class="fed">' . $dh . '</pre>';
 			echo '<span class="small">' . _('Red: your version only. Green: the peer\'s version only.') . '</span>';
+			if (strpos($dh, '<ins>') === false && strpos($dh, '<del>') === false) {
+				// differs, yet the line diff shows nothing: report the first differing byte
+				$n = min(strlen($mineval), strlen($theirs));
+				for ($p = 0; $p < $n && $mineval[$p] === $theirs[$p]; $p++);
+				echo '<br><span class="small">' . sprintf(_('Differs at byte %d (lengths: yours %d, peer %d). Yours: %s Peer: %s'),
+					$p, strlen($mineval), strlen($theirs),
+					Sanitize::encodeStringForDisplay(json_encode(substr($mineval, max(0, $p - 5), 20), JSON_INVALID_UTF8_SUBSTITUTE)),
+					Sanitize::encodeStringForDisplay(json_encode(substr($theirs, max(0, $p - 5), 20), JSON_INVALID_UTF8_SUBSTITUTE))) . '</span>';
+			}
 		}
 		echo '</td>';
 		if ($pending && $isconflict && $mine !== null && !$same) {
@@ -260,16 +282,13 @@ if (isset($_GET['id'])) {
 			echo '<p class="small">' . _('Taking the peer\'s version also copies its images (existing image files are never overwritten) and any questions it refers to that are waiting for review.') . '</p>';
 		}
 	}
-	printf('<p><a href="federationreview.php?peer=%d">%s</a></p>', $peerid, _('Back to the list'));
+	printf('<p><a href="federationreview.php?peer=%d%s">%s</a></p>', $peerid, $keepq, _('Back to the list'));
 	require_once "../footer.php";
 	exit;
 }
 
 // ---- list view ----
 echo '<p>' . _('These changes have been downloaded from the peer. Nothing is changed in your libraries until you approve it.') . '</p>';
-
-$kindfilter = intval($_GET['kind'] ?? 0);
-$typefilter = intval($_GET['type'] ?? 0);
 
 $stm = $DBH->prepare('SELECT type,kind,COUNT(*) FROM imas_federation_staged WHERE peerid=? AND status=? GROUP BY type,kind');
 $stm->execute(array($peerid, FED_STATUS_PENDING));
@@ -325,7 +344,7 @@ if (count($rows) == 0) {
 		echo '<td>' . Sanitize::encodeStringForDisplay(fed_row_label($row['type'], $rec)) . ' <span class="small">(' . Sanitize::encodeStringForDisplay($row['uid']) . ')</span></td>';
 		echo '<td>' . tzdate('n/j/y g:i a', $row['remote_lastmod']) . '</td>';
 		echo '<td>' . ($row['parentstageid'] > 0 ? '#' . Sanitize::onlyInt($row['parentstageid']) : '') . '</td>';
-		printf('<td><a href="federationreview.php?peer=%d&id=%d">%s</a></td></tr>', $peerid, $row['id'], $isconf ? _('Resolve') : _('View'));
+		printf('<td><a href="federationreview.php?peer=%d&id=%d%s">%s</a></td></tr>', $peerid, $row['id'], $keepq, $isconf ? _('Resolve') : _('View'));
 	}
 	echo '</tbody></table>';
 	echo '<p><button type="submit" name="action" value="approve">' . _('Approve selected') . '</button> ';
