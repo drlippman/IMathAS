@@ -105,6 +105,7 @@ After setting grid and changing options and tools, click Create drawing window t
 <div id="warns"></div>
 <textarea id="outtext" rows="8" readonly></textarea>
 <details><summary class="note">Raw encoded drawing</summary><pre id="rawdraw" style="white-space:pre-wrap"></pre></details>
+<details id="bgdrawwrap" style="display:none"><summary class="note">Drawing in $background format</summary><pre id="bgdraw" style="white-space:pre-wrap"></pre></details>
 </div>
 
 <script src="../../javascript/jquery.min.js"></script>
@@ -664,6 +665,15 @@ function generate() {
   var str = $('#qn' + QN).val() || '';
   $('#rawdraw').text(str);
   var ans = convertAll(str);
+  if ((S.af[0] === 'polygon' || S.af[0] === 'closedpolygon') && ans.length > 1) {
+    var isClosed = S.afOut === 'closedpolygon', bgpts = ans.slice();
+    if (isClosed && bgpts[0] !== bgpts[bgpts.length - 1]) { bgpts.push(bgpts[0]); }
+    $('#bgdraw').text("draw:strokewidth=2;stroke='red';" + (isClosed ? "fill='transred';" : '') + "path([" + bgpts.map(function(p) { return '[' + p + ']'; }).join(',') + ']);');
+    $('#bgdrawwrap').show();
+  } else {
+    $('#bgdraw').text('');
+    $('#bgdrawwrap').hide();
+  }
   var part = $('#partsel').val();
   var idx = part === '' ? '' : '[' + part + ']';
   var gridv = [$('#xmin').val().trim(), $('#xmax').val().trim(), S.numberline ? 0 : $('#ymin').val().trim(),
