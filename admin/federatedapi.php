@@ -91,13 +91,15 @@ if ($type === 'libs') {
 	if ($more) { array_pop($rows); }
 	$response['data'] = fed_serialize_libraries($rows);
 } else if ($type === 'libitems') {
-	$query = 'SELECT ili.id,il.uniqueid AS libuid,iq.uniqueid AS quid,ili.junkflag,ili.deleted,ili.lastmoddate ';
-	$query .= 'FROM imas_library_items AS ili ';
+	// Walk ili in lastmoddate order via its index and join out per row (STRAIGHT_JOIN +
+	// FORCE INDEX), rather than letting the planner join first and sort; stops at limit+1.
+	$query = 'SELECT STRAIGHT_JOIN ili.id,il.uniqueid AS libuid,iq.uniqueid AS quid,ili.junkflag,ili.deleted,ili.lastmoddate ';
+	$query .= 'FROM imas_library_items AS ili FORCE INDEX (lastmoddate) ';
 	$query .= 'JOIN imas_libraries AS il ON il.id=ili.libid AND ' . FED_LIB_SHARED_SQL . ' ';
 	$query .= 'JOIN imas_questionset AS iq ON iq.id=ili.qsetid AND ' . FED_QUESTION_SHARED_SQL . ' ';
-	$query .= 'WHERE ' . sprintf($cursorsql, 'ili.lastmoddate', 'ili.id');
+	$query .= 'WHERE ili.lastmoddate>=:lm0 AND ' . sprintf($cursorsql, 'ili.lastmoddate', 'ili.id');
 	$stm = $DBH->prepare($query);
-	$stm->execute($cursorparams);
+	$stm->execute($cursorparams + array(':lm0' => $req['lm']));
 	$rows = $stm->fetchAll(PDO::FETCH_ASSOC);
 	$more = count($rows) > $limit;
 	if ($more) { array_pop($rows); }
@@ -112,6 +114,7 @@ if ($type === 'libs') {
 	$query = 'SELECT /*+ NO_SEMIJOIN(@fedsub) */ iq.* FROM imas_questionset AS iq FORCE INDEX (lastmoddate) WHERE ' . FED_QUESTION_SHARED_SQL . ' ';
 	$query .= 'AND EXISTS (SELECT /*+ QB_NAME(fedsub) */ 1 FROM imas_library_items AS ili JOIN imas_libraries AS il ON il.id=ili.libid AND ' . FED_LIB_SHARED_SQL;
 	$query .= ' WHERE ili.qsetid=iq.id) ';
+	$query .= 'AND ' . FED_QUESTION_CANON_SQL . ' ';
 	$query .= 'AND iq.lastmoddate>=:lm0 AND ' . sprintf($cursorsql, 'iq.lastmoddate', 'iq.id');
 	$stm = $DBH->prepare($query);
 	$stm->execute($cursorparams + array(':lm0' => $req['lm']));

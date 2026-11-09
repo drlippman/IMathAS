@@ -196,7 +196,7 @@ function fed_local_records($type, $recs) {
 				if (!isset($out[$rec['uid']])) { $out[$rec['uid']] = $rec; }
 			}
 		} else {
-			$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE uniqueid IN ($ph)");
+			$stm = $DBH->prepare("SELECT * FROM imas_questionset WHERE uniqueid IN ($ph) ORDER BY id");   // lowest id first, matching the sender's canonical copy
 			$stm->execute($uids);
 			list($local,) = fed_serialize_questions($stm->fetchAll(PDO::FETCH_ASSOC));
 			foreach ($local as $rec) {
@@ -277,8 +277,28 @@ function fed_process_records($peerid, $pullid, $type, $recs, $parents = array())
 	$recs = fed_normalize_list($type, $recs, $counts['invalid']);   // never trust the peer's data
 	if (count($recs) == 0) { return array($counts, $stagedids); }
 
-	$uids = array();
-	foreach ($recs as $rec) { $uids[] = fed_record_uid($type, $rec); }
+	// The same uid can appear more than once in a batch (uniqueids are not guaranteed
+	// unique in imas_questionset).  The base/pending lookups below are done once per batch,
+	// so duplicates would each try to insert the same sync-base row.  Keep one per uid:
+	// prefer an undeleted copy, then the most recently modified.
+	$byuid = array();
+	foreach ($recs as $rec) {
+		$u = fed_record_uid($type, $rec);
+		if (!isset($byuid[$u])) {
+			$byuid[$u] = $rec;
+		} else {
+			$cur = $byuid[$u];
+			if ((!empty($cur['deleted']) && empty($rec['deleted'])) ||
+				(!empty($cur['deleted']) == !empty($rec['deleted']) && $rec['lastmoddate'] > $cur['lastmoddate'])
+			) {
+				$byuid[$u] = $rec;
+			}
+			$counts['skipped']++;
+		}
+	}
+	$recs = array_values($byuid);
+
+	$uids = array_keys($byuid);
 	$local = fed_local_records($type, $recs);
 	$base = fed_get_base($peerid, $type, $uids);
 	$pending = fed_get_pending($peerid, $type, $uids);

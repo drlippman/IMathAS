@@ -23,6 +23,13 @@ const FED_DEP_MAX_COUNT = 500;  // max dependency questions attached to one batc
 const FED_LIB_SHARED_SQL = 'il.federationlevel>0 AND il.userights=8 AND il.uniqueid>0';
 // SQL fragment: question (alias iq) may be shared via federation
 const FED_QUESTION_SHARED_SQL = 'iq.uniqueid>0 AND iq.userights>1 AND iq.license>0';
+// SQL fragment: question (alias iq) is the canonical copy of its uniqueid.  The same uniqueid
+// can exist on several local ids (past duplicate imports); only the lowest-id copy that is
+// itself shareable (and in a shared library) is sent, so a uid maps to one stable record.
+const FED_QUESTION_CANON_SQL = 'NOT EXISTS (SELECT 1 FROM imas_questionset AS iq2 WHERE iq2.uniqueid=iq.uniqueid AND iq2.id<iq.id
+	AND iq2.userights>1 AND iq2.license>0 AND EXISTS (SELECT 1 FROM imas_library_items AS ili2
+	JOIN imas_libraries AS il2 ON il2.id=ili2.libid AND il2.federationlevel>0 AND il2.userights=8 AND il2.uniqueid>0
+	WHERE ili2.qsetid=iq2.id))';
 
 /**
  * Name this install presents to peers (must match peername in their table)
