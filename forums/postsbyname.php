@@ -260,8 +260,6 @@
 	$stm = $DBH->prepare($query);
 	$stm->execute($arr);
 
-	$laststu = -1;
-	$cnt = 0;
 	echo "<button type=\"button\" onclick=\"toggleshowall()\" id=\"toggleall\">"._('Expand All')."</button> ";
 	echo '<button type="button" onclick="toggleposts(this)">'._("Hide Posts").'</button> ';
 	echo '<button type="button" onclick="togglereplies(this)">'._("Hide Replies").'</button> ';
@@ -291,26 +289,13 @@
 		echo '<div class="forumgrp">'.$content.'</div>';
 		echo '</div>';
 	}
-	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = ''; $lasthasuserimg = 0; $lastlocked = 0;
-	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
-		if ($line['userid']!=$laststu) {
-			if ($laststu!=-1) {
-				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg, $lastlocked);
-				$content = '';  $postcnt = 0; $replycnt = 0;
-			}
-            $laststu = $line['userid'];
-            $lasthasuserimg = $line['hasuserimg'];
-            $lastlocked = ($canviewall ? intval($line['locked'] ?? 0) : 0);
-			$lastname = Sanitize::encodeStringForDisplay($line['LastName']).", " . Sanitize::encodeStringForDisplay($line['FirstName']);
-		}
-
+	function renderpost($line, $cnt) {
+		global $haspoints, $caneditscore, $canviewscore, $rubric, $pointspos, $scores, $feedback, $userid, $myrights, $allowreply;
+		$content = '';
 		if ($line['parent']!=0) {
-			if ($line['userid']!=$userid && in_array($line['threadid'], $blockreplythreads)) { continue;}
 			$content .= '<div class="reply"><div class="block flexgroup">';
-			$replycnt++;
 		} else {
 			$content .= '<div class="initialpost"><div class="block flexgroup">';
-			$postcnt++;
 		}
 
 		$content .= "<button type=\"button\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" aria-controls=\"m$cnt\" aria-expanded=\"false\">+</button>";
@@ -401,9 +386,26 @@
 			}
 		}
 		$content .= '</div></div>';
-		$cnt++;
+		return $content;
 	}
-	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg, $lastlocked);
+
+	//group posts by user; SQL ordering is preserved by insertion order
+	$students = array();
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($line['parent']!=0 && $line['userid']!=$userid && in_array($line['threadid'], $blockreplythreads)) { continue; }
+		$students[$line['userid']][] = $line;
+	}
+	$cnt = 0;
+	foreach ($students as $uid => $posts) {
+		$first = $posts[0];
+		$content = ''; $postcnt = 0; $replycnt = 0;
+		foreach ($posts as $line) {
+			if ($line['parent']!=0) { $replycnt++; } else { $postcnt++; }
+			$content .= renderpost($line, $cnt++);
+		}
+		$name = Sanitize::encodeStringForDisplay($first['LastName']).", ".Sanitize::encodeStringForDisplay($first['FirstName']);
+		printuserposts($name, $uid, $content, $postcnt, $replycnt, $first['hasuserimg'], intval($first['locked'] ?? 0));
+	}
 	echo "<script>var bcnt = $cnt;</script>";
 	if ($caneditscore && $haspoints) {
 		echo "<div><button type=\"submit\">"._('Save Grades')."</button></div>";
