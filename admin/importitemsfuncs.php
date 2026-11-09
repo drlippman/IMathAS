@@ -398,13 +398,24 @@ private function importQuestionSet() {
 	}
 	$qstoimport = array_unique($qstoimport);
 	$qsuidmap = array();
+	$uidalias = array();
+	$uniqueqstoimport = array();
 	foreach ($qstoimport as $qsid) {
 		if (empty($this->data['questionset'][$qsid]['uniqueid'])) {
 			$mt = microtime();
 			$this->data['questionset'][$qsid]['uniqueid'] = substr($mt,11).substr($mt,2,1).str_pad($qsid,5,"0",STR_PAD_LEFT);
 		}
-		$qsuidmap[$this->data['questionset'][$qsid]['uniqueid']] = $qsid;
+		$thisuid = $this->data['questionset'][$qsid]['uniqueid'];
+		if (isset($qsuidmap[$thisuid])) {
+			// same uniqueid appears under multiple export ids; only import the first
+			// and alias the others to it once local ids are known
+			$uidalias[$qsid] = $qsuidmap[$thisuid];
+		} else {
+			$qsuidmap[$thisuid] = $qsid;
+			$uniqueqstoimport[] = $qsid;
+		}
 	}
+	$qstoimport = $uniqueqstoimport;
 
 	//prep DB fields
 	$db_fields['questionset'] = explode(',', $db_fields['questionset']);
@@ -495,6 +506,12 @@ private function importQuestionSet() {
 		$firstqsid = $DBH->lastInsertId();
 		foreach ($tomap as $k=>$tomapeqid) {
 			$this->qsmap[$tomapeqid] = $firstqsid+$k;
+		}
+	}
+	// export ids that shared a uniqueid with an imported question map to the same local question
+	foreach ($uidalias as $dupqid => $canonqid) {
+		if (isset($this->qsmap[$canonqid])) {
+			$this->qsmap[$dupqid] = $this->qsmap[$canonqid];
 		}
 	}
 
