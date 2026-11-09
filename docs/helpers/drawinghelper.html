@@ -82,6 +82,15 @@ A leading <code>0:</code> on xmin/ymin (e.g. <code>0:-1</code>) gives first-quad
 </select></label>
 <details id="asubwrap" class="dd" style="display:none"><summary>Tools</summary><div id="asublist" class="ddpanel"></div></details><br/>
 <label>Decimal places for points <input type="text" id="dec" value="2" style="width:3em"></label>
+<details id="bgdetails" style="margin:6px 0">
+<summary>Background (<code>$background</code>)</summary>
+<p class="note">Same format as <code>$background</code>: enter one item per line (each line is one entry of the array), or a single
+<code>draw:</code> ASCIIsvg command string, <code>none</code>, or <code>transparent</code>. Leave blank for just the axes/grid.<br/>
+Items use the <code>showplot</code> format: <code>function,color,xmin,xmax,startmarker,endmarker,strokewidth,dash</code>;
+also <code>dot,x,y,open|closed,color,label,labelloc</code>, <code>text,x,y,string,color,loc,angle</code>,
+parametric <code>[x(t),y(t)],color,tmin,tmax</code>, inequalities like <code>&lt;x^2</code>, <code>&gt;=2x+1</code>, <code>x&lt;3</code>, and <code>x=3</code>.</p>
+<textarea id="bgtext" rows="5" placeholder="x^2-2,blue&#10;dot,1,-1,open,red&#10;text,2,3,My label"></textarea>
+</details>
 <p class="note">Leave snap blank for no snapping.<br/>
 After setting grid and changing options and tools, click Create drawing window to build the drawing tool.</p>
 <button type="button" id="genbtn">Create drawing window</button>
@@ -242,7 +251,108 @@ function buildBg(s) {
     if (s.xscl.name !== '' && s.xscl.name !== 'off') { cmd += 'text([' + s.xmax + ',0],"' + s.xscl.name + '","aboveleft");'; }
     if (s.yscl.name !== '') { cmd += 'text([0,' + s.ymax + '],"' + s.yscl.name + '","belowright");'; }
   }
-  return 'setBorder(5); initPicture(' + s.xmin + ',' + s.xmax + ',' + wymin + ',' + wymax + ');' + cmd;
+  var bgt = $('#bgtext').val().trim(), pic = 'setBorder(5); initPicture(' + s.xmin + ',' + s.xmax + ',' + wymin + ',' + wymax + ');';
+  if (bgt === 'none') { return 'setBorder(5); initPicture(0,10,0,10);'; }
+  if (bgt === 'transparent') { return pic; }
+  if (bgt.substr(0, 5) === 'draw:') {
+    var ai = bgt.indexOf('alt:');
+    var dc = (ai < 0 ? bgt.substr(5) : bgt.substr(5, ai - 5)).replace(/'/g, '"').replace(/\n/g, ' ');
+    return pic + cmd.replace(/^(.*?axes\(.*?\);)/, function(m) { return m + dc; });
+  }
+  return pic + cmd.replace(/^(.*?axes\(.*?\);)/, function(m) { return m + bgItems(bgt, s, wymin, wymax); });
+}
+
+// ---------- background (showplot-style items -> ASCIIsvg commands) ----------
+function splitTop(str) { // split on commas not inside brackets/parens; "\," is a literal comma
+  var out = [], cur = '', depth = 0, i, c;
+  for (i = 0; i < str.length; i++) {
+    c = str[i];
+    if (c === '\\' && str[i + 1] === ',') { cur += ','; i++; continue; }
+    if (c === '(' || c === '[') { depth++; } else if (c === ')' || c === ']') { depth--; }
+    if (c === ',' && depth <= 0) { out.push(cur.trim()); cur = ''; } else { cur += c; }
+  }
+  out.push(cur.trim());
+  return out;
+}
+function jsq(str) { return JSON.stringify(String(str)); }
+function numOr(v, d) { var n = evalNum(v); return isNaN(n) ? d : n; }
+function markerCode(m) { return m === 'arrow' ? 1 : m === 'open' ? 2 : m === 'closed' ? 3 : 0; }
+function bgItems(text, s, wymin, wymax) {
+  var out = '';
+  var xr = 5 * (s.xmax - s.xmin) / s.cw, yr = 5 * (wymax - wymin) / s.ch;
+  var xxmin = s.xmin - xr, xxmax = s.xmax + xr, yymin = wymin - yr, yymax = wymax + yr;
+  text.split('\n').forEach(function(line) {
+    line = line.trim();
+    if (line === '' || line.substr(0, 4) === 'alt:') { return; }
+    var f = splitTop(line), i;
+    if (f[0] === 'dot') {
+      out += 'stroke=' + jsq(f[4] || 'black') + ';dot([' + numOr(f[1], 0) + ',' + numOr(f[2], 0) + '],' + jsq(f[3] === 'open' ? 'open' : 'closed');
+      if (f[5]) { out += ',' + jsq(f[5]) + ',' + jsq(f[6] || 'above'); }
+      out += ');';
+      return;
+    }
+    if (f[0] === 'text') {
+      out += 'fontfill=' + jsq(f[4] || 'black') + ';text([' + numOr(f[1], 0) + ',' + numOr(f[2], 0) + '],' + jsq(f[3] || '') + ',' + jsq(f[5] || 'centered') + ',' + (parseInt(f[6], 10) || 0) + ');';
+      return;
+    }
+    var color, param = false, fn, isIneq = false, itype = '', xeq = null;
+    if (f[0][0] === '[') { // parametric: "[xf", "yf]" were split at the comma
+      param = true;
+      if (/\]$/.test(f[0])) { // bracketed pair arrived as a single token
+        fn = splitTop(f[0].replace(/^\[/, '').replace(/\]$/, ''));
+      } else {
+        fn = [f[0].replace(/^\[/, ''), f[1].replace(/\]$/, '')];
+        f.shift();
+      }
+      if (fn.length < 2) { return; }
+    } else if (/^[<>]/.test(f[0])) {
+      isIneq = true; itype = f[0].match(/^[<>]=?/)[0]; fn = f[0].substr(itype.length);
+    } else if (/^x\s*[<>=]/.test(f[0])) {
+      var mm = f[0].match(/^x\s*([<>]=?|=)\s*(.*)$/);
+      if (mm[1] === '=' && isNaN(evalNum(mm[2]))) { // x = g(y): parametric
+        param = true; fn = [mm[2].replace(/\by\b/g, 't'), 't'];
+      } else { xeq = evalNum(mm[2]); itype = mm[1]; isIneq = itype !== '='; }
+    } else {
+      fn = f[0].replace(/^\s*y\s*=?/, '');
+      if (fn === '') { return; }
+    }
+    color = f[1] || 'black';
+    var xmn = f[2] !== undefined && f[2] !== '' ? evalNum(f[2]) : NaN, xmx = f[3] !== undefined && f[3] !== '' ? evalNum(f[3].split('!')[0]) : NaN;
+    var dom = !isNaN(xmn) || !isNaN(xmx);
+    var dash = (isIneq && itype.length === 1) ? '5' : (f[7] ? (f[7] === 'dash' ? '5' : (evalNum(f[7]) > 0 ? f[7] : 'none')) : 'none');
+    var attrs = 'stroke=' + jsq(color) + ';strokewidth=' + jsq(f[6] || '1') + ';strokedasharray=' + jsq(dash) + ';fill="none";';
+    var fill = 'fill=' + jsq('trans' + (f[1] || 'blue')) + ';stroke="none";strokedasharray="none";';
+    if (xeq !== null && !isNaN(xeq)) { // vertical line / half plane
+      var y0 = dom && !isNaN(xmn) ? xmn : yymin, y1 = dom && !isNaN(xmx) ? xmx : yymax;
+      out += attrs + 'line([' + xeq + ',' + y0 + '],[' + xeq + ',' + y1 + ']);';
+      if (f[4] === 'open' || f[4] === 'closed') { out += 'dot([' + xeq + ',' + y0 + '],' + jsq(f[4]) + ');'; }
+      if (f[5] === 'open' || f[5] === 'closed') { out += 'dot([' + xeq + ',' + y1 + '],' + jsq(f[5]) + ');'; }
+      if (isIneq) {
+        out += fill + (itype[0] === '<' ? 'rect([' + xxmin + ',' + y0 + '],[' + xeq + ',' + y1 + ']);' : 'rect([' + xeq + ',' + y0 + '],[' + xxmax + ',' + y1 + ']);');
+      }
+      return;
+    }
+    var lo = !isNaN(xmn) ? xmn : (param ? s.xmin : xxmin), hi = !isNaN(xmx) ? xmx : (param ? s.xmax : xxmax);
+    if (isIneq && !param) { // sample for the shaded region
+      var g = makeMathFunction(fn.replace(/Math\./g, ''), 'x'), pts = [], n = 100, st, yv;
+      if (g) {
+        for (i = 0; i <= n; i++) {
+          st = lo + (hi - lo) * i / n;
+          yv = g({ x: st + (i === 0 ? 1e-10 : i === n ? -1e-10 : 0) });
+          if (isNaN(yv) || !isFinite(yv)) { continue; }
+          pts.push([st, Math.max(yymin, Math.min(yymax, yv))]);
+        }
+        if (pts.length > 1) {
+          var edge = itype[0] === '<' ? yymin : yymax;
+          var poly = pts.concat([[pts[pts.length - 1][0], edge], [pts[0][0], edge]]);
+          out += fill + 'path(' + JSON.stringify(poly.map(function(p) { return [rnd(p[0], 5), rnd(p[1], 5)]; })) + ');';
+        }
+      }
+    }
+    out += attrs + 'plot(' + (param ? '[' + jsq(fn[0]) + ',' + jsq(fn[1]) + ']' : jsq(fn)) + ',' +
+      (dom || param ? lo : 'null') + ',' + (dom || param ? hi : 'null') + ',null,null,' + markerCode(f[4]) + ',' + markerCode(f[5]) + ');';
+  });
+  return out;
 }
 
 // ---------- toolbar ----------
@@ -561,6 +671,16 @@ function generate() {
   var lines = ['$grid' + idx + ' = ' + q(gridv.join(','))];
   if (S.snapRaw !== '') { lines.push('$snaptogrid' + idx + ' = ' + q(S.snapRaw)); }
   if (S.afOut) { lines.push('$answerformat' + idx + ' = ' + q(S.afOut)); }
+  var bgt = $('#bgtext').val().trim();
+  if (bgt !== '') {
+    var qb = function(s) { return q(s).replace(/\$/g, '\\$'); };
+    if (bgt === 'none' || bgt === 'transparent' || bgt.substr(0, 5) === 'draw:') {
+      lines.push('$background' + idx + ' = ' + qb(bgt.replace(/\s*\n\s*/g, ' ')));
+    } else {
+      var bl = bgt.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l !== ''; });
+      lines.push('$background' + idx + ' = ' + (bl.length === 1 ? qb(bl[0]) : '[' + bl.map(qb).join(',') + ']'));
+    }
+  }
   if (ans.length === 1) { lines.push('$answers' + idx + ' = ' + q(ans[0])); }
   else if (ans.length > 1) { lines.push('$answers' + idx + ' = [' + ans.map(q).join(',') + ']'); }
   else { lines.push('$answers' + idx + ' = ""'); warns.push('Nothing was drawn (or nothing could be converted).'); }
