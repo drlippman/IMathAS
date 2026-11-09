@@ -23,18 +23,18 @@ if (isset($_POST['record'])) {
 	$now = time();
 	$todel = array_map('Sanitize::onlyInt', $_POST['todel']);
 	$ph = Sanitize::generateQueryPlaceholders($todel);
-	$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1 WHERE id IN ($ph)");
-	$stm->execute($todel);
+	$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1,lastmoddate=? WHERE id IN ($ph)");
+	$stm->execute(array_merge(array($now),$todel));
 	
 	$unwrong = array_map('Sanitize::onlyInt', $_POST['unwrong']);
 	$ph = Sanitize::generateQueryPlaceholders($unwrong);
-	$stm = $DBH->prepare("UPDATE imas_library_items SET junkflag=0 WHERE id IN ($ph)");
-	$stm->execute($unwrong);
+	$stm = $DBH->prepare("UPDATE imas_library_items SET junkflag=0,lastmoddate=? WHERE id IN ($ph)");
+	$stm->execute(array_merge(array($now),$unwrong));
 	
 	//now, resolve any unassigned issues
 	//first, try to undelete the unassigned library item for any question with no undeleted library items
 	$query = "UPDATE imas_library_items AS ili, (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ";
-	$query .= "SET ili.deleted=0 WHERE ili.qsetid=tofix.qsetid AND ili.libid=0";
+	$query .= "SET ili.deleted=0,ili.lastmoddate=$now WHERE ili.qsetid=tofix.qsetid AND ili.libid=0";
 	$stm = $DBH->query($query);
 	
 	//if any still have no undeleted library items, then they must not have an unassigned entry to undelete, so add it
@@ -44,7 +44,7 @@ if (isset($_POST['record'])) {
 	
 	//make unassigned deleted if there's also an undeleted other library
 	$query = "UPDATE imas_library_items AS A JOIN imas_library_items AS B ON A.qsetid=B.qsetid AND A.deleted=0 AND B.deleted=0 ";
-	$query .= "SET A.deleted=1 WHERE A.libid=0 AND B.libid>0";
+	$query .= "SET A.deleted=1,A.lastmoddate=$now WHERE A.libid=0 AND B.libid>0";
 	$stm = $DBH->query($query);
 	echo "Done";
 } else {

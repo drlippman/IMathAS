@@ -437,6 +437,8 @@ private function importQuestionSet() {
 			} else {
 				$this->data['questionset'][$exportqid]['ownerid'] = $this->getMappedOwnerid($this->data['questionset'][$exportqid]['ownerid']);
 			}
+			// stamp with local time, not the exporting site's, so other installs pulling from this one see the change
+			$this->data['questionset'][$exportqid]['lastmoddate'] = $this->now;
 			foreach ($db_fields['questionset'] as $field) {
 				$exarr[] = $this->data['questionset'][$exportqid][$field];
 			}

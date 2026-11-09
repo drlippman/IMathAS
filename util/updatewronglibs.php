@@ -8,7 +8,7 @@ function doquery($vals) {  //provide presanitized values
 	$query = "UPDATE imas_library_items AS ili
 	  JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
 	  JOIN imas_libraries AS il ON ili.libid=il.id
-	  SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN ($query_placeholders)";
+	  SET ili.junkflag = 1, ili.lastmoddate = ".time()." WHERE (iqs.uniqueid, il.uniqueid) IN ($query_placeholders)";
 	 $stm = $DBH->prepare($query);
 	 $stm->execute($vals);
 	 return $stm->rowCount();

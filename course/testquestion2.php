@@ -87,7 +87,7 @@ if ($myrights<20) {
         //first, try to undelete the unassigned library item for any question with no undeleted library items
         $query = "UPDATE imas_library_items AS ili JOIN (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ON ili.qsetid=tofix.qsetid ";
         $query .= "JOIN imas_questionset AS iq ON ili.qsetid=iq.id ";
-        $query .= "SET ili.deleted=0 WHERE ili.libid=0 AND iq.deleted=0";
+        $query .= "SET ili.deleted=0,ili.lastmoddate=".time()." WHERE ili.libid=0 AND iq.deleted=0";
         $stm = $DBH->query($query);
         
         //if any still have no undeleted library items, then they must not have an unassigned entry to undelete, so add it

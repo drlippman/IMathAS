@@ -1326,6 +1326,34 @@ switch($_POST['action']) {
 		break;
 	case "modfedpeers":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		require_once "../includes/federationfuncs.php";
+		// a secret that is new or changed must be long enough; an unchanged existing one is left alone
+		$newsecret = (string) ($_POST['secret'] ?? '');
+		$checksecret = true;
+		if ($_GET['id'] != 'new') {
+			$stm = $DBH->prepare("SELECT secret FROM imas_federation_peers WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$oldsecret = $stm->fetchColumn();
+			if ($oldsecret !== false && $oldsecret === $newsecret) { $checksecret = false; }
+		}
+		$fedErr = '';
+		if ($checksecret && strlen($newsecret) < FED_MIN_SECRET_LENGTH) {
+			$fedErr = sprintf(_('The shared secret must be at least %d characters. Use a long random value.'), FED_MIN_SECRET_LENGTH);
+		} else if ($checksecret && strlen($newsecret) > FED_MAX_SECRET_LENGTH) {
+			$fedErr = sprintf(_('The shared secret can be at most %d characters.'), FED_MAX_SECRET_LENGTH);
+		}
+		if ($fedErr !== '') {
+			$pagetitle = _('Federation Peer');
+			require_once "../header.php";
+			echo '<p class="noticetext">' . Sanitize::encodeStringForDisplay($fedErr) . '</p>';
+			if ($_GET['id'] == 'new') {
+				echo '<p><a href="forms.php?action=listfedpeers&from=' . Sanitize::encodeUrlParam($from) . '">' . _('Go back') . '</a></p>';
+			} else {
+				echo '<p><a href="forms.php?action=modfedpeers&id=' . Sanitize::onlyInt($_GET['id']) . '&from=' . Sanitize::encodeUrlParam($from) . '">' . _('Go back') . '</a></p>';
+			}
+			require_once "../footer.php";
+			exit;
+		}
 		if ($_GET['id']=='new') {
 			$query = "INSERT INTO imas_federation_peers (peername,peerdescription,secret,url,lastpull) VALUES ";
 			$query .= "(:peername, :peerdescription, :secret, :url, 0)";
@@ -1343,8 +1371,14 @@ switch($_POST['action']) {
 		break;
 	case "delfedpeers":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
+		// also remove what was recorded about syncing with this peer
+		$delpeerid = intval($_GET['id']);
+		foreach (array('imas_federation_items', 'imas_federation_staged', 'imas_federation_pulls') as $feddeltable) {
+			$stm = $DBH->prepare("DELETE FROM $feddeltable WHERE peerid=:id");
+			$stm->execute(array(':id'=>$delpeerid));
+		}
 		$stm = $DBH->prepare("DELETE FROM imas_federation_peers WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$delpeerid));
 		header('Location: ' . $GLOBALS['basesiteurl'] . '/admin/forms.php?action=listfedpeers&from='.Sanitize::encodeUrlParam($from));
 		exit;
 		break;

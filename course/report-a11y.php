@@ -241,8 +241,8 @@ if (count($vidstocheck)>0) {
         }
         // if we updated extrefs, update database
         if ($updatedextref) {
-            $stm = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
-            $stm->execute([implode('~~', $extrefs), $row['id']]);
+            $stm = $DBH->prepare("UPDATE imas_questionset SET extref=?,lastmoddate=? WHERE id=?");
+            $stm->execute([implode('~~', $extrefs), time(), $row['id']]);
         }
     }
 }

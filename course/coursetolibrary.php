@@ -54,7 +54,8 @@ if ($stm->rowCount()==0) {
 	exit;
 }
 $qarr = array();
-$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ";
+$now = time();
+$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES ";
 $first = true;
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($first) {
@@ -62,8 +63,8 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	} else {
 		$query .= ',';
 	}
-	$query .= "(?,?,?)";
-	array_push($qarr, $tolib, $row[0], $row[1]);
+	$query .= "(?,?,?,?)";
+	array_push($qarr, $tolib, $row[0], $row[1], $now);
 }
 $stm = $DBH->prepare($query);
 $stm->execute($qarr);

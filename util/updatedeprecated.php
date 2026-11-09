@@ -27,9 +27,9 @@ if (isset($_POST['data'])) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[2]==0) { //no existing replaceby
 			if (isset($ref[$replace[$row[1]]])) { //if the replaceby exists on this system
-				$query = 'UPDATE imas_questionset SET replaceby=:replaceby where id=:id';
+				$query = 'UPDATE imas_questionset SET replaceby=:replaceby,lastmoddate=:now where id=:id';
 				$stm = $DBH->prepare($query); //we know values are all numeric
-				$stm->execute(array(':replaceby'=>intval($ref[$replace[$row[1]]]), ':id'=>$row[0]));
+				$stm->execute(array(':replaceby'=>intval($ref[$replace[$row[1]]]), ':id'=>$row[0], ':now'=>time()));
 				echo "Updated question ID ".Sanitize::onlyInt($row[0])."<br/>";
 			} else {
 				echo "Skipped question ID ".Sanitize::onlyInt($row[0])."; replaceby not found (".Sanitize::encodeStringForDisplay($names[$replace[$row[1]]]).")<br/>";

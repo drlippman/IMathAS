@@ -46,8 +46,8 @@ if (!empty($_POST['from']) && !empty($_POST['to'])) {
 		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':to'=>$to));
 		*/
 		$nas = $stm->rowCount();
-		$stm = $DBH->prepare("UPDATE imas_questionset SET extref=REPLACE(extref,:from2,:to) WHERE extref LIKE :from");
-		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':to'=>$to));
+		$stm = $DBH->prepare("UPDATE imas_questionset SET extref=REPLACE(extref,:from2,:to),lastmoddate=:now WHERE extref LIKE :from");
+		$stm->execute(array(':from'=>"%$from%", ':from2'=>$from, ':to'=>$to, ':now'=>time()));
 		$nqe = $stm->rowCount();
 		echo "Inline Texts changed: $ni<br/>Linked texts changed: $nlt<br/>";
 		echo "Assessments changed: $nas<br/>Question video links changed: $nqe";

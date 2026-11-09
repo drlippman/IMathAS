@@ -1,209 +1,139 @@
 <?php
-//IMathAS:  Federated libraries update send
-//(c) 2017 David Lippman
+//IMathAS:  Federation API (sender), protocol version 2
+//See federation-plan.md
+//
+//Read-only.  A peer (a row in imas_federation_peers, matched by peername)
+//requests a batch of changed records, using a signed request.
+//
+//Parameters (GET):
+//  peer   name this peer is known by in our imas_federation_peers
+//  ts     unix timestamp of request; must be within FED_MAX_SKEW of our clock
+//  type   ping | libs | questions | libitems
+//  lm,id  cursor: return records after (lastmoddate=lm, id=id) in ascending order
+//  limit  max records (capped)
+//  sig    base64 HMAC-SHA256 of fed_signing_string() using the shared secret
+//
+//Response: JSON
+//  {v, type, more, cursor:{lm,id}, data:[wire records]}
+//  questions responses also include deps:[wire records], withheld:[uids], truncated:bool
+//  errors: HTTP 4xx with {error:"..."}
 
-//exit; //not ready for use yet.
-
-if (empty($_GET['peer']) || !isset($_GET['since']) || !isset($_GET['sig'])) {
-	exit;
-}
-
-$since = intval($_GET['since']);
 require_once "../init_without_validate.php";
 require_once "../includes/filehandler.php";
+require_once "../includes/federationfuncs.php";
 
-$peerName = Sanitize::stripHtmlTags($_GET['peer']);
+function fed_api_respond($arr, $code = 200) {
+	http_response_code($code);
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode($arr, JSON_INVALID_UTF8_IGNORE | JSON_HEX_TAG | JSON_UNESCAPED_UNICODE);
+	exit;
+}
+
+// optional kill switch: $CFG['federation']['enableapi'] = false;
+if (isset($CFG['federation']['enableapi']) && !$CFG['federation']['enableapi']) {
+	fed_api_respond(array('error' => 'Not available'), 404);
+}
+
+foreach (array('peer', 'ts', 'type', 'sig') as $reqparam) {
+	if (!isset($_GET[$reqparam]) || is_array($_GET[$reqparam])) {
+		fed_api_respond(array('error' => 'Missing parameter: ' . $reqparam), 400);
+	}
+}
+
+$req = array(
+	'peer' => $_GET['peer'],
+	'ts' => intval($_GET['ts']),
+	'type' => $_GET['type'],
+	'lm' => isset($_GET['lm']) ? intval($_GET['lm']) : 0,
+	'id' => isset($_GET['id']) ? intval($_GET['id']) : 0,
+	'limit' => isset($_GET['limit']) ? intval($_GET['limit']) : 0,
+);
+
 $stm = $DBH->prepare("SELECT id,secret FROM imas_federation_peers WHERE peername=:peername");
-$stm->execute(array(':peername'=>$peerName));
+$stm->execute(array(':peername' => $req['peer']));
 $peer = $stm->fetch(PDO::FETCH_ASSOC);
-if ($peer === false) {
-	echo '{error:"Unknown peer"}';
-	exit;
+// Same response for unknown peer, empty secret and bad signature, and the signature is computed
+// in every case, so neither the reply nor its timing shows whether a peer name exists.
+// A peer with an empty secret can never authenticate (anyone could sign with an empty key).
+$secret = ($peer !== false && is_string($peer['secret']) && strlen($peer['secret']) > 0) ? $peer['secret'] : null;
+$sigok = fed_verify_sig($secret === null ? bin2hex(random_bytes(16)) : $secret, $req, $_GET['sig']);
+if ($secret === null || !$sigok) {
+	fed_api_respond(array('error' => 'Invalid authorization'), 403);
 }
-if (function_exists("hash_hmac")) {
-	$computed_signature =  base64_encode(hash_hmac('sha256', $_GET['peer'], $peer['secret'], true));
+if (abs(time() - $req['ts']) > FED_MAX_SKEW) {
+	fed_api_respond(array('error' => 'Request timestamp out of range; check server clocks'), 403);
+}
+
+if ($req['lm'] < 0 || $req['id'] < 0) {
+	fed_api_respond(array('error' => 'Invalid cursor'), 400);
+}
+
+$type = $req['type'];
+if ($type === 'ping') {
+	fed_api_respond(array('v' => FED_PROTOCOL_VERSION, 'type' => 'ping', 'name' => fed_my_peer_name(), 'time' => time()));
+}
+
+$maxlimit = ($type === 'questions') ? 200 : 1000;
+$limit = $req['limit'] > 0 ? min($req['limit'], $maxlimit) : $maxlimit;
+$cursorsql = '(%1$s>:lm OR (%1$s=:lm2 AND %2$s>:id)) ORDER BY %1$s,%2$s LIMIT ' . ($limit + 1);
+$cursorparams = array(':lm' => $req['lm'], ':lm2' => $req['lm'], ':id' => $req['id']);
+
+$response = array('v' => FED_PROTOCOL_VERSION, 'type' => $type);
+
+if ($type === 'libs') {
+	$query = 'SELECT il.id,il.uniqueid,il.name,il.parent,il.sortorder,il.deleted,il.adddate,il.lastmoddate,pl.uniqueid AS parentuid ';
+	$query .= 'FROM imas_libraries AS il LEFT JOIN imas_libraries AS pl ON il.parent=pl.id ';
+	$query .= 'WHERE ' . FED_LIB_SHARED_SQL . ' AND ' . sprintf($cursorsql, 'il.lastmoddate', 'il.id');
+	$stm = $DBH->prepare($query);
+	$stm->execute($cursorparams);
+	$rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+	$more = count($rows) > $limit;
+	if ($more) { array_pop($rows); }
+	$response['data'] = fed_serialize_libraries($rows);
+} else if ($type === 'libitems') {
+	$query = 'SELECT ili.id,il.uniqueid AS libuid,iq.uniqueid AS quid,ili.junkflag,ili.deleted,ili.lastmoddate ';
+	$query .= 'FROM imas_library_items AS ili ';
+	$query .= 'JOIN imas_libraries AS il ON il.id=ili.libid AND ' . FED_LIB_SHARED_SQL . ' ';
+	$query .= 'JOIN imas_questionset AS iq ON iq.id=ili.qsetid AND ' . FED_QUESTION_SHARED_SQL . ' ';
+	$query .= 'WHERE ' . sprintf($cursorsql, 'ili.lastmoddate', 'ili.id');
+	$stm = $DBH->prepare($query);
+	$stm->execute($cursorparams);
+	$rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+	$more = count($rows) > $limit;
+	if ($more) { array_pop($rows); }
+	$response['data'] = fed_serialize_libitems($rows);
+} else if ($type === 'questions') {
+	// questions in at least one shared library (library items of any deleted state, so
+	// that a question's own deleted flag keeps flowing after it is removed from a library)
+	$query = 'SELECT iq.* FROM imas_questionset AS iq WHERE ' . FED_QUESTION_SHARED_SQL . ' ';
+	$query .= 'AND EXISTS (SELECT 1 FROM imas_library_items AS ili JOIN imas_libraries AS il ON il.id=ili.libid AND ' . FED_LIB_SHARED_SQL;
+	$query .= ' WHERE ili.qsetid=iq.id) ';
+	$query .= 'AND ' . sprintf($cursorsql, 'iq.lastmoddate', 'iq.id');
+	$stm = $DBH->prepare($query);
+	$stm->execute($cursorparams);
+	$rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+	$more = count($rows) > $limit;
+	if ($more) { array_pop($rows); }
+
+	list($response['data'], $refids) = fed_serialize_questions($rows);
+	$haveids = array();
+	foreach ($rows as $row) { $haveids[] = $row['id']; }
+	list($response['deps'], $response['withheld'], $response['truncated']) = fed_collect_dependencies($refids, $haveids);
 } else {
-	$computed_signature = base64_encode(custom_hmac('sha256', $_GET['peer'], $peer['secret'], true));
-}
-if ($computed_signature != $_GET['sig']) {
-	echo '{error:"Invalid authorization"}';
-	exit;
+	fed_api_respond(array('error' => 'Unknown type'), 400);
 }
 
-
-$stm = $DBH->prepare("SELECT pulltime FROM imas_federation_pulls WHERE peerid=:peerid");
-$stm->execute(array(":peerid"=>$peer['id']));
-$toskip = array();
-while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-	$toskip[] = $row['pulltime'];
-}
-if (count($toskip)>0) {
-	$skipph = Sanitize::generateQueryPlaceholders($toskip);
-}
-
-if (isset($_GET['stage'])) {
-	$stage = intval($_GET['stage']);
+if (count($rows) > 0) {
+	$last = $rows[count($rows) - 1];
+	$response['cursor'] = array('lm' => (int) $last['lastmoddate'], 'id' => (int) $last['id']);
 } else {
-	$stage = 0;
+	$response['cursor'] = array('lm' => $req['lm'], 'id' => $req['id']);
+}
+$response['more'] = $more;
+
+if (!$more) {
+	$stm = $DBH->prepare('UPDATE imas_federation_peers SET lastpull=:now WHERE id=:id');
+	$stm->execute(array(':now' => time(), ':id' => $peer['id']));
 }
 
-if ($stage == 0) { //send updated libraries
-	$query = 'SELECT A.id,A.uniqueid,A.federationlevel,A.name,A.deleted,A.lastmoddate,A.parent,B.uniqueid as parentuid ';
-	$query .= 'FROM imas_libraries AS A LEFT JOIN imas_libraries AS B ON A.parent=B.id ';
-	$query .= 'WHERE A.lastmoddate>? AND A.federationlevel>0 AND A.userights=8 ';
-	if (count($toskip)>0) {
-		$query .= "AND A.lastmoddate NOT IN ($skipph)";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array_merge(array($since),$toskip));
-	} else {
-		$stm = $DBH->prepare($query);
-		$stm->execute(array($since));
-	}
-	$libs = array();
-	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$libs[] = array('uid'=>$row['uniqueid'], 'fl'=>$row['federationlevel'], 'n'=>$row['name'],
-			'd'=>$row['deleted'], 'lm'=>$row['lastmoddate'], 'p'=>$row['parent']==0?0:$row['parentuid']);
-	}
-	echo json_encode(array('since'=>$since, 'stage'=>0, 'data'=>$libs));
-
-	//record this pull
-	$now = time();
-	$stm = $DBH->prepare('UPDATE imas_federation_peers SET lastpull=:now WHERE peername=:peername');
-	$stm->execute(array(':now'=>$now, ':peername'=>$peerName));
-	exit;
-} else if ($stage == 1) { //send updated questions
-	//we're going to order from most recent back so that if something updates while we're
-	//pulling, it might just cause us to re-send something rather than miss something
-	//newly updated stuff will catch the next pull
-	if (isset($_GET['offset'])) {
-		$offset = intval($_GET['offset']);
-		if ($offset<0) { echo '{error:"Invalid offset"}'; exit;}
-	} else {
-		$offset = 0;
-	}
-	$batchsize = 1000;
-	//TODO:  Handle replaceby, sourceinstall, includecodefrom, includeqtextfrom
-	$query = 'SELECT iq.*,il.uniqueid AS ulibid,ili.junkflag,ili.deleted AS libdel,ili.lastmoddate AS liblastmod FROM imas_questionset as iq ';
-	$query .= 'JOIN imas_library_items AS ili ON iq.id=ili.qsetid ';
-	$query .= 'JOIN imas_libraries AS il ON il.id=ili.libid AND il.federationlevel>0 AND il.userights=8 ';
-	$query .= 'WHERE iq.lastmoddate>? AND iq.userights>1 AND iq.license>0 ';
-	if (count($toskip)>0) {
-		$query .= "AND iq.lastmoddate NOT IN ($skipph) ";
-	}
-	$query .= 'ORDER BY iq.lastmoddate DESC LIMIT '.$batchsize.' OFFSET '.$offset;
-	$stm = $DBH->prepare($query);
-
-	$img_stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
-
-	if (count($toskip)>0) {
-		$stm = $DBH->prepare($query);
-		$stm->execute(array_merge(array($since),$toskip));
-	} else {
-		$stm = $DBH->prepare($query);
-		$stm->execute(array($since));
-	}
-	$qinfo = array();
-	$qcnt = -1; $lastq = -1; $linecnt = -1; $hasmoreq = false;
-	$includedqs = array();  //includecodefrom to resolve
-	$includetoresolve = array();
-	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$linecnt++;
-		if ($row['id']==$lastq) { //same question, different libid
-			$qinfo[$qcnt]['libs'][] = array('ulibid'=>$row['ulibid'], 'junkflag'=>$row['junkflag'], 'deleted'=>$row['libdel']);
-		} else { //new question
-			//we need to stop before the full offset to ensure all the library entries
-			//for a question are sent with the question
-			if ($linecnt>.9*$batchsize) {$hasmoreq = true; break;}
-			$qcnt++;
-			if (preg_match_all('/includecodefrom\((\d+)\)/',$row['control'],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
-				$includetoresolve[$qcnt] = 1;
-			}
-			if (preg_match_all('/includeqtextfrom\((\d+)\)/',$row['qtext'],$matches,PREG_PATTERN_ORDER) >0) {
-				$includedqs = array_merge($includedqs,$matches[1]);
-				$includetoresolve[$qcnt] = 1;
-			}
-			$qinfo[$qcnt] = array('uniqueid'=>$row['uniqueid'], 'adddate'=>$row['adddate'],
-				'lastmoddate'=>$row['lastmoddate'], 'author'=>$row['author'],
-				'description'=>$row['description'], 'qtype'=>$row['qtype'], 'control'=>$row['control'],
-				'qcontrol'=>$row['qcontrol'], 'qtext'=>$row['qtext'], 'answer'=>$row['answer'],
-				'extref'=>$row['extref'], 'deleted'=>$row['deleted'], 'broken'=>$row['broken'],
-				'solution'=>$row['solution'], 'solutionopts'=>$row['solutionopts'], 'license'=>$row['license'],
-				'ancestorauthors'=>$row['ancestorauthors'], 'otherattribution'=>$row['otherattribution'],
-				'libs'=>array(array('ulibid'=>$row['ulibid'], 'junkflag'=>$row['junkflag'], 'deleted'=>$row['libdel'], 'lastmoddate'=>$row['liblastmod'])),
-				'imgs'=>array());
-			if ($row['hasimg']>0) {
-				$img_stm->execute(array(':qsetid'=>$row['id']));
-				while ($imgrow = $img_stm->fetch(PDO::FETCH_ASSOC)) {
-					$qinfo[$qcnt]['imgs'][] = array('var'=>$imgrow['var'],
-						'filename'=>getqimageurl($imgrow['filename'],true),
-						'alttext'=>$imgrow['alttext']);
-				}
-			}
-			$lastq = $row['id'];
-		}
-	}
-	$includedqs = array_unique($includedqs);
-	if (count($includedqs)>0) {
-		$placeholders = Sanitize::generateQueryPlaceholders($includedqs);
-		$stm = $DBH->prepare("SELECT id,uniqueid FROM imas_questionset WHERE id IN ($placeholders)");
-		$stm->execute($includedqs);
-		$includedbackref = array();
-		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-			$includedbackref[$row['id']] = $row['uniqueid'];
-		}
-		foreach ($includetoresolve as $i=>$v) {
-			$qinfo[$i]['control'] = preg_replace_callback('/includecodefrom\((\d+)\)/', function($matches) use ($includedbackref) {
-					return "includecodefrom(UID".$includedbackref[$matches[1]].")";
-				}, $qinfo[$i]['control']);
-			$qinfo[$i]['qtext'] = preg_replace_callback('/includeqtextfrom\((\d+)\)/', function($matches) use ($includedbackref) {
-					return "includeqtextfrom(UID".$includedbackref[$matches[1]].")";
-				}, $qinfo[$i]['qtext']);
-		}
-	}
-	echo json_encode(array('since'=>$since, 'stage'=>1, 'nextoffset'=>$hasmoreq?($offset+$linecnt):-1, 'data'=>$qinfo));
-	exit;
-} else if ($stage == 3) { //send updated library items for unchanged questions
-	$query = 'SELECT il.uniqueid,iq.uniqueid,ili.junkflag,ili.deleted FROM ';
-	$query .= 'imas_libraries AS il JOIN imas_library_items AS ili ON il.id=ili.libid AND il.federationlevel>0 AND il.userights=8 ';
-	$query .= 'JOIN imas_questionset AS iq ON iq.id=ili.qsetid ';
-	$query .= 'WHERE ili.lastmoddate>? AND iq.lastmoddate<=? ';
-	if (count($toskip)>0) {
-		$query .= "AND ili.lastmoddate NOT IN ($skipph) ";
-	}
-	$stm = $DBH->prepare($query);
-	if (count($toskip)>0) {
-		$stm = $DBH->prepare($query);
-		$stm->execute(array_merge(array($since,$since),$toskip));
-	} else {
-		$stm = $DBH->prepare($query);
-		$stm->execute(array($since,$since));
-	}
-	$libitems = array();
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		 $libitems[] = array('ulibid'=>$row[0], 'uniqueid'=>$row[1], 'junkflag'=>$row[2], 'deleted'=>$row[3]);
-	}
-	$replacebys = array();
-	$query = 'SELECT iq.uniqueid,iq2.uniqueid FROM imas_questionset AS iq ';
-	$query .= 'LEFT JOIN imas_questionset AS iq2 ON iq.replaceby=iq2.id ';
-	$query .= 'WHERE iq.replaceby>0 AND iq.lastmoddate>? ';
-	if (count($toskip)>0) {
-		$query .= "AND iq.lastmoddate NOT IN ($skipph) ";
-	}
-	$stm = $DBH->prepare($query);
-	if (count($toskip)>0) {
-		$stm = $DBH->prepare($query);
-		$stm->execute(array_merge(array($since),$toskip));
-	} else {
-		$stm = $DBH->prepare($query);
-		$stm->execute(array($since));
-	}
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		if ($row[1]===null) {continue;}
-		$replacebys[] = array('uniqueid'=>$row[0], 'replaceby'=>$row[1]);
-	}
-
-	echo json_encode(array('since'=>$since, 'stage'=>3, 'data'=>array('libitems'=>$libitems,'replacebys'=>$replacebys)), JSON_HEX_TAG);
-	exit;
-}
-?>
+fed_api_respond($response);

@@ -62,7 +62,7 @@ if (isset($_GET['fixorphanqs'])) {
 	//first, try to undelete the unassigned library item for any question with no undeleted library items
 	$query = "UPDATE imas_library_items AS ili JOIN (SELECT qsetid FROM imas_library_items GROUP BY qsetid HAVING min(deleted)=1) AS tofix ON ili.qsetid=tofix.qsetid ";
 	$query .= "JOIN imas_questionset AS iq ON ili.qsetid=iq.id ";
-	$query .= "SET ili.deleted=0 WHERE ili.libid=0 AND iq.deleted=0";
+	$query .= "SET ili.deleted=0,ili.lastmoddate=".time()." WHERE ili.libid=0 AND iq.deleted=0";
 	$stm = $DBH->query($query);
 	$n1 = $stm->rowCount();
 
@@ -80,7 +80,7 @@ if (isset($_GET['fixorphanqs'])) {
 
 	//make unassigned deleted if there's also an undeleted other library
 	$query = "UPDATE imas_library_items AS A JOIN imas_library_items AS B ON A.qsetid=B.qsetid AND A.deleted=0 AND B.deleted=0 ";
-	$query .= "SET A.deleted=1 WHERE A.libid=0 AND B.libid>0";
+	$query .= "SET A.deleted=1,A.lastmoddate=".time()." WHERE A.libid=0 AND B.libid>0";
 	$stm = $DBH->query($query);
 
 	echo '<p>'.($n1+$n2+$n3). ' questions with no libraries fixed</p>';
@@ -140,7 +140,7 @@ if (isset($_POST['updatecaption'])) {
 			$likeparams[] = '%'.str_replace('_', '\\_', $vidid).'%';
 		}
 		$idregex = '/\b(?:'.implode('|', array_map('preg_quote', $captionedids)).')\b/';
-		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=? WHERE id=?");
+		$upd = $DBH->prepare("UPDATE imas_questionset SET extref=?,lastmoddate=? WHERE id=?");
 		$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE ".implode(' OR ', $likes));
 		$stm->execute($likeparams);
 
@@ -157,7 +157,7 @@ if (isset($_POST['updatecaption'])) {
 				}
 			}
 			if ($changed) {
-				$upd->execute(array(implode('~~', $parts), $row[0]));
+				$upd->execute(array(implode('~~', $parts), time(), $row[0]));
 				$chg += $upd->rowCount();
 			}
 		}
@@ -171,7 +171,7 @@ if (isset($_POST['updatecaptionbyqids'])) {
 		echo "Must provide question IDs";
 		exit;
 	}
-	$upd = $DBH->prepare('UPDATE imas_questionset SET extref=? WHERE id=?');
+	$upd = $DBH->prepare('UPDATE imas_questionset SET extref=?,lastmoddate=? WHERE id=?');
 	$ph = Sanitize::generateQueryPlaceholders($qids);
 	$stm = $DBH->prepare("SELECT id,extref FROM imas_questionset WHERE id IN ($ph)");
 	$stm->execute($qids);
@@ -195,7 +195,7 @@ if (isset($_POST['updatecaptionbyqids'])) {
 		}
 		if ($changed) {
 			$updatedcnt++;
-			$upd->execute([implode('~~', $extrefs), $row['id']]);
+			$upd->execute([implode('~~', $extrefs), time(), $row['id']]);
 		}
 	}
 	

@@ -508,7 +508,7 @@ if ($myrights < 100) {
 				}
 				if (count($toundel)>0) {
 					$undellist = implode(',', $toundel);
-					$stm = $DBH->query("UPDATE imas_questionset SET deleted=0 WHERE id IN ($undellist)");
+					$stm = $DBH->query("UPDATE imas_questionset SET deleted=0,lastmoddate=".time()." WHERE id IN ($undellist)");
 				}
 
 				$updatelist = implode(',', array_map('intval', $qidstoupdate));

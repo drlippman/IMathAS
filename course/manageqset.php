@@ -452,8 +452,8 @@ if ($myrights<20) {
           ':qcontrol'=>$row['qcontrol'], ':qtext'=>$row['qtext'], ':answer'=>$row['answer'], ':hasimg'=>$row['hasimg'],
           ':ancestors'=>$ancestors, ':ancestorauthors'=>$ancestorauthors, ':license'=>$row['license']));
 				$nqid = $DBH->lastInsertId();
-				$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
-				$stm->execute(array(':libid'=>$lib, ':qsetid'=>$nqid, ':ownerid'=>$userid));
+				$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid,lastmoddate) VALUES (:libid, :qsetid, :ownerid, :now)");
+				$stm->execute(array(':libid'=>$lib, ':qsetid'=>$nqid, ':ownerid'=>$userid, ':now'=>$now));
 				$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm->execute(array(':qsetid'=>$qid));
         $img_ins_stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alttext)");
@@ -485,24 +485,24 @@ if ($myrights<20) {
 			$qtochg = implode(',', array_map('intval', explode(',',$_POST['qtochg'])));
 			if ($_POST['sellicense']!=-1) {
 				if (!$isadmin) {
-          $query = "UPDATE imas_questionset SET license=:license WHERE id IN ($qtochg)";
+          $query = "UPDATE imas_questionset SET license=:license,lastmoddate=".time()." WHERE id IN ($qtochg)";
 					$query .= " AND ownerid=:ownerid";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':license'=>$_POST['sellicense'], ':ownerid'=>$userid));
 				} else {
-          $stm = $DBH->prepare("UPDATE imas_questionset SET license=:license WHERE id IN ($qtochg)");
+          $stm = $DBH->prepare("UPDATE imas_questionset SET license=:license,lastmoddate=".time()." WHERE id IN ($qtochg)");
           $stm->execute(array(':license'=>$_POST['sellicense']));
         }
 			}
 			if ($_POST['otherattribtype']!=-1) {
 				if ($_POST['otherattribtype']==0) {
 					if (!$isadmin) {
-            $query = "UPDATE imas_questionset SET otherattribution=:otherattribution WHERE id IN ($qtochg)";
+            $query = "UPDATE imas_questionset SET otherattribution=:otherattribution,lastmoddate=".time()." WHERE id IN ($qtochg)";
 						$query .= " AND ownerid=:ownerid";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':otherattribution'=>$_POST['addattr'], ':ownerid'=>$userid));
 					} else {
-            $stm = $DBH->prepare("UPDATE imas_questionset SET otherattribution=:otherattribution WHERE id IN ($qtochg)");
+            $stm = $DBH->prepare("UPDATE imas_questionset SET otherattribution=:otherattribution,lastmoddate=".time()." WHERE id IN ($qtochg)");
             $stm->execute(array(':otherattribution'=>$_POST['addattr']));
           }
 				} else {
@@ -514,7 +514,7 @@ if ($myrights<20) {
 					} else {
             $stm = $DBH->query("SELECT id,otherattribution FROM imas_questionset WHERE id IN ($qtochg)");
           }
-          $upd_stm = $DBH->prepare("UPDATE imas_questionset SET otherattribution=:otherattribution WHERE id=:id");
+          $upd_stm = $DBH->prepare("UPDATE imas_questionset SET otherattribution=:otherattribution,lastmoddate=".time()." WHERE id=:id");
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
             $attr = $row[1] . $_POST['addattr'];
 						$upd_stm->execute(array(':otherattribution'=>$attr, ':id'=>$row[0]));
@@ -549,17 +549,17 @@ if ($myrights<20) {
 				}
 				if (count($tochg)>0) {
 					$chglist = implode(',',$tochg);
-					$stm = $DBH->prepare("UPDATE imas_questionset SET userights=:userights WHERE id IN ($chglist)");
+					$stm = $DBH->prepare("UPDATE imas_questionset SET userights=:userights,lastmoddate=".time()." WHERE id IN ($chglist)");
 					$stm->execute(array(':userights'=>$_POST['newrights']));
 				}
 			} else {
 				if (!$isadmin) {
-          $query = "UPDATE imas_questionset SET userights=:userights WHERE id IN ($chglist)";
+          $query = "UPDATE imas_questionset SET userights=:userights,lastmoddate=".time()." WHERE id IN ($chglist)";
 					$query .= " AND ownerid=:ownerid";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':userights'=>$_POST['newrights'], ':ownerid'=>$userid));
 				} else {
-          $stm = $DBH->prepare("UPDATE imas_questionset SET userights=:userights WHERE id IN ($chglist)");
+          $stm = $DBH->prepare("UPDATE imas_questionset SET userights=:userights,lastmoddate=".time()." WHERE id IN ($chglist)");
           $stm->execute(array(':userights'=>$_POST['newrights']));
         }
 			}

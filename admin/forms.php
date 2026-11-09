@@ -1603,13 +1603,9 @@ switch($_GET['action']) {
 		echo '</div>';
 		echo "<table><tr><th>Name</th><th>Description</th><th>Their Last Pull</th><th>Our Last Pull</th><th>Modify</th><th>Delete</th><th>Pull</th></tr>\n";
 
-		$query = "SELECT ifp.id,ifp.peername,ifp.peerdescription,ifp.lastpull,max(pulls.pulltime) as uspull FROM imas_federation_peers AS ifp ";
-		$query .= "LEFT JOIN imas_federation_pulls AS pulls ON ifp.id=pulls.peerid GROUP BY pulls.peerid";
-
-		$query = "SELECT ifp.*,pulls.pulltime AS uspull,pulls.step FROM imas_federation_peers AS ifp ";
-		$query .= "LEFT JOIN imas_federation_pulls as pulls ON ifp.id=pulls.peerid WHERE ";
-		$query .= "pulls.id=(SELECT id FROM imas_federation_pulls AS ifps WHERE ifps.peerid=ifp.id ORDER BY pulltime DESC LIMIT 1) ";
-		$query .= "OR pulls.id IS NULL";
+		$query = "SELECT ifp.*,pulls.starttime AS uspull,pulls.status AS pullstatus FROM imas_federation_peers AS ifp ";
+		$query .= "LEFT JOIN imas_federation_pulls AS pulls ON pulls.id=(SELECT id FROM imas_federation_pulls AS ifps ";
+		$query .= "WHERE ifps.peerid=ifp.id ORDER BY ifps.starttime DESC, ifps.id DESC LIMIT 1)";
 		$stm = $DBH->query($query);
 		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$lastpull = $row['lastpull'] > 0 ? tzdate("n/j/y", $row['lastpull']) : _('Never');
@@ -1619,15 +1615,16 @@ switch($_GET['action']) {
 				Sanitize::encodeStringForDisplay($row['peerdescription']));
 			echo '<td>'.Sanitize::encodeStringForDisplay($lastpull).'</td>';
 			echo '<td>'.Sanitize::encodeStringForDisplay($uspull);
-			if ($row['uspull']!==null && $row['step']<99) {
+			if ($row['uspull']!==null && $row['pullstatus']==0) {
 				echo '<br/>'._('Incomplete').'. <a href="federationpull.php?peer='.Sanitize::onlyInt($row['id']).'">'._('Continue').'</a>.';
 			}
 			echo '</td>';
 			printf('<td><a href="forms.php?action=modfedpeers&id=%d&from=%s">', $row['id'], Sanitize::encodeUrlParam($from));
 			echo _('Modify'),'</a></td>';
-			printf("<td><a href=\"actions.php?action=delfedpeers&id=%d&from=%s\" onclick=\"return confirm('Are you sure?');\">", $row['id'],  Sanitize::encodeUrlParam($from));
-			echo _('Delete'),'</a></td>';
-			echo '<td><a href="federationpull.php?peer='.Sanitize::onlyInt($row['id']).'&stage=-1">'._('Start New Pull').'</a></td>';
+			printf('<td><form method="post" style="display:inline" action="actions.php?id=%d&from=%s" onsubmit="return confirm(\'%s\');">',
+				$row['id'], Sanitize::encodeUrlParam($from), Sanitize::encodeStringForJavascript(_('Are you sure? This also removes the sync records for this peer.')));
+			echo '<input type="hidden" name="action" value="delfedpeers" /><button type="submit" class="secondarybtn">', _('Delete'), '</button></form></td>';
+			echo '<td><a href="federationpull.php?peer='.Sanitize::onlyInt($row['id']).'">'._('Pull').'</a> | <a href="federationreview.php?peer='.Sanitize::onlyInt($row['id']).'">'._('Review').'</a></td>';
 			echo "</tr>\n";
 		}
 		echo "</table>\n";
@@ -1637,7 +1634,8 @@ switch($_GET['action']) {
 		echo "Install Name: <input type=text name=\"peername\" size=20><br/>\n";
 		echo "Description: <input type=text name=\"peerdescription\" size=50><br/>\n";
 		echo "Root URL: <input type=text name=\"url\" size=50><br/>\n";
-		echo "Secret: <input type=text name=\"secret\" size=20><br/>\n";
+		require_once "../includes/federationfuncs.php";
+		echo "Secret: <input type=text name=\"secret\" size=40 maxlength=64> ".sprintf(_('(%d to %d characters; use a long random value)'), FED_MIN_SECRET_LENGTH, FED_MAX_SECRET_LENGTH)."<br/>\n";
 		echo "<input type=submit value=\"Add Federation Peer\"></p>\n";
 		echo "</form>\n";
 		break;
@@ -1658,8 +1656,10 @@ switch($_GET['action']) {
 			Sanitize::encodeStringForDisplay($row['peerdescription']));
 		printf("Root URL: <input type=text name=\"url\" value=\"%s\" size=50><br/>\n",
 			Sanitize::encodeStringForDisplay($row['url']));
-		printf("Secret: <input type=text name=\"secret\"  value=\"%s\" size=20><br/>\n",
+		require_once "../includes/federationfuncs.php";
+		printf("Secret: <input type=text name=\"secret\"  value=\"%s\" size=40 maxlength=64> ",
 			Sanitize::encodeStringForDisplay($row['secret']));
+		echo sprintf(_('(a changed secret must be %d to %d characters)'), FED_MIN_SECRET_LENGTH, FED_MAX_SECRET_LENGTH) . "<br/>\n";
 		echo "<input type=submit value=\"Update Federation Peer\">\n";
 		echo "</form>\n";
 		break;

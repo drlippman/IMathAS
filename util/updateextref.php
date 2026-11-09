@@ -10,7 +10,7 @@ if (isset($_POST['data'])) {
 		$extref = str_replace(array("\r","\t"),'',$extref);
 		$info[$uid] = array($lastm,$extref);
 	}
-	$add_extref_stm = $DBH->prepare("UPDATE imas_questionset SET extref=:extref WHERE id=:id");
+	$add_extref_stm = $DBH->prepare("UPDATE imas_questionset SET extref=:extref,lastmoddate=:now WHERE id=:id");
 	$stm = $DBH->query("SELECT id,uniqueid,lastmoddate,extref FROM imas_questionset WHERE 1");
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($info[$row['uniqueid']])) {continue;}
@@ -18,13 +18,13 @@ if (isset($_POST['data'])) {
 			if ($row['extref']=='') {
 				echo "Found new extref.  Adding.<br/>";
 				//add it
-				$add_extref_stm->execute(array(':extref'=>$info[$row['uniqueid']][1], ':id'=>$row['id']));
+				$add_extref_stm->execute(array(':extref'=>$info[$row['uniqueid']][1], ':id'=>$row['id'], ':now'=>time()));
 			} else {
 				if ($row['lastmoddate']>$info[$row['uniqueid']][0]) {
 					echo 'Local more recent '.Sanitize::onlyInt($row['id']).': '.Sanitize::encodeStringForDisplay($row['extref']). ' vs. '.Sanitize::encodeStringForDisplay($info[$row['uniqueid']][1]).'.  Skipping.<br/>';
 				} else {
 					echo 'Import more recent '.Sanitize::onlyInt($row['id']).': '.Sanitize::encodeStringForDisplay($row['extref']). ' vs. '.Sanitize::encodeStringForDisplay($info[$row['uniqueid']][1]).'.   Updating.<br/>';
-					$add_extref_stm->execute(array(':extref'=>$info[$row['uniqueid']][1], ':id'=>$row['id']));
+					$add_extref_stm->execute(array(':extref'=>$info[$row['uniqueid']][1], ':id'=>$row['id'], ':now'=>time()));
 				}
 			}
 		}
