@@ -10,11 +10,16 @@
 //  - replaceby / a11yalt, numeric includecodefrom(ID) / includeqtextfrom(ID) references
 //    and imas_drillassess.itemids are repointed
 //  - the duplicate imas_questionset rows are deleted
-// Groups whose copies differ in content are listed and left alone.
+// Groups whose copies differ in content are listed with a choice per group: skip, merge to a
+// chosen id, or give the later copies a new uniqueid (keeping the timestamp prefix).
+// A group with exactly one undeleted copy is merged to that copy regardless of content.
+// Trailing whitespace on lines and at the end of fields is ignored when comparing.
 // Not repointed: imas_questionset.ancestors (history only).
 require_once "../init.php";
 if ($myrights < 100) { exit; }
 set_time_limit(0);
+$pagetitle = 'Merge duplicate questions';
+require_once "../header.php";
 
 // fields that must match for copies to be considered the same question
 $cmpfields = array('qtype', 'control', 'qtext', 'extref', 'solution', 'solutionopts', 'qcontrol', 'answer', 'hasimg');
@@ -32,6 +37,85 @@ function mdq_rank($a, $b) {
 	if ($sa != $sb) { return $sa - $sb; }
 	if ($a['userights'] != $b['userights']) { return $b['userights'] - $a['userights']; }
 	return $a['id'] - $b['id'];
+}
+
+// normalize a field for comparison: ignore trailing whitespace on each line and at the end of the field
+function mdq_norm($v) {
+	$v = (string) $v;
+	$v = preg_replace('/[ \t\r\f\v]+$/m', '', $v);
+	return rtrim($v, " \t\r\n");
+}
+
+// make a new uniqueid with the same timestamp prefix (first 11 chars), differing only after that
+function mdq_newuid($uid, &$used) {
+	global $DBH;
+	$uid = (string) $uid;
+	$prefix = substr($uid, 0, 10);
+	$len = max(strlen($uid) - 10, 1);
+	$chk = $DBH->prepare('SELECT 1 FROM imas_questionset WHERE uniqueid=? LIMIT 1');
+	for ($try = 0; $try < 10000; $try++) {
+		$cand = $prefix . str_pad((string) random_int(0, pow(10, min($len, 15)) - 1), $len, '0', STR_PAD_LEFT);
+		if ($cand === $uid || isset($used[$cand])) { continue; }
+		$chk->execute(array($cand));
+		if ($chk->fetchColumn() !== false) { continue; }
+		$used[$cand] = 1;
+		return $cand;
+	}
+	throw new Exception('Could not generate a unique uniqueid for ' . $uid);
+}
+
+// line diff of two normalized strings.  Returns array of array(' '|'-'|'+', line)
+function mdq_diff($a, $b) {
+	$x = explode("\n", mdq_norm($a));
+	$y = explode("\n", mdq_norm($b));
+	// trim common head/tail to keep the LCS table small
+	$head = array(); $tail = array();
+	while (count($x) && count($y) && $x[0] === $y[0]) { $head[] = array(' ', array_shift($x)); array_shift($y); }
+	while (count($x) && count($y) && end($x) === end($y)) { array_unshift($tail, array(' ', array_pop($x))); array_pop($y); }
+	$n = count($x); $m = count($y);
+	$mid = array();
+	if ($n * $m > 4000000) {
+		foreach ($x as $l) { $mid[] = array('-', $l); }
+		foreach ($y as $l) { $mid[] = array('+', $l); }
+	} else {
+		$L = array_fill(0, $n + 1, array_fill(0, $m + 1, 0));
+		for ($i = $n - 1; $i >= 0; $i--) {
+			for ($j = $m - 1; $j >= 0; $j--) {
+				$L[$i][$j] = $x[$i] === $y[$j] ? $L[$i+1][$j+1] + 1 : max($L[$i+1][$j], $L[$i][$j+1]);
+			}
+		}
+		$i = 0; $j = 0;
+		while ($i < $n && $j < $m) {
+			if ($x[$i] === $y[$j]) { $mid[] = array(' ', $x[$i]); $i++; $j++; }
+			else if ($L[$i+1][$j] >= $L[$i][$j+1]) { $mid[] = array('-', $x[$i++]); }
+			else { $mid[] = array('+', $y[$j++]); }
+		}
+		while ($i < $n) { $mid[] = array('-', $x[$i++]); }
+		while ($j < $m) { $mid[] = array('+', $y[$j++]); }
+	}
+	return array_merge($head, $mid, $tail);
+}
+
+// render a diff as HTML, collapsing unchanged runs to 2 lines of context
+function mdq_diffhtml($d) {
+	$keep = array();
+	foreach ($d as $k => $line) {
+		if ($line[0] != ' ') {
+			for ($c = max(0, $k - 2); $c <= min(count($d) - 1, $k + 2); $c++) { $keep[$c] = 1; }
+		}
+	}
+	$out = '<pre style="margin:0;overflow:auto;max-height:30em;border:1px solid #ccc;padding:2px;">';
+	$gap = false;
+	foreach ($d as $k => $line) {
+		if (!isset($keep[$k])) { $gap = true; continue; }
+		if ($gap) { $out .= '<span style="color:#888">&hellip;</span>' . "\n"; $gap = false; }
+		$e = Sanitize::encodeStringForDisplay($line[1]);
+		if ($line[0] == '-') { $out .= '<span style="background:#fcc;display:block;">- ' . $e . '</span>'; }
+		else if ($line[0] == '+') { $out .= '<span style="background:#cfc;display:block;">+ ' . $e . '</span>'; }
+		else { $out .= '<span style="display:block;">  ' . $e . '</span>'; }
+	}
+	if ($gap) { $out .= '<span style="color:#888">&hellip;</span>'; }
+	return $out . '</pre>';
 }
 
 function mdq_in($ids) {
@@ -52,27 +136,52 @@ foreach ($uids as $uid) {
 	usort($rows, 'mdq_rank');
 	$groups[$uid] = $rows;
 	$diff = array();
-	foreach ($cmpfields as $f) {
-		foreach ($rows as $r) {
-			if ($r[$f] !== $rows[0][$f]) { $diff[] = $f; break; }
+	$nlive = 0;
+	foreach ($rows as $r) { if (!$r['deleted']) { $nlive++; } }
+	if ($nlive != 1) {   // exactly one undeleted copy: merge to it without comparing
+		foreach ($cmpfields as $f) {
+			$base = mdq_norm($rows[0][$f]);
+			foreach ($rows as $r) {
+				if (mdq_norm($r[$f]) !== $base) { $diff[] = $f; break; }
+			}
 		}
 	}
 	if (count($diff) == 0) { $identical[] = $uid; } else { $differ[$uid] = $diff; }
 }
 
-$map = array();   // duplicate id => retained id
+$mergeGroups = array();  // uniqueid => array(keep id, array of dup ids)
 foreach ($identical as $uid) {
-	$keep = $groups[$uid][0]['id'];
-	for ($i = 1; $i < count($groups[$uid]); $i++) {
-		$map[$groups[$uid][$i]['id']] = $keep;
+	$dups = array();
+	for ($i = 1; $i < count($groups[$uid]); $i++) { $dups[] = (int) $groups[$uid][$i]['id']; }
+	$mergeGroups[$uid] = array((int) $groups[$uid][0]['id'], $dups);
+}
+$renames = array();   // uniqueid => ids that get a new uniqueid
+
+if ($apply) {
+	foreach ($differ as $uid => $diff) {
+		$choice = isset($_POST['choice'][$uid]) ? (string) $_POST['choice'][$uid] : 'skip';
+		$ids = array();
+		foreach ($groups[$uid] as $r) { $ids[] = (int) $r['id']; }
+		sort($ids);
+		if (strpos($choice, 'keep_') === 0 && in_array((int) substr($choice, 5), $ids)) {
+			$keep = (int) substr($choice, 5);
+			$mergeGroups[$uid] = array($keep, array_values(array_diff($ids, array($keep))));
+		} else if ($choice === 'new') {
+			$renames[$uid] = array_slice($ids, 1);
+		}
 	}
+}
+
+$map = array();   // duplicate id => retained id
+foreach ($mergeGroups as $uid => $g) {
+	foreach ($g[1] as $d) { $map[$d] = $g[0]; }
 }
 
 echo '<h2>Duplicate question uniqueids</h2>';
 echo '<p>' . count($uids) . ' uniqueids with more than one copy; ' . count($identical) . ' identical (' . count($map) .
 	' duplicate rows removable); ' . count($differ) . ' differ in content and will be skipped.</p>';
 
-if ($apply && count($map) > 0) {
+if ($apply && (count($map) > 0 || count($renames) > 0)) {
 	$now = time();
 	$dupids = array_keys($map);
 	$log = array();
@@ -81,16 +190,25 @@ if ($apply && count($map) > 0) {
 	$qsetids_stm = null;
 	$DBH->beginTransaction();
 	try {
-		foreach ($identical as $uid) {
-			$rows = $groups[$uid];
-			$keep = (int) $rows[0]['id'];
-			$dups = array();
-			for ($i = 1; $i < count($rows); $i++) { $dups[] = (int) $rows[$i]['id']; }
+		// give later copies new uniqueids
+		$used = array();
+		$updu = $DBH->prepare('UPDATE imas_questionset SET uniqueid=?,lastmoddate=? WHERE id=?');
+		$nrenamed = 0;
+		foreach ($renames as $uid => $ids) {
+			foreach ($ids as $id) {
+				$updu->execute(array(mdq_newuid($uid, $used), $now, $id));
+				$nrenamed++;
+			}
+		}
+		if ($nrenamed > 0) { $log[] = "$nrenamed questions assigned new uniqueids"; }
+
+		foreach ($mergeGroups as $uid => $g) {
+			$keep = $g[0];
+			$dups = $g[1];
+			if (count($dups) == 0) { continue; }
 			$dl = mdq_in($dups);
 
 			$DBH->exec("UPDATE imas_questions SET questionsetid=$keep WHERE questionsetid IN ($dl)");
-			$DBH->exec("UPDATE imas_firstscores SET qsetid=$keep WHERE qsetid IN ($dl)");
-			$DBH->exec("UPDATE IGNORE imas_questionerrorlog SET qsetid=$keep WHERE qsetid IN ($dl)");
 			$DBH->exec("DELETE FROM imas_questionerrorlog WHERE qsetid IN ($dl)");
 			$DBH->exec("UPDATE IGNORE imas_a11yreviews SET qsetid=$keep WHERE qsetid IN ($dl)");
 			$DBH->exec("DELETE FROM imas_a11yreviews WHERE qsetid IN ($dl)");
@@ -131,7 +249,7 @@ if ($apply && count($map) > 0) {
 		}
 
 		// replaceby / a11yalt pointing at a removed copy
-		$all = mdq_in($dupids);
+		$all = count($dupids) > 0 ? mdq_in($dupids) : '0';
 		foreach (array('replaceby', 'a11yalt') as $col) {
 			$stm = $DBH->query("SELECT id,$col FROM imas_questionset WHERE $col IN ($all)");
 			$upd = $DBH->prepare("UPDATE imas_questionset SET $col=?,lastmoddate=? WHERE id=?");
@@ -186,37 +304,59 @@ if ($apply && count($map) > 0) {
 	} catch (Throwable $e) {
 		$DBH->rollBack();
 		echo '<p><b>Failed, rolled back:</b> ' . Sanitize::encodeStringForDisplay($e->getMessage()) . '</p>';
+		require_once "../footer.php";
 		exit;
 	}
 	echo '<p><b>Done.</b></p><ul>';
 	foreach ($log as $l) { echo '<li>' . Sanitize::encodeStringForDisplay($l) . '</li>'; }
 	echo '</ul>';
+	require_once "../footer.php";
 	exit;
 }
 
+echo '<form method="post"><input type="hidden" name="apply" value="yes"/>';
+
 if (count($differ) > 0) {
-	echo '<h3>Groups that differ (not merged)</h3><table class="gb"><tr><th>uniqueid</th><th>ids (retain first)</th><th>differing fields</th></tr>';
+	echo '<h3>Groups that differ</h3><table class="gb"><thead><tr><th>uniqueid</th><th>ids (deleted marked *)</th><th>differing fields</th><th>Action</th></tr></thead><tbody>';
 	foreach ($differ as $uid => $diff) {
-		$ids = array();
-		foreach ($groups[$uid] as $r) { $ids[] = (int) $r['id']; }
-		echo '<tr><td>' . Sanitize::onlyInt($uid) . '</td><td>' . implode(', ', $ids) . '</td><td>' .
-			Sanitize::encodeStringForDisplay(implode(', ', $diff)) . '</td></tr>';
+		$rows = $groups[$uid];
+		usort($rows, function ($a, $b) { return $a['id'] - $b['id']; });
+		$idlabels = array();
+		foreach ($rows as $r) { $idlabels[] = (int) $r['id'] . ($r['deleted'] ? '*' : ''); }
+		echo '<tr><td>' . Sanitize::onlyInt($uid) . '</td><td>' . implode(', ', $idlabels) . '</td><td>' .
+			Sanitize::encodeStringForDisplay(implode(', ', $diff));
+		// expandable diff of each differing field: every other copy compared to the lowest id
+		echo '<details><summary>Show differences</summary>';
+		foreach ($diff as $f) {
+			echo '<p><b>' . Sanitize::encodeStringForDisplay($f) . '</b></p>';
+			for ($i = 1; $i < count($rows); $i++) {
+				if (mdq_norm($rows[$i][$f]) === mdq_norm($rows[0][$f])) { continue; }
+				echo '<div>id ' . (int) $rows[0]['id'] . ' (-) vs id ' . (int) $rows[$i]['id'] . ' (+)</div>';
+				echo mdq_diffhtml(mdq_diff($rows[0][$f], $rows[$i][$f]));
+			}
+		}
+		echo '</details></td><td>';
+		echo '<select name="choice[' . Sanitize::onlyInt($uid) . ']"><option value="skip">Skip</option>';
+		foreach ($rows as $r) {
+			echo '<option value="keep_' . (int) $r['id'] . '">Keep id ' . (int) $r['id'] . '</option>';
+		}
+		echo '<option value="new">Assign new uniqueid to later copies</option></select></td></tr>';
 	}
-	echo '</table>';
+	echo '</tbody></table>';
 }
 
 if (count($map) > 0) {
 	echo '<h3>Identical groups to merge</h3><p>First 50 shown (retained id &larr; removed ids):</p><ul>';
 	$shown = 0;
-	foreach ($identical as $uid) {
+	foreach ($mergeGroups as $uid => $g) {
 		if ($shown++ >= 50) { break; }
-		$ids = array();
-		foreach ($groups[$uid] as $r) { $ids[] = (int) $r['id']; }
-		$keep = array_shift($ids);
-		echo '<li>' . $keep . ' &larr; ' . implode(', ', $ids) . '</li>';
+		echo '<li>' . $g[0] . ' &larr; ' . implode(', ', $g[1]) . '</li>';
 	}
 	echo '</ul>';
-	echo '<form method="post"><input type="hidden" name="apply" value="yes"/>';
 	echo '<p><b>Back up first.</b> This deletes rows and repoints references, in one transaction.</p>';
-	echo '<button type="submit">Merge ' . count($map) . ' duplicate questions</button></form>';
+	echo '<button type="submit">Merge ' . count($map) . ' duplicate questions and apply selections</button>';
+} else if (count($differ) > 0) {
+	echo '<p><b>Back up first.</b></p><button type="submit">Apply selections</button>';
 }
+echo '</form>';
+require_once "../footer.php";
