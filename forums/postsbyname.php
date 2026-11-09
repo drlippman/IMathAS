@@ -147,6 +147,15 @@
 			$(".initialpost").addClass("pseudohidden");
 		}
 	}
+	function togglelocked(el) {
+		if ($(el).text()==_("Hide Locked Students")) {
+			$(el).text(_("Show Locked Students"));
+			$(".lockedstu").hide();
+		} else {
+			$(el).text(_("Hide Locked Students"));
+			$(".lockedstu").show();
+		}
+	}
 	function togglereplies(el) {
 		if ($(el).text()==_("Show Replies")) {
 			$(el).text(_("Hide Replies"));
@@ -233,7 +242,7 @@
 			$blockreplythreads[] = $row[0];
 		}
 	}
-	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview,imas_students.id AS stuid FROM imas_forum_posts JOIN ";
+	$query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview,imas_students.id AS stuid,imas_students.locked FROM imas_forum_posts JOIN ";
 	$query .= "imas_forum_threads AS ift ON ift.id=imas_forum_posts.threadid AND ift.lastposttime<:now JOIN imas_users ";
 	$query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid=:userid) AS ifv ON ";
 	$query .= "ifv.threadid=imas_forum_posts.threadid ";
@@ -256,14 +265,18 @@
 	echo "<button type=\"button\" onclick=\"toggleshowall()\" id=\"toggleall\">"._('Expand All')."</button> ";
 	echo '<button type="button" onclick="toggleposts(this)">'._("Hide Posts").'</button> ';
 	echo '<button type="button" onclick="togglereplies(this)">'._("Hide Replies").'</button> ';
+	if ($canviewall) {
+		echo '<button type="button" onclick="togglelocked(this)">'._("Hide Locked Students").'</button> ';
+	}
 	echo "<button type=\"button\" onclick=\"window.location.href='postsbyname.php?cid=$cid&forum=$forumid&markallread=true'\">"._('Mark all Read')."</button><br/>";
 
 	if ($caneditscore && $haspoints) {
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=".Sanitize::onlyInt($page)."&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	function printuserposts($name, $uid, $content, $postcnt, $replycnt, $hasuserimg) {
-        global $imasroot, $urlmode;
+	function printuserposts($name, $uid, $content, $postcnt, $replycnt, $hasuserimg, $locked = 0) {
+        global $imasroot, $urlmode, $canviewall;
+		echo '<div class="stublock'.(($locked > 0 && $canviewall) ? ' lockedstu' : '').'">';
 		printf("<b><pii class='pii-full-name'>%s</span></b> (", Sanitize::encodeStringForDisplay($name));
 		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
 		if ($hasuserimg==1) {
@@ -276,16 +289,18 @@
 			echo '</button>';
 		}
 		echo '<div class="forumgrp">'.$content.'</div>';
+		echo '</div>';
 	}
-	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = ''; $lasthasuserimg = 0;
+	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = ''; $lasthasuserimg = 0; $lastlocked = 0;
 	while ($line =  $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
-				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg);
+				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg, $lastlocked);
 				$content = '';  $postcnt = 0; $replycnt = 0;
 			}
             $laststu = $line['userid'];
             $lasthasuserimg = $line['hasuserimg'];
+            $lastlocked = ($canviewall ? intval($line['locked'] ?? 0) : 0);
 			$lastname = Sanitize::encodeStringForDisplay($line['LastName']).", " . Sanitize::encodeStringForDisplay($line['FirstName']);
 		}
 
@@ -388,7 +403,7 @@
 		$content .= '</div></div>';
 		$cnt++;
 	}
-	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg);
+	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt, $lasthasuserimg, $lastlocked);
 	echo "<script>var bcnt = $cnt;</script>";
 	if ($caneditscore && $haspoints) {
 		echo "<div><button type=\"submit\">"._('Save Grades')."</button></div>";
