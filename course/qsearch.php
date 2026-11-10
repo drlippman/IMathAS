@@ -92,7 +92,9 @@ if (!empty($search['unused']) && $searchcontext!='c') {
     $stm->execute(array($aid, $cid));
     $options['existing'] = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 }
-if ($searchcontext=='c') {
+// only fetch lastmod if the user's column preferences include it
+require_once '../includes/userprefs.php';
+if (getQsearchColMask($searchcontext=='c' ? 'manageq' : 'addq') & 32) {
     $options['includelastmod'] = 1;
 }
 

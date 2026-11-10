@@ -278,25 +278,35 @@ function displayQuestionList(results) {
     } else if (qsearchaddr.match(/did=/)) {
         searchcontext = 'adddrill';
     }
-    var colcnt = 9;
+    // Selectable columns. Bit values must match getQsearchColDefs() in includes/userprefs.php.
+    // qscolmask is set by the host page from the user's preferences.
+    var colmask = (typeof qscolmask !== 'undefined') ? qscolmask : (searchcontext == 'manageq' ? 111 : 31);
+    var coldefs = [
+        {bit: 1, label: _('Info'), sort: 'S'},
+        {bit: 2, label: _('Owner'), sort: 'S'},
+        {bit: 4, label: _('Type'), sort: 'S'},
+        {bit: 8, label: _('Times Used'), sort: 'N'},
+        {bit: 16, label: _('Avg Time'), sort: 'N'},
+        {bit: 32, label: _('Last Mod'), sort: 'D'},
+        {bit: 64, label: _('ID'), sort: 'N'}
+    ];
+    var showcols = {};
     var $theadRow = $('<tr>').append(
         $('<th>').append($('<span class="sr-only">').text(_('Select'))),
         $('<th>').text(_('Description')),
-        $('<th>').text(_('Actions')),
-        $('<th>').text(_('Info')),
-        $('<th>').text(_('Owner')),
-        $('<th>').text(_('Type')),
-        $('<th>').text(_('Times Used')),
-        $('<th>').text(searchcontext == 'manageq' ? _('Last Mod') : _('Avg Time'))
+        $('<th>').text(_('Actions'))
     );
-    if (searchcontext == 'manageq') {
-        $theadRow.append($('<th>').text(_('ID')));
+    var sortinit = [false,'S',false];
+    for (var ci = 0; ci < coldefs.length; ci++) {
+        var cd = coldefs[ci];
+        if (colmask & cd.bit) {
+            showcols[cd.bit] = true;
+            $theadRow.append($('<th>').text(cd.label));
+            sortinit.push(cd.sort);
+        }
     }
+    var colcnt = sortinit.length;
     var $thead = $('<thead>').append($theadRow);
-    var sortinit = [false,'S',false,'S','S','S','N', searchcontext == 'manageq' ? 'D' : 'N'];
-    if (searchcontext == 'manageq') {
-        sortinit.push('N');
-    }
     var $tbody = $('<tbody>');
     var lastlib = -1;
     var existingq = [];
@@ -445,16 +455,21 @@ function displayQuestionList(results) {
         var $row = $('<tr>').append(
             $checkboxTd,
             $descrTd,
-            $actionsTd,
-            $features,
-            $('<td>').append($('<span>', {text: q['ownershort'], "data-tip": _('Question ID') + ' ' + q['id']})),
-            $('<td>').text(q['qtype']),
-            $('<td class="c">').text(q['times'])
+            $actionsTd
         );
-
-        if (searchcontext == 'manageq') {
-            $row.append($('<td>').text(q['lastmod']));
-        } else {
+        if (showcols[1]) {
+            $row.append($features);
+        }
+        if (showcols[2]) {
+            $row.append($('<td>').append($('<span>', {text: q['ownershort'], "data-tip": _('Question ID') + ' ' + q['id']})));
+        }
+        if (showcols[4]) {
+            $row.append($('<td>').text(q['qtype']));
+        }
+        if (showcols[8]) {
+            $row.append($('<td class="c">').text(q['times']));
+        }
+        if (showcols[16]) {
             var $avgTd = $('<td class="c">');
             if (q['meantimen'] > 3) {
                 var tipHtml = _('Avg score on first try: ') + q['meanscore'] + '%'
@@ -467,7 +482,10 @@ function displayQuestionList(results) {
             }
             $row.append($avgTd);
         }
-        if (searchcontext == 'manageq') {
+        if (showcols[32]) {
+            $row.append($('<td>').text(q['lastmod']));
+        }
+        if (showcols[64]) {
             $row.append($('<td>').append(q['id']));
         }
         $tbody.append($row);

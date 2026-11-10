@@ -192,6 +192,94 @@ function storeUserPrefs() {
 	}
 }
 
+// Selectable columns for qsearch.js results, per context.
+// Bit values are shared with the COLDEFS in javascript/qsearch.js.
+// The selection is stored in imas_user_prefs as an integer bitmask
+// under item 'qscols_addq' or 'qscols_manageq'.
+function getQsearchColDefs() {
+	$cols = array(
+		1 => _('Info and Features'),
+		2 => _('Owner'),
+		4 => _('Question Type'),
+		8 => _('Times Used'),
+		16 => _('Average Time for First Try'),
+		32 => _('Last Modified Date'),
+		64 => _('ID')
+	);
+	return array('addq' => $cols, 'manageq' => $cols);
+}
+
+function getQsearchColDefault($context) {
+	return $context == 'manageq' ? (1|2|4|8|32|64) : (1|2|4|8|16);
+}
+
+function getQsearchColMask($context) {
+	$key = 'qscols_'.$context;
+	if (isset($_SESSION['userprefs'][$key]) && is_numeric($_SESSION['userprefs'][$key])) {
+		return intval($_SESSION['userprefs'][$key]);
+	}
+	return getQsearchColDefault($context);
+}
+
+function showQsearchColsForm() {
+	$defs = getQsearchColDefs();
+	$titles = array(
+		'addq' => _('Add/Remove Questions page'),
+		'manageq' => _('Manage Questions page')
+	);
+	echo '<details id="userinfoqscols"><summary>'._('Question search results columns').'</summary>';
+	echo '<p>'._('The selection checkbox, description, and actions columns are always shown.').'</p>';
+	echo '<input type=hidden name="qscols_present" value="1"/>';
+	foreach ($defs as $context => $cols) {
+		$mask = getQsearchColMask($context);
+		echo '<span class=form>'.$titles[$context].'</span><span class=formright>';
+		foreach ($cols as $bit => $label) {
+			$id = 'qscols_'.$context.'_'.$bit;
+			echo '<label for="'.$id.'"><input type=checkbox id="'.$id.'" name="qscols_'.$context.'[]" value="'.$bit.'"';
+			if ($mask & $bit) { echo ' checked'; }
+			echo '/> '.$label.'</label><br/>';
+		}
+		echo '</span><br class=form />';
+	}
+	echo '</details>';
+}
+
+function storeQsearchColPrefs() {
+	global $DBH, $userid;
+	if (empty($_POST['qscols_present'])) { return; }
+	$defs = getQsearchColDefs();
+	foreach ($defs as $context => $cols) {
+		$key = 'qscols_'.$context;
+		$mask = 0;
+		if (!empty($_POST[$key]) && is_array($_POST[$key])) {
+			foreach ($_POST[$key] as $bit) {
+				if (isset($cols[intval($bit)])) {
+					$mask |= intval($bit);
+				}
+			}
+		}
+		$stm = $DBH->prepare("SELECT id FROM imas_user_prefs WHERE userid=:userid AND item=:item");
+		$stm->execute(array(':userid'=>$userid, ':item'=>$key));
+		$existing = $stm->fetchColumn(0);
+		if ($mask == getQsearchColDefault($context)) {
+			if ($existing !== false) {
+				$stm = $DBH->prepare("DELETE FROM imas_user_prefs WHERE id=:id");
+				$stm->execute(array(':id'=>$existing));
+			}
+			unset($_SESSION['userprefs'][$key]);
+		} else {
+			if ($existing !== false) {
+				$stm = $DBH->prepare("UPDATE imas_user_prefs SET value=:value WHERE id=:id");
+				$stm->execute(array(':value'=>$mask, ':id'=>$existing));
+			} else {
+				$stm = $DBH->prepare("INSERT INTO imas_user_prefs (item,value,userid) VALUES (:item,:value,:userid)");
+				$stm->execute(array(':item'=>$key, ':value'=>$mask, ':userid'=>$userid));
+			}
+			$_SESSION['userprefs'][$key] = $mask;
+		}
+	}
+}
+
 function generateuserprefs($uid) {
 	global $DBH, $CFG;
 

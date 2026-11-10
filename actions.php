@@ -1178,6 +1178,9 @@ require_once "includes/sanitize.php";
 
 		require_once "includes/userprefs.php";
 		storeUserPrefs();
+		if ($myrights>19) {
+			storeQsearchColPrefs();
+		}
 
         $jsondata = json_decode($jsondata,true);
 

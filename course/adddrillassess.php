@@ -256,14 +256,17 @@ if (!isset($_GET['daid'])) {
 $useeditor = "summary";
 $editorpublicids = "summary"; //editors for course-page text: uploads stored publicly (instructors only)
 $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+require_once "../includes/userprefs.php";
+$qscolmask = getQsearchColMask('addq');
 $placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
 		var qsearchaddr = '$imasroot/course/qsearch.php?cid=$cid&did=$daid';
+		var qscolmask = $qscolmask;
 		</script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addquestions.js\"></script>";
 $placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=102326\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=111026\"></script>";
 $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
 require_once "../header.php";
 
@@ -292,7 +295,8 @@ if (isset($_SESSION['searchind'.$daid])) {
 require_once '../includes/questionsearch.php';
 $search_parsed = parseSearchString($searchterms);
 $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
-	'existing' => $itemids
+	'existing' => $itemids,
+	'includelastmod' => ($qscolmask & 32) ? 1 : 0
 ]);
 
 echo '<script type="text/javascript">';

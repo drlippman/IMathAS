@@ -630,7 +630,9 @@ if ($myrights<20) {
         // do initial search
         require_once '../includes/questionsearch.php';
         $search_parsed = parseSearchString($searchterms);
-        $searchoptions = ['includelastmod' => 1, 'includeowner' => ($cid=='admin'?1:0)];
+        require_once "../includes/userprefs.php";
+        $qscolmask = getQsearchColMask('manageq');
+        $searchoptions = ['includelastmod' => ($qscolmask & 32) ? 1 : 0, 'includeowner' => ($cid=='admin'?1:0)];
         if ($isadmin) {
             $searchoptions['isadmin'] = true;
         } else if ($isgrpadmin) {
@@ -641,10 +643,12 @@ if ($myrights<20) {
 }
 
 $testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
+require_once "../includes/userprefs.php";
+$qscolmask = getQsearchColMask('manageq');
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js?v=021326\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=102326\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=111026\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '" . $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 $placeinhead .= "<link rel=\"stylesheet\" href=\"$staticroot/course/addquestions2.css?v=060823\" type=\"text/css\" />";
@@ -653,6 +657,7 @@ $placeinhead .= "<script type=\"text/javascript\">
         var qsearchaddr = '$imasroot/course/qsearch.php?cid=$cid';
         var aselectaddr = '$imasroot/course/assessselect.php?cid=$cid';
         var assessver = 2;
+        var qscolmask = $qscolmask;
         var curaid = 0;
         var curcid = \"$cid\";
         function postWSform(val) {

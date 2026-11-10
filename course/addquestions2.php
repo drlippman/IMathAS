@@ -378,17 +378,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$address = $GLOBALS['basesiteurl'] . "/course/$addassess?cid=$cid&aid=$aid";
 	$testqpage = ($courseUIver>1) ? 'testquestion2.php' : 'testquestion.php';
-	$placeinhead = "<script type=\"text/javascript\">
+	require_once "../includes/userprefs.php";
+	$qscolmask = getQsearchColMask('addq');
+	$placeinhead ="<script type=\"text/javascript\">
         var previewqaddr = '$imasroot/course/$testqpage?cid=$cid';
         var qsearchaddr = '$imasroot/course/qsearch.php?cid=$cid&aid=$aid';
         var aselectaddr = '$imasroot/course/assessselect.php?cid=$cid&aid=$aid';
         var qsettingsaddr = '$imasroot/course/embedmodquestiongrid2.php?cid=$cid&aid=$aid';
 		var addqaddr = '$address';
         var assessver = '$aver';
+        var qscolmask = $qscolmask;
 		</script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/addqsort2.js?v=101026\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=102326\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/qsearch.js?v=111026\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/junkflag.js?v=021326\"></script>";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js?v=080818\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
@@ -470,7 +473,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     require_once '../includes/questionsearch.php';
     $search_parsed = parseSearchString($searchterms);
     $search_results = searchQuestions($search_parsed, $userid, $searchtype, $searchin, [
-        'existing' => $existingq
+        'existing' => $existingq,
+        'includelastmod' => ($qscolmask & 32) ? 1 : 0
     ]);
 }
 

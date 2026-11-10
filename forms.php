@@ -603,6 +603,7 @@ switch($_GET['action']) {
 			if ($line['usedeflib']==1) {echo "checked=1";}
 			echo "> ",_('Use default question library for all templated questions'),'</label>';
 			echo "</span><br class=form><p>",_("Default question library is used for all local (assessment-only) copies of questions created when you edit a question (that's not yours) in an assessment.  You can elect to have all templated questions be assigned to this library."),"</p>";
+			showQsearchColsForm();
 			echo '</fieldset>';
 
 		}
