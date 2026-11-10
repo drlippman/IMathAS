@@ -4,14 +4,14 @@
 //add federation table indices
 $DBH->beginTransaction();
 
- $query = "ALTER TABLE  `imas_questionset` ADD INDEX ( `uniqueid` )";
+ $query = "ALTER TABLE  `imas_questionset` ADD UNIQUE INDEX ( `uniqueid` )";
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
 	$DBH->rollBack();
 	return false;
  }
- $query = "ALTER TABLE  `imas_libraries` ADD INDEX ( `uniqueid` )";
+ $query = "ALTER TABLE  `imas_libraries` ADD UNIQUE INDEX ( `uniqueid` )";
  $res = $DBH->query($query);
  if ($res===false) {
  	 echo "<p>Query failed: ($query) : " . $DBH->errorInfo() . "</p>";
