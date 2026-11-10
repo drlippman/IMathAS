@@ -533,7 +533,8 @@ require_once "includes/sanitize.php";
 				// reset secrets are single-use; new ones are made when the next link is requested.
 				// A regular reset must not revoke recovery links (they may be the owner's
 				// only way back after a hijack).
-				unset($jsondata['pwresetsecret']);
+				unset($jsondata['pwreset']); // single-use: the active reset link is consumed
+				unset($jsondata['pwresetsecret']); // legacy JWT-style links
 				if ($linkdata['recoverylink']) {
 					// revoke this recovery link and any issued after it (not earlier ones)
 					require_once './includes/passwordreset.php';
