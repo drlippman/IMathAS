@@ -186,9 +186,54 @@ if ($apply && (count($map) > 0 || count($renames) > 0)) {
 	$dupids = array_keys($map);
 	$log = array();
 
-	// per-group work
-	$qsetids_stm = null;
-	$DBH->beginTransaction();
+		// Slow table scans are done up front, outside the transaction, so row locks taken by
+		// the per-group work below aren't held while they run.  They only depend on $map.
+		// Each planned rewrite is applied later only if the row is still unchanged.
+		$all = count($dupids) > 0 ? mdq_in($dupids) : '0';
+
+		// replaceby / a11yalt pointing at a removed copy
+		$planRef = array('replaceby' => array(), 'a11yalt' => array());
+		foreach ($planRef as $col => $unused) {
+			$stm = $DBH->query("SELECT id,$col FROM imas_questionset WHERE $col IN ($all)");
+			foreach ($stm->fetchAll(PDO::FETCH_NUM) as $r) {
+				if (isset($map[$r[1]]) && !isset($map[$r[0]])) {
+					$planRef[$col][] = array($r[0], $r[1], $map[$r[1]]);
+				}
+			}
+		}
+
+		// numeric includecodefrom(ID) / includeqtextfrom(ID) references (UID-form refs need no change)
+		$cb = function ($m) use ($map) {
+			return isset($map[$m[2]]) ? $m[1] . $map[$m[2]] . ')' : $m[0];
+		};
+		$recode = '/(includecodefrom\()(\d+)\)/';
+		$reqtext = '/(includeqtextfrom\()(\d+)\)/';
+		$planInc = array();
+		$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE (control LIKE '%includecodefrom(%' AND control REGEXP 'includecodefrom[(][0-9]+[)]')
+			OR (qtext LIKE '%includeqtextfrom(%' AND qtext REGEXP 'includeqtextfrom[(][0-9]+[)]')");
+		while ($r = $stm->fetch(PDO::FETCH_ASSOC)) {
+			if (isset($map[$r['id']])) { continue; }   // about to be deleted anyway
+			$c = preg_replace_callback($recode, $cb, $r['control']);
+			$q = preg_replace_callback($reqtext, $cb, $r['qtext']);
+			if ($c !== $r['control'] || $q !== $r['qtext']) {
+				$planInc[] = array($r['id'], $r['control'], $r['qtext'], $c, $q);
+			}
+		}
+
+		// drill assessments keep a comma-separated list of question ids
+		$planDrill = array();
+		$stm = $DBH->query("SELECT id,itemids FROM imas_drillassess WHERE itemids<>''");
+		foreach ($stm->fetchAll(PDO::FETCH_NUM) as $r) {
+			$parts = explode(',', $r[1]);
+			$changed = false;
+			foreach ($parts as $k => $p) {
+				if (isset($map[trim($p)])) { $parts[$k] = $map[trim($p)]; $changed = true; }
+			}
+			if ($changed) { $planDrill[] = array($r[0], $r[1], implode(',', $parts)); }
+		}
+
+		// per-group work (transaction: only fast indexed writes from here on)
+		$DBH->beginTransaction();
 	try {
 		// give later copies new uniqueids
 		$used = array();
@@ -206,12 +251,17 @@ if ($apply && (count($map) > 0 || count($renames) > 0)) {
 			$keep = $g[0];
 			$dups = $g[1];
 			if (count($dups) == 0) { continue; }
-			$dl = mdq_in($dups);
+				// IN lists are chunked to stay under eq_range_index_dive_limit (default 200); above it
+				// the optimizer can estimate badly and pick a full table scan instead of the index.
+				$dchunks = array_chunk($dups, 100);
 
-			$DBH->exec("UPDATE imas_questions SET questionsetid=$keep WHERE questionsetid IN ($dl)");
-			$DBH->exec("DELETE FROM imas_questionerrorlog WHERE qsetid IN ($dl)");
-			$DBH->exec("UPDATE IGNORE imas_a11yreviews SET qsetid=$keep WHERE qsetid IN ($dl)");
-			$DBH->exec("DELETE FROM imas_a11yreviews WHERE qsetid IN ($dl)");
+				foreach ($dchunks as $dc) {
+					$dl = mdq_in($dc);
+					$DBH->exec("UPDATE imas_questions SET questionsetid=$keep WHERE questionsetid IN ($dl)");
+					$DBH->exec("DELETE FROM imas_questionerrorlog WHERE qsetid IN ($dl)");
+					$DBH->exec("UPDATE IGNORE imas_a11yreviews SET qsetid=$keep WHERE qsetid IN ($dl)");
+					$DBH->exec("DELETE FROM imas_a11yreviews WHERE qsetid IN ($dl)");
+				}
 
 			// images: keep the retained copy's if it has any, else adopt the first duplicate's
 			$hasimg = $DBH->query("SELECT COUNT(*) FROM imas_qimages WHERE qsetid=$keep")->fetchColumn();
@@ -224,7 +274,9 @@ if ($apply && (count($map) > 0 || count($renames) > 0)) {
 					}
 				}
 			}
-			$DBH->exec("DELETE FROM imas_qimages WHERE qsetid IN ($dl)");
+				foreach ($dchunks as $dc) {
+					$DBH->exec('DELETE FROM imas_qimages WHERE qsetid IN (' . mdq_in($dc) . ')');
+				}
 
 			// library items
 			$liveInKeep = array();
@@ -232,7 +284,11 @@ if ($apply && (count($map) > 0 || count($renames) > 0)) {
 			foreach ($DBH->query("SELECT id,libid,deleted FROM imas_library_items WHERE qsetid=$keep") as $li) {
 				if ($li['deleted']) { $deadInKeep[$li['libid']][] = $li['id']; } else { $liveInKeep[$li['libid']] = 1; }
 			}
-			$items = $DBH->query("SELECT id,libid,deleted FROM imas_library_items WHERE qsetid IN ($dl) ORDER BY deleted,id")->fetchAll(PDO::FETCH_ASSOC);
+				$items = array();
+				foreach ($dchunks as $dc) {
+					$items = array_merge($items, $DBH->query('SELECT id,libid,deleted FROM imas_library_items WHERE qsetid IN (' . mdq_in($dc) . ')')->fetchAll(PDO::FETCH_ASSOC));
+				}
+				usort($items, function ($a, $b) { return $a['deleted'] != $b['deleted'] ? $a['deleted'] - $b['deleted'] : $a['id'] - $b['id']; });
 			foreach ($items as $li) {
 				$lib = $li['libid'];
 				if ($li['deleted'] || isset($liveInKeep[$lib])) {
@@ -248,52 +304,34 @@ if ($apply && (count($map) > 0 || count($renames) > 0)) {
 			}
 		}
 
-		// replaceby / a11yalt pointing at a removed copy
-		$all = count($dupids) > 0 ? mdq_in($dupids) : '0';
-		foreach (array('replaceby', 'a11yalt') as $col) {
-			$stm = $DBH->query("SELECT id,$col FROM imas_questionset WHERE $col IN ($all)");
-			$upd = $DBH->prepare("UPDATE imas_questionset SET $col=?,lastmoddate=? WHERE id=?");
+			// apply the planned reference rewrites (by primary key); skip any row edited since the scan
+			$nskipped = 0;
+			foreach ($planRef as $col => $plan) {
+				$upd = $DBH->prepare("UPDATE imas_questionset SET $col=?,lastmoddate=? WHERE id=? AND $col=?");
+				$n = 0;
+				foreach ($plan as $p) {
+					$upd->execute(array($p[2], $now, $p[0], $p[1]));
+					if ($upd->rowCount() > 0) { $n++; } else { $nskipped++; }
+				}
+				$log[] = "$n $col references repointed";
+			}
+
+			$upd = $DBH->prepare('UPDATE imas_questionset SET control=?,qtext=?,lastmoddate=? WHERE id=? AND control=? AND qtext=?');
 			$n = 0;
-			foreach ($stm->fetchAll(PDO::FETCH_NUM) as $r) {
-				if (isset($map[$r[1]]) && !isset($map[$r[0]])) { $upd->execute(array($map[$r[1]], $now, $r[0])); $n++; }
+			foreach ($planInc as $p) {
+				$upd->execute(array($p[3], $p[4], $now, $p[0], $p[1], $p[2]));
+				if ($upd->rowCount() > 0) { $n++; } else { $nskipped++; }
 			}
-			$log[] = "$n $col references repointed";
-		}
+			$log[] = "$n questions had include references rewritten";
 
-		// numeric includecodefrom(ID) / includeqtextfrom(ID) references (UID-form refs need no change)
-		$cb = function ($m) use ($map) {
-			return isset($map[$m[2]]) ? $m[1] . $map[$m[2]] . ')' : $m[0];
-		};
-		$recode = '/(includecodefrom\()(\d+)\)/';
-		$reqtext = '/(includeqtextfrom\()(\d+)\)/';
-		$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE (control LIKE '%includecodefrom(%' AND control REGEXP 'includecodefrom[(][0-9]+[)]')
-			OR (qtext LIKE '%includeqtextfrom(%' AND qtext REGEXP 'includeqtextfrom[(][0-9]+[)]')");
-		$upd = $DBH->prepare('UPDATE imas_questionset SET control=?,qtext=?,lastmoddate=? WHERE id=?');
-		$n = 0;
-		while ($r = $stm->fetch(PDO::FETCH_ASSOC)) {
-			if (isset($map[$r['id']])) { continue; }   // about to be deleted anyway
-			$c = preg_replace_callback($recode, $cb, $r['control']);
-			$q = preg_replace_callback($reqtext, $cb, $r['qtext']);
-			if ($c !== $r['control'] || $q !== $r['qtext']) {
-				$upd->execute(array($c, $q, $now, $r['id']));
-				$n++;
+			$upd = $DBH->prepare('UPDATE imas_drillassess SET itemids=? WHERE id=? AND itemids=?');
+			$n = 0;
+			foreach ($planDrill as $p) {
+				$upd->execute(array($p[2], $p[0], $p[1]));
+				if ($upd->rowCount() > 0) { $n++; } else { $nskipped++; }
 			}
-		}
-		$log[] = "$n questions had include references rewritten";
-
-		// drill assessments keep a comma-separated list of question ids
-		$stm = $DBH->query("SELECT id,itemids FROM imas_drillassess WHERE itemids<>''");
-		$upd = $DBH->prepare('UPDATE imas_drillassess SET itemids=? WHERE id=?');
-		$n = 0;
-		foreach ($stm->fetchAll(PDO::FETCH_NUM) as $r) {
-			$parts = explode(',', $r[1]);
-			$changed = false;
-			foreach ($parts as $k => $p) {
-				if (isset($map[trim($p)])) { $parts[$k] = $map[trim($p)]; $changed = true; }
-			}
-			if ($changed) { $upd->execute(array(implode(',', $parts), $r[0])); $n++; }
-		}
-		$log[] = "$n drill assessments updated";
+			$log[] = "$n drill assessments updated";
+			if ($nskipped > 0) { $log[] = "$nskipped reference rewrites skipped because the row changed during the run; rerun to catch them"; }
 
 		// finally remove the duplicates
 		foreach (array_chunk($dupids, 500) as $chunk) {
