@@ -85,8 +85,9 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
 	} else {
 		$tostr = implode(',', $email);
 
+		$boundary = 'alt-' . bin2hex(random_bytes(12));
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+		$headers .= 'Content-Type: multipart/alternative; boundary="' . $boundary . '"' . "\r\n";
 		$headers .= "From: $from\r\n";
 		if (count($replyto)>0) {
 			$headers .= "Reply-To: ".implode(',', $replyto)."\r\n";
@@ -102,8 +103,47 @@ function send_email($email, $from, $subject, $message, $replyto=array(), $bccLis
             $headers .= 'List-Unsubscribe: <' . $GLOBALS['basesiteurl'] . '/actions.php?action=unsubscribe&email='
                 . Sanitize::encodeUrlParam($baseemail) . '&ver=' . $hash . ">\r\n";
         }
-		mail($tostr, $subject, $message, $headers);
+		// plain-text part first, then HTML; base64 keeps UTF-8 safe through 7-bit transports
+		$body = '--' . $boundary . "\r\n"
+			. 'Content-Type: text/plain; charset=UTF-8' . "\r\n"
+			. 'Content-Transfer-Encoding: base64' . "\r\n\r\n"
+			. chunk_split(base64_encode(email_html_to_text($message)), 76, "\r\n")
+			. '--' . $boundary . "\r\n"
+			. 'Content-Type: text/html; charset=UTF-8' . "\r\n"
+			. 'Content-Transfer-Encoding: base64' . "\r\n\r\n"
+			. chunk_split(base64_encode($message), 76, "\r\n")
+			. '--' . $boundary . '--' . "\r\n";
+		mail($tostr, $subject, $body, $headers);
 	}	
+}
+
+/*
+Makes a plain-text version of an HTML email body, for use as the text/plain part
+of a multipart/alternative message.
+Links are kept as "text (url)", or just the url if the link text is the url.
+*/
+function email_html_to_text($html) {
+	// links: keep the target URL
+	$text = preg_replace_callback('/<a\s[^>]*?href\s*=\s*(["\'])(.*?)\1[^>]*>(.*?)<\/a>/is', function ($m) {
+		$url = html_entity_decode($m[2], ENT_QUOTES, 'UTF-8');
+		$label = trim(html_entity_decode(strip_tags($m[3]), ENT_QUOTES, 'UTF-8'));
+		if ($label === '' || $label === $url) {
+			return $url;
+		}
+		return $label . ' (' . $url . ')';
+	}, $html);
+	// drop non-content blocks
+	$text = preg_replace('/<(style|script|head)\b.*?<\/\1>/is', '', $text);
+	// line breaks for block-level elements
+	$text = preg_replace('/<br\s*\/?>/i', "\n", $text);
+	$text = preg_replace('/<\/(p|h[1-6]|div|li|tr|ul|ol|table)>/i', "\n\n", $text);
+	$text = strip_tags($text);
+	$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+	$text = str_replace(["\r\n", "\r", "\xC2\xA0"], ["\n", "\n", ' '], $text);
+	// tidy whitespace
+	$text = preg_replace('/[ \t]+\n/', "\n", $text);
+	$text = preg_replace('/\n{3,}/', "\n\n", $text);
+	return trim($text);
 }
 
 function send_msg_notification($emailto, $from, $subject, $courseid, $coursename, $msgid) {

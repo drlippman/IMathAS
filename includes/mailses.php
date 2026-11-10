@@ -33,7 +33,9 @@ function send_SESemail($email, $from, $subject, $message, $replyto=array(), $bcc
 		}
 	}
 	$m->setSubject($subject);
-	$m->setMessageFromString(null,$message);
+	// send both a plain-text and an HTML version
+	$m->setMessageFromString(email_html_to_text($message), $message);
+	$m->setMessageCharset('UTF-8', 'UTF-8');
 	$ses->sendEmail($m, $includeUnsub);
 }
 
