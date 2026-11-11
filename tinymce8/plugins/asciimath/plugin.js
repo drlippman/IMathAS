@@ -40,6 +40,14 @@
 
         // Convert math to ascii
         function math2ascii(el) {
+            // Fast path for rendered math: skip serializing innerHTML, which
+            // contains a large data: URI that is expensive to serialize/regex
+            if (el.firstElementChild && el.title !== '' && el.title.indexOf('math') === -1 &&
+                el.title.indexOf('img') === -1 && el.title.indexOf('`') === -1
+            ) {
+                el.innerHTML = "`" + cleanmath(el.title.replace(/>/g, "&gt;").replace(/</g, "&lt;")) + "`";
+                return;
+            }
             var myAM = el.innerHTML;
             if (myAM.indexOf("`") === -1) {
                 if (el.title !== '' && el.title.indexOf('math') === -1 && el.title.indexOf('img') === -1) {
@@ -86,6 +94,9 @@
         function cachedToImg(entry, str) {
             var img = document.createElement('img');
             img.className = 'AMimg';
+            // Tells TinyMCE's image scanner/auto-uploader to leave this image
+            // alone (otherwise it gets blob-cached, uploaded and rewritten)
+            img.setAttribute('data-mce-placeholder', '1');
             img.src = entry.src;
             img.title = str;
             img.alt = str;
@@ -135,8 +146,24 @@
             svg.removeAttribute('focusable');
             // glyphs may reference a shared global cache that an <img> can't see
             var cache = document.querySelector('svg defs[id$="global-cache"]');
-            if (cache && svg.querySelector('use')) {
-                svg.insertBefore(cache.cloneNode(true), svg.firstChild);
+            var uses = svg.querySelectorAll('use');
+            if (cache && uses.length) {
+                // copy only the glyph defs this SVG references, not the whole
+                // page-wide cache (which makes every data URI enormous)
+                var needed = {};
+                uses.forEach(function (u) {
+                    var h = u.getAttribute('href') || u.getAttribute('xlink:href');
+                    if (h && h.charAt(0) === '#') {
+                        needed[h.substring(1)] = true;
+                    }
+                });
+                var newcache = cache.cloneNode(false);
+                Array.from(cache.children).forEach(function (c) {
+                    if (needed[c.getAttribute('id')]) {
+                        newcache.appendChild(c.cloneNode(true));
+                    }
+                });
+                svg.insertBefore(newcache, svg.firstChild);
             }
             // an <img> doesn't inherit text color
             var svgText = new XMLSerializer().serializeToString(svg)
@@ -400,6 +427,12 @@
 
         editor.on('PastePreProcess', function(e) {
             // convert mjx-container to span so doesn't get stripped in processing
+            // safety net: replace any rendered math images with their AsciiMath
+            // source; they get re-rendered after insertion
+            e.content = e.content.replace(/<img\b[^>]*\bclass=["']?AMimg\b[^>]*>/g, function (tag) {
+                var m = tag.match(/\btitle="([^"]*)"/) || tag.match(/\balt="([^"]*)"/);
+                return m ? '`' + m[1].replace(/`/g, '') + '`' : '';
+            });
             e.content = e.content.replace(/<mjx-container/g,'<span').replace(/<\/mjx-container/g,'*</span');
         });
 
@@ -450,7 +483,7 @@
             if (loaded) {
                 var AMtags = editor.dom.select('span.AM');
                 for (var i = 0; i < AMtags.length; i++) {
-                    if (!AMtags[i].innerHTML.match(/(math|img)/)) {
+                    if (!isRendered(AMtags[i])) {
                         nodeToAM(AMtags[i]);
                     }
                 }
@@ -460,6 +493,13 @@
         editor.on('BeforeSetContent', function(o) {
             o.content = o.content.replace(/(<span[^>]+AM.*?<\/span>)</, "$1 <");
         });
+
+        // Commands that don't modify content, so math needn't be un/re-rendered
+        var NOCONTENTCMDS = /^(mceFocus|mceRepaint|selectAll|mceAutoResize|mceResize|mceSelectNode|mceFullScreen|mceCodeEditor|mceTogglePlainTextPaste|mceToggleVisualAid|mceToggleAccessibilityChecker|mceHelp)$/i;
+
+        function isRendered(el) {
+            return el.querySelector('img, math, svg') !== null;
+        }
 
         editor.on('BeforeExecCommand', function(e) {
             if (lastAMnode !== null) {
@@ -473,20 +513,24 @@
                     return;
                 }
             }
-            if (e.command !== 'mceAsciimath' && e.command !== 'mceAsciimathDlg' && e.command !== 'mceFocus') {
+            if (e.command !== 'mceAsciimath' && e.command !== 'mceAsciimathDlg' && !NOCONTENTCMDS.test(e.command)) {
                 var AMtags = editor.dom.select('span.AM');
                 for (var i = 0; i < AMtags.length; i++) {
-                    math2ascii(AMtags[i]);
+                    if (isRendered(AMtags[i])) {
+                        math2ascii(AMtags[i]);
+                    }
                 }
             }
         });
 
         editor.on('ExecCommand', function(e) {
-            if (e.command !== 'mceAsciimath' && e.command !== 'mceAsciimathDlg' && e.command !== 'mceFocus') {
+            if (e.command !== 'mceAsciimath' && e.command !== 'mceAsciimathDlg' && !NOCONTENTCMDS.test(e.command)) {
                 var AMtags = editor.dom.select('span.AM');
                 for (var i = 0; i < AMtags.length; i++) {
-                    if (!AMtags[i].innerHTML.match(/(math|img)/)) {
-                        AMtags[i].innerHTML = AMtags[i].title;
+                    if (!isRendered(AMtags[i])) {
+                        if (AMtags[i].title !== '') {
+                            AMtags[i].innerHTML = AMtags[i].title;
+                        }
                         nodeToAM(AMtags[i]);
                     }
                 }
