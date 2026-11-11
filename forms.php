@@ -335,7 +335,7 @@ switch($_GET['action']) {
                 });
             });
 
-        </script>';
+        </script><style>details .formright { width: 480px;}</style>';
 		if ($gb == '') {
 			echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; ",_('Modify User Profile'),"</div>\n";
 		}
