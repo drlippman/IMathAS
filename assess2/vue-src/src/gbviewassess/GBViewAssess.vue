@@ -883,7 +883,10 @@ export default {
       if (!this.canEdit || this.aData.submitby !== 'by_question') {
         return false;
       }
-      const qs = this.aData.assess_versions[this.aData.assess_versions.length - 1].questions;
+      const qs = this.aData?.assess_versions?.[store.curAver]?.questions;
+      if (!qs) {
+        return false;
+      }
       return qs.some(qvers => qvers.some(qv => qv.hasOwnProperty('autosaves')));
     },
     hasError () {
