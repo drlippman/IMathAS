@@ -2330,8 +2330,10 @@ class DrawingScorePart implements ScorePart
                     $x = $k*$step;
                     $coordx = ($x - $imgborder)/$pixelsperx + $settings[0]+1E-10;
                     $coordy = $func(['x'=>$coordx]);
-                    if ($coordy>$settings[2] && $coordy<$settings[3]) {
-                        $anslines[$key][$k] = $settings[7] - ($coordy-$settings[2])*$pixelspery - $imgborder;
+                    $coordypix = $settings[7] - ($coordy-$settings[2])*$pixelspery - $imgborder;
+                    // same bounds test (with tolerance) as used for the student's drawn points
+                    if ($coordypix>$imgborder-1e-6 && $coordypix<($settings[7]-$imgborder+1e-6)) {
+                        $anslines[$key][$k] = $coordypix;
                         if (!isset($anslineptcnt[$k])) {
                             $anslineptcnt[$k] =1;
                         } else {
@@ -2389,7 +2391,9 @@ class DrawingScorePart implements ScorePart
                         if (!isset($linedata[$k])) { $linedata[$k] = []; }
                         $x = $k*$step;
                         $y = round($line[$i-1][1] + $m*($x-$line[$i-1][0]),10);
-                        if ($y>$imgborder && $y<($settings[7]-$imgborder)) {
+                        // tolerance so a point exactly on the grid edge counts as inside,
+                        // matching how the answer points are sampled above
+                        if ($y>$imgborder-1e-6 && $y<($settings[7]-$imgborder+1e-6)) {
                             if ($scoremethod != 'ignoreoverlap' || !in_array($y,$linedata[$k])) {
                                 $linedata[$k][] = $y;
                                 $totinterp++;
