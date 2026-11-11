@@ -190,6 +190,15 @@
               {{ $t('gradebook-set_as_last') }}
             </button>
           </div>
+          <div v-if="canEdit && hasUnscoredAutosaves">
+            {{ $t('gradebook-has_autosaves') }}
+            <button
+              type="button"
+              @click="submitVersion"
+            >
+              {{ $t('gradebook-score_autosaves') }}
+            </button>
+          </div>
           <div v-if="isUnsubmitted">
             {{ $t('gradebook-unsubmitted') }}
             <button
@@ -867,6 +876,15 @@ export default {
     isUnsubmitted () {
       return (this.aData.submitby === 'by_assessment' &&
         this.aData.assess_versions[store.curAver].status === 0);
+    },
+    hasUnscoredAutosaves () {
+      // by_question only; the server only sends autosaves to teachers,
+      // and only for the last version
+      if (!this.canEdit || this.aData.submitby !== 'by_question') {
+        return false;
+      }
+      const qs = this.aData.assess_versions[this.aData.assess_versions.length - 1].questions;
+      return qs.some(qvers => qvers.some(qv => qv.hasOwnProperty('autosaves')));
     },
     hasError () {
       return (store.errorMsg !== null);
