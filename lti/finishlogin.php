@@ -103,6 +103,9 @@ if ($localuserid === false) {
     // create new account
     require_once __DIR__.'/../includes/newusercommon.php';
     $err = checkNewUserValidation();
+    if ($role == 'Learner' && studentTOSRequired() && empty($_POST['agree'])) {
+      $err .= '<p>' . _('You must agree to the Terms of Use to set up an account.') . '</p>';
+    }
 
     $groupid = 0;
     if ($role == 'Instructor') {
@@ -134,7 +137,10 @@ if ($localuserid === false) {
   } else if ($role=='Learner') {
     // create no-direct-login student account
     $email = '';
-    if (!empty($_POST['firstname'])) {
+    require_once __DIR__.'/../includes/newusercommon.php';
+    if (studentTOSRequired() && empty($_POST['agree'])) {
+      $err = _('You must agree to the Terms of Use to set up an account.');
+    } else if (!empty($_POST['firstname'])) {
       $firstname = $_POST['firstname'];
       $lastname = $_POST['lastname'];
     } else if ($name = parse_name_from_launch($launch->get_launch_data())) {

@@ -306,6 +306,12 @@ if (isset($_GET['launch'])) {
 			if (empty($_POST['firstname']) || empty($_POST['lastname'])) {
 				$infoerr = 'Please provide your name';
 			}
+			if ($ltirole=='learner') {
+				require_once __DIR__.'/includes/newusercommon.php';
+				if (studentTOSRequired() && empty($_POST['agree'])) {
+					$infoerr .= ' '._('You must agree to the Terms of Use to set up an account.');
+				}
+			}
 			$_POST['email'] = 'none@none.com';
 			$msgnot = 0;
 		} else {
@@ -436,23 +442,38 @@ if (isset($_GET['launch'])) {
 		$nologo = true;
 		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once "header.php";
+		echo '<h1>'.sprintf(_('Connecting to %s'), Sanitize::encodeStringForDisplay($installname)).'</h1>';
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
 		}
 
-		echo "<form method=\"post\" id=\"pageform\" class=\"limitaftervalidate\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
+		echo "<form method=\"post\" id=\"pageform\" class=\"limitaftervalidate\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\">";
 		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
-			echo "<p>Please provide a little information about yourself:</p>";
-			echo "<span class=form><label for=\"firstname\">Enter First Name (given name):</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\"><BR class=form>\n";
-			echo "<span class=form><label for=\"lastname\">Enter Last Name (surname):</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=form>\n";
+			if (empty($_SESSION['LMSfirstname']) || empty($_SESSION['LMSlastname'])) {
+				echo "<p>Please provide a little information about yourself:</p>";
+			}
+			require_once __DIR__.'/includes/newusercommon.php';
+			$needTOS = ($ltirole=='learner' && studentTOSRequired());
+			if (!empty($_SESSION['LMSfirstname']) && !empty($_SESSION['LMSlastname'])) {
+				//already have name from LMS; no need to ask again
+				echo '<input type=hidden name=firstname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname']).'">';
+				echo '<input type=hidden name=lastname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSlastname']).'">';
+			} else {
+				echo "<span class=form><label for=\"firstname\">Enter First Name (given name):</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname'] ?? '')."\"><BR class=form>\n";
+				echo "<span class=form><label for=\"lastname\">Enter Last Name (surname):</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSlastname'] ?? '')."\"><BR class=form>\n";
+			}
+			if ($needTOS) {
+				echo getStudentTOSAgreeRow();
+			}
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
 			echo '<script type="text/javascript"> $(function() {
 				$("#pageform").validate({
 					rules: {
 						firstname: {required: true},
-						lastname: {required: true}
+						lastname: {required: true}'.($needTOS ? ',
+						agree: {required: true}' : '').'
 					},
 					submitHandler: function(el,evt) {return submitlimiter(evt);}
 				});
@@ -506,8 +527,12 @@ if (isset($_GET['launch'])) {
 				echo "<span class=form><label for=\"lastname\">"._("Enter Last Name:")."</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deflast)."\" size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=form>\n";
 				echo "<span class=form><label for=\"email\">"._("Enter E-mail address:")."</label></span>  <input class=form type=email value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email autocomplete=\"email\"><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">"._("Notify me by email when I receive a new message:")."</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
-				echo "<div class=submit><input type=submit value='"._("Create Account")."'></div>\n";
 				require_once __DIR__.'/includes/newusercommon.php';
+				$needTOS = ($ltirole=='learner' && studentTOSRequired());
+				if ($needTOS) {
+					echo getStudentTOSAgreeRow();
+				}
+				echo "<div class=submit><input type=submit value='"._("Create Account")."'></div>\n";
 				$requiredrules = array(
 					'curSID'=>'{depends: function(element) {return $("#SID").val()==""}}',
 					'curPW'=>'{depends: function(element) {return $("#SID").val()==""}}',
@@ -518,7 +543,12 @@ if (isset($_GET['launch'])) {
 					'lastname'=>'{depends: function(element) {return $("#SID").val()!=""}}',
 					'email'=>'{depends: function(element) {return $("#SID").val()!=""}}',
 				);
-				showNewUserValidation('pageform',array('curSID','curPW'), $requiredrules);
+				$extrareq = array('curSID','curPW');
+				if ($needTOS) {
+					$extrareq[] = 'agree';
+					$requiredrules['agree'] = '{depends: function(element) {return $("#SID").val()!=""}}';
+				}
+				showNewUserValidation('pageform',$extrareq, $requiredrules);
 
 			} else {
 				echo "<p>".sprintf(_("If you do not already have an account on %s, please visit the site to request an account."),$installname)."</p>";
@@ -534,6 +564,9 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		echo "</form>\n";
+		if (!empty($needTOS)) {
+			showStudentTOSText();
+		}
 		require_once "footer.php";
 		exit;
 
@@ -797,8 +830,11 @@ if (isset($_GET['launch'])) {
 		//has name information (should we skip?)
 		//domain level placement and (student or instructor with acceptable key rights)
 		//a _1 type placement and (student or instructor with acceptable key rights)
+		//but not if a student needs to agree to terms of use first
 
+		require_once __DIR__.'/includes/newusercommon.php';
 		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
+		   !($ltirole=='learner' && studentTOSRequired()) &&
 		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner') )) {
 			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {
 				$firstname = $_REQUEST['lis_person_name_given'];
@@ -2018,6 +2054,12 @@ if (isset($_GET['launch'])) {
 			if (empty($_POST['firstname']) || empty($_POST['lastname'])) {
 				$infoerr = 'Please provide your name';
 			}
+			if ($ltirole=='learner') {
+				require_once __DIR__.'/includes/newusercommon.php';
+				if (studentTOSRequired() && empty($_POST['agree'])) {
+					$infoerr .= ' '._('You must agree to the Terms of Use to set up an account.');
+				}
+			}
 			$_POST['email'] = 'none@none.com';
 			$msgnot = 0;
 		} else {
@@ -2075,6 +2117,9 @@ if (isset($_GET['launch'])) {
 					} else {
 						require_once __DIR__.'/includes/newusercommon.php';
 						$infoerr = checkNewUserValidation();
+						if ($ltirole=='learner' && studentTOSRequired() && empty($_POST['agree'])) {
+							$infoerr .= '<p>'._('You must agree to the Terms of Use to set up an account.').'</p>';
+						}
 						//new info
 						if (isset($_POST['msgnot'])) {
 							$msgnot = 1;
@@ -2138,23 +2183,38 @@ if (isset($_GET['launch'])) {
 		$flexwidth = true;
 		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once "header.php";
+		echo '<h1>'.sprintf(_('Connecting to %s'), Sanitize::encodeStringForDisplay($installname)).'</h1>';
 		if (isset($infoerr)) {
 			echo '<p class=noticetext>'.Sanitize::encodeStringForDisplay($infoerr).'</p>';
 		}
 
-		echo "<form method=\"post\" id=\"pageform\" class=\"limitaftervalidate\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\" ";
+		echo "<form method=\"post\" id=\"pageform\" class=\"limitaftervalidate\" action=\"".$imasroot."/bltilaunch.php?userinfo=set\">";
 		if ($name_only) {
 			//using LTI for authentication; don't need username/password
 			//only request name
-			echo "<p>Please provide a little information about yourself:</p>";
-			echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\"><BR class=form>\n";
-			echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=form>\n";
+			if (empty($_SESSION['LMSfirstname']) || empty($_SESSION['LMSlastname'])) {
+				echo "<p>Please provide a little information about yourself:</p>";
+			}
+			require_once __DIR__.'/includes/newusercommon.php';
+			$needTOS = ($ltirole=='learner' && studentTOSRequired());
+			if (!empty($_SESSION['LMSfirstname']) && !empty($_SESSION['LMSlastname'])) {
+				//already have name from LMS; no need to ask again
+				echo '<input type=hidden name=firstname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname']).'">';
+				echo '<input type=hidden name=lastname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSlastname']).'">';
+			} else {
+				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname'] ?? '')."\"><BR class=form>\n";
+				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSlastname'] ?? '')."\"><BR class=form>\n";
+			}
+			if ($needTOS) {
+				echo getStudentTOSAgreeRow();
+			}
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
 			echo '<script type="text/javascript"> $(function() {
 				$("#pageform").validate({
 					rules: {
 						firstname: {required: true},
-						lastname: {required: true}
+						lastname: {required: true}'.($needTOS ? ',
+						agree: {required: true}' : '').'
 					},
 					submitHandler: function(el,evt) {return submitlimiter(evt);}
 				});
@@ -2211,8 +2271,12 @@ if (isset($_GET['launch'])) {
 				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($deflast)."\" size=20 id=lastname name=lastname><BR class=form>\n";
 				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=email autocomplete=\"email\" value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
-				echo "<div class=submit><input type=submit value='Create Account'></div>\n";
 				require_once __DIR__.'/includes/newusercommon.php';
+				$needTOS = ($ltirole=='learner' && studentTOSRequired());
+				if ($needTOS) {
+					echo getStudentTOSAgreeRow();
+				}
+				echo "<div class=submit><input type=submit value='Create Account'></div>\n";
 				$requiredrules = array(
 					'curSID'=>'{depends: function(element) {return $("#SID").val()==""}}',
 					'curPW'=>'{depends: function(element) {return $("#SID").val()==""}}',
@@ -2223,7 +2287,12 @@ if (isset($_GET['launch'])) {
 					'lastname'=>'{depends: function(element) {return $("#SID").val()!=""}}',
 					'email'=>'{depends: function(element) {return $("#SID").val()!=""}}',
 				);
-				showNewUserValidation('pageform',array('curSID','curPW'), $requiredrules);
+				$extrareq = array('curSID','curPW');
+				if ($needTOS) {
+					$extrareq[] = 'agree';
+					$requiredrules['agree'] = '{depends: function(element) {return $("#SID").val()!=""}}';
+				}
+				showNewUserValidation('pageform',$extrareq, $requiredrules);
 			} else {
 				echo "<p>If you do not already have an account on $installname, please visit the site to request an account.</p>";
 				echo '<script type="text/javascript"> $(function() {
@@ -2238,6 +2307,9 @@ if (isset($_GET['launch'])) {
 			}
 		}
 		echo "</form>\n";
+		if (!empty($needTOS)) {
+			showStudentTOSText();
+		}
 		require_once "footer.php";
 		exit;
 
@@ -2487,7 +2559,9 @@ if (isset($_GET['launch'])) {
 		//domain level placement and (student or instructor with acceptable key rights)
 		//a _1 type placement and (student or instructor with acceptable key rights)
 
+		require_once __DIR__.'/includes/newusercommon.php';
 		if (((!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) || !empty($_REQUEST['lis_person_name_full'])) &&
+		   !($ltirole=='learner' && studentTOSRequired()) &&
 		   ((count($keyparts)==1 && $ltirole=='learner') || (count($keyparts)==1 && $keytype=='cc-vf' && $_SESSION['lti_keyrights']>75) ||
 		   (count($keyparts)>2 && $keyparts[2]==1 && $ltirole=='learner'))) {
 			if (!empty($_REQUEST['lis_person_name_given']) && !empty($_REQUEST['lis_person_name_family'])) {

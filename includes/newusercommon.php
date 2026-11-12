@@ -89,6 +89,41 @@ echo '},
   </script>';
 }
 
+/**
+ * Whether a terms-of-use agreement is configured for new student accounts
+ */
+function studentTOSRequired() {
+  global $CFG, $studentTOS;
+  return (isset($studentTOS) || isset($CFG['GEN']['TOSpage']));
+}
+
+/**
+ * Returns the HTML for the "I agree to the terms of use" form row
+ */
+function getStudentTOSAgreeRow() {
+  global $CFG, $studentTOS;
+  if (isset($studentTOS)) {
+    $label = _('I have read and agree to the Terms of Use (below)');
+  } else if (isset($CFG['GEN']['TOSpage'])) {
+    $t1 = _('Terms of Use');
+    $ta = sprintf("<a href=\"#\" onclick=\"GB_show('%s','".$CFG['GEN']['TOSpage']."',700,500);return false;\">%s</a>", $t1, $t1);
+    $label = sprintf(_('I have read and agree to the %s'), $ta);
+  } else {
+    return '';
+  }
+  return "<span class=form><label for=\"agree\">".$label."</label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
+}
+
+/**
+ * Outputs the full TOS text below the form, if a $studentTOS file is configured
+ */
+function showStudentTOSText() {
+  global $studentTOS;
+  if (isset($studentTOS)) {
+    require_once $studentTOS;
+  }
+}
+
 function checkFormatAgainstRegex($val, $regexs) {
   if (!is_array($regexs)) {
     $regexs = array($regexs);

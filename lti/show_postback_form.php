@@ -10,6 +10,8 @@ function show_postback_form($launch, $db, $err='') {
   $promptForName = false;
   $promptForAcctCreation = false;
   $promptForLogin = false;
+  $needTOS = false;
+  $promptForTOS = false;
 
   $role = standardize_role($launch->get_roles());
   $contextid = $launch->get_platform_context_id();
@@ -36,6 +38,13 @@ function show_postback_form($launch, $db, $err='') {
         $promptForLogin = true;
         $promptForAcctCreation = true;
       }
+      // new student accounts require agreeing to terms of use, if configured
+      require_once __DIR__.'/../includes/newusercommon.php';
+      $needTOS = studentTOSRequired();
+      if ($needTOS && !$promptForLogin) {
+        // need to show the form so they can agree, even if we have their name
+        $promptForTOS = true;
+      }
     }
   } else if ($role == 'Instructor') {
     if ($localuserid === false) {
@@ -45,7 +54,7 @@ function show_postback_form($launch, $db, $err='') {
       // associated with this deployment; we'll only trust LTI to create instructors
       // if we recognize the deployment and can assign them to a group
       if (!empty($GLOBALS['CFG']['LTI']['allow_instr_create'])) {
-        $groups = $this->db->get_groups($platform_id, $launch->get_deployment_id());
+        $groups = $db->get_groups($platform_id, $launch->get_deployment_id());
         if (count($groups)>0) {
           $promptForAcctCreation = true;
         }
@@ -104,6 +113,9 @@ function show_postback_form($launch, $db, $err='') {
         echo '</select><br class=form>';
       }
 
+      if ($needTOS) {
+        echo getStudentTOSAgreeRow();
+      }
       echo '<div class=submit><button type=submit>'._('Create Account').'</button></div>';
       require_once __DIR__.'/../includes/newusercommon.php';
       $requiredrules = array(
@@ -116,7 +128,12 @@ function show_postback_form($launch, $db, $err='') {
         'lastname'=>'{depends: function(element) {return $("#SID").val()!=""}}',
         'email'=>'{depends: function(element) {return $("#SID").val()!=""}}',
       );
-      showNewUserValidation('postbackform',array('curSID','curPW'), $requiredrules);
+      $extrareq = array('curSID','curPW');
+      if ($needTOS) {
+        $extrareq[] = 'agree';
+        $requiredrules['agree'] = '{depends: function(element) {return $("#SID").val()!=""}}';
+      }
+      showNewUserValidation('postbackform', $extrareq, $requiredrules);
     } else {
       echo '<script type="text/javascript"> $(function() {
         $("#postbackform").validate({
@@ -131,16 +148,22 @@ function show_postback_form($launch, $db, $err='') {
         echo '<p>'.sprintf(_('If you need an account, please visit the %s website to request an account'), $installname).'</p>';
       }
     }
-  } else if ($promptForName) {
-    echo '<p>'._('Please provide a little information about yourself').'</p>';
-    echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstname name=firstname><BR class=form>';
-    echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname><BR class=form>';
+  } else if ($promptForName || $promptForTOS) {
+    if ($promptForName) {
+      echo '<p>'._('Please provide a little information about yourself').'</p>';
+      echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstname name=firstname><BR class=form>';
+      echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname><BR class=form>';
+    }
+    if ($needTOS) {
+      echo getStudentTOSAgreeRow();
+    }
     echo '<div class=submit><button type=submit>'._('Continue').'</button></div>';
     echo '<script type="text/javascript"> $(function() {
-      $("#pageform").validate({
+      $("#postbackform").validate({
         rules: {
-          firstname: {required: true},
-          lastname: {required: true}
+          '.($promptForName ? 'firstname: {required: true},
+          lastname: {required: true}' : '').($promptForName && $needTOS ? ',' : '').($needTOS ? '
+          agree: {required: true}' : '').'
         },
         submitHandler: function(el,evt) {return submitlimiter(evt);}
       });
@@ -157,7 +180,7 @@ function show_postback_form($launch, $db, $err='') {
             document.getElementById("tzname").value = tz.name();
             window.sessionStorage.setItem('LTI1p3_launchid','<?php echo Sanitize::encodeStringForDisplay($launch->get_launch_id());?>');
       <?php
-      if (!$promptForLogin && !$promptForName) {
+      if (!$promptForLogin && !$promptForName && !$promptForTOS) {
         echo 'document.getElementById("postbackform").submit();';
       }
       ?>
@@ -165,5 +188,8 @@ function show_postback_form($launch, $db, $err='') {
 	</script>
   <?php
   echo '</form>';
+  if ($needTOS) {
+    showStudentTOSText();
+  }
   require_once '../footer.php';
 }
