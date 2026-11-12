@@ -19,6 +19,19 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
   echo '<script type="text/javascript">
   $(function() {
 	$("#'.Sanitize::simpleString($formname).'").validate({
+    onkeyup: function(element, event) {
+      if (element.name === "SID") {
+        // no live (remote) validation on SID; just clear a stale error
+        if ([16,17,18,20,35,36,37,38,39,40,45,144,225].indexOf(event.keyCode) !== -1) { return; }
+        if ($(element).hasClass(this.settings.errorClass)) {
+          this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
+          this.hideThese(this.errorsFor(element));
+          $("#errorlive").text("");
+        }
+        return;
+      }
+      $.validator.defaults.onkeyup.call(this, element, event);
+    },
     showErrors: function(m, l) {
         let txt = "";
         for (const id in m) {
