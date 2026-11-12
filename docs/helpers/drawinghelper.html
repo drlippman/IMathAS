@@ -127,7 +127,7 @@ function evalNum(s) {
   s = String(s).trim();
   if (s === '') { return NaN; }
   if (!/^[0-9a-z+\-*\/().^\s]*$/i.test(s)) { return NaN; }
-  var js = s.replace(/\^/g, '**').replace(/\bpi\b/gi, '(Math.PI)').replace(/\bsqrt\b/g, 'Math.sqrt').replace(/\babs\b/g, 'Math.abs');
+  var js = s.replace(/\^/g, '**').replace(/(^|[^a-z])pi(?![a-z])/gi, '$1(Math.PI)').replace(/(^|[^a-z])sqrt(?![a-z])/g, '$1Math.sqrt').replace(/(^|[^a-z])abs(?![a-z])/g, '$1Math.abs');
   if (/[a-z]/i.test(js.replace(/Math\.(PI|sqrt|abs)/g, ''))) { return NaN; }
   js = js.replace(/(\d|\))\s*(\(|Math)/g, '$1*$2');
   try {
