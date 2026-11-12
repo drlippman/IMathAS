@@ -880,7 +880,7 @@ export default {
     hasUnscoredAutosaves () {
       // by_question only; the server only sends autosaves to teachers,
       // and only for the last version
-      if (!this.canEdit || this.aData.submitby !== 'by_question') {
+      if (!this.canEdit || this.aData.submitby !== 'by_question' || store.curAver !== 0) {
         return false;
       }
       const qs = this.aData?.assess_versions?.[store.curAver]?.questions;

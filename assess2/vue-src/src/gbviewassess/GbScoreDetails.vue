@@ -216,7 +216,6 @@ export default {
       for (let i = 0; i < this.answeights.length; i++) {
         out[i] = Math.round(1000 * this.qdata.points_possible * this.answeights[i]) / 1000;
       }
-      console.log(out);
       return out;
     },
     fullCreditLabel () {
