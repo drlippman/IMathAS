@@ -25,9 +25,11 @@ if (!empty($_POST['checked'])) {
 
 $timesused = [];
 $stm = null;
+$limited = '';
 if ($isadmin) {
     // build the FROM/WHERE used to identify erroring questions
     if (!empty($_GET['limited'])) {
+        $limited = '&limited=1';
         if (isset($CFG['GEN']['qerroronold'])) {
             $old = time() - 60*60*24*$CFG['GEN']['qerroronold'][0];
         } else {
@@ -38,6 +40,7 @@ if ($isadmin) {
             JOIN imas_users AS iu ON iqs.ownerid=iu.id
             WHERE iqs.userights>0 AND iu.lastaccess<'.intval($old);
     } else if (!empty($_GET['all'])) {
+        $limited = '&all=1';
         $from = 'imas_questionerrorlog AS iqe WHERE 1=1';
     } else {
         $from = 'imas_questionerrorlog AS iqe
@@ -143,9 +146,9 @@ echo _('Once you have fixed the issue or determined it does not need fixing, cle
 echo '</p>';
 echo '<p>'._('Sort by: ');
 if ($sort === 'recent') {
-    echo ' <strong>'._('Most Recent Error').'</strong> | <a href="questionerrors.php?cid='.$qcid.'&sort=timesused">'._('Most Used Questions').'</a>';
+    echo ' <strong>'._('Most Recent Error').'</strong> | <a href="questionerrors.php?cid='.$qcid.'&sort=timesused'.$limited.'">'._('Most Used Questions').'</a>';
 } else {
-    echo ' <a href="questionerrors.php?cid='.$qcid.'&sort=recent">'._('Most Recent Error').'</a> | <strong>'._('Most Used Questions').'</strong>';
+    echo ' <a href="questionerrors.php?cid='.$qcid.'&sort=recent'.$limited.'">'._('Most Recent Error').'</a> | <strong>'._('Most Used Questions').'</strong>';
 }
 echo '</p>';
 if (isset($CFG['hooks']['util/questionerrors'])) {
