@@ -2593,8 +2593,11 @@ class AssessRecord
         (($qsdata['a11yalttype']&2)==2 && ($_SESSION['userprefs']['drawentry'] ?? 1)==0)
       ) {
         // sub out for accessible alt
-        $qsettings['questionsetid'] = $qsdata['a11yalt'];
-        $useda11yalt = true;
+        // only sub if the alt question still exists; otherwise show the original
+        if (!empty($qsdata['a11yalt']) && $this->assess_info->getQuestionSetData($qsdata['a11yalt']) !== null) {
+          $qsettings['questionsetid'] = $qsdata['a11yalt'];
+          $useda11yalt = true;
+        }
       }
     }
 
@@ -2756,7 +2759,9 @@ class AssessRecord
 
     if (!empty($qver['useda11yalt'])) {
       $qsdata = $this->assess_info->getQuestionSetData($qsettings['questionsetid']);
-      $qsettings['questionsetid'] = $qsdata['a11yalt'];
+      if (!empty($qsdata['a11yalt']) && $this->assess_info->getQuestionSetData($qsdata['a11yalt']) !== null) {
+        $qsettings['questionsetid'] = $qsdata['a11yalt'];
+      }
     }
 
     $scoreQuestionParams = new ScoreQuestionParams();

@@ -380,7 +380,10 @@ private function importQuestionSet() {
 		if ($this->data['items'][$item]['type']=='Assessment') {
 			$qids = $this->getAssessQids($this->data['items'][$item]['data']['itemorder']);
 			foreach ($qids as $qid) {
-                $qsid = $this->data['questions'][$qid]['questionsetid'];
+                $qsid = $this->data['questions'][$qid]['questionsetid'] ?? 0;
+                if (empty($qsid) || !isset($this->data['questionset'][$qsid])) {
+                    continue; // malformed export: question references a missing questionset
+                }
                 if ($this->data['questionset'][$qsid]['license'] == 0 && $this->options['skipcopyrighted']) {
                     continue; // skip it
                 }
@@ -889,7 +892,8 @@ private function insertAssessment() {
 		$qids = $this->getAssessQids($this->data['items'][$toimport]['data']['itemorder']);
 		$exarr = array();
 		foreach ($qids as $qid) {
-            if (!isset($this->qsmap[$this->data['questions'][$qid]['questionsetid']])) {
+            if (empty($this->data['questions'][$qid]['questionsetid']) ||
+                empty($this->qsmap[$this->data['questions'][$qid]['questionsetid']])) {
                 // if question was skipped in import, skip here too
                 continue;
             }
@@ -977,7 +981,9 @@ private function insertAssessment() {
                         $newsub[] = $this->qmap[$q[$k]];
                     }
                 }
-                if (count($newsub) == 1) { // if only one in group, ungroup
+                if (count($newsub) == 0) { // every question in the group was skipped
+                    continue;
+                } else if (count($newsub) == 1) { // if only one in group, ungroup
                     if (!$haspreamble) {
                         $newitems[] = $newsub[0];
                     }

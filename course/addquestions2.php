@@ -92,7 +92,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				exit;
 			}
 		} else {
-			$checked = $_POST['nchecked'];
+			// keep only positive ints that correspond to existing questions
+			$checked = array_values(array_unique(array_filter(array_map('intval', (array) $_POST['nchecked']))));
+			if (count($checked) > 0) {
+				$stm = $DBH->prepare('SELECT id FROM imas_questionset WHERE deleted=0 AND id IN ('.Sanitize::generateQueryPlaceholders($checked).')');
+				$stm->execute($checked);
+				$validids = array_flip($stm->fetchAll(PDO::FETCH_COLUMN, 0));
+				$checked = array_values(array_filter($checked, function($v) use ($validids) { return isset($validids[$v]); }));
+			}
+			if (count($checked) == 0) {
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions2.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
+				exit;
+			}
+			$qids = [];
 			foreach ($checked as $qsetid) {
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid,showhints) ";
 				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :questionsetid, :showhints);";

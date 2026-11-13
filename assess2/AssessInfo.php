@@ -539,7 +539,8 @@ class AssessInfo
     if (!isset($this->questionSetData[$qsid])) {
       $stm = $this->DBH->prepare("SELECT * FROM imas_questionset WHERE id=?");
       $stm->execute([$qsid]);
-      $this->questionSetData[$qsid] = $stm->fetch(PDO::FETCH_ASSOC);
+      // null (not false) if no such question, so it fits ?array type hints
+      $this->questionSetData[$qsid] = $stm->fetch(PDO::FETCH_ASSOC) ?: null;
     }
     return $this->questionSetData[$qsid];
   }

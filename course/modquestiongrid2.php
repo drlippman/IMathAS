@@ -29,8 +29,15 @@
 			if (isset($_POST['addasgroup'])) {
 				$points = trim($_POST['points'.$_POST['firstqsetid']]);
 			}
-			foreach (explode(',',$_POST['qsetids']) as $k=>$qsetid) {
-				for ($i=0; $i<$_POST['copies'.$qsetid];$i++) {
+			$qsetidlist = array_values(array_unique(array_filter(array_map('intval', explode(',',$_POST['qsetids'])))));
+			if (count($qsetidlist) > 0) {
+				$stm = $DBH->prepare('SELECT id FROM imas_questionset WHERE deleted=0 AND id IN ('.Sanitize::generateQueryPlaceholders($qsetidlist).')');
+				$stm->execute($qsetidlist);
+				$validqsetids = array_flip($stm->fetchAll(PDO::FETCH_COLUMN, 0));
+				$qsetidlist = array_values(array_filter($qsetidlist, function($v) use ($validqsetids) { return isset($validqsetids[$v]); }));
+			}
+			foreach ($qsetidlist as $k=>$qsetid) {
+				for ($i=0; $i<intval($_POST['copies'.$qsetid] ?? 0);$i++) {
 					if (!isset($_POST['addasgroup'])) {
 						$points = trim($_POST['points'.$qsetid]);
 					}

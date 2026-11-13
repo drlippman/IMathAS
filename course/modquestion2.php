@@ -116,14 +116,22 @@ if (!(isset($teacherid))) {
 				echo 'Invalid id';
 				exit;
 			}
-            if (isset($_POST['replacementid']) && $_POST['replacementid'] != '' && intval($_POST['replacementid']) != 0) {
+            $replacementid = intval($_POST['replacementid'] ?? 0);
+            if ($replacementid > 0) {
+                $stm = $DBH->prepare("SELECT id FROM imas_questionset WHERE id=? AND deleted=0");
+                $stm->execute([$replacementid]);
+                if ($stm->fetchColumn() === false) {
+                    $replacementid = 0;
+                }
+            }
+            if ($replacementid > 0) {
                 $query = "UPDATE imas_questions SET points=:points,attempts=:attempts,penalty=:penalty,regen=:regen,showans=:showans,showwork=:showwork,rubric=:rubric,showhints=:showhints,fixedseeds=:fixedseeds";
                 $query .= ',questionsetid=:questionsetid,extracredit=:extracredit WHERE id=:id';
                 $stm = $DBH->prepare($query);
                 $settings = array(':points' => $points, ':attempts' => $attempts,
                     ':penalty' => $penalty, ':regen' => $regen, ':showans' => $showans, ':showwork' => $showwork,
                     ':rubric' => $rubric, ':showhints' => $showhints, ':fixedseeds' => $fixedseeds,
-                    ':questionsetid' => $_POST['replacementid'], ':extracredit' => $extracredit, 
+                    ':questionsetid' => $replacementid,':extracredit' => $extracredit, 
                     ':id' => $_GET['id']);
                 $stm->execute($settings);
             } else {

@@ -144,7 +144,7 @@ class ScoreQuestionParams
      * @param array $questionData
      * @return ScoreQuestionParams
      */
-    public function setQuestionData(array $questionData): ScoreQuestionParams
+    public function setQuestionData(?array $questionData): ScoreQuestionParams
     {
         $this->questionData = $questionData;
         return $this;
