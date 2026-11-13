@@ -53,6 +53,10 @@ $assess_info->loadException($uid, $isstudent, $studentinfo['latepasses'] , $late
 $assess_record = new AssessRecord($DBH, $assess_info, false);
 $assess_record->loadRecord($uid);
 
+if (!$assess_record->hasRecord() || !$assess_record->hasActiveAttempt()) {
+  echo '{"error": "not_ready"}';
+  exit;
+}
 
 // grab any assessment info fields that may have updated:
 $include_from_assess_info = array(

@@ -689,7 +689,7 @@ if ($overwriteBody==1) {
 					$LPcutoffs[] = -1;
 					$fpdates[] = -1; $frdates[] = -1;
 					if (isset($prefix['Block'.$parent.'-'.($k+1)])) {$pres[] = $prefix['Block'.$parent.'-'.($k+1)];} else {$pres[] = '';}
-					if (count($item['items'])>0) {
+					if (!empty($item['items']) && is_array($item['items'])) {
 						getblockinfo($item['items'],$parent.'-'.($k+1));
 					}
 				}

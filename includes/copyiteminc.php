@@ -508,12 +508,12 @@ function copysub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = fals
                 $newblock['grouplimit'] = $samecourse ? ($item['grouplimit'] ?? []) : [];
                 $newblock['innav'] = $item['innav'] ?? 0;
                 $newblock['items'] = array();
-                if (count($item['items']) > 0) {
+                if (!empty($item['items']) && is_array($item['items'])) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
                 }
                 $addtoarr[] = $newblock;
             } else {
-                if (count($item['items']) > 0) {
+                if (!empty($item['items']) && is_array($item['items'])) {
                     copysub($item['items'], $parent . '-' . ($k + 1), $addtoarr, $gbcats, $sethidden);
                 }
             }
@@ -783,7 +783,7 @@ function copyallsub($items, $parent, &$addtoarr, $gbcats = false, $sethidden = f
             $newblock['fixedheight'] = $item['fixedheight'] ?? 0;
             $newblock['grouplimit'] = $item['grouplimit'] ?? [];
             $newblock['items'] = array();
-            if (isset($item['items']) && count($item['items']) > 0) {
+            if (!empty($item['items']) && is_array($item['items'])) {
                 copyallsub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
             }
             $addtoarr[] = $newblock;
@@ -854,7 +854,7 @@ function getsubinfo($items, $parent, $pre, $itemtypelimit = false, $spacer = '|&
             $parents[] = $parent;
             $gitypeids[] = '';
             $sums[] = '';
-            if (count($item['items']) > 0) {
+            if (!empty($item['items']) && is_array($item['items'])) {
                 getsubinfo($item['items'], $parent . '-' . ($k + 1), $pre . $spacer, $itemtypelimit, $spacer);
             }
         } else {
@@ -904,7 +904,7 @@ function buildexistblocks($items, $parent, $pre = '')
     foreach ($items as $k => $item) {
         if (is_array($item)) {
             $existblocks[$parent . '-' . ($k + 1)] = $pre . $item['name'];
-            if (count($item['items']) > 0) {
+            if (!empty($item['items']) && is_array($item['items'])) {
                 buildexistblocks($item['items'], $parent . '-' . ($k + 1), $pre . '&nbsp;&nbsp;');
             }
         }

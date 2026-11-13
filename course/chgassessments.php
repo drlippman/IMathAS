@@ -837,8 +837,8 @@ $(function() {
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
 				<td class="r">Default penalty:</td>
-				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
-   					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
+				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>">%
+   					<select name="skippenalty">
 						<option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
 						<option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
 						<option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
