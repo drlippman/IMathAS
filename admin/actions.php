@@ -896,6 +896,9 @@ switch($_POST['action']) {
 				}
 				if ($_POST['usetemplate'] > 0 && $ctcinfo['UIver'] > 1) {
 					$destUIver = $ctcinfo['UIver'];
+				} else if ($_POST['usetemplate'] > 0 && empty($CFG['assess_upgrade_optout'])) {
+					//upgrade is mandatory unless opt-out is allowed
+					$destUIver = 2;
 				}
 			}
 
@@ -1074,14 +1077,18 @@ switch($_POST['action']) {
 			*/
 			$DBH->commit();
 
+			$auditData = [
+				'action' => 'Course Created',
+				'via' => 'Home'
+			];
+			if (isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+				$auditData['copied_from'] = intval($_POST['usetemplate']);
+			}
 			TeacherAuditLog::addTracking(
 				$cid,
 				"Course Settings Change",
 				null,
-				[
-					'action' => 'Course Created',
-					'via' => 'Home'
-				]
+				$auditData
 			);
 
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE (rights=11 OR rights=76 OR rights=77) AND groupid=?");

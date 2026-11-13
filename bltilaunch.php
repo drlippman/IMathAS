@@ -1183,7 +1183,7 @@ if ($placementrow === false) {
 				$deflatepass = $r[5];
 				$sourceUIver = $r[6];
 				$courselevel = $r[7];
-				if (isset($_POST['usenewassess'])) {
+				if (isset($_POST['usenewassess']) || empty($CFG['assess_upgrade_optout'])) {
 					$destUIver = 2;
 					$convertAssessVer = 2;
 				} else {
