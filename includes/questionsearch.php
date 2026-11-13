@@ -84,7 +84,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
 
     $searchand = [];
     $searchvals = [];
-    $stopwords = ['about','are','com','for','from','how','that','the','this','was','what','when','where','will','with','und','www'];
+    $stopwords = ['about','are','com','for','from','how','that','the','this','was','what','when','where','who','will','with','und','www'];
 
     if ($searchtype != 'all' && !is_array($libs)) {
         $libs = explode(',', $libs);
@@ -117,10 +117,10 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                 $searchvals[] = $names[2] . ',' . $names[0] . '%';
             }
             $authorbool = [];
-            if (isset($names[0]) && strlen($names[0])>2 && !in_array($names[0], $stopwords)) {
+            if (isset($names[0]) && strlen($names[0])>2 && !in_array(strtolower($names[0]), $stopwords)) {
                 $authorbool[] = '+'.$names[0];
             }
-            if (isset($names[2]) && strlen($names[2])>2 && !in_array($names[2], $stopwords)) {
+            if (isset($names[2]) && strlen($names[2])>2 && !in_array(strtolower($names[2]), $stopwords)) {
                 $authorbool[] = '+'.$names[2];
             }
             if (count($authorbool)>0) {
@@ -165,7 +165,7 @@ function searchQuestions($search, $userid, $searchtype, $libs = array(), $option
                     $sgn = '-';
                     $v = substr($v, 1);
                 }
-                if (ctype_alnum($v) && strlen($v) > 2 && !in_array($v, $stopwords)) {
+                if (ctype_alnum($v) && strlen($v) > 2 && !in_array(strtolower($v), $stopwords)) {
                     $wholewords[] = $sgn . $v . '*';
                     unset($search['terms'][$k]);
                 }
