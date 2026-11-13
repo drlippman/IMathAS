@@ -526,7 +526,7 @@ if ($overwriteBody==1) {
 		<option value="r">Review Date</option>
 		<option value="lp">LatePass Cutoff</option>
 		<option value="fp">Forum Post By</option>
-		<option value="fp">Forum Reply By</option>
+		<option value="fr">Forum Reply By</option>
 		</select>';
 	echo ' to <select id="swapselected" aria-label="new attribute value">
 		<option value="0">Hidden</option>
