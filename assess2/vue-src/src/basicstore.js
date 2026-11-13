@@ -1134,6 +1134,24 @@ export const actions = {
       return store.initValues[qn][fieldname];
     }
   },
+  /*
+   * Compare two HTML strings by parsed DOM, so differences in entity
+   * encoding (&amp;), attribute order, and self-closing slashes are ignored.
+   */
+  htmlEquivalent (a, b) {
+    if (typeof a !== 'string' || typeof b !== 'string' ||
+      a.indexOf('<') === -1 || b.indexOf('<') === -1
+    ) {
+      return false;
+    }
+    // DOMParser gives an inert document: no scripts run, no resources load
+    const parser = new DOMParser();
+    const d1 = parser.parseFromString(a.trim(), 'text/html').body;
+    const d2 = parser.parseFromString(b.trim(), 'text/html').body;
+    d1.normalize();
+    d2.normalize();
+    return d1.isEqualNode(d2);
+  },
   clearInitValue (qn) {
     store.initValues[qn] = {};
   },
@@ -1186,7 +1204,10 @@ export const actions = {
           } else if (el.type === 'file' && document.getElementById(el.name + '-autosave') !== null) {
             thisChanged = true; // file with autosave input
           } else {
-            if (el.value.trim() !== actions.getInitValue(qn, el.name) && el.value.trim() !== '') {
+            const curVal = el.value.trim();
+            if (curVal !== '' && curVal !== actions.getInitValue(qn, el.name) &&
+              !(el.tagName === 'TEXTAREA' && actions.htmlEquivalent(curVal, actions.getInitValue(qn, el.name)))
+            ) {
               thisChanged = true;
             }
           }
