@@ -91,10 +91,10 @@ input:invalid {
 	background-color: #faa;
 }
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
-	color: #db0000 !important;
+	color: #bd0000 !important;
 }
 label.error {
-	color: #db0000;
+	color: #bd0000;
 	font-style: italic;
 	display: block;
 }
