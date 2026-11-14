@@ -633,24 +633,24 @@ div.ddmenu {
 	font-size: 90%;
 	text-align: center;
 	color: #505050;
-	background-color: #ece9d8;
+	background-color: #eee;
 	border: 1px solid #AAAAAA;
 	}
 .dpTD {
-	border: 1px solid #ece9d8;
+	border: 1px solid #eee;
 	}
 .dpDayHighlightTD {
 	background-color: #CCCCCC;
 	border: 1px solid #AAAAAA;
 	}
 .dpTDHover {
-	background-color: #aca998;
+	background-color: #ddd;
 	border: 1px solid #888888;
 	cursor: pointer;
-	color: red;
+	color: #900;
 	}
 .dpDayTD {
-	background-color: #CCCCCC;
+	background-color: #757575;
 	border: 1px solid #AAAAAA;
 	color: white;
 	}
@@ -658,16 +658,15 @@ div.ddmenu {
 	font-weight: bold;
 	}
 .dpDayHighlight {
-	color: #4060ff;
+	color: #052FFF;
 	font-weight: bold;
 	}
 .dpButton, .dpTodayButton {
 	font-size: 90%;
-	color: gray;
-	background: #d8e8ff;
-	font-weight: bold;
-	padding: 0px;
-	}
+	color: #000;
+	background: #fff;
+	padding: 1px 5px;
+}
 
 /*div.inactivewrapper, div.activewrapper {
 	margin: 0px;

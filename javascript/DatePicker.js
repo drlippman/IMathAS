@@ -195,12 +195,12 @@ function refreshDatePicker(dateFieldName, year, month, day, jumpFieldName, jumpT
   if (jumpFieldName && document.getElementsByName(jumpFieldName).length>0) {
 	  var dtj = getFieldDate(document.getElementsByName (jumpFieldName).item(0).value );
 	  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\","+ dtj.getFullYear()+ ","+ dtj.getMonth()+ ","+dtj.getDate()+ ",\""+jumpFieldName+ "\",\""+ jumpTitle + "\");'>"+jumpTitle+"</button> ";
-	  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\",0,0,0,\""+jumpFieldName+ "\",\""+ jumpTitle + "\");'>this month</button><br/> ";
+	  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\",0,0,0,\""+jumpFieldName+ "\",\""+ jumpTitle + "\");'>This month</button><br/> ";
   } else {
-	   html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\");'>this month</button> ";
+	   html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\");'>This month</button> ";
   }
 
-  html += "<button class='dpTodayButton' onClick='updateDateField(\"" + dateFieldName + "\");'>close</button>";
+  html += "<button class='dpTodayButton' onClick='updateDateField(\"" + dateFieldName + "\");'>Close</button>";
   html += xTD + xTR;
 
   // and finally, close the table
