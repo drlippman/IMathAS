@@ -1691,12 +1691,9 @@ class DrawingScorePart implements ScorePart
                     if (abs($ansexp[2]-$exps[$i][5])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    //check left point if base>1
-                    if ($ansexp[1]>1 && abs($ansexp[0]*safepow($ansexp[1],$exps[$i][0]) - $exps[$i][1]) >$defpttol*$reltolerance) {
-                        continue;
-                    }
-                    //check right point if base<=
-                    if ($ansexp[1]<=1 && abs($ansexp[0]*safepow($ansexp[1],$exps[$i][2]) - $exps[$i][3]) >$defpttol*$reltolerance) {
+                    //check the point closer to the asymptote, regardless of entry order
+                    $pi = (abs($exps[$i][1]) <= abs($exps[$i][3])) ? 0 : 2;
+                    if (abs($ansexp[0]*safepow($ansexp[1],$exps[$i][$pi]) - $exps[$i][$pi+1]) >$defpttol*$reltolerance) {
                         continue;
                     }
                     if ($scores[$scoretype[$key]][$key] == 1) {
@@ -1725,12 +1722,9 @@ class DrawingScorePart implements ScorePart
                     if (abs($anslog[2]-$logs[$i][5])>$defpttol*$reltolerance) {
                         continue;
                     }
-                    //check bottom point if base>1
-                    if ($anslog[1]>1 && abs($anslog[0]*safepow($anslog[1],$logs[$i][0]) - $logs[$i][1]) >$defpttol*$reltolerance) {
-                        continue;
-                    }
-                    //check top point if base<=
-                    if ($anslog[1]<=1 && abs($anslog[0]*safepow($anslog[1],$logs[$i][2]) - $logs[$i][3]) >$defpttol*$reltolerance) {
+                    //check the point closer to the asymptote, regardless of entry order
+                    $pi = (abs($logs[$i][1]) <= abs($logs[$i][3])) ? 0 : 2;
+                    if (abs($anslog[0]*safepow($anslog[1],$logs[$i][$pi]) - $logs[$i][$pi+1]) >$defpttol*$reltolerance) {
                         continue;
                     }
                     if ($scores[$scoretype[$key]][$key] == 1) {
