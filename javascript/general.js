@@ -620,6 +620,7 @@ function initeditor(edmode,edids,css,inline,setupfunction,extendsetup){
 		branding: false,
 		promotion: false,
 		sandbox_iframes: false,
+		draggable_modal: true,
 		resize: !inline ? "both" : false,
 		width: '100%',
 		height: 150,
