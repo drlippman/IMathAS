@@ -280,6 +280,18 @@
 			}
 		}
 
+		//Build the sage command for a formula, variable list, and operation
+		function buildSageCommand(formula, variables, operation) {
+			var variable_list=variables.join(",");
+			var variablestr=variable_list+"=var(\""+variable_list+"\")";
+			if (operation=="plot") {
+				return variablestr+"\nplot("+formula+", ("+variables[0]+",-10,10))";
+			} else if (operation=="simplify") {
+				return "def fullsimp(expr):return expr.simplify_full().simplify_trig()\n"+variablestr+"\nfullsimp("+formula+")";
+			}
+			return variablestr+"\n"+operation+"( "+formula+" , "+variables[0]+")";
+		}
+
 		//Guess the sage command based on the formula if selected
 		function guessSageCommand(formula_variables) {
 			var formula=formula_variables.formula;
@@ -288,24 +300,20 @@
 				return formula;
 			}
 
-			var variable_list=variables.join(",");
-			sagecommand=variable_list+"=var(\""+variable_list+"\")";
 			var operation=$("#solveroperation").val();
-			if (operation!==undefined && operation != "") {
-				sagecommand=sagecommand+"\n"+operation+"( "+formula+" , "+variables[0]+")";
-			} else if ( formula.indexOf("=")>=0 ) {
-				//if no operation selected and contains =
-				//assume solving for the first symbolic variable
-				sagecommand=sagecommand+"\nsolve( "+formula+" , "+variables[0]+")";
-				$("#solveroperation").val("solve")
-										.trigger("chosen:updated");
-			} else {
-				//start with example of differentiating wrt the first symbolic variable
-				sagecommand=sagecommand+"\ndiff( "+formula+" , "+variables[0]+")";
-				$("#solveroperation").val("diff")
+			if (operation===undefined || operation == "") {
+				if ( formula.indexOf("=")>=0 ) {
+					//if no operation selected and contains =
+					//assume solving for the first symbolic variable
+					operation = "solve";
+				} else {
+					//start with example of differentiating wrt the first symbolic variable
+					operation = "diff";
+				}
+				$("#solveroperation").val(operation)
 										.trigger("chosen:updated");
 			}
-			return sagecommand;
+			return buildSageCommand(formula, variables, operation);
 		}
 
 		//Send command to Sage cell
@@ -339,15 +347,7 @@
 				if (variables===undefined||variables===null||operation===undefined || operation == "") {
 					sagecommand = formula;
 				} else {
-					var variable_list=variables.join(",");
-					var variablestr=variable_list+"=var(\""+variable_list+"\")";
-					if (operation=="plot") {
-						sagecommand=variablestr+"\nplot("+formula+", ("+variables[0]+",-10,10))";
-					} else if (operation=="simplify") {
-						sagecommand="def fullsimp(expr):return expr.simplify_full().simplify_trig()\n"+variablestr+"\nfullsimp("+formula+")";
-					} else {
-						sagecommand=variablestr+"\n"+operation+"( "+formula+" , "+variables[0]+")";
-					}
+					sagecommand=buildSageCommand(formula, variables, operation);
 				}
 				
 				//$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);;
