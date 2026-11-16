@@ -894,9 +894,8 @@
 
 	$useeditor = "noinit";
 	$editorquestionids = "qtext,solution"; //question editors: uploads stored publicly
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js?v=102426"></script>';
-	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror_min.css?v=091522">';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=111526"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=111526">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
@@ -921,13 +920,10 @@
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=060926"></script>';
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
-	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
-		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto; clip-path: inset(0px);}
-		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
-		#qtbox .CodeMirror-scroll {min-height:150px; max-height:600px;}
-		.CodeMirror-selectedtext {color: #ffffff !important;background-color: #3366AA;}
-		.CodeMirror-focused .CodeMirror-selected {background: #3366AA;}
-		.CodeMirror-selected {background: #666666;}
+	$placeinhead .= '<style type="text/css">.cm-editor {font-size: medium;border: 1px solid #ccc;}
+		#ccbox .cm-editor, #qtbox .cm-editor {height: auto; clip-path: inset(0px);}
+		#ccbox .cm-scroller {min-height:220px; max-height:600px;}
+		#qtbox .cm-scroller {min-height:150px; max-height:600px;}
         .dd-active {background-color: #eef;}
 		</style>';
 	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";

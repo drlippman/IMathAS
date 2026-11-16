@@ -986,9 +986,8 @@ $ansfmtlbl = array("none","any fraction","reduced fraction","fraction or decimal
 $useeditor = "text,popuptxt";
 $editorquestionids = "text,popuptxt"; //question editors: uploads stored publicly
 
-$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/codemirror-compressed.js?v=091522"></script>';
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/codemirror/imathas.js"></script>';
-$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/codemirror/codemirror.css">';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=111526"></script>';
+$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=111526">';
 $placeinhead .= '<style type="text/css">
   .txted {
     padding-left: 1px;
@@ -998,11 +997,8 @@ $placeinhead .= '<style type="text/css">
     .choicetbl {
     white-space: nowrap;
     }
-   .CodeMirror {font-size: medium;border: 1px solid #ccc; height: auto;}
-	.CodeMirror-scroll {min-height:70px; max-height:600px;}
-	.CodeMirror-selectedtext {color: #ffffff !important;background-color: #3366AA;}
-	.CodeMirror-focused .CodeMirror-selected {background: #3366AA;}
-	.CodeMirror-selected {background: #666666;}
+   .cm-editor {font-size: medium;border: 1px solid #ccc; height: auto;}
+	.cm-scroller {min-height:70px; max-height:600px;}
  </style>';
 
 $flexwidth = true;
@@ -1206,31 +1202,11 @@ function rubrictouchmove(evt) {
 }
 var randvarEditor;
 function setupRandvarEditor() {
-  randvarEditor = CodeMirror.fromTextArea(document.getElementById("randvars"), {
-	lineNumbers: true,
-	matchBrackets: true,
-	autoCloseBrackets: true,
-	mode: "text/x-imathas",
-	smartIndent: true,
-	lineWrapping: true,
-	indentUnit: 2,
-	tabSize: 2,
-	styleSelectedText:true
-      });
+  randvarEditor = IMathASCM.fromTextArea(document.getElementById("randvars"), {kind: "imathas"});
 };
 var keepcodeEditor;
 function setupKeepcodeEditor() {
-  keepcodeEditor = CodeMirror.fromTextArea(document.getElementById("keepcode"), {
-	lineNumbers: true,
-	matchBrackets: true,
-	autoCloseBrackets: true,
-	mode: "text/x-imathas",
-	smartIndent: true,
-	lineWrapping: true,
-	indentUnit: 2,
-	tabSize: 2,
-	styleSelectedText:true
-      });
+  keepcodeEditor = IMathASCM.fromTextArea(document.getElementById("keepcode"), {kind: "imathas"});
 };
 </script>
 

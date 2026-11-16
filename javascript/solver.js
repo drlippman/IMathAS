@@ -1,6 +1,6 @@
 	   $(function() {
-        controlEditor.setOption("extraKeys", {
-         "Ctrl-M": function(cm) {
+        IMathASCM.addKeys(controlEditor, {
+         "Ctrl-m": function(view) {
           handleSageEvent();
          }
 	    });
@@ -35,7 +35,7 @@
 			handleDragStart(event);
 		});
 		$("#sagetocontrol").on("dragend", function(event) {
-			controlEditor.removeOverlay("answer");
+			IMathASCM.highlightAnswerLines(controlEditor, false);
 		});
 		$("#solverappend").on("click",handleSolverAppend);
 		$("#solverappendalone").on("click",handleSolverAppendAlone);
@@ -102,21 +102,7 @@
 			});
 		});
 
-		//CodeMirror mode to highlight $answer lines during drag
-		CodeMirror.defineMode("answer", function() {
-			return {
-				token: function(stream) {
-					//look for a line containing $answer[...]
-					var tw_pos = stream.string.search(/\$answers?[\[\]0-9\s]*=/i);
-					stream.skipToEnd();
-					if (tw_pos === -1) {
-						stream.skipToEnd();
-						return null;
-					}
-					return "searching";
-			}
-		  };
-		});
+		//$answer lines are highlighted during drag by IMathASCM.highlightAnswerLines
 	});
 	   
 
@@ -140,14 +126,14 @@
 			}*/
 			var sagecommand = '';
 			$("#solverpopup").show()
-				if (controlEditor.somethingSelected()) {
-					var selection=controlEditor.getSelection();
+				var selection = IMathASCM.getSelection(controlEditor);
+				if (selection !== "") {
 					$("#imathastosage").val(selection);
 					var formula_variables = convertMomSageVariables(selection,true);
 					sagecommand=guessSageCommand(formula_variables);
 					//sendSageCommand(sagecommand);
 				}
-			if (controlEditor.getValue().search(/\$answer[\[\]\s0-9]*=/i) > 0) {
+			if (IMathASCM.getValue(controlEditor).search(/\$answer[\[\]\s0-9]*=/i) > 0) {
 				//disable Append button
 				$("#solverappend").prop("disabled", true);
 				$("#solverappend").css("color", "#808080");
@@ -195,13 +181,13 @@
 		//Append output as $answer to Common Control
 		function handleSolverAppend() {
 			handleSolverCopy();
-			controlEditor.setValue(controlEditor.getValue()+"\n$answer = \""+$("#sagetocontrol").val()+"\"");
+			IMathASCM.setValue(controlEditor, IMathASCM.getValue(controlEditor)+"\n$answer = \""+$("#sagetocontrol").val()+"\"");
 		}
 
 		//Append output to Common Control
 		function handleSolverAppendAlone() {
 			handleSolverCopy();
-			controlEditor.setValue(controlEditor.getValue()+"\n"+$("#sagetocontrol").val());
+			IMathASCM.setValue(controlEditor, IMathASCM.getValue(controlEditor)+"\n"+$("#sagetocontrol").val());
 		}
 
 		//Show Solver Input help
@@ -437,7 +423,7 @@
 
 		function handleDrop(event) {
 			//clear the CodeMirror selection
-			controlEditor.setCursor(controlEditor.getCursor());
+			IMathASCM.collapseSelection(controlEditor);
 			var imathas_dropped = event.originalEvent.dataTransfer.getData("Text");
 			var formula_variables = convertMomSageVariables(imathas_dropped , true);
 			sagecommand=guessSageCommand(formula_variables);
@@ -449,7 +435,7 @@
 
 		function handleDragStart(event) {
 			event.originalEvent.dataTransfer.setData("text", $("#"+event.target.id).text());
-			controlEditor.addOverlay("answer");
+			IMathASCM.highlightAnswerLines(controlEditor, true);
 		}
 
 		var lastsolverpos, solvermousebase;
