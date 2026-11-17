@@ -50,7 +50,7 @@ if (empty($_COOKIE['fromltimenu'])) {
 }
 if (!isset($teacherid)) { // loaded by a NON-teacher
 	$overwriteBody=1;
-	$body = "You need to log in as a teacher to access this page";
+	$body = _('You need to log in as a teacher to access this page');
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
 	if (isset($_POST['posted']) && $_POST['posted']=="Unenroll") {
@@ -66,8 +66,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 	if (isset($_GET['assigncode'])) {
 
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Assign Codes\n";
-		$pagetitle = "Assign Section/Code Numbers";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Assign Codes')."\n";
+		$pagetitle = _('Assign Section/Code Numbers');
 
 		if (isset($_POST['submit'])) {
 			$keys = array_keys($_POST['sec'] ?? []);
@@ -99,8 +99,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 	} elseif (isset($_GET['enroll']) && ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true))) {
 
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
-		$pagetitle = "Enroll an Existing User";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Enroll Students')."\n";
+		$pagetitle = _('Enroll an Existing User');
 
 		if (isset($_POST['username'])) {
 			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
@@ -108,28 +108,28 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$row = $stm->fetch(PDO::FETCH_NUM);
 			if ($row === false) {
 				$overwriteBody = 1;
-				$body = "Error, username doesn't exist. <a href=\"listusers.php?cid=$cid&enroll=student\">Try again</a>\n";
+				$body = _("Error, username doesn't exist.") . " <a href=\"listusers.php?cid=$cid&enroll=student\">" . _('Try again') . "</a>\n";
 				if ($CFG['GEN']['allowinstraddstus']) {
-					$body .= "or <a href=\"listusers.php?cid=$cid&newstu=new\">create and enroll a new student</a>";
+					$body .= ' ' . _('or') . " <a href=\"listusers.php?cid=$cid&newstu=new\">" . _('create and enroll a new student') . "</a>";
 				}
 			} else {
 				$id = $row[0];
 				$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$cid));
 				if ($stm->fetch() !== false) {
-					echo "Teachers can't be enrolled as students - use Student View, or create a separate student account.";
+					echo _("Teachers can't be enrolled as students - use Student View, or create a separate student account.");
 					exit;
 				}
 				$stm = $DBH->prepare("SELECT id FROM imas_tutors WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$cid));
 				if ($stm->fetch() !== false) {
-					echo "Tutors can't be enrolled as students.";
+					echo _("Tutors can't be enrolled as students.");
 					exit;
 				}
 				$stm = $DBH->prepare("SELECT id FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$cid));
 				if ($stm->fetch() !== false) {
-					echo "This username is already enrolled in the class.";
+					echo _('This username is already enrolled in the class.');
 					exit;
 				}
 				$stm = $DBH->prepare("SELECT deflatepass FROM imas_courses WHERE id=:id");
@@ -151,8 +151,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 
 		}
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
-		$pagetitle = "Enroll a New Student";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Enroll Students')."\n";
+		$pagetitle = _('Enroll a New Student');
 		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 
 		if (isset($_POST['SID'])) {
@@ -160,7 +160,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$errors = checkNewUserValidation(array('SID','firstname','lastname','email','pw1'));
 			if ($errors != '') {
 				$overwriteBody = 1;
-				$body = $errors . "<br/><a href=\"listusers.php?cid=$cid&newstu=new\">Try Again</a>\n";
+				$body = $errors . "<br/><a href=\"listusers.php?cid=$cid&newstu=new\">" . _('Try Again') . "</a>\n";
 			} else {
 				require_once "../includes/password.php";
 				$pwhash = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
@@ -193,8 +193,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			}
 		}
 	} elseif (isset($_POST['posted']) && $_POST['posted']=="Copy Emails") {
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Copy Emails\n";
-		$pagetitle = "Copy Student Emails";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Copy Emails')."\n";
+		$pagetitle = _('Copy Student Emails');
 		if (!empty($_POST['checked'])) {
 			$ulist = implode(',', array_map('intval', $_POST['checked']));
 			$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email ";
@@ -212,8 +212,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		}
 
 	} elseif (isset($_GET['chgstuinfo'])) {
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Change User Info\n";
-		$pagetitle = "Change Student Info";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Change User Info')."\n";
+		$pagetitle = _('Change Student Info');
 		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
 		require_once "../includes/newusercommon.php";
 
@@ -225,7 +225,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$stm->execute([$cid, $uidToUpdate]);
 			$olddata = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($olddata === false) {
-				echo 'Invalid userid';
+				echo _('Invalid userid');
 				exit;
 			}
 			$jsondata = json_decode($olddata['jsondata'], true);
@@ -252,9 +252,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				}
 				
 				if ($updateusername) {
-					$msgout .= '<p>Username changed to <span class="pii-username">'.Sanitize::encodeStringForDisplay($un).'</span></p>';
+					$msgout .= '<p>' . sprintf(_('Username changed to %s'), '<span class="pii-username">'.Sanitize::encodeStringForDisplay($un).'</span>') . '</p>';
 				} else {
-					$msgout .= '<p>Username left unchanged</p>';
+					$msgout .= '<p>' . _('Username left unchanged') . '</p>';
 				}
 				if ($_POST['firstname'] != $olddata['FirstName'] || $_POST['lastname'] != $olddata['LastName']) {
 					$chglog['oldname'] = $olddata['LastName'] . ', ' . $olddata['FirstName'];
@@ -268,7 +268,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				}
 				if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',$_POST['email']) ||
 					(isset($CFG['acct']['emailFormat']) && !checkFormatAgainstRegex($_POST['email'], $CFG['acct']['emailFormat']))) {
-					$msgout .= '<p>Invalid email address - left unchanged</p>';
+					$msgout .= '<p>' . _('Invalid email address - left unchanged') . '</p>';
 				} else {
 					if ($_POST['email'] != $olddata['email']) {
 						$chglog['oldemail'] = $olddata['email'];
@@ -278,7 +278,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				}
 				if (isset($_POST['doresetpw'])) {
 					if (isset($CFG['acct']['passwordFormat']) && !checkFormatAgainstRegex($_POST['pw1'], $CFG['acct']['passwordFormat'])) {
-						$msgout .= '<p>Invalid password - left unchanged</p>';
+						$msgout .= '<p>' . _('Invalid password - left unchanged') . '</p>';
 					} else {
 						require_once "../includes/password.php";
 						$newpw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
@@ -286,7 +286,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 						$chglog['resetpw'] = 1;
 						$query .= ",password=:password,forcepwreset=1";
 						$qarr[':password'] = $newpw;
-						$msgout .= '<p>Password updated</p>';
+						$msgout .= '<p>' . _('Password updated') . '</p>';
 					}
 				}
 				if (!empty($chglog)) {
@@ -303,7 +303,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm->execute($qarr);
 
 			} else {
-				$msgout = '<p>Username, name, email, and password left unchanged.</p>';
+				$msgout = '<p>' . _('Username, name, email, and password left unchanged.') . '</p>';
 			}
 			$code = $_POST['code'];
 			$section = $_POST['section'];
@@ -372,9 +372,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			require_once "../header.php";
 			echo '<div class="breadcrumb">'.$curBreadcrumb.'</div>';
 			echo '<div id="headerlistusers" class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
-			echo "<p>User info updated. ";
+			echo "<p>" . _('User info updated.') . " ";
 			echo $msgout;
-			echo "</p><p><a href=\"listusers.php?cid=$cid\">OK</a></p>";
+			echo "</p><p><a href=\"listusers.php?cid=$cid\">" . _('OK') . "</a></p>";
 			require_once "../footer.php";
 
 			//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");
@@ -397,15 +397,15 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$overwriteBody = 1;
 		$fileToInclude = "massexception.php";
 	} elseif (isset($_GET['action']) && $_GET['action']=="unenroll" && !isset($CFG['GEN']['noInstrUnenroll'])){
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
-		$pagetitle = "Unenroll Students";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Confirm Change')."\n";
+		$pagetitle = _('Unenroll Students');
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "unenroll.php";
 
 	} elseif (isset($_GET['action']) && $_GET['action']=="lock") {
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Confirm Change\n";
-		$pagetitle = "LockStudents";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Confirm Change')."\n";
+		$pagetitle = _('Lock Students');
 		$calledfrom='lu';
 		$overwriteBody = 1;
 		$fileToInclude = "lockstu.php";
@@ -428,8 +428,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else if (isset($_POST['posted']) && $_POST['posted']=='maketutor' && !empty($_POST['checked'])) {
-		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Add Tutors\n";
-		$pagetitle = "Add Tutors";
+		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Add Tutors')."\n";
+		$pagetitle = _('Add Tutors');
 
 		// get stu info
 		$stus = array_map('intval', $_POST['checked']);
@@ -468,8 +468,8 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		sort($sections);
 	} else { //DEFAULT DATA MANIPULATION HERE
 
-		$curBreadcrumb .= " Roster\n";
-		$pagetitle = "Student Roster";
+		$curBreadcrumb .= " "._('Roster')."\n";
+		$pagetitle = _('Student Roster');
 		$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL ORDER BY section");
 		$stm->execute(array(':courseid'=>$cid));
 		$sectionrows = $stm->fetchAll(PDO::FETCH_NUM);
@@ -550,12 +550,12 @@ $address = $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid";
 $placeinhead .= "       var toopen = '$address&secfilter=' + encodeURIComponent(sec);\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";
-$placeinhead .= '$(function() { $(".lal").attr("title","View login log");
-	$(".gl").attr("title","View student grades");
-	$(".ex").attr("title","Set due date exceptions");
-	$(".ui").attr("title","Edit student profile and options");
-	$(".ll").attr("title","Lock student out of the course");
-	$(".ull").attr("title","Allow student access to the course");
+$placeinhead .= '$(function() { $(".lal").attr("title","'._('View login log').'");
+	$(".gl").attr("title","'._('View student grades').'");
+	$(".ex").attr("title","'._('Set due date exceptions').'");
+	$(".ui").attr("title","'._('Edit student profile and options').'");
+	$(".ll").attr("title","'._('Lock student out of the course').'");
+	$(".ull").attr("title","'._('Allow student access to the course').'");
 	$("input[type=checkbox]").on("change",function() {$(this).parents("tr").toggleClass("highlight");});
 	});';
 $placeinhead .= "</script>";
@@ -599,7 +599,7 @@ $placeinhead .= '
 	$("#myTable input:checkbox:checked").each(function(i) {
 		ids.push(this.value);
 	});
-	GB_show("Emails","viewemails.php?cid="+cid+"&ids="+ids.join("-"),500,500);
+	GB_show("'._('Emails').'","viewemails.php?cid="+cid+"&ids="+ids.join("-"),500,500);
   }
   </script>';
 
@@ -688,7 +688,7 @@ if ($overwriteBody==1) {
 		showNewUserValidation("pageform");
 	} elseif (isset($_POST['posted']) && $_POST['posted']=="Copy Emails") {
 		if (empty($_POST['checked'])) {
-			echo "No student selected. <a href=\"listusers.php?cid=$cid\">Try again</a>";
+			echo _('No student selected.') . " <a href=\"listusers.php?cid=$cid\">" . _('Try again') . "</a>";
 		} else {
 			echo '<textarea id="emails" rows="30" cols="60">'.Sanitize::encodeStringForDisplay($stuemails).'</textarea>';
 			echo '<script type="text/javascript">addLoadEvent(function(){var el=document.getElementById("emails");el.focus();el.select();})</script>';
@@ -837,25 +837,25 @@ if ($overwriteBody==1) {
 	<div class="cpmid">
 	<?php
 	echo '<span class="column" style="width:auto;">';
-	echo "<a href=\"logingrid.php?cid=$cid\">View Login Grid</a><br/>";
-	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">Assign Sections and/or Codes</a>";
+	echo "<a href=\"logingrid.php?cid=$cid\">" . _('View Login Grid') . "</a><br/>";
+	echo "<a href=\"listusers.php?cid=$cid&assigncode=1\">" . _('Assign Sections and/or Codes') . "</a>";
 	echo '</span>';
 	echo '<span class="column" style="width:auto;">';
-	echo "<a href=\"latepasses.php?cid=$cid\">Manage LatePasses</a>";
+	echo "<a href=\"latepasses.php?cid=$cid\">" . _('Manage LatePasses') . "</a>";
 	if ($CFG['GEN']['allowinstraddtutors']) {
-		echo "<br/><a href=\"managetutors.php?cid=$cid\">Manage Tutors</a>";
+		echo "<br/><a href=\"managetutors.php?cid=$cid\">" . _('Manage Tutors') . "</a>";
 	}
     echo '</span>';
     if (empty($_COOKIE['fromltimenu'])) {
         echo '<span class="column" style="width:auto;">';
         if ($myrights==100 || (isset($CFG['GEN']['allowinstraddbyusername']) && $CFG['GEN']['allowinstraddbyusername']==true)) {
-            echo "<a href=\"listusers.php?cid=$cid&enroll=student\">Enroll Student with known username</a><br/>";
+            echo "<a href=\"listusers.php?cid=$cid&enroll=student\">" . _('Enroll Student with known username') . "</a><br/>";
         }
-        echo "<a href=\"enrollfromothercourse.php?cid=$cid\">Enroll students from another course</a>";
+        echo "<a href=\"enrollfromothercourse.php?cid=$cid\">" . _('Enroll from another course') . "</a>";
         if (isset($CFG['GEN']['allowinstraddstus']) && $CFG['GEN']['allowinstraddstus']==true) {
             echo '</span><span class="column" style="width:auto;">';
-            echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">Import Students from File</a><br/>";
-            echo "<a href=\"listusers.php?cid=$cid&newstu=new\">Create and Enroll new student</a>";
+            echo "<a href=\"$imasroot/admin/importstu.php?cid=$cid\">" . _('Import Students from File') . "</a><br/>";
+            echo "<a href=\"listusers.php?cid=$cid&newstu=new\">" . _('Create and Enroll new student') . "</a>";
         }
         echo '</span>';
     }
@@ -903,7 +903,7 @@ if ($overwriteBody==1) {
 	?>
 		
 	<table class=gb id=myTable>
-    <caption class="sr-only">Roster</caption>
+    <caption class="sr-only"><?php echo _('Roster'); ?></caption>
 		<thead>
 		<tr>
 			<th><span class="sr-only"><?php echo _('Checkboxes'); ?></span></th>
