@@ -52,6 +52,7 @@ if (isset($_GET['seed'])) {
 } else {
 	$seed = rand(1,9999);
 }
+$seed = ($seed%10000) + 10000;
 
 foreach ($qsetlist as $qn=>$qsetid) {
 	if (!empty($qsetid)) {
