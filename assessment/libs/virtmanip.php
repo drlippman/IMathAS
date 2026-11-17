@@ -207,6 +207,9 @@ function vmitemsortgetcontainers($state, $n) {
 		$n = array();
 	}
 	list($initbasestr,$initobjstr,$cont) = explode('|',$state);
+	if (count($n)==0) {
+		$n = explode(';', $initbasestr);
+	}
 	//this is a very inelegant parsing of the container info
 	//the format is
 	//contname:el,el,el;contname2:el,el
