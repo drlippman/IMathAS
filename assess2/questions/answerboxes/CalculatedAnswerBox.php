@@ -186,7 +186,7 @@ class CalculatedAnswerBox implements AnswerBox
         }
 
         if ($answer !== '' && !is_array($answer) && !$isConditional) {
-            if ($nosolntype > 0) {
+            if ($nosolntype > 0 || $answer === 'DNE') {
                 $sa = $answer;
             } else if (!is_numeric($answer)) {
                 //$sa = '`' . $answer . '`';

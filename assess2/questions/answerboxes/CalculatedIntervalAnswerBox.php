@@ -119,7 +119,7 @@ class CalculatedIntervalAnswerBox implements AnswerBox
         }
 
         if ($answer !== '' && !$isConditional && !is_array($answer)) {
-            if ($nosolntype > 0) {
+            if ($nosolntype > 0 || $answer === 'DNE') {
                 $sa = $answer;
             } else if (in_array('inequality', $ansformats) && strpos($answer, '"') === false) {
                 $anspts = explode('or', $answer);

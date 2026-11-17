@@ -157,7 +157,7 @@ class ComplexNTupleAnswerBox implements AnswerBox
             list($out, $answer, $nosolntype) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
         }
         if ($answer !== '' && !is_array($answer) && !$isConditional) {
-            if ($nosolntype > 0) {
+            if ($nosolntype > 0 || $answer === 'DNE') {
                 $sa = $answer;
             } else {
                 $sa = $answer;
