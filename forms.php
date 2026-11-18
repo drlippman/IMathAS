@@ -38,6 +38,42 @@ if (isset($CFG['locale'])) {
 if ($_GET['action']=='chguserinfo') {
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
 }
+switch($_GET['action']) {
+	case "newuser":
+		$pagetitle = _('New Student Signup');
+		break;
+	case "googlelink":
+		$pagetitle = _('Sign in with Google');
+		break;
+	case "forcechgpwd":
+	case "chgpwd":
+		$pagetitle = _('Change Your Password');
+		break;
+	case "chguserinfo":
+		$pagetitle = _('User Profile');
+		break;
+	case "addpasskey":
+		$pagetitle = _('Add Passkey');
+		break;
+	case "enroll":
+		$pagetitle = _('Enroll in a Course');
+		break;
+	case "unenroll":
+		$pagetitle = _('Unenroll');
+		break;
+	case "resetpw":
+		$pagetitle = _('Reset Password');
+		break;
+	case "lookupusername":
+		$pagetitle = _('Lookup Username');
+		break;
+	case "forumwidgetsettings":
+		$pagetitle = _('Forum Widget Settings');
+		break;
+	case "adminmfanotice":
+		$pagetitle = _('Two-Factor Authentication Required');
+		break;
+}
 require_once "header.php";
 switch($_GET['action']) {
 	case "newuser":
