@@ -113,7 +113,7 @@ switch($_GET['action']) {
                 }
 				echo '<div id="courseinfo">';
 				echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); var c2 = document.getElementById("selfenrollwarn"); ';
-				echo 'if (el.value==0) {c.style.display="";c2.style.display="none";} else {c.style.display="none";c2.style.display="";}}</script>';
+				echo 'if (el.value==0) {c.style.display="";c2.textContent="";} else {c.style.display="none";c2.textContent=c2.getAttribute("data-msg");}}</script>';
 			} else {
                 if (isset($CFG['GEN']['COPPA'])) {
                     echo '<p class="fullopt" style="display:none">';
@@ -138,9 +138,9 @@ switch($_GET['action']) {
 			echo '<span class="form"><label for="ekey">',_('Enrollment Key'),':</label></span><input class="form" type="text" size="20" name="ekey" id="ekey"/><br class="form"/>';
 			if ($doselfenroll) {
 				echo '</div>';
-				echo '<div id="selfenrollwarn" class=noticetext style="display:none;">',_('Warning: You have selected a non-credit self-study course. ');
-				echo sprintf(_('If you are using %s with an instructor-led course, this is NOT what you want; nothing you do in the self-study course will be viewable by your instructor or count towards your course.  For an instructor-led course, you need to enter the course ID and key provided by your instructor.'),$installname);
-				echo '</div>';
+				echo '<div id="selfenrollwarn" class="noticetext" role="status" data-msg="',Sanitize::encodeStringForDisplay(_('Warning: You have selected a non-credit self-study course. '));
+				echo Sanitize::encodeStringForDisplay(sprintf(_('If you are using %s with an instructor-led course, this is NOT what you want; nothing you do in the self-study course will be viewable by your instructor or count towards your course.  For an instructor-led course, you need to enter the course ID and key provided by your instructor.'),$installname));
+				echo '"></div>';
 			}
 		}
 		$_SESSION['challenge'] = bin2hex(random_bytes(16));
@@ -765,7 +765,7 @@ switch($_GET['action']) {
 			echo '</select></p>';
 			echo '<div id="courseinfo">';
 			echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); var c2 = document.getElementById("selfenrollwarn"); ';
-			echo 'if (el.value==0) {c.style.display="";c2.style.display="none";} else {c.style.display="none";c2.style.display="";}}</script>';
+			echo 'if (el.value==0) {c.style.display="";c2.textContent="";} else {c.style.display="none";c2.textContent=c2.getAttribute("data-msg");}}</script>';
 		} else {
 			echo '<p>',_('Enter the course ID provided by your teacher.'),'</p>';
 			echo '<input type="hidden" name="courseselect" id="courseselect" value="0"/>';
@@ -774,9 +774,9 @@ switch($_GET['action']) {
 		echo '<span class="form"><label for="ekey">',_('Enrollment Key'),':</label></span><input class="form" type="text" size="20" name="ekey" id="ekey"/><br class="form"/>';
 		if ($doselfenroll) {
 			echo '</div>';
-			echo '<div id="selfenrollwarn" class=noticetext style="display:none;">',_('Warning: You have selected a non-credit self-study course. ');
-			echo sprintf(_('If you are using %s with an instructor-led course, this is NOT what you want; nothing you do in the self-study course will be viewable by your instructor or count towards your course. For an instructor-led course, you need to enter the course ID and key provided by your instructor.'),$installname);
-			echo '</div>';
+			echo '<div id="selfenrollwarn" class="noticetext" role="status" data-msg="',Sanitize::encodeStringForDisplay(_('Warning: You have selected a non-credit self-study course. '));
+			echo Sanitize::encodeStringForDisplay(sprintf(_('If you are using %s with an instructor-led course, this is NOT what you want; nothing you do in the self-study course will be viewable by your instructor or count towards your course. For an instructor-led course, you need to enter the course ID and key provided by your instructor.'),$installname));
+			echo '"></div>';
 		}
 		echo '<script type="text/javascript">
 		$("#pageform").validate({errorElement: "span",
