@@ -149,7 +149,7 @@ fmInitFileList(<?php echo json_encode($rows, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_
 <title><?php echo _('File Manager'); ?></title>
 
 <script src="<?php echo $staticroot;?>/javascript/jquery.min.js"></script>
-<link href="file_manager/styles.css?v=3" rel="stylesheet" type="text/css">
+<link href="file_manager/styles.css?v=4" rel="stylesheet" type="text/css">
 <?php
 if (isset($CFG['locale'])) {
 	$lang = substr($CFG['locale'],0,2);
