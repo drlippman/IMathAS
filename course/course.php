@@ -437,7 +437,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=021326\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/course.js?v=111826\"></script>";
 if (isset($tutorid) && isset($_SESSION['ltiitemtype']) && $_SESSION['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -530,7 +530,7 @@ if ($overwriteBody==1) {
 			} else {
 				$incclass = '';
 			}
-			echo '<span id="leftcontenttoggle" '.$incclass.' aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$staticroot.'/img/menu.svg"></span> ';
+			echo '<button type="button" id="leftcontenttoggle" '.$incclass.' aria-controls="leftcontent" aria-expanded="false" aria-label="'._('Navigation menu').'"><img alt="" src="'.$staticroot.'/img/menu.svg"></button> ';
 		}
 		echo $curBreadcrumb;
 		?>

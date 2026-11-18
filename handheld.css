@@ -7,11 +7,11 @@ div#leftcolumn, div#rightcolumn  {
 	width: auto;
 }
 
-span#leftcontenttoggle.hideifnavlist, .hideifnavlist {
+button#leftcontenttoggle.hideifnavlist, .hideifnavlist {
 	display: none;
 }
 
-span#leftcontenttoggle {
+button#leftcontenttoggle {
 	display: inline-block;
 }
 

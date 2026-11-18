@@ -508,7 +508,14 @@ $(function() {$("#leftcontenttoggle").on("click", function(e) {
 	var el = $("#leftcontenttoggle");
 	$("#leftcontent").toggleClass("hiddenmobile").css("top",el.position().top+el.outerHeight(true)-parseInt($("#leftcontent").css("margin-top")));
 	el.toggleClass("leftcontentactive");
-	if (!$("#leftcontent").hasClass("hiddenmobile")) {
+	var isOpen = !$("#leftcontent").hasClass("hiddenmobile");
+		el.attr("aria-expanded", isOpen ? "true" : "false");
+		if (isOpen) {
+			$(document).on("keydown.lefttoggle", function(e) {
+				if (e.key === "Escape") {
+					$("#leftcontenttoggle").trigger("click").trigger("focus");
+				}
+			});
 		$(document).on("click.lefttoggle", function(e) {
 			var container = $("#leftcontent");
 			var togglebtn = $("#leftcontenttoggle");
@@ -518,7 +525,7 @@ $(function() {$("#leftcontenttoggle").on("click", function(e) {
 			}
 		});
 	} else {
-		$(document).off("click.lefttoggle");
+		$(document).off("click.lefttoggle keydown.lefttoggle");
 	}
 	e.preventDefault();});
 })

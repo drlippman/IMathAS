@@ -414,15 +414,25 @@ div.submit {
 	width: 400px;
 	text-align: right;
 }
-span#leftcontenttoggle {
+button#leftcontenttoggle {
 	display:none;
 	vertical-align:middle;
 	padding: 0px 5px;
+	margin: 0;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	line-height: 1;
+	cursor: pointer;
 }
-span#leftcontenttoggle:hover {
+button#leftcontenttoggle img {
+	vertical-align: middle;
+}
+button#leftcontenttoggle:hover {
 	background-color: #eee;
 }
-span#leftcontenttoggle.leftcontentactive {
+button#leftcontenttoggle.leftcontentactive {
 	background-color: #eee;
 }
 
