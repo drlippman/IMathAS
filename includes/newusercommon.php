@@ -18,7 +18,9 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
 
   echo '<script type="text/javascript">
   $(function() {
-	$("#'.Sanitize::simpleString($formname).'").validate({
+	var validator = $("#'.Sanitize::simpleString($formname).'").validate({
+    // non-label error element so the plugin links errors via aria-describedby
+    errorElement: "span",
     onkeyup: function(element, event) {
       if (element.name === "SID") {
         // no live (remote) validation on SID; just clear a stale error
@@ -26,19 +28,10 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
         if ($(element).hasClass(this.settings.errorClass)) {
           this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
           this.hideThese(this.errorsFor(element));
-          $("#errorlive").text("");
         }
         return;
       }
       $.validator.defaults.onkeyup.call(this, element, event);
-    },
-    showErrors: function(m, l) {
-        let txt = "";
-        for (const id in m) {
-            txt += m[id] + " ";
-        }
-        $("#errorlive").text(txt);
-        this.defaultShowErrors();
     },
     rules: {
       SID: {
@@ -98,6 +91,12 @@ echo '},
 		},
 		submitHandler: function(el,evt) {return submitlimiter(evt);}
   });
+  // mark unconditionally required fields; conditional ("depends") rules are skipped
+  $.each(validator.settings.rules, function(name, rule) {
+    if (rule.required === true) {
+      $(validator.currentForm).find("[name=\'" + name + "\']").attr("aria-required", "true");
+    }
+  });
 	});
   </script>';
 }
@@ -113,7 +112,7 @@ function studentTOSRequired() {
 /**
  * Returns the HTML for the "I agree to the terms of use" form row
  */
-function getStudentTOSAgreeRow() {
+function getStudentTOSAgreeRow($required=false) {
   global $CFG, $studentTOS;
   if (isset($studentTOS)) {
     $label = _('I have read and agree to the Terms of Use (below)');
@@ -124,7 +123,7 @@ function getStudentTOSAgreeRow() {
   } else {
     return '';
   }
-  return "<span class=form><label for=\"agree\">".$label."</label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
+  return "<span class=form><label for=\"agree\">".$label."</label></span><span class=formright><input type=checkbox name=agree id=agree".($required ? ' aria-required=true' : '')."></span><br class=form />\n";
 }
 
 /**

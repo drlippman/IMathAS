@@ -51,7 +51,6 @@ switch($_GET['action']) {
 			echo '<p>'._('You signed in with Google. Finish creating your account below - your name and email have been filled in for you.')."</p>\n";
 		}
 		echo "<form id=\"newuserform\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
-		echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
         echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form pii-username\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">",_('Choose a password:'),"</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">",_('Confirm password:'),"</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
@@ -221,7 +220,6 @@ switch($_GET['action']) {
 		} else {
 			echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=chgpwd$gb\">\n";
 		}
-        echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
 		echo "<span class=form><label for=\"oldpw\">",_('Enter old password'),":</label></span> <input class=form type=password id=oldpw name=oldpw size=40 /> <BR class=form>\n";
         if ($mfa !== '') {
             echo "<span class=form><label for=\"mfa\">",_('Enter 2-factor Authentication code'),":</label></span> <input class=form type=text id=mfa name=mfa size=10 /> <BR class=form>\n";
@@ -348,7 +346,6 @@ switch($_GET['action']) {
 
 		echo "<form id=\"pageform\" class=limitaftervalidate enctype=\"multipart/form-data\" method=post action=\"actions.php?action=chguserinfo$gb\">\n";
 		echo '<fieldset id="userinfoprofile"><legend>',_('Profile Settings'),'</legend>';
-        echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
         echo '<div id="infolive" aria-live="polite" class="sr-only"></div>';
 		echo "<span class=form><label for=\"firstname\">",_('Enter First Name'),":</label></span> <input class=\"form pii-first-name\" type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($line['FirstName'])."\" /><br class=\"form\" />\n";
 		echo "<span class=form><label for=\"lastname\">",_('Enter Last Name'),":</label></span> <input class=\"form pii-first-name\" type=text size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($line['LastName'])."\"><BR class=form>\n";
@@ -782,7 +779,7 @@ switch($_GET['action']) {
 			echo '</div>';
 		}
 		echo '<script type="text/javascript">
-		$("#pageform").validate({
+		$("#pageform").validate({errorElement: "span",
 			rules: {
 				cid: {
 					required: {depends: function(element) {return $("#courseselect").val()==0}}
@@ -813,7 +810,6 @@ switch($_GET['action']) {
 		}
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Reset Password'),'</h1></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=resetpw$gb\">\n";
-		echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
         if (isset($_GET['code'])) {
             require_once './includes/passwordreset.php';
             // verify reset code
@@ -840,9 +836,9 @@ switch($_GET['action']) {
 			}
 		} else {
 			echo "<p>",_('Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will reset your password.'),"</p>";
-			echo "<p><label for=username>",_('User Name'),"</label>: <input type=text class=\"pii-username\" name=\"username\" id=username /></p>";
+			echo "<p><label for=username>",_('User Name'),"</label>: <input type=text class=\"pii-username\" name=\"username\" id=username aria-required=true /></p>";
 			echo '<script type="text/javascript">
-			$("#pageform").validate({
+			$("#pageform").validate({errorElement: "span",
 				rules: {
 					username: { required: true}
 				},
@@ -865,9 +861,9 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h1>',_('Lookup Username'),'</h1></div>';
 		echo "<form id=\"pageform\" method=post action=\"actions.php?action=lookupusername$gb\">\n";
 		echo _("If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ");
-		echo "<p><label for=email>",_('Email'),"</label>: <input type=text class=\"pii-email\" name=\"email\" id=email /></p>";
+		echo "<p><label for=email>",_('Email'),"</label>: <input type=text class=\"pii-email\" name=\"email\" id=email aria-required=true /></p>";
 		echo '<script type="text/javascript">
-		$("#pageform").validate({
+		$("#pageform").validate({errorElement: "span",
 			rules: {
 				email: { required: true, email: true}
 			},

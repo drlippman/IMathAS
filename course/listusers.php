@@ -670,7 +670,6 @@ if ($overwriteBody==1) {
 ?>
 
 	<form method=post id=pageform class=limitaftervalidate action="listusers.php?cid=<?php echo $cid ?>&newstu=new">
-    <div id="errorlive" aria-live="polite" class="sr-only"></div>
 	<span class=form><label for="SID"><?php echo $loginprompt;?>:</label></span> <input class="form pii-username" type=text size=12 id=SID name=SID><BR class=form>
 	<span class=form><label for="pw1"><?php echo _('Choose a password:'); ?></label></span><input class="form pii-security" type=text size=20 id=pw1 name=pw1><BR class=form>
 	<span class=form><label for="firstname"><?php echo _('Enter First Name:'); ?></label></span> <input class="form pii-first-name" type=text size=20 id=firstname name=firstname><BR class=form>
@@ -702,7 +701,6 @@ if ($overwriteBody==1) {
 		}
 ?>
 		<form enctype="multipart/form-data" id=pageform method=post action="listusers.php?cid=<?php echo $cid ?>&chgstuinfo=true&uid=<?php echo Sanitize::onlyInt($_GET['uid']) ?>" class="limitaftervalidate"/>
-            <div id="errorlive" aria-live="polite" class="sr-only"></div>
             <span class=form><label for="SID"><?php echo _('User Name (login name):'); ?></label></span>
 			<input <?php echo $disabled;?> class="form pii-username" type=text size=20 id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($lineStudent['SID']); ?>"/><br class=form>
 			<span class=form><label for="firstname"><?php echo _('First Name:'); ?></label></span>

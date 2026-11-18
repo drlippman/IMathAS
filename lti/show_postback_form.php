@@ -85,7 +85,6 @@ function show_postback_form($launch, $db, $err='') {
   }
   echo '<form id=postbackform method=post class="limitaftervalidate" action="finishlogin.php">';
   echo '<input type=hidden name=launchid value="'.Sanitize::encodeStringForDisplay($launch->get_launch_id()).'"/>';
-  echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
 
   if ($promptForLogin) {
     echo '<p>'.sprintf(_('If you already have an account on %s, please enter your username and password below to enable automated signin.'), $installname).'</p>';
@@ -136,7 +135,7 @@ function show_postback_form($launch, $db, $err='') {
       showNewUserValidation('postbackform', $extrareq, $requiredrules);
     } else {
       echo '<script type="text/javascript"> $(function() {
-        $("#postbackform").validate({
+        $("#postbackform").validate({errorElement: "span",
           rules: {
             curSID: {required: true},
             curPW: {required: true}
@@ -151,15 +150,15 @@ function show_postback_form($launch, $db, $err='') {
   } else if ($promptForName || $promptForTOS) {
     if ($promptForName) {
       echo '<p>'._('Please provide a little information about yourself').'</p>';
-      echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstname name=firstname><BR class=form>';
-      echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname><BR class=form>';
+      echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstname name=firstname aria-required=true><BR class=form>';
+      echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname aria-required=true><BR class=form>';
     }
     if ($needTOS) {
-      echo getStudentTOSAgreeRow();
+      echo getStudentTOSAgreeRow(true);
     }
     echo '<div class=submit><button type=submit>'._('Continue').'</button></div>';
     echo '<script type="text/javascript"> $(function() {
-      $("#postbackform").validate({
+      $("#postbackform").validate({errorElement: "span",
         rules: {
           '.($promptForName ? 'firstname: {required: true},
           lastname: {required: true}' : '').($promptForName && $needTOS ? ',' : '').($needTOS ? '

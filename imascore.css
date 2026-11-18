@@ -93,18 +93,18 @@ input:invalid {
 .noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #bd0000 !important;
 }
-label.error {
+label.error, span.error {
 	color: #bd0000;
 	font-style: italic;
 	display: block;
 }
-input.form + label.error {
+input.form + label.error, input.form + span.error {
 	float: left;
 	display: inline;
 	margin-left: 10px;
 }
 
-input[type=checkbox] + label.error {
+input[type=checkbox] + label.error, input[type=checkbox] + span.error {
 	float:none;
 	display: inline;
 	margin-left: 10px;

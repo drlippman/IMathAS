@@ -461,15 +461,15 @@ if (isset($_GET['launch'])) {
 				echo '<input type=hidden name=firstname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname']).'">';
 				echo '<input type=hidden name=lastname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSlastname']).'">';
 			} else {
-				echo "<span class=form><label for=\"firstname\">Enter First Name (given name):</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname'] ?? '')."\"><BR class=form>\n";
-				echo "<span class=form><label for=\"lastname\">Enter Last Name (surname):</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSlastname'] ?? '')."\"><BR class=form>\n";
+				echo "<span class=form><label for=\"firstname\">Enter First Name (given name):</label></span> <input class=form type=text size=20 id=firstname name=firstname aria-required=true autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname'] ?? '')."\"><BR class=form>\n";
+				echo "<span class=form><label for=\"lastname\">Enter Last Name (surname):</label></span> <input class=form type=text size=20 id=lastname name=lastname aria-required=true autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSlastname'] ?? '')."\"><BR class=form>\n";
 			}
 			if ($needTOS) {
-				echo getStudentTOSAgreeRow();
+				echo getStudentTOSAgreeRow(true);
 			}
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
 			echo '<script type="text/javascript"> $(function() {
-				$("#pageform").validate({
+				$("#pageform").validate({errorElement: "span",
 					rules: {
 						firstname: {required: true},
 						lastname: {required: true}'.($needTOS ? ',
@@ -519,7 +519,6 @@ if (isset($_GET['launch'])) {
 			echo "<div class=submit><input type=submit value='"._("Sign In")."'></div>\n";
 			if ($allow_acctcreation) {
 				echo "<p>".sprintf(_("If you do not already have an account on %s, provide the information below to create an account and enable automated signon from %s"),$installname,Sanitize::encodeStringForDisplay($ltiorgname))."</p>";
-				echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
                 echo "<span class=form><label for=\"SID\">".Sanitize::encodeStringForDisplay($longloginprompt).":</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
 				echo "<span class=form><label for=\"pw1\">"._("Choose a password:")."</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 				echo "<span class=form><label for=\"pw2\">"._("Confirm password:")."</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
@@ -553,7 +552,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				echo "<p>".sprintf(_("If you do not already have an account on %s, please visit the site to request an account."),$installname)."</p>";
 				echo '<script type="text/javascript"> $(function() {
-					$("#pageform").validate({
+					$("#pageform").validate({errorElement: "span",
 						rules: {
 							curSID: {required: true},
 							curPW: {required: true}
@@ -2202,15 +2201,15 @@ if (isset($_GET['launch'])) {
 				echo '<input type=hidden name=firstname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname']).'">';
 				echo '<input type=hidden name=lastname value="'.Sanitize::encodeStringForDisplay($_SESSION['LMSlastname']).'">';
 			} else {
-				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname'] ?? '')."\"><BR class=form>\n";
-				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSlastname'] ?? '')."\"><BR class=form>\n";
+				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text size=20 id=firstname name=firstname aria-required=true autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSfirstname'] ?? '')."\"><BR class=form>\n";
+				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text size=20 id=lastname name=lastname aria-required=true autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($_SESSION['LMSlastname'] ?? '')."\"><BR class=form>\n";
 			}
 			if ($needTOS) {
-				echo getStudentTOSAgreeRow();
+				echo getStudentTOSAgreeRow(true);
 			}
 			echo "<div class=submit><input type=submit value='Submit'></div>\n";
 			echo '<script type="text/javascript"> $(function() {
-				$("#pageform").validate({
+				$("#pageform").validate({errorElement: "span",
 					rules: {
 						firstname: {required: true},
 						lastname: {required: true}'.($needTOS ? ',
@@ -2257,7 +2256,6 @@ if (isset($_GET['launch'])) {
 				echo "<p>Enter your username and ";
 				echo "password for $installname below to enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
 			}
-			echo '<div id="errorlive" aria-live="polite" class="sr-only"></div>';
             echo "<span class=form><label for=\"curSID\">".Sanitize::encodeStringForDisplay($loginprompt).":</label></span> <input class=form type=text size=12 id=\"curSID\" name=\"curSID\"><BR class=form>\n";
 			echo "<span class=form><label for=\"curPW\">Password:</label></span><input class=form type=password size=20 id=\"curPW\" name=\"curPW\"><BR class=form>\n";
 			echo "<div class=submit><input type=submit value='Sign In'></div>\n";
@@ -2296,7 +2294,7 @@ if (isset($_GET['launch'])) {
 			} else {
 				echo "<p>If you do not already have an account on $installname, please visit the site to request an account.</p>";
 				echo '<script type="text/javascript"> $(function() {
-					$("#pageform").validate({
+					$("#pageform").validate({errorElement: "span",
 						rules: {
 							curSID: {required: true},
 							curPW: {required: true}
