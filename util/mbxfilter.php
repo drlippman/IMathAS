@@ -158,6 +158,15 @@ function mbxfilter($str) {
 		array('</em>','</em>','','</em>','','</p>','</p>','</p>','</p>','</p>','</p>','',''),
 		$str);
 
+	// PreTeXt says how a list is labelled with a marker attribute, not with CSS
+	$str = preg_replace_callback('/<(ol|ul)\b([^>]*)>/', function($m) {
+		$markers = array('upper-alpha'=>'A', 'lower-alpha'=>'a', 'upper-roman'=>'I', 'lower-roman'=>'i', 'decimal'=>'1');
+		if ($m[1]=='ol' && preg_match('/list-style-type:\s*([\w-]+)/', $m[2], $t) && isset($markers[$t[1]])) {
+			return '<ol marker="'.$markers[$t[1]].'">';
+		}
+		return '<'.$m[1].'>';
+	}, $str);
+
 	//HTML doesn't allow ul and ol inside p; mbx requires it, so wrap ul and ol in p
 	//this is going to make a mess of nested lists
 	$str = str_replace(array('<ul','<ol','</ul>','</ol>'),array('<p><ul','<p><ol','</ul></p>','</ol></p>'), $str);
