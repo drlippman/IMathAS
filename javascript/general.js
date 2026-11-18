@@ -501,6 +501,19 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 }
 function GB_doneload() {
 	document.getElementById("GB_loading").style.display = "none";
+	// keydown inside the iframe doesn't bubble to the parent document,
+	// so close on Escape from within the frame too (same-origin only)
+	try {
+		var gbframe = document.getElementById("GB_frame");
+		var gbdoc = gbframe && gbframe.contentDocument;
+		if (gbdoc) {
+			$(gbdoc).off('keydown.GB').on('keydown.GB', function(evt) {
+				if (evt.keyCode == 27 && document.getElementById("GB_window").style.display != "none") {
+					GB_hide();
+				}
+			});
+		}
+	} catch (e) {}
 }
 function GB_hide() {
     document.getElementById("GB_window").style.display = "none";
@@ -2305,6 +2318,8 @@ $(function() {
 			$("div.scrollpane[tabindex=-1]").first().focus();
 		} else if ($("div.pagetitle").length > 0) {
 			$("div.pagetitle").attr("tabindex","-1").focus();
+		} else if ($(".header").length > 0) {
+			$(".header").attr("tabindex","-1").focus();
 		}
 	});
 });
