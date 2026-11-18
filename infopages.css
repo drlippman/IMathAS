@@ -189,3 +189,14 @@ color: #fff;
 	padding: 0;
 }
 
+@media (max-width: 700px) {
+	.floatleft {
+		float: none;
+		display: block;
+		margin: 10px auto;
+		max-width: 60%;
+	}
+	.content {
+		margin-left: 0;
+	}
+}
