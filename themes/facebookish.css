@@ -7,7 +7,7 @@ body {
 }
 
 /*Link styles*/
-a:link {
+a:link, button.linkbutton {
 	text-decoration: none;
 	color: #3B5998;
 }
@@ -15,7 +15,7 @@ a:visited {
 	text-decoration: none;
 	color: #3B5998;
 }
-a:hover {
+a:hover, button.linkbutton:hover {
 	text-decoration: underline;
 }
 

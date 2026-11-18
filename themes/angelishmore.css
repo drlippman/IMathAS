@@ -4,13 +4,13 @@ body {
 }
 
 /*Link styles*/
-a:link {
+a:link, button.linkbutton {
 	text-decoration: none;
 }
 a:visited {
 	text-decoration: none;
 }
-a:hover {
+a:hover, button.linkbutton:hover {
 	text-decoration: underline;
 }
 

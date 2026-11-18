@@ -43,7 +43,7 @@ h5,h6 {
 	font-size: 1em;
 }
 
-a:link, span.link, .breadcrumb a:visited, #leftcontent a:visited, 
+a:link, span.link, button.linkbutton, .breadcrumb a:visited, #leftcontent a:visited, 
 .cp a:visited, .cpmid a:visited, #homelinkbox a:visited, .headerwrapper a:visited {
 	color: #3333ff;
 }
@@ -954,6 +954,20 @@ button.plain {
 }
 button.plain:hover, button.plain:active {
 	background-color: #e3e3ff;
+}
+/* button that looks like a link, for actions that open dialogs */
+button.linkbutton, button.linkbutton:hover, button.linkbutton:focus, button.linkbutton:active {
+	background: none;
+	border: 0;
+	border-radius: 0;
+	margin: 0;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	text-align: inherit;
+}
+button.linkbutton:focus-visible {
+	text-decoration: underline;
 }
 
 
