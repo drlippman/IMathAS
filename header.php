@@ -28,7 +28,7 @@ if (empty($_SESSION['tzoffset']) && !empty($CFG['static_server'])) {
     echo '<script src="'.$CFG['static_server'].'/javascript/staticcheck.js"></script>';
 }
 ?>
-<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=111826";?>" type="text/css">
+<link rel="stylesheet" href="<?php echo $staticroot . "/imascore.css?ver=111826a";?>" type="text/css">
 <?php
 $isfw = false;
 if (isset($coursetheme)) {
@@ -75,7 +75,7 @@ var usertype = <?php if (isset($teacherid)) { echo 2; } else if (isset($tutorid)
 <?php if (!empty($CFG['nocommathousandsseparator'])) { echo 'var commasep = false;'; } ?>
 <?php if (isset($CFG['S3']['altendpoint'])) { echo 'var altfilesendpoint = "'.Sanitize::encodeStringForDisplay($CFG['S3']['altendpoint']).'";';} ?>
 </script>
-<script src="<?php echo $staticroot;?>/javascript/general.js?v=111526"></script>
+<script src="<?php echo $staticroot;?>/javascript/general.js?v=111826"></script>
 <?php
 // override allowedImgDomains if set in config
 if (isset($CFG['GEN']['allowedImgDomains'])) {
@@ -217,7 +217,7 @@ if (function_exists('insertIntoHead')) {
     insertIntoHead();
 }
 if (isset($coursetheme)) {
-	echo '<link rel="stylesheet" href="'. $staticroot . "/themes/$coursetheme?v=081225\" type=\"text/css\">";
+	echo '<link rel="stylesheet" href="'. $staticroot . "/themes/$coursetheme?v=111826\" type=\"text/css\">";
 }
 echo '<link rel="stylesheet" href="'. $staticroot . '/handheld.css?v=071320" media="only screen and (max-width:480px)">';
 if (isset($CFG['GEN']['translatewidgetID'])) {

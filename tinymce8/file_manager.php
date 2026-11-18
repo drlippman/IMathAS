@@ -149,7 +149,7 @@ fmInitFileList(<?php echo json_encode($rows, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_
 <title><?php echo _('File Manager'); ?></title>
 
 <script src="<?php echo $staticroot;?>/javascript/jquery.min.js"></script>
-<link href="file_manager/styles.css?v=2" rel="stylesheet" type="text/css">
+<link href="file_manager/styles.css?v=3" rel="stylesheet" type="text/css">
 <?php
 if (isset($CFG['locale'])) {
 	$lang = substr($CFG['locale'],0,2);
@@ -158,7 +158,7 @@ if (isset($CFG['locale'])) {
 	}
 }
 ?>
-<script src="file_manager/file_manager.js?v=5"></script>
+<script src="file_manager/file_manager.js?v=6"></script>
 </head>
 <body data-type="<?php echo Sanitize::encodeStringForDisplay($type); ?>" data-files-url="file_manager.php?showfiles=true&amp;type=<?php echo Sanitize::encodeUrlParam($type); if ($inassess) { echo '&amp;ctx=' . Sanitize::encodeUrlParam($_REQUEST['ctx']); } ?>"<?php if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") { echo ' data-inserted="' . Sanitize::encodeStringForDisplay($ispublicupload ? getuserfileurl($storeprefix.$filename) : geteditorfileurl($storeprefix.$filename)) . '"'; } ?>>
 <?php

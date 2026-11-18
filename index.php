@@ -609,7 +609,7 @@ function printCourseLine($data, $type=null) {
 		// echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.Sanitize::encodeUrlParam($data['id']).'">', sprintf(_('Posts (%d)'), $newpostcnt[$data['id']]), '</a>';
 	}
 	if ($type != 'teach' || ($data['ownerid']==$userid && $myrights<40) || $myrights<20) {
-		echo '<div class="delx"><a href="#" onclick="return hidefromcourselist(this,'.$data['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'">x</a></div>';
+		echo '<div class="delx"><button type="button" class="closebtn" onclick="hidefromcourselist(this,'.$data['id'].',\''.$type.'\');" title="'._("Hide from course list").'" aria-label="'._("Hide from course list").'"></button></div>';
 	}
 	echo '</li>';
 

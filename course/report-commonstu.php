@@ -97,7 +97,7 @@ echo '<div class="pagetitle"><h1>'.$pagetitle.'</h1></div>';
 				<button @click="move(index,-1)" title="Up" aria-label="Move up">&uarr;</button>
 				<button @click="move(index,1)" title="Down" aria-label="Move down">&darr;</button>
 				<button @click="edit(index)">Edit</button>
-				<button @click="remove(index)" title="Delete" aria-label="Delete">X</button>
+				<button @click="remove(index)" title="Delete" aria-label="Delete" class="closebtn"></button>
 				</span>
 				{{ index==0?"First, ":"Of those remaining, "}} show students
 				{{phrase}}

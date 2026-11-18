@@ -47,7 +47,7 @@ initstack = new Array();
 window.onload = init;
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<link rel="stylesheet" href="<?php echo $staticroot . "/assessment/mathtest.css?ver=040520";?>" type="text/css"/>
+<link rel="stylesheet" href="<?php echo $staticroot . "/assessment/mathtest.css?ver=111826";?>" type="text/css"/>
 <?php
 
 //if (!empty($CFG['GEN']['uselocaljs'])) {
@@ -98,11 +98,11 @@ if (!empty($CFG['use_csrfp']) && class_exists('csrfProtector')) {
 	echo csrfProtector::output_header_code();
 }
 
-echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=082525" type="text/javascript"></script>';
+echo '<script src="' . $staticroot . '/javascript/assessment_min.js?v=111826" type="text/javascript"></script>';
 
 //assessment_min.js bundles: general.js, mathparser.js, AMhelpers.js, confirmsubmit.js, drawing.js, and eqntips.js
 /*
-echo '<script src="' . $imasroot . '/javascript/general.js?v=042220" type="text/javascript"></script>';
+echo '<script src="' . $imasroot . '/javascript/general.js?v=111826" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/mathparser.js?v=081925" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/AMhelpers.js?v=060920" type="text/javascript"></script>';
 echo '<script src="' . $imasroot . '/javascript/confirmsubmit.js?v=031018" type="text/javascript"></script>';
@@ -219,7 +219,7 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
 } else if ($useeqnhelper==3 || $useeqnhelper==4) {
-	echo "<link rel=\"stylesheet\" href=\"$staticroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
+	echo "<link rel=\"stylesheet\" href=\"$staticroot/assessment/mathquill.css?v=111826\" type=\"text/css\" />";
 	//This bundles mathquill.js, mathquilled.js, and AMtoMQ.js
 	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/MQbundle_min.js?v=021920\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';

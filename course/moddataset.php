@@ -930,7 +930,7 @@
 		.CodeMirror-selected {background: #666666;}
         .dd-active {background-color: #eef;}
 		</style>';
-	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
+	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=111826\" rel=\"stylesheet\">";
 	$placeinhead .= "<style>.quickSaveButton {display:none;}</style>";
 
 	require_once "../header.php";
@@ -1303,7 +1303,7 @@ if ($line['deleted']==1 && ($myrights==100 || $line['ownerid']==$userid)) {
 $placeinfooter='
 <div id="solverpopup" style="display: none" class="solverpopup">
 	<div id="solvertopbar">
-		<div id="solverclosebutton">X</div>
+		<button type="button" id="solverclosebutton" class="closebtn" aria-label="Close"></button>
 		<span>Solver</span>
 	</div>
 	<div id="solverinsides">

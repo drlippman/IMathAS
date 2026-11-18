@@ -175,7 +175,7 @@ function renderList() {
 				}).appendTo($row);
 			}
 			if (!f.locked) {
-				$('<a href="#" class="delbtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '">').text('\u00d7')
+				$('<button type="button" class="delbtn closebtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '"></button>')
 					.on('click', function(e) { e.preventDefault(); delete_file(f, $row); }).appendTo($row);
 			}
 			$list.append($row);
@@ -198,7 +198,7 @@ function gridMore($grid, $more) {
 	items.slice(shown, shown + PASTE_PAGE).forEach(function(f) {
 		var $t = $('<div class="thumb">');
 		if (!f.locked) {
-			$('<a href="#" class="delbtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '">').text('\u00d7')
+			$('<button type="button" class="delbtn closebtn" title="' + _("Delete file") + '" aria-label="' + _("Delete file") + '"></button>')
 				.on('click', function(e) { e.preventDefault(); delete_file(f, $t); }).appendTo($t);
 		}
 		$('<a href="#" class="thumbimg">').attr('title', f.name)

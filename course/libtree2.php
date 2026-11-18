@@ -31,7 +31,7 @@ END;
 <script type="text/javascript">var imasroot = "$imasroot";var staticroot = "$staticroot";</script>
 <link rel="stylesheet" href="$staticroot/course/libtree.css?v=090317" type="text/css" />
 <script type="text/javascript" src="$staticroot/javascript/jquery.min.js"></script>
-<script type="text/javascript" src="$staticroot/javascript/general.js?v=021326"></script>
+<script type="text/javascript" src="$staticroot/javascript/general.js?v=111826"></script>
 <script type="text/javascript" src="$staticroot/javascript/libtree2.js?v=041422"></script>
 </head>
 <body>

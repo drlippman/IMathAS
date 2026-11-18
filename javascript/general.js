@@ -335,8 +335,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
 		document.getElementsByTagName("body")[0].appendChild(gb_window);
 		GB_loaded  = true;
 		jQuery("#GB_caption").on('mousedown touchstart', function(e) {
-			if (e.target.nodeName.toLowerCase()=='input' || e.target.nodeName.toLowerCase()=='button'
-				|| e.target.nodeName.toLowerCase()=='a') {
+			if (jQuery(e.target).closest('input,button,a').length > 0) {
 				return;
 			}
 			var gbwin = document.getElementById("GB_window");
@@ -405,7 +404,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
         document.getElementById("GB_loading").style.display = 'none';
 	}
     jQuery("#GB_frameholder").isolatedScroll();
-    document.getElementById("GB_caption").innerHTML = '<span class="floatright"><a href="#" class="pointer" onclick="GB_hide();return false;" aria-label="Close">[X]</a></span><span id="GB_title">'+caption+'</span>';
+    document.getElementById("GB_caption").innerHTML = '<span class="floatright"><button type="button" class="closebtn" onclick="GB_hide()" aria-label="Close"></button></span><span id="GB_title">'+caption+'</span>';
 	if (url.match(/libtree/)) {
         document.getElementById("GB_footer").innerHTML = '<button type="button" class="primary" onclick="document.getElementById(\'GB_frame\').contentWindow.setlib()">Use Libraries</button> <button type=button onclick="GB_hide()">Close</button>';
 		var h = (self.innerHeight || (de&&de.clientHeight) || document.body.clientHeight) - 30;
