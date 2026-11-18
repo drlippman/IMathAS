@@ -430,6 +430,7 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
         document.getElementById("GB_overlay").style.display = "block";
         document.getElementById("GB_footer").style.display = "block";
         document.getElementsByTagName("body")[0].style.overflow = "hidden";
+        GB_setinert(true);
     } else {
         document.getElementById("GB_overlay").style.display = "none";
         document.getElementById("GB_footer").style.display = "none";
@@ -497,7 +498,39 @@ function GB_show(caption,url,width,height,overlay,posstyle,showbelow,callback) {
             GB_retainfocus(evt);
         }
     });
+    $(document).off('focusin.GB');
+    if (overlay !== false) {
+        // backstop for focus moves that don't come from a Tab keydown
+        // (screen reader virtual cursor, programmatic focus, etc.)
+        $(document).on('focusin.GB', function(evt) {
+            var gbwin = document.getElementById("GB_window");
+            if (gbwin.style.display != "none" && !gbwin.contains(evt.target)) {
+                gbwin.focus();
+            }
+        });
+    }
     document.getElementById("GB_window").focus();
+}
+// Make everything outside the GB window inert (and hidden from AT) while a modal GB is open
+function GB_setinert(on) {
+    if (on) {
+        if (document.querySelector('[data-gbinert]')) { return; }
+        $("body").children().each(function() {
+            if (this.id == 'GB_window' || this.id == 'GB_overlay' || /^(SCRIPT|STYLE|LINK)$/.test(this.tagName)) {
+                return;
+            }
+            var $el = $(this);
+            $el.attr('data-gbinert', $el.attr('aria-hidden') === undefined ? '' : $el.attr('aria-hidden'))
+                .attr('aria-hidden', 'true').prop('inert', true);
+        });
+    } else {
+        $('[data-gbinert]').each(function() {
+            var prev = this.getAttribute('data-gbinert');
+            this.removeAttribute('data-gbinert');
+            this.inert = false;
+            if (prev === '') { this.removeAttribute('aria-hidden'); } else { this.setAttribute('aria-hidden', prev); }
+        });
+    }
 }
 function GB_doneload() {
 	document.getElementById("GB_loading").style.display = "none";
@@ -521,7 +554,8 @@ function GB_hide() {
         document.getElementById("GB_overlay").style.display = "none";
         document.getElementsByTagName("body")[0].style.overflow = "";
 	}
-    $(document).off('keydown.GB');
+    $(document).off('keydown.GB focusin.GB');
+    GB_setinert(false);
     if (GB_sourceel) {
         GB_sourceel.focus();
     }
@@ -529,14 +563,19 @@ function GB_hide() {
 }
 
 function GB_retainfocus(evt) {
+    var $tabbable = $("#GB_window").find("a[href],button,input,select,textarea,iframe,[tabindex]")
+        .filter(function() {
+            return !this.disabled && this.type != 'hidden' && this.tabIndex >= 0 && $(this).is(":visible");
+        });
+    if ($tabbable.length == 0) { return; }
     if (!document.getElementById("GB_window").contains(document.activeElement)) {
-        $("#GB_window").find("a,button,input").first().focus();
+        $tabbable.first().focus();
     } else {
-        if (evt.shiftKey && $("#GB_window").find("a,button,input").first()[0] == document.activeElement) {
-            $("#GB_window").find("a,button,input").last().focus();
+        if (evt.shiftKey && $tabbable.first()[0] == document.activeElement) {
+            $tabbable.last().focus();
             evt.preventDefault();
-        } else if (!evt.shiftKey && $("#GB_window").find("a,button,input").last()[0] == document.activeElement) {
-            $("#GB_window").find("a,button,input").first().focus();
+        } else if (!evt.shiftKey && $tabbable.last()[0] == document.activeElement) {
+            $tabbable.first().focus();
             evt.preventDefault();
         }
     }
