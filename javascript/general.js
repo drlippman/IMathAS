@@ -1962,8 +1962,7 @@ jQuery(document).ready(function($) {
 		}
 		e.preventDefault();
 	}
-	$("#topnavmenu").on("click", toggleHeaderMobileMenuList)
-	   .on("keydown", function(e) { if (e.which===13 || e.which==32) { toggleHeaderMobileMenuList(e);}});
+	$("#topnavmenu").on("click", toggleHeaderMobileMenuList);
 });
 var sagecellcounter = 0;
 function initSageCell(base) {
