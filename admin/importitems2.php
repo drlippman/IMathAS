@@ -37,6 +37,16 @@ if (!(isset($teacherid))) {
     $uploadfile = getimportfilepath($filekey);
 
     $data = json_decode(file_get_contents($uploadfile), true);
+    if ($data === null || !isset($data['course'])) {
+        echo _('Invalid import file');
+        exit;
+    }
+    $requiredErrors = checkImportRequiredFields($data);
+    if (count($requiredErrors) > 0) {
+        echo '<p class="noticetext">' . _('Import failed.') . ' '
+            . Sanitize::encodeStringForDisplay(implode('; ', $requiredErrors)) . '</p>';
+        exit;
+    }
     if (!isset($data['course']['UIver'])) {
         $data['course']['UIver'] = 1;
     }
@@ -99,6 +109,9 @@ if (!(isset($teacherid))) {
     $data = json_decode(file_get_contents($uploadfile), true);
     if ($data === null || !isset($data['course'])) {
         $page_fileErrorMsg .= _("This does not appear to be a course items file.  It may be a question or library export, or an older format course export.") . "\n";
+    } else if (count($reqErrors = checkImportRequiredFields($data)) > 0) {
+        $page_fileErrorMsg .= _("Import file is missing required data and cannot be imported.") . ' '
+            . Sanitize::encodeStringForDisplay(implode('; ', $reqErrors)) . "\n";
     } else {
         $ids = array();
         $types = array();
