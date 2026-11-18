@@ -842,7 +842,7 @@ private function insertAssessment() {
 			$thisitemdata['intro'] = json_encode($introjson);
 		}
 		//Sanitize endmsg
-		if (is_array($thisitemdata['endmsg'])) {
+		if (isset($thisitemdata['endmsg']) && is_array($thisitemdata['endmsg'])) {
 			$endmsgdata = $thisitemdata['endmsg'];
 			$endmsgdata['commonmsg'] = Sanitize::incomingHtml($endmsgdata['commonmsg']);
 			$endmsgdata['def'] = Sanitize::incomingHtml($endmsgdata['def']);
