@@ -197,28 +197,14 @@ function mbxfilter($str) {
 		'–'=>'<ndash/>',
 		'&mdash;'=>'<mdash/>',
 		'—'=>'<mdash/>',
-		'&lt;'=>'<less/>',
-		'&gt;'=>'<greater/>',
 		'&le;'=>'<m>\le</m>',
 		'&ge;'=>'<m>\ge</m>',
 		'&hellip;'=>'<ellipsis/>',
 		'…'=>'<ellipsis/>',
-		'$'=>'<dollar/>',
-		'%'=>'<percent/>',
-		'^'=>'<circumflex/>',
-		'_'=>'<underscore/>',
-		'{'=>'<lbrace/>',
-		'}'=>'<rbrace/>',
-		'['=>'<lbracket/>',
-		']'=>'<rbracket/>',
-		'~'=>'<tilde/>',
-		'\\'=>'<backslash/>',
-		'*'=>'<asterisk/>',
 		'&ldquo;'=>'<lq/>',
 		'&rdquo;'=>'<rq/>',
 		'&lsquo;'=>'<lsq/>',
 		'&rsquo;'=>'<rsq/>',
-		'&amp'=>'&',
 		'“'=>'<lq/>',
 		'”'=>'<rq/>',
 		'‘'=>'<lsq/>',
@@ -226,9 +212,12 @@ function mbxfilter($str) {
 	);
 	$str = str_replace(array_keys($ent),array_values($ent), $str);
 
-//attempt to convert any remaining entities to unicode, then convert & to <ampersand/>
+//attempt to convert any remaining entities to unicode, then convert # to <hash/>
+//and non-entity & to <ampersand/>
+// any unconverted entities will remain as entities
 	$str = html_entity_decode($str);
-	$str = str_replace(['#','&'],['<hash/>','<ampersand />'],$str);
+	$str = str_replace('#','<hash/>',$str);
+	$str = preg_replace('/&(?!#?\w+;)/','<ampersand/>',$str);
 
 //restore tags
     $str = preg_replace_callback('|<t(\d+)>|', function($m) {
