@@ -404,9 +404,21 @@ private function importQuestionSet() {
 	$uidalias = array();
 	$uniqueqstoimport = array();
 	foreach ($qstoimport as $qsid) {
-		if (empty($this->data['questionset'][$qsid]['uniqueid'])) {
+		$uid = $this->data['questionset'][$qsid]['uniqueid'] ?? '';
+		if (is_string($uid) || is_int($uid)) {
+			$uid = trim((string) $uid);
+		} else {
+			$uid = '';
+		}
+		// must be a positive integer string that fits in a signed bigint;
+		// anything else (0, blank, non-numeric, float, overflow) would be stored as 0 or clamped
+		if (!ctype_digit($uid) || ltrim($uid, '0') === '' || strlen(ltrim($uid, '0')) > 19 ||
+			(strlen(ltrim($uid, '0')) == 19 && ltrim($uid, '0') > '9223372036854775807')
+		) {
 			$mt = microtime();
 			$this->data['questionset'][$qsid]['uniqueid'] = substr($mt,11).substr($mt,2,2).str_pad($qsid,4,"0",STR_PAD_LEFT);
+		} else {
+			$this->data['questionset'][$qsid]['uniqueid'] = ltrim($uid, '0'); // normalize
 		}
 		$thisuid = $this->data['questionset'][$qsid]['uniqueid'];
 		if (isset($qsuidmap[$thisuid])) {
@@ -424,7 +436,12 @@ private function importQuestionSet() {
 	$db_fields['questionset'] = explode(',', $db_fields['questionset']);
 	//only keep values in db_fields that are also keys of first questionset
 	if (count($this->data['questionset'])>0) {
-		$db_fields['questionset'] = array_values(array_intersect($db_fields['questionset'], array_keys($this->data['questionset'][0])));
+		$firstqs = reset($this->data['questionset']);
+		$db_fields['questionset'] = array_values(array_intersect($db_fields['questionset'], array_keys($firstqs)));
+	}
+	// uniqueid is always set on imported questions above, and must always be written
+	if (!in_array('uniqueid', $db_fields['questionset'])) {
+		array_unshift($db_fields['questionset'], 'uniqueid');
 	}
 	$questionset_sets = implode('=?,', $db_fields['questionset']).'=?';
 	$update_qset_stm = $DBH->prepare("UPDATE imas_questionset SET $questionset_sets WHERE id=?");
