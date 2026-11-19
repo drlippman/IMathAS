@@ -73,11 +73,13 @@ if (!empty($_SESSION['userid'])) { // logged in
 $hasusername = isset($userid);
 $haslogin = (isset($_POST['password']) && isset($_POST['username'])) || !empty($_POST['passkeyCredentialId']) || !empty($_POST['googleLoginToken']);
 
-// A guest account is only created by a POST carrying the session's challenge,
-// which is issued on the confirmation page below.
+// A guest account is only created by a POST to a URL containing guestaccess
+// and carrying the session's challenge, which is issued on the confirmation page below.
 $guestPostBad = false;
 if (!$hasusername && $haslogin && isset($CFG['GEN']['guesttempaccts']) && ($_POST['username'] ?? '') === 'guest') {
-    if (empty($_SESSION['challenge']) || !is_string($_POST['challenge'] ?? null) ||
+    // guestaccess must also be in the query string so guest creation is
+    // identifiable by URL (e.g. for rate limiting rules)
+    if (!isset($_GET['guestaccess']) || empty($_SESSION['challenge']) || !is_string($_POST['challenge'] ?? null) ||
         !hash_equals($_SESSION['challenge'], $_POST['challenge'])
     ) {
         // missing/stale challenge: fall back to the confirmation page
@@ -108,10 +110,11 @@ if (!$hasusername && !$haslogin && isset($CFG['GEN']['guesttempaccts']) &&
         }
 
         $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
-        // strip guestaccess from the query string so the POST isn't re-intercepted
+        // keep guestaccess in the action URL; a POST with a valid challenge
+        // isn't re-intercepted, and the URL marks this as a guest creation request
         $qparams = $_GET;
-        unset($qparams['guestaccess']);
-        $querys = count($qparams) > 0 ? '?' . http_build_query($qparams) : '';
+        $qparams['guestaccess'] = 'true';
+        $querys = '?' . http_build_query($qparams);
         $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . $querys;
 
         require_once __DIR__."/header.php";
