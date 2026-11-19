@@ -73,8 +73,27 @@ if (!empty($_SESSION['userid'])) { // logged in
 $hasusername = isset($userid);
 $haslogin = (isset($_POST['password']) && isset($_POST['username'])) || !empty($_POST['passkeyCredentialId']) || !empty($_POST['googleLoginToken']);
 
-if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
-    if (empty($_SERVER['HTTP_REFERER'])) {
+// A guest account is only created by a POST carrying the session's challenge,
+// which is issued on the confirmation page below.
+$guestPostBad = false;
+if (!$hasusername && $haslogin && isset($CFG['GEN']['guesttempaccts']) && ($_POST['username'] ?? '') === 'guest') {
+    if (empty($_SESSION['challenge']) || !is_string($_POST['challenge'] ?? null) ||
+        !hash_equals($_SESSION['challenge'], $_POST['challenge'])
+    ) {
+        // missing/stale challenge: fall back to the confirmation page
+        $guestPostBad = true;
+        $haslogin = false;
+    }
+}
+if (!$hasusername && !$haslogin && isset($CFG['GEN']['guesttempaccts']) &&
+    (isset($_GET['guestaccess']) || $guestPostBad)
+) {
+    // A GET must never create an account. Show a confirmation page whose form
+    // POSTs username=guest, which is handled by the normal login branch below.
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' || $guestPostBad) {
+        if (empty($_SESSION['challenge'])) {
+            $_SESSION['challenge'] = base64_encode(microtime() . rand(0,9999));
+        }
         if (isset($_GET['cid'])) {
             $cid = Sanitize::onlyInt($_GET['cid']);
             $stm = $DBH->prepare("SELECT istemplate,available FROM imas_courses WHERE id=?");
@@ -89,15 +108,17 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
         }
 
         $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/jstz_min.js?v=102226\" ></script>";
-        if (isset($_SERVER['QUERY_STRING'])) {
-            $querys = '?' . Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . '&guestaccess=true';
-        } else {
-            $querys = '?guestaccess=true';
-        }
-        $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . Sanitize::encodeStringForDisplay($querys);
-        
+        // strip guestaccess from the query string so the POST isn't re-intercepted
+        $qparams = $_GET;
+        unset($qparams['guestaccess']);
+        $querys = count($qparams) > 0 ? '?' . http_build_query($qparams) : '';
+        $formAction = $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . $querys;
+
         require_once __DIR__."/header.php";
-        echo '<form method=post action="' . $formAction . '">';
+        echo '<form method=post action="' . Sanitize::encodeStringForDisplay($formAction) . '">';
+        echo '<input type=hidden name=username value="guest" />';
+        echo '<input type=hidden name=password value="temp" />';
+        echo '<input type=hidden name=challenge value="' . Sanitize::encodeStringForDisplay($_SESSION['challenge']) . '" />';
         echo '<p>' . _('You have requested guest access to a course.') . '</p>';
         echo '<p><button type=button onclick="location.href=\'' . $imasroot . '/index.php\'">', _('Nevermind'), '</button> ';
         echo '<button type=submit>' . _('Continue') . '</button>';
@@ -111,13 +132,6 @@ if (!$hasusername && !$haslogin && isset($_GET['guestaccess']) && isset($CFG['GE
         echo '</form>';
         require_once __DIR__ . '/footer.php';
         exit;
-    }
-    $haslogin = true;
-    $_POST['username'] = 'guest';
-    $_POST['mathdisp'] = 0;
-    $_POST['graphdisp'] = 2;
-    if (!isset($_POST['tzname'])) { // set an arbitrary default for guests
-        $_POST['tzname'] = 'America/Los_Angeles';
     }
 }
 if (isset($_GET['checksess']) && !$hasusername) {
@@ -133,6 +147,10 @@ $now = time();
 if ($haslogin && !$hasusername) {
 
     if (isset($CFG['GEN']['guesttempaccts']) && isset($_POST['username']) && $_POST['username'] == 'guest') { // create a temp account when someone logs in w/ username: guest
+        unset($_SESSION['challenge']); // single use
+        if (empty($_POST['tzname'])) { // set an arbitrary default for guests
+            $_POST['tzname'] = 'America/Los_Angeles';
+        }
         $stm = $DBH->query('SELECT ver FROM imas_dbschema WHERE id=2');
         $guestcnt = $stm->fetchColumn(0);
         $stm = $DBH->query('UPDATE imas_dbschema SET ver=ver+1 WHERE id=2');
