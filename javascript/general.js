@@ -2355,8 +2355,10 @@ $(function() {
 			$("div.scrollpane[tabindex=-1]").first().focus();
 		} else if ($("div.pagetitle").length > 0) {
 			$("div.pagetitle").attr("tabindex","-1").focus();
-		} else if ($(".header").length > 0) {
-			$(".header").attr("tabindex","-1").focus();
+		} else if ($("#header").length > 0) {
+			$("#header").attr("tabindex","-1").focus();
+		} else if ($("h1").length > 0) {
+			$("h1").attr("tabindex","-1").focus();
 		}
 	});
 });
