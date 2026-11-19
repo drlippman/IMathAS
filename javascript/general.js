@@ -1868,7 +1868,7 @@ jQuery('input.filealt').each(function(i,el) { initFileAlt(el);});
         "iframe[src*='youtube.com']",
         "iframe[src*='youtube-nocookie.com']",
         "iframe[src*='loom.com']",
-		"iframe[src*='ableplayer.php'"
+        "iframe[src*='ableplayer.php']"
       ];
 
       var $allVideos = $(this).find(selectors.join(','));
