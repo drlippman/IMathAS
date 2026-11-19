@@ -16,7 +16,12 @@ function showNewUserValidation($formname, $extrarequired=array(), $requiredrules
     $CFG['acct']['emailFormat'] = '['.implode(',', $CFG['acct']['emailFormat']).']';
   }
 
-  echo '<script type="text/javascript">
+  echo '<style type="text/css">
+  .errorsummary { border: 2px solid #b00020; padding: 0.5em 1em; margin: 0 0 1em 0; }
+  .errorsummary p { margin: 0 0 0.25em 0; }
+  .errorsummary ul { margin: 0; }
+  </style>
+  <script type="text/javascript">
   $(function() {
 	var validator = $("#'.Sanitize::simpleString($formname).'").validate({
     // non-label error element so the plugin links errors via aria-describedby
@@ -86,9 +91,50 @@ echo '
         echo 'email: {pattern: "'.Sanitize::encodeStringForJavascript($CFG['acct']['emailFormaterror']).'"},';
       }
 echo '},
-    invalidHandler: function() {
-      setTimeout(function(){$("#'.Sanitize::simpleString($formname).'").removeClass("submitted").removeClass("submitted2");}, 100);
-		},
+    // we focus the error summary instead of the first invalid field
+    focusInvalid: false,
+    highlight: function(el, errorClass, validClass) {
+      var $el = (el.type === "radio") ? this.findByName(el.name) : $(el);
+      $el.addClass(errorClass).removeClass(validClass).attr("aria-invalid", "true");
+    },
+    unhighlight: function(el, errorClass, validClass) {
+      var $el = (el.type === "radio") ? this.findByName(el.name) : $(el);
+      $el.removeClass(errorClass).addClass(validClass).removeAttr("aria-invalid");
+    },
+    showErrors: function(errorMap, errorList) {
+      this.defaultShowErrors();
+      // all errors resolved: hide the (now stale) summary
+      if (this.numberOfInvalids() === 0) {
+        $("#'.Sanitize::simpleString($formname).'-errsummary").hide().empty();
+      }
+    },
+    invalidHandler: function(event, v) {
+      var $form = $("#'.Sanitize::simpleString($formname).'");
+      setTimeout(function(){$form.removeClass("submitted").removeClass("submitted2");}, 100);
+      // summary of all errors, so screen reader users learn about every problem at once
+      var sumid = "'.Sanitize::simpleString($formname).'-errsummary";
+      var $sum = $("#" + sumid);
+      if (!$sum.length) {
+        $sum = $("<div>", {id: sumid, tabindex: -1, role: "alert", "class": "errorsummary"});
+        $form.prepend($sum);
+      }
+      var $ul = $("<ul>");
+      $.each(v.errorList, function(i, err) {
+        var el = err.element;
+        if (!el) { return; }
+        if (!el.id) { el.id = el.name; }
+        var lbl = (el.labels && el.labels.length) ? $.trim($(el.labels[0]).text()).replace(/[:：]\s*$/, "") : "";
+        var msg = $("<div>").html(err.message).text();
+        $("<li>").append(
+          $("<a>", {href: "#" + el.id}).text(lbl ? lbl + ": " + msg : msg).on("click", function(e) {
+            e.preventDefault();
+            $(el).trigger("focus");
+          })
+        ).appendTo($ul);
+      });
+      $sum.empty().append($("<p>").append($("<strong>").text("'.Sanitize::encodeStringForJavascript(_('Please correct the following:')).'"))).append($ul).show();
+      $sum.trigger("focus");
+    },
 		submitHandler: function(el,evt) {return submitlimiter(evt);}
   });
   // mark unconditionally required fields; conditional ("depends") rules are skipped
