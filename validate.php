@@ -154,9 +154,11 @@ if ($haslogin && !$hasusername) {
         if (empty($_POST['tzname'])) { // set an arbitrary default for guests
             $_POST['tzname'] = 'America/Los_Angeles';
         }
-        $stm = $DBH->query('SELECT ver FROM imas_dbschema WHERE id=2');
-        $guestcnt = $stm->fetchColumn(0);
-        $stm = $DBH->query('UPDATE imas_dbschema SET ver=ver+1 WHERE id=2');
+        // atomically increment the counter and capture the new value, avoiding
+        // a race where concurrent requests get the same guest number.
+        // Must be read before the INSERT below, which overwrites LAST_INSERT_ID.
+        $DBH->query('UPDATE imas_dbschema SET ver=LAST_INSERT_ID(ver+1) WHERE id=2');
+        $guestcnt = $DBH->lastInsertId();
 
         if (isset($CFG['GEN']['homelayout'])) {
             $homelayout = $CFG['GEN']['homelayout'];
