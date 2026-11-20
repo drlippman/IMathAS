@@ -12,6 +12,28 @@ function imasrubric_getpttot(rubricid) {
 	pttot = Math.round(10*pttot)/10;
 	return pttot;
 }
+// For score-breakdown rubrics (types 0/1): points for each item, rounded to 2
+// decimals, using cumulative rounding so the items always sum exactly to pointsposs
+// (e.g. 1/3,1/3,1/3 of 1 point -> .33,.34,.33)
+function imasrubric_calcparts(rubricid, pointsposs) {
+	var data = imasrubrics[rubricid].data;
+	var wtot = 0;
+	for (var i=0; i<data.length; i++) {
+		wtot += data[i][2];
+	}
+	var parts = [];
+	var cum = 0, prevrounded = 0, rounded;
+	for (var i=0; i<data.length; i++) {
+		cum += data[i][2];
+		rounded = (i == data.length - 1) ? Math.round(100*pointsposs) : Math.round(100*pointsposs*cum/wtot);
+		parts.push((rounded - prevrounded)/100);
+		prevrounded = rounded;
+	}
+	return parts;
+}
+function imasrubric_calcpts(pointsposs, weight, pttot) {
+	return Math.round(100*pointsposs*weight/pttot)/100;
+}
 function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	var html = "<div style='margin: 10px;'><form id='imasrubricform'><table><thead>";
 	if (imasrubrics[rubricid].type<2) {
@@ -24,6 +46,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	} 
 	html += '</thead><tbody>';
 	var pttot = imasrubric_getpttot(rubricid);
+	var parts = imasrubric_calcparts(rubricid, pointsposs);
 
 	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
@@ -31,7 +54,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
+			totpts = parts[i];
 			html += '</th><td width="10%" style="white-space:nowrap;"><label><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</label></td>';
 			//if (totpts==2) {
 			//	html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
@@ -49,7 +72,7 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			totpts = Math.round( 100*Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot )/100;
+			totpts = imasrubric_calcpts(pointsposs, imasrubrics[rubricid].data[i][2], pttot);
 			html += '</th><td width="10%"><label><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</label></td></tr>';
 		}
 	}
@@ -75,22 +98,23 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 	var pttot = imasrubric_getpttot(rubricid);
 	if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown and feedback
 		var score = 0;
+		var parts = imasrubric_calcparts(rubricid, pointsposs);
 		for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 			val = getRadioValue('rubricgrp'+i);
 			if (val==-1) {
-				thisscore = 1*document.getElementById('rubricother'+i).value;
+				thisscore = Math.round(100*document.getElementById('rubricother'+i).value)/100;
 			} else {
 				thisscore = 1*val;
 			}
 			score += thisscore;
-			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot;
+			totpts = parts[i];
 
 			feedback += '<li>'+imasrubrics[rubricid].data[i][0]+': '+thisscore+'/'+totpts+'.</li>';
 		}
 		if (feedback != '') {
 			feedback = qninf + '<ul class=nomark>'+feedback+'</ul>';
 		}
-		document.getElementById(scoreboxid).value = score;
+		document.getElementById(scoreboxid).value = Math.round(100*score)/100;
 		if (imasrubrics[rubricid].type==1) {
 			if (clearexisting) {
 				if (window.tinymce) {
@@ -130,7 +154,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 		}
 	} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4 ) {  //score total and feedback
 		loc = getRadioValue('rubricgrp');
-		totpts = Math.round(pointsposs*imasrubrics[rubricid].data[loc][2])/pttot;
+		totpts = imasrubric_calcpts(pointsposs, imasrubrics[rubricid].data[loc][2], pttot);
 		feedback += qninf + imasrubrics[rubricid].data[loc][0];//+': '+totpts+'/'+pointsposs+'. ';
 		document.getElementById(scoreboxid).value = totpts;
 		if (imasrubrics[rubricid].type==3) {
