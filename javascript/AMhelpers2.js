@@ -1535,8 +1535,17 @@ function roundForDisp(val) {
          var strs = [origstr.replace(/,/g,'')];
      }
      var str;
+     var isPercent = (format.match(/(^|,)\s*percent\s*(,|$)/) !== null && format.indexOf('units') === -1);
      for (var j=0;j<strs.length;j++) {
          str = strs[j];
+         if (isPercent) {
+             if (str.match(/%\s*$/)) {
+                 // strip the percent sign so the remainder can be checked as a number
+                 str = str.replace(/\s*%\s*$/, '');
+             } else {
+                 err += _('Missing percent sign. ');
+             }
+         }
          if (format.indexOf('units')!=-1) {
              var unitformat = _('Units must be given as [decimal number]*[unit]^[power]*[unit]^[power].../[unit]^[power]*[unit]^[power]...');
              if (!str.match(/^\s*(-?\s*\d+\.?\d*|-?\s*\.\d+|-?\s*\d\.?\d*\s*(E|\*\s*10\s*\^)\s*[\-\+]?\d+)/)) {

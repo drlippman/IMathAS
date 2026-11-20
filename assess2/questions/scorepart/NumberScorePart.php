@@ -64,6 +64,22 @@ class NumberScorePart implements ScorePart
             list($givenans, $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt ?? '');
         }
 
+        $isPercent = in_array('percent', $ansformats) && !$hasUnits;
+        if ($isPercent) {
+            // $answer and $partialcredit may be given with or without a %.
+            // Compare on the percent number, so strip any % from them.
+            if (is_string($answer)) {
+                $answer = str_replace('%', '', $answer);
+            }
+            if (is_array($partialcredit)) {
+                $partialcredit = array_map(function ($v) {
+                    return is_string($v) ? str_replace('%', '', $v) : $v;
+                }, $partialcredit);
+            } else if (is_string($partialcredit)) {
+                $partialcredit = str_replace('%', '', $partialcredit);
+            }
+        }
+
         $givenans = trim($givenans," ,");
         $scorePartResult->setLastAnswerAsGiven($givenans);
         if (!$hasUnits) {
@@ -76,6 +92,9 @@ class NumberScorePart implements ScorePart
                 }
             }
             foreach ($possiblenumvals as $k=>$v) {
+                if ($isPercent && preg_match('/%$/', $v)) {
+                    $v = $possiblenumvals[$k] = substr($v, 0, -1);
+                }
                 if ($v!='DNE' && $v!='oo' && $v!='+oo' && $v!='-oo') {
                     if (!is_numeric($v)) {
                         $possiblenumvals[$k] = '';
@@ -242,6 +261,17 @@ class NumberScorePart implements ScorePart
             }
 
             $gaarr[$k] = trim(str_replace(array('$',',',' '),'',$v));
+            if ($isPercent) {
+                $gaupper = strtoupper($gaarr[$k]);
+                if (substr($gaarr[$k], -1) === '%') {
+                    // require the % but compare using just the number
+                    $gaarr[$k] = substr($gaarr[$k], 0, -1);
+                } else if ($gaupper !== 'DNE' && $gaupper !== 'OO' && $gaupper !== '-OO' && $gaupper !== '+OO') {
+                    // missing the required %; make it non-numeric so it cannot match
+                    $gaarr[$k] = '';
+                    continue;
+                }
+            }
             if (strtoupper($gaarr[$k])=='DNE') {
                 $gaarr[$k] = 'DNE';
             } else if ($gaarr[$k]=='oo' || $gaarr[$k]=='-oo' || $gaarr[$k]=='-oo') {

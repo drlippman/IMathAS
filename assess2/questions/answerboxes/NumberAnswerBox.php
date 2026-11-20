@@ -67,6 +67,8 @@ class NumberAnswerBox implements AnswerBox
             $rightb = '';
         }
         $hasUnits = false;
+        // percent is not compatible with units
+        $isPercent = in_array('percent', $ansformats) && !in_array('units', $ansformats);
         if (in_array('units', $ansformats)) {
             $hasUnits = true;
             if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
@@ -85,6 +87,30 @@ class NumberAnswerBox implements AnswerBox
                     $tip = _('Enter your answer as an integer or decimal number with units. Examples: -4.2 cm, 3E6 m/s^2') . "<br/>";
                     $shorttip = _('Enter an integer or decimal number with units');
                 }
+            }
+        } else if ($isPercent) {
+            if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
+                if (in_array('integer', $ansformats)) {
+                    $tip = _('Enter your answer as a list of integer percents separated with commas. Examples: 5%, 23%') . "<br/>";
+                    $shorttip = _('Enter a list of integer percents');
+                } else {
+                    $tip = _('Enter your answer as a list of integer or decimal percents separated with commas. Examples: 5%, 23.4%') . "<br/>";
+                    $shorttip = _('Enter a list of integer or decimal percents');
+                }
+            } else if (in_array('set', $ansformats) || in_array('exactset', $ansformats)) {
+                if (in_array('integer', $ansformats)) {
+                    $tip = _('Enter your answer as a set of integer percents separated with commas. Example: {5%, 23%}') . "<br/>";
+                    $shorttip = _('Enter a set of integer percents');
+                } else {
+                    $tip = _('Enter your answer as a set of integer or decimal percents separated with commas. Example: {5%, 23.4%}') . "<br/>";
+                    $shorttip = _('Enter a set of integer or decimal percents');
+                }
+            } else if (in_array('integer', $ansformats)) {
+                $tip = _('Enter your answer as an integer percent. Examples: 5%, 23%') . "<br/>";
+                $shorttip = _('Enter an integer percent');
+            } else {
+                $tip = _('Enter your answer as an integer or decimal percent. Examples: 5%, 23.4%') . "<br/>";
+                $shorttip = _('Enter an integer or decimal percent');
             }
         } else if (in_array('list', $ansformats) || in_array('exactlist', $ansformats) || in_array('orderedlist', $ansformats)) {
             if (in_array('integer', $ansformats)) {
@@ -154,7 +180,15 @@ class NumberAnswerBox implements AnswerBox
             $ansors = explode(' or ', $anans);
             foreach ($ansors as $k=>$ans) {
                 $unitstr = '';
-                if ($hasUnits && preg_match('/^(\-?\d*(\.\d*)?([eE]\-?\d+)?)\s*(\D.*|$)/',$ans, $matches)) {
+                if ($isPercent) {
+                    // $answer may be given as 23.4 or 23.4%; normalize to include the %
+                    $ans = trim(preg_replace('/\s*%\s*$/', '', $ans));
+                    if (is_numeric($ans)) {
+                        $unitstr = '%';
+                    }
+                    $ansors[$k] = $ans . $unitstr;
+                }
+                if ($hasUnits &&preg_match('/^(\-?\d*(\.\d*)?([eE]\-?\d+)?)\s*(\D.*|$)/',$ans, $matches)) {
                     $unitstr = ' ' . $matches[4];
                     $ans = $matches[1];  
                 }
