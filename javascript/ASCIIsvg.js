@@ -537,7 +537,9 @@ function line(p,q,id) { // segment connecting points p,q (coordinates in units)
 }
 
 
-function path(plist,id,c) {
+// Optional startmk/endmk ("open", "closed" or "arrow") draw an end dot/arrowhead as part of the path,
+// so keyboard exploration treats them as the ends of this path rather than as separate elements.
+function path(plist,id,c,startmk,endmk) {
   if (c==null) c="";
   var node, st, i;
   if (id!=null) node = doc.getElementById(id);
@@ -568,6 +570,21 @@ function path(plist,id,c) {
     if (marker=="dot" || marker=="arrowdot") {
       el.startMark = el.endMark = "dot";
       if (el.polyline) el.vertMark = "dot";
+    }
+    if (plist.length > 1 && (startmk || endmk)) {
+      var mkNames = {open:"open dot", closed:"closed dot", arrow:"arrow, graph continues"};
+      var last = plist.length - 1;
+      ASnoreg++;  // these belong to the path, not separate explorable elements
+      try {
+        if (startmk === "arrow") { arrowhead(plist[1], plist[0]); }
+        else if (startmk === "open" || startmk === "closed") { dot(plist[0], startmk); }
+        if (endmk === "arrow") { arrowhead(plist[last-1], plist[last]); }
+        else if (endmk === "open" || endmk === "closed") { dot(plist[last], endmk); }
+      } finally {
+        ASnoreg--;
+      }
+      if (mkNames[startmk]) { el.startMark = mkNames[startmk]; }
+      if (mkNames[endmk]) { el.endMark = mkNames[endmk]; }
     }
   }
   ASreg(el);

@@ -739,7 +739,41 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         if ($lastl > 0) {
             $pathstr .= "]);";
         }
-        $path .= $pathstr;
+        // Pass the start/end markers into the first/last path() call, so that the graph's
+        // keyboard navigation treats them as ends of the path rather than separate dots.
+        // Only done when the path really starts/ends at the marker location. If the curve is
+        // clipped there (leaves the graph window), the marker would be off-screen, so it is skipped.
+        $startattached = false;
+        $endattached = false;
+        $pathout = $pathstr;
+        $mkjs = ['open' => '"open"', 'closed' => '"closed"', 'arrow' => '"arrow"'];
+        $pieces = preg_split('/(?<=\]\);)/', $pathstr, -1, PREG_SPLIT_NO_EMPTY);
+        $npieces = count($pieces);
+        if ($npieces > 0) {
+            if (
+                isset($function[4]) && isset($mkjs[$function[4]]) && isset($fx[0]) &&
+                strpos($pieces[0], "path([[{$fx[0]},{$fy[0]}],") === 0
+            ) {
+                $startattached = true;
+            }
+            if (
+                isset($function[5]) && isset($mkjs[$function[5]]) &&
+                substr($pieces[$npieces - 1], -strlen(",[$x,$y]]);")) === ",[$x,$y]]);"
+            ) {
+                $endattached = true;
+            }
+        }
+        if ($startattached || $endattached) {
+            foreach ($pieces as $pi => $piece) {
+                $smk = ($pi == 0 && $startattached) ? $mkjs[$function[4]] : 'null';
+                $emk = ($pi == $npieces - 1 && $endattached) ? $mkjs[$function[5]] : 'null';
+                if ($smk != 'null' || $emk != 'null') {
+                    $pieces[$pi] = substr($piece, 0, -2) . ",null,\"\",$smk,$emk);";
+                }
+            }
+            $pathout = implode('', $pieces);
+        }
+        $path .= $pathout;
         if ($xmax != $xmin) {
             $alt .= "</tbody></table>\n";
         }
@@ -798,24 +832,19 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 }
             }
         }
+        // the dots/arrows themselves were drawn by path() above, if the path reaches that point
         if (isset($function[5]) && $function[5] == 'open') {
-            $path .= "dot([$x,$y],\"open\");";
             $alt .= "Open dot at ($x,$y). ";
         } else if (isset($function[5]) && $function[5] == 'closed') {
-            $path .= "dot([$x,$y],\"closed\");";
             $alt .= "Closed dot at ($x,$y). ";
         } else if (isset($function[5]) && $function[5] == 'arrow' && isset($fx[$stopat - 2])) {
-            $path .= "arrowhead([{$fx[$stopat - 2]},{$fy[$stopat - 2]}],[$x,$y]);";
             $alt .= "Arrow at ($x,$y). ";
         }
         if (isset($function[4]) && $function[4] == 'open' && isset($fx[0])) {
-            $path .= "dot([{$fx[0]},{$fy[0]}],\"open\");";
             $alt .= "Open dot at ({$fx[0]},{$fy[0]}). ";
         } else if (isset($function[4]) && $function[4] == 'closed' && isset($fx[0])) {
-            $path .= "dot([{$fx[0]},{$fy[0]}],\"closed\");";
             $alt .= "Closed dot at ({$fx[0]},{$fy[0]}). ";
         } else if (isset($function[4]) && $function[4] == 'arrow' && isset($fx[1])) {
-            $path .= "arrowhead([{$fx[1]},{$fy[1]}],[{$fx[0]},{$fy[0]}]);";
             $alt .= "Arrow at ({$fx[0]},{$fy[0]}). ";
         }
 
