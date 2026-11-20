@@ -323,11 +323,17 @@ createApp({
 			}
 		},
 		handleFocusOut(event) {
-			if (!event.currentTarget.contains(event.relatedTarget)) {
+			// relatedTarget is null when clicking non-focusable content (e.g. a label);
+			// outside clicks are handled by clickaway, so only act on focus moving elsewhere
+			if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) {
 				this.showFilter = '';
 			}
 		},
 		handleEsc(event) {
+			if (this.showFilter === '') {
+				return; // nothing to close; let Esc bubble (e.g. to close the GB_show modal)
+			}
+			event.stopPropagation();
 			this.showFilter = '';
 			const button = event.currentTarget.querySelector('button');
 			if (button) {
