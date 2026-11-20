@@ -485,6 +485,10 @@ function initPicture(x_min,x_max,y_min,y_max) {
  svgpicture.setAttribute("ymax",ymax);
  svgpicture.setAttribute("ox",origin[0]);
  svgpicture.setAttribute("oy",origin[1]);
+ // registry of graph elements, used for keyboard exploration
+ svgpicture._as = {svg:svgpicture, els:[], on:false, cur:0, t:0, mk:null,
+   view:{xu:xunitlength, yu:yunitlength, ox:origin[0], oy:origin[1],
+     h:Number(height), w:Number(width), xmin:xmin, xmax:xmax, ymin:ymin, ymax:ymax}};
  var node = myCreateElementSVG("rect");
  node.setAttribute("x","0");
  node.setAttribute("y","0");
@@ -528,6 +532,8 @@ function line(p,q,id) { // segment connecting points p,q (coordinates in units)
     if (marker=="arrowdot") arrowhead(p,q);
     ASdot(q,4,markerstroke,markerfill);
   } else if (marker=="arrow") arrowhead(p,q);
+  var mk = ASendMarks();
+  ASreg({kind:'line', node:node, pts:[[p[0],p[1]],[q[0],q[1]]], startMark:mk.s, endMark:mk.e});
 }
 
 
@@ -555,6 +561,16 @@ function path(plist,id,c) {
     for (i=0; i<plist.length; i++)
       if (c!="C" && c!="T" || i!=1 && i!=2)
         ASdot(plist[i],4,markerstroke,markerfill);
+  var el = {kind:(c=="T"?'curve':(c=="C"?'loop':'path')), node:node};
+  if (typeof plist != "string") {
+    el.pts = plist.map(function(q) {return [q[0],q[1]]});
+    el.polyline = (c=="");
+    if (marker=="dot" || marker=="arrowdot") {
+      el.startMark = el.endMark = "dot";
+      if (el.polyline) el.vertMark = "dot";
+    }
+  }
+  ASreg(el);
 }
 
 
@@ -578,6 +594,7 @@ function circle(center,radius,id) { // coordinates in units
   node.setAttribute("rx",radius*xunitlength);
   node.setAttribute("ry",radius*yunitlength);
   setStrokeFill(node);
+  ASreg({kind:'circle', node:node, c:[center[0],center[1]], r:radius});
 }
 
 
@@ -625,6 +642,7 @@ function sector(center,radius,startang,endang,id) {
 	} else {
 		node.setAttribute("fill", fill);
 	}
+	ASreg({kind:'sector', node:node, c:[center[0],center[1]], r:radius});
 }
 
 
@@ -657,6 +675,8 @@ function arc(start,end,radius,id) { // coordinates in units
     if (marker=="arrowdot") arrowhead(v,end);
     ASdot(end,4,markerstroke,markerfill);
   } else if (marker=="arrow") arrowhead(v,end);
+  var mk = ASendMarks();
+  ASreg({kind:'arc', node:node, from:[start[0],start[1]], to:[end[0],end[1]], startMark:mk.s, endMark:mk.e});
 }
 
 
@@ -674,6 +694,7 @@ function ellipse(center,rx,ry,id) { // coordinates in units
   node.setAttribute("rx",rx*xunitlength);
   node.setAttribute("ry",ry*yunitlength);
   setStrokeFill(node);
+  ASreg({kind:'ellipse', node:node, c:[center[0],center[1]], rx:rx, ry:ry});
 }
 
 
@@ -692,6 +713,7 @@ function rect(p,q,id,rx,ry) { // opposite corners in units, rounded by radii
   if (rx!=null) node.setAttribute("rx",rx*xunitlength);
   if (ry!=null) node.setAttribute("ry",ry*yunitlength);
   setStrokeFill(node);
+  ASreg({kind:'rect', node:node, p:[p[0],p[1]], q:[q[0],q[1]]});
 }
 
 function text(p,st,pos,angle) {
@@ -701,6 +723,7 @@ function text(p,st,pos,angle) {
 }
 
 function textabs(p,st,pos,angle,id,fontsty) {
+  ASreg({kind:'text', at:[(p[0]-origin[0])/xunitlength, (p[1]-origin[1])/yunitlength], str:st, stroke:fontfill});
   if (angle==null) {
 	  angle = 0;
   } else {
@@ -888,6 +911,15 @@ function textfrac(p,n,d,pos) {
     text(p, n, pos);
     return;
   }
+  ASreg({kind:'text', at:[p[0],p[1]], str:n+" over "+d, stroke:fontfill});
+  ASnoreg++;
+  try {
+    textfrac_(p,n,d,pos);
+  } finally {
+    ASnoreg--;
+  }
+}
+function textfrac_(p,n,d,pos) {
   p[0] = p[0]*xunitlength+origin[0];
 	p[1] = p[1]*yunitlength+origin[1];
   let dy = 0;
@@ -978,8 +1010,15 @@ function dot(center, typ, label, pos, id) {
     node.setAttribute("stroke", stroke);
     node.setAttribute("fill", (typ=="open"?"white":stroke));
   }
-  if (label!=null)
-    text(center,label,(pos==null?"below":pos),(id==null?id:id+"label"))
+  ASreg({kind:'dot', node:node, at:[center[0],center[1]], typ:typ, label:label});
+  if (label!=null) {
+    ASnoreg++;
+    try {
+      text(center,label,(pos==null?"below":pos),(id==null?id:id+"label"));
+    } finally {
+      ASnoreg--;
+    }
+  }
 }
 
 
@@ -1069,6 +1108,14 @@ function noaxes() {
 
 
 function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
+  ASnoreg++;  // axes, ticks and tick labels aren't explorable graph elements
+  try {
+    axes_(dx,dy,labels,gdx,gdy,dox,doy,smallticks);
+  } finally {
+    ASnoreg--;
+  }
+}
+function axes_(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 //xscl=x is equivalent to xtick=x; xgrid=x; labels=true;
   var x, y, ldx, ldy, lx, ly, lxp, lyp, pnode, st;
   if (!initialized) initPicture();
@@ -1225,6 +1272,15 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 
 
 function slopefield(fun,dx,dy) {
+  ASreg({kind:'slopefield', src:(typeof fun=="string"?fun:null)});
+  ASnoreg++;
+  try {
+    slopefield_(fun,dx,dy);
+  } finally {
+    ASnoreg--;
+  }
+}
+function slopefield_(fun,dx,dy) {
   var g = fun;
   if (typeof fun=="string") {
     g = makeMathFunction(g.replace(/Math\./g,''), 'x|y');
@@ -1369,6 +1425,7 @@ function parseShortScript(sscript,gw,gh) {
 			if (!svgpicture.hasAttribute("viewBox") && !svgpicture.hasAttribute("data-nomag")) {
 				addMagGlass();
 			}
+			ASmakeAccessible();
 		} catch (e) {
 			if (picture.hasAttribute("data-failedrenders")) {
 				var fails = 1*picture.getAttribute("data-failedrenders");
@@ -1444,6 +1501,7 @@ function drawPics(base) {
 					  if (!picture.hasAttribute("data-enlarged") && !picture.hasAttribute("data-nomag")) {
 					  	  addMagGlass();
 					  }
+					  ASmakeAccessible();
 				  } catch(err) {console.log(err+"\n"+src)}
 			  }
 		  }
@@ -1517,7 +1575,16 @@ function adaptiveSamples(g, xa, xb, ylo, yhi) {
 //added min/max type:  0:nothing, 1:arrow, 2:open dot, 3:closed dot
 //non-parametric plots use adaptive sampling unless points is given
 function plot(fun,x_min,x_max,points,id,min_type,max_type) {
+  ASnoreg++;  // the plot's pieces and endpoint dots are registered as one element
+  try {
+    return plot_(fun,x_min,x_max,points,id,min_type,max_type);
+  } finally {
+    ASnoreg--;
+  }
+}
+function plot_(fun,x_min,x_max,points,id,min_type,max_type) {
   var pth = [];
+  var vt0 = null, vt1 = null;  // first and last parameter values with a defined point
   var f = function(obj) { return obj.t }, g = fun;
   var name = null;
   var isParam = (typeof fun=="object");
@@ -1554,6 +1621,8 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
     t = ts[i];
     gt = gs[i];
     if (!(isNaN(gt)||Math.abs(gt)=="Infinity")) {
+	    if (vt0 === null) { vt0 = t; }
+	    vt1 = t;
 	    if ((pth.length > 0) && (brk[i] || Math.abs(gt-pth[pth.length-1][1]) > (ymax-ymin))) {
 		    // jump or too steep to connect; end this path and start another
 		    if (pth.length > 1)  path(pth,name);
@@ -1579,11 +1648,626 @@ function plot(fun,x_min,x_max,points,id,min_type,max_type) {
 	dot(pth[pth.length-1], "closed");
   }
 
+  if (vt0 !== null) {
+    var markName = function(mt) {
+      return mt == 1 ? "arrow, graph continues" : (mt == 2 ? "open dot" : (mt == 3 ? "closed dot" : null));
+    };
+    ASreg({kind:(isParam?'param':'plot'), f:f, g:g, src:(typeof fun=="function"?null:fun),
+      min:min, max:max, t0:vt0, t1:vt1, startMark:markName(min_type), endMark:markName(max_type)}, true);
+  }
+
   return p;
   //}
 }
 
 //end ASCIIsvgAddon.js dump
+
+/*
+ * Keyboard / screen reader exploration of graphs.
+ *
+ * Drawing functions register what they draw in svgpicture._as.els (see ASreg).
+ * Once a graph is drawn, ASmakeAccessible makes the svg focusable. Enter starts
+ * exploring: the window and number of elements are announced and the first
+ * element is selected, with a marker drawn on it.
+ *   Arrow keys           move along the element (Right/Up forward, Left/Down back)
+ *   Shift+arrow          smaller step
+ *   PageUp / PageDown    larger step
+ *   Home / End           jump to the ends of the element
+ *   Alt+Down / Alt+Up    next / previous graph element
+ *   Enter                describe the current element again
+ *   W, H                 describe the window, help
+ *   Escape               stop exploring
+ */
+var ASnoreg = 0;  // >0 while drawing things that shouldn't be explorable elements
+
+function ASreg(el, force) {
+  if ((ASnoreg > 0 && !force) || !svgpicture || !svgpicture._as) { return; }
+  if (el.stroke === undefined) { el.stroke = stroke; }
+  el.dash = strokedasharray;
+  el.fill = fill;
+  var els = svgpicture._as.els;
+  if (el.node) {
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].node === el.node) { els[i] = el; return; }
+    }
+  }
+  els.push(el);
+}
+
+function ASendMarks() { // markers currently set for line/arc ends
+  if (marker=="dot") { return {s:"dot", e:"dot"}; }
+  if (marker=="arrowdot") { return {s:"dot", e:"dot and arrow"}; }
+  if (marker=="arrow") { return {s:null, e:"arrow"}; }
+  return {s:null, e:null};
+}
+
+var ASkindLabels = {plot:'curve', param:'parametric curve', line:'line segment', path:'path',
+  curve:'curve', loop:'loop', circle:'circle', ellipse:'ellipse', rect:'rectangle',
+  sector:'sector', arc:'arc', dot:'point', text:'text label', slopefield:'slope field'};
+
+var ASpalette = {black:[0,0,0], gray:[128,128,128], white:[255,255,255], red:[255,0,0],
+  orange:[255,165,0], yellow:[255,255,0], green:[0,128,0], 'light green':[0,255,0],
+  blue:[0,0,255], cyan:[0,255,255], purple:[128,0,128], magenta:[255,0,255],
+  pink:[255,192,203], brown:[165,42,42]};
+
+function ASfmt(v, dec) { // number to text, with a real minus sign so it is read aloud
+  var r = Number(v.toFixed(dec));
+  if (r === 0) { r = 0; }
+  return String(r).replace('-', '−');
+}
+
+function ASdecFor(range) { // decimals to show for a given axis range
+  if (!(range > 0)) { return 2; }
+  return Math.max(0, Math.min(6, 3 - Math.floor(Math.log10(range))));
+}
+
+function ASnice(v) { // round down to 1, 2 or 5 times a power of 10
+  var e = Math.pow(10, Math.floor(Math.log10(v)));
+  var m = v/e;
+  return parseFloat(((m >= 5 ? 5 : (m >= 2 ? 2 : 1))*e).toPrecision(12));
+}
+
+function ASsmall(n) { return parseFloat((n/10).toPrecision(12)); }
+
+function ASdecOf(step) { return Math.max(0, Math.min(8, -Math.floor(Math.log10(step)))); }
+
+function ASisBad(y) { return isNaN(y) || Math.abs(y) == Infinity; }
+
+function ASmapColor(c) {
+  if (c == null || c === 'none') { return 'black'; }
+  c = String(c).trim().toLowerCase();
+  if (/^[a-z]+$/.test(c)) { return c; }
+  var rgb = null, m;
+  if ((m = c.match(/^#([0-9a-f]{3})$/))) {
+    rgb = [parseInt(m[1].charAt(0)+m[1].charAt(0),16), parseInt(m[1].charAt(1)+m[1].charAt(1),16), parseInt(m[1].charAt(2)+m[1].charAt(2),16)];
+  } else if ((m = c.match(/^#([0-9a-f]{6})$/))) {
+    rgb = [parseInt(m[1].substr(0,2),16), parseInt(m[1].substr(2,2),16), parseInt(m[1].substr(4,2),16)];
+  } else if ((m = c.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/))) {
+    rgb = [+m[1], +m[2], +m[3]];
+  }
+  if (!rgb) { return c; }
+  var best = 'black', bd = Infinity;
+  for (var name in ASpalette) {
+    var d = Math.pow(rgb[0]-ASpalette[name][0],2) + Math.pow(rgb[1]-ASpalette[name][1],2) + Math.pow(rgb[2]-ASpalette[name][2],2);
+    if (d < bd) { bd = d; best = name; }
+  }
+  return best;
+}
+
+function ASspeak(s) { // make an equation a bit friendlier to hear
+  return String(s)
+    .replace(/\^2(?![\d.])/g, ' squared')
+    .replace(/\^3(?![\d.])/g, ' cubed')
+    .replace(/\^\(([^()]*)\)/g, ' to the power $1 ')
+    .replace(/\^(-?[\w.]+)/g, ' to the power $1 ')
+    .replace(/\*/g, ' times ').replace(/\//g, ' over ')
+    .replace(/\+/g, ' plus ').replace(/-/g, ' minus ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function ASstyle(el) {
+  var s = [];
+  var dash = ASdashKind(el.dash);
+  if (dash) { s.push(dash); }
+  s.push(ASmapColor(el.stroke));
+  return s.join(' ');
+}
+
+// stroke-dasharray value to 'dotted', 'dashed' or null. Values like "", "none" and "0" are solid lines.
+function ASdashKind(d) {
+  if (d == null) { return null; }
+  var nums = String(d).match(/\d*\.?\d+/g);
+  if (!nums) { return null; }
+  var vals = nums.map(parseFloat);
+  if (!vals.some(function(x) { return x > 0; })) { return null; }
+  return vals[0] <= 2 ? 'dotted' : 'dashed';
+}
+
+function ASinWin(p, v) { // is the point in the visible graph window?
+  var ex_ = (v.xmax - v.xmin)*1e-6, ey_ = (v.ymax - v.ymin)*1e-6;
+  return !!p && p[1] != null && p[0] >= v.xmin - ex_ && p[0] <= v.xmax + ex_ &&
+    p[1] >= v.ymin - ey_ && p[1] <= v.ymax + ey_;
+}
+
+// If the natural starting point is off the graph window, start at the first visible point instead.
+function ASfirstVisible(ex, v) {
+  if (ASinWin(ex.pos(ex.start), v)) { return; }
+  var lo = ex.closed ? 0 : ex.lowT, hi = ex.closed ? ex.T : ex.highT;
+  for (var i = 1; i <= 400; i++) {
+    var t = lo + (hi - lo)*i/400;
+    if (ASinWin(ex.pos(t), v)) {
+      if (ex.snap && hi > lo) {  // tidy onto the step grid if that is still visible
+        var tt = parseFloat((Math.ceil(t/ex.steps.normal - 1e-9)*ex.steps.normal).toPrecision(12));
+        if (tt <= hi && ASinWin(ex.pos(tt), v)) { t = tt; }
+      }
+      ex.start = t;
+      return;
+    }
+  }
+}
+
+function ASpt(q, ex) {
+  return 'x ' + ASfmt(q[0], ex.dx) + ', y ' + ASfmt(q[1], ex.dy);
+}
+
+function ASplain(st) {
+  return String(st).replace(/<[^>]*>/g, '').replace(/`/g, '');
+}
+
+// Work out how to move along an element. Cached on the element.
+function ASprep(el, a) {
+  if (el.ex) { return el.ex; }
+  var v = a.view, kind = el.kind;
+  var ex = {isStatic:false, snap:false, closed:false, verts:[], sign:1, at:null,
+    dx:ASdecFor(v.xmax - v.xmin), dy:ASdecFor(v.ymax - v.ymin)};
+  el.ex = ex;
+  if (kind === 'dot' || kind === 'text' || kind === 'slopefield') {
+    ex.isStatic = true;
+    ex.at = el.at || null;
+    return ex;
+  }
+  if (kind === 'plot' || kind === 'param') {
+    var W;
+    ex.snap = true;
+    if (kind === 'plot') {
+      ex.lowT = Math.max(el.t0, v.xmin);
+      ex.highT = Math.min(el.t1, v.xmax);
+      if (ex.lowT > ex.highT) { ex.lowT = el.t0; ex.highT = el.t1; }
+      ex.pos = function(t) {
+        var y = el.g({x:t});
+        return ASisBad(y) ? null : [t, y];
+      };
+      ex.lowName = 'Left end';
+      ex.highName = 'Right end';
+    } else {
+      ex.lowT = el.t0;
+      ex.highT = el.t1;
+      ex.pos = function(t) {
+        var x = el.f({t:t}), y = el.g({t:t});
+        return (ASisBad(x) || ASisBad(y)) ? null : [x, y];
+      };
+      ex.lowName = 'Start';
+      ex.highName = 'End';
+    }
+    // function plots step relative to the x window (-5..5 gives 0.5); parametric plots relative to t
+    W = (kind === 'plot') ? v.xmax - v.xmin : ex.highT - ex.lowT;
+    if (!(W > 0)) { W = 1; }
+    var n = ASnice(W/20);
+    ex.steps = {normal:n, small:ASsmall(n), large:ASnice(W/4)};
+    ex.dx = Math.max(ex.dx, ASdecOf(ex.steps.small));
+    ex.lowMark = (ex.lowT === el.t0) ? el.startMark : null;
+    ex.highMark = (ex.highT === el.t1) ? el.endMark : null;
+    ex.start = ex.lowT;
+    if (kind === 'plot') {  // y is a function of x, with t being x
+      ex.xfunc = true;
+      ex.xlo = ex.lowT;
+      ex.xhi = ex.highT;
+      ex.sAtX = function(x) { return x; };
+    }
+    ASfirstVisible(ex, v);
+    return ex;
+  }
+  // everything else is a shape in the svg; move along it by arc length (pixels)
+  var node = el.node, T = NaN;
+  try { T = node.getTotalLength(); } catch (e) {}
+  if (!(T > 0)) {
+    ex.isStatic = true;
+    ex.at = (el.pts && el.pts[0]) || el.c || el.from || el.p || null;
+    return ex;
+  }
+  ex.T = T;
+  ex.pos = function(s) {
+    var pt = node.getPointAtLength(Math.min(Math.max(s, 0), T));
+    return [(pt.x - v.ox)/v.xu, (v.h - pt.y - v.oy)/v.yu];
+  };
+  var closed = (kind === 'circle' || kind === 'ellipse' || kind === 'rect' || kind === 'sector');
+  if (el.pts && el.pts.length > 2) {
+    var f = el.pts[0], l = el.pts[el.pts.length-1];
+    if (f[0] === l[0] && f[1] === l[1]) { closed = true; }
+  } else if (kind === 'path' && node.getAttribute('d') && /z\s*$/i.test(node.getAttribute('d'))) {
+    closed = true;
+  }
+  ex.closed = closed;
+  if (el.polyline && el.pts) { // corners are places to stop
+    var cum = 0, px = function(q) { return [q[0]*v.xu + v.ox, v.h - q[1]*v.yu - v.oy]; };
+    var pp = el.pts.map(px), mono = true, mdir = 0;
+    for (var i = 1; i < pp.length; i++) { // is x monotone, i.e. does it look like a function graph?
+      var dxs = Math.sign(pp[i][0] - pp[i-1][0]);
+      if (dxs !== 0) {
+        if (mdir !== 0 && dxs !== mdir) { mono = false; break; }
+        mdir = dxs;
+      }
+    }
+    // Points on a function-like path are usually just samples of a curve, so only
+    // count sharp turns as corners. Markers drawn on every point count as corners too.
+    var minTurn = (mono ? 30 : 10)*Math.PI/180;
+    for (var i = 1; i < pp.length - 1; i++) {
+      var d0 = [pp[i][0]-pp[i-1][0], pp[i][1]-pp[i-1][1]];
+      var d1 = [pp[i+1][0]-pp[i][0], pp[i+1][1]-pp[i][1]];
+      cum += Math.hypot(d0[0], d0[1]);
+      var turn = Math.abs(Math.atan2(d0[0]*d1[1]-d0[1]*d1[0], d0[0]*d1[0]+d0[1]*d1[1]));
+      if (el.vertMark || turn > minTurn) { ex.verts.push(cum); }
+    }
+  }
+  ex.steps = {normal:T/20, small:T/100, large:T/4};
+  if (closed) {
+    ex.start = 0;
+    ex.lowT = ex.highT = 0;
+  } else {
+    var p0 = ex.pos(0), p1 = ex.pos(T);
+    var ddx = (p1[0]-p0[0])*v.xu, ddy = (p1[1]-p0[1])*v.yu;
+    var horiz = Math.abs(ddx) >= Math.abs(ddy);
+    ex.sign = (horiz ? ddx : ddy) >= 0 ? 1 : -1;  // so that Right/Up goes toward the right/top end
+    ex.lowT = ex.sign > 0 ? 0 : T;
+    ex.highT = ex.sign > 0 ? T : 0;
+    ex.lowName = horiz ? 'Left end' : 'Bottom end';
+    ex.highName = horiz ? 'Right end' : 'Top end';
+    ex.lowMark = ex.sign > 0 ? el.startMark : el.endMark;
+    ex.highMark = ex.sign > 0 ? el.endMark : el.startMark;
+    ex.start = ex.lowT;
+    // If it looks like y is a function of x (x never reverses and it isn't mostly vertical),
+    // step through round x values based on the x window, like plot() does.
+    var xmono = true, last = null, tolx = 0.01/v.xu;
+    for (var j = 0; j <= 200 && xmono; j++) {
+      var xx = ex.pos(T*j/200)[0];
+      if (last !== null && (xx - last)*ex.sign < -tolx) { xmono = false; }
+      last = xx;
+    }
+    if (xmono && Math.abs(ddx) >= 0.2*T) {
+      var Wx = v.xmax - v.xmin, nx = ASnice(Wx/20);
+      ex.xsteps = {normal:nx, small:ASsmall(nx), large:ASnice(Wx/4)};
+      ex.xlo = Math.min(p0[0], p1[0]);
+      ex.xhi = Math.max(p0[0], p1[0]);
+      ex.dx = Math.max(ex.dx, ASdecOf(ex.xsteps.small));
+      ex.lowName = "Left end"; ex.highName = "Right end";
+      ex.xfunc = true;
+      ex.sAtX = function(nx) { // x is monotone along the path, so bisect for the position
+        if (nx <= ex.xlo || nx >= ex.xhi) { return ((nx <= ex.xlo) === (ex.sign > 0)) ? 0 : ex.T; }
+        var sa = 0, sb = ex.T;
+        for (var it = 0; it < 40; it++) {
+          var sm = (sa + sb)/2;
+          if ((ex.pos(sm)[0] - nx)*ex.sign < 0) { sa = sm; } else { sb = sm; }
+        }
+        return (sa + sb)/2;
+      };
+    }
+  }
+  ASfirstVisible(ex, v);
+  return ex;
+}
+
+function ASdescribe(el, a) { // what the element is, without a position
+  var ex = ASprep(el, a), v = a.view;
+  var st = ASstyle(el), filled = (el.fill && el.fill !== 'none');
+  var P = function(q) { return ASpt(q, ex); };
+  var r = function(n) { return ASfmt(n, ex.dx); };
+  switch (el.kind) {
+    case 'plot':
+      var s = st + ' curve';
+      if (el.src != null) { s += ', y equals ' + ASspeak(el.src); }
+      if (el.min !== v.xmin || el.max !== v.xmax) {
+        s += ', for x from ' + r(el.min) + ' to ' + r(el.max);
+      }
+      return s;
+    case 'param':
+      return st + ' parametric curve, x equals ' + ASspeak(el.src[0]) + ', y equals ' + ASspeak(el.src[1]) +
+        ', for t from ' + r(el.min) + ' to ' + r(el.max);
+    case 'line':
+      return st + ' line segment from ' + P(el.pts[0]) + ' to ' + P(el.pts[1]);
+    case 'path':
+    case 'curve':
+      return st + ' ' + (el.kind === 'path' ? 'path' : 'curve') +
+        (el.pts && ex.verts.length > 0 ? ' through ' + el.pts.length + ' points' : '') + (filled ? ', filled' : '');
+    case 'loop':
+      return st + ' loop';
+    case 'circle':
+      return st + ' circle, center ' + P(el.c) + ', radius ' + r(el.r) + (filled ? ', filled' : '');
+    case 'ellipse':
+      return st + ' ellipse, center ' + P(el.c) + ', horizontal radius ' + r(el.rx) +
+        ', vertical radius ' + r(el.ry) + (filled ? ', filled' : '');
+    case 'rect':
+      return st + ' rectangle from ' + P(el.p) + ' to ' + P(el.q) + (filled ? ', filled' : '');
+    case 'sector':
+      return st + ' sector, center ' + P(el.c) + ', radius ' + r(el.r) + (filled ? ', filled' : '');
+    case 'arc':
+      return st + ' arc from ' + P(el.from) + ' to ' + P(el.to);
+    case 'dot':
+      return ASmapColor(el.stroke) + ' ' + (el.typ === 'open' ? 'open ' : (el.typ === 'closed' ? 'closed ' : '')) +
+        'point' + (el.label != null ? ', labeled ' + ASplain(el.label) : '');
+    case 'text':
+      return ASmapColor(el.stroke) + ' text label "' + ASplain(el.str) + '"';
+    case 'slopefield':
+      return 'slope field' + (el.src != null ? ', slope equals ' + ASspeak(el.src) : '');
+  }
+  return el.kind;
+}
+
+function ASposText(el, a, t) { // where we are on the element
+  var ex = ASprep(el, a), v = a.view;
+  if (ex.isStatic) {
+    return (el.kind === 'slopefield' || !ex.at) ? '' : ASpt(ex.at, ex);
+  }
+  var p = ex.pos(t);
+  if (!p) {
+    return el.kind === 'plot' ? 'x ' + ASfmt(t, ex.dx) + ', undefined' : 'undefined';
+  }
+  var s = ASpt(p, ex);
+  var ex_ = (v.xmax - v.xmin)*1e-6, ey_ = (v.ymax - v.ymin)*1e-6;
+  if (p[0] < v.xmin - ex_ || p[0] > v.xmax + ex_ || p[1] < v.ymin - ey_ || p[1] > v.ymax + ey_) {
+    s += ', outside the graph window';
+  }
+  return s;
+}
+
+function ASwindowDesc(a) {
+  var v = a.view, dx = ASdecFor(v.xmax - v.xmin), dy = ASdecFor(v.ymax - v.ymin);
+  return 'Graph window: x from ' + ASfmt(v.xmin, dx) + ' to ' + ASfmt(v.xmax, dx) +
+    ', y from ' + ASfmt(v.ymin, dy) + ' to ' + ASfmt(v.ymax, dy) + '.';
+}
+
+function ASsummary(a) {
+  var counts = {}, order = [], n = a.els.length;
+  a.els.forEach(function(el) {
+    var l = ASkindLabels[el.kind] || el.kind;
+    if (!counts[l]) { counts[l] = 0; order.push(l); }
+    counts[l]++;
+  });
+  return n + ' graph element' + (n == 1 ? '' : 's') + ': ' + order.map(function(l) {
+    return counts[l] + ' ' + l + (counts[l] == 1 ? '' : 's');
+  }).join(', ') + '.';
+}
+
+var AShelptext = 'Arrow keys move along the current element. Hold shift for smaller steps. ' +
+  'Page up and page down take larger steps. Home and end jump to the ends. ' +
+  'Alt down and alt up move to the next and previous graph element. ' +
+  'Enter describes the current element. W describes the graph window. Escape leaves the graph.';
+
+function ASsay(svg, msg) {
+  var live = svg._asLive;
+  if (!live) { return; }
+  live._flip = !live._flip;  // so repeating the same message is still announced
+  live.textContent = msg + (live._flip ? ' ' : '');
+}
+
+function ASplace(a) { // put the visible marker at the current position
+  var svg = a.svg, el = a.els[a.cur], ex = ASprep(el, a), v = a.view;
+  if (!a.mk || !a.mk.isConnected) {
+    var g = myCreateElementSVG('g'), c;
+    g.setAttribute('pointer-events', 'none');
+    c = myCreateElementSVG('circle');
+    c.setAttribute('r', 7); c.setAttribute('fill', 'none');
+    c.setAttribute('stroke', 'white'); c.setAttribute('stroke-width', 4);
+    g.appendChild(c);
+    c = myCreateElementSVG('circle');
+    c.setAttribute('r', 7); c.setAttribute('fill', 'none');
+    c.setAttribute('stroke', '#c00'); c.setAttribute('stroke-width', 2);
+    g.appendChild(c);
+    c = myCreateElementSVG('circle');
+    c.setAttribute('r', 2); c.setAttribute('fill', '#c00');
+    g.appendChild(c);
+    svg.appendChild(g);
+    a.mk = g;
+  }
+  var p = ex.isStatic ? ex.at : ex.pos(a.t);
+  var eps = 1e-6;
+  if (!p || p[1] == null || p[0] < v.xmin - (v.xmax-v.xmin)*eps || p[0] > v.xmax + (v.xmax-v.xmin)*eps ||
+      p[1] < v.ymin - (v.ymax-v.ymin)*eps || p[1] > v.ymax + (v.ymax-v.ymin)*eps) {
+    a.mk.style.display = 'none';
+  } else {
+    a.mk.style.display = '';
+    a.mk.setAttribute('transform', 'translate(' + (p[0]*v.xu + v.ox) + ',' + (v.h - p[1]*v.yu - v.oy) + ')');
+  }
+}
+
+// x of the current position, if the current element is a function of x (else null)
+function AScurX(a) {
+  var el = a.els[a.cur], ex = ASprep(el, a);
+  if (!ex.xfunc) { return null; }
+  if (ex.xsteps) { return (a.sx && a.sx.el === el && a.sx.t === a.t) ? a.sx.x : ex.pos(a.t)[0]; }
+  return a.t;
+}
+
+// Select element i and put the marker at its start (or at x=keepX if given and the element
+// is also a function of x with a visible point there). Returns the announcement.
+function ASselect(a, i, keepX) {
+  var n = a.els.length;
+  a.cur = ((i % n) + n) % n;
+  var el = a.els[a.cur], ex = ASprep(el, a);
+  a.t = ex.isStatic ? 0 : ex.start;
+  a.sx = null;
+  if (keepX != null && ex.xfunc && keepX >= ex.xlo - 1e-9 && keepX <= ex.xhi + 1e-9) {
+    var kx = Math.min(Math.max(keepX, ex.xlo), ex.xhi), kt = ex.sAtX(kx);
+    if (ASinWin(ex.pos(kt), a.view)) {
+      a.t = kt;
+      if (ex.xsteps) { a.sx = {el:el, t:kt, x:kx}; }
+    }
+  }
+  ASplace(a);
+  return ASdescribeFull(a, true);
+}
+
+function ASdescribeFull(a, withEnds) {
+  var el = a.els[a.cur], ex = ASprep(el, a);
+  var parts = ['Element ' + (a.cur+1) + ' of ' + a.els.length + ': ' + ASdescribe(el, a)];
+  if (withEnds && !ex.isStatic && !ex.closed && ex.lowMark && Math.abs(a.t - ex.lowT) < ex.steps.small*1e-6) {
+    parts.push(ex.lowMark + ' at the ' + ex.lowName.toLowerCase());
+  }
+  var pos = ASposText(el, a, a.t);
+  if (pos) { parts.push(pos); }
+  return parts.join('. ') + '.';
+}
+
+function ASendText(ex, high) {
+  var mark = high ? ex.highMark : ex.lowMark;
+  return (high ? ex.highName : ex.lowName) + (mark ? ', ' + mark : '');
+}
+
+function ASmove(a, dir, size) { // dir: +1 forward (right/up), -1 back
+  var el = a.els[a.cur], ex = ASprep(el, a);
+  if (ex.isStatic) {
+    return el.kind === 'dot' || el.kind === 'text' ?
+      'This is a single ' + ASkindLabels[el.kind] + '. Use alt up or alt down to move to another element.' :
+      'The slope field cannot be traced. Use alt up or alt down to move to another element.';
+  }
+  var t = a.t, st = ex.steps[size], nt, ds = 0, eps = ex.steps.small*1e-6;
+  var mn = Math.min(ex.lowT, ex.highT), mx = Math.max(ex.lowT, ex.highT);
+  if (ex.snap) {  // land on multiples of the step size
+    nt = dir > 0 ? (Math.floor(t/st + 1e-9) + 1)*st : (Math.ceil(t/st - 1e-9) - 1)*st;
+    nt = parseFloat(nt.toPrecision(12));
+  } else if (ex.xsteps) {  // y is a function of x: land on round x values
+    var xst = ex.xsteps[size];
+    // use the x we snapped to last time if we are still there; reading it back from the svg is slightly inexact
+    var cx = (a.sx && a.sx.el === el && a.sx.t === t) ? a.sx.x : ex.pos(t)[0];
+    var nx = dir > 0 ? (Math.floor(cx/xst + 1e-4) + 1)*xst : (Math.ceil(cx/xst - 1e-4) - 1)*xst;
+    nx = Math.min(Math.max(parseFloat(nx.toPrecision(12)), ex.xlo), ex.xhi);
+    nt = ex.sAtX(nx);
+    ds = nt - t;
+  } else {
+    ds = dir*ex.sign*st;
+    nt = t + ds;
+  }
+  var wrapped = false, vertex = false;
+  if (ex.closed) {
+    var raw = nt;
+    nt = ((nt % ex.T) + ex.T) % ex.T;
+    wrapped = (raw !== nt);
+  } else if (nt < mn) { nt = mn; } else if (nt > mx) { nt = mx; }
+  if (!ex.snap && !wrapped && ex.verts.length) { // don't step over a corner
+    var best = null;
+    ex.verts.forEach(function(vv) {
+      if (ds > 0 && vv > t + 0.01 && vv < nt - 0.01 && (best === null || vv < best)) { best = vv; }
+      if (ds < 0 && vv < t - 0.01 && vv > nt + 0.01 && (best === null || vv > best)) { best = vv; }
+    });
+    if (best !== null) { nt = best; vertex = true; }
+  }
+  if (!ex.closed && Math.abs(nt - t) < eps) {
+    return ASendText(ex, dir > 0);
+  }
+  a.t = nt;
+  a.sx = (ex.xsteps && !vertex) ? {el:el, t:nt, x:nx} : null;
+  ASplace(a);
+  var parts = [];
+  if (!ex.closed && Math.abs(nt - ex.lowT) < eps) {
+    parts.push(ASendText(ex, false));
+  } else if (!ex.closed && Math.abs(nt - ex.highT) < eps) {
+    parts.push(ASendText(ex, true));
+  } else if (vertex) {
+    parts.push(el.vertMark || 'vertex');
+  }
+  parts.push(ASposText(el, a, nt));
+  return parts.join('. ');
+}
+
+function ASjump(a, toEnd) {
+  var el = a.els[a.cur], ex = ASprep(el, a);
+  if (ex.isStatic) { return ASmove(a, 1, 'normal'); }
+  a.t = ex.closed ? 0 : (toEnd ? ex.highT : ex.lowT);
+  ASplace(a);
+  return (ex.closed ? '' : ASendText(ex, toEnd) + '. ') + ASposText(el, a, a.t);
+}
+
+function ASstop(a) {
+  a.on = false;
+  if (a.mk && a.mk.parentNode) { a.mk.parentNode.removeChild(a.mk); }
+  a.mk = null;
+}
+
+function ASkeydown(e) {
+  var svg = e.currentTarget;
+  if (e.target !== svg || !svg._as) { return; }  // e.g. the expand button inside the graph
+  var a = svg._as, k = e.key;
+  if (e.ctrlKey || e.metaKey || !a.els.length) { return; }
+  if (!a.on) {
+    if (k === 'Enter' || k === ' ') {
+      e.preventDefault();
+      a.on = true;
+      ASsay(svg, 'Exploring graph. ' + ASwindowDesc(a) + ' ' + ASsummary(a) + ' ' + ASselect(a, 0) +
+        ' Press H for keyboard help.');
+    }
+    return;
+  }
+  var msg = null, size = e.shiftKey ? 'small' : 'normal';
+  if (e.altKey) {
+    if (k === 'ArrowDown') { msg = ASselect(a, a.cur + 1, AScurX(a)); }
+    else if (k === 'ArrowUp') { msg = ASselect(a, a.cur - 1, AScurX(a)); }
+    else { return; }
+  } else {
+    switch (k) {
+      case 'ArrowRight': case 'ArrowUp': msg = ASmove(a, 1, size); break;
+      case 'ArrowLeft': case 'ArrowDown': msg = ASmove(a, -1, size); break;
+      case 'PageUp': msg = ASmove(a, 1, 'large'); break;
+      case 'PageDown': msg = ASmove(a, -1, 'large'); break;
+      case 'Home': msg = ASjump(a, false); break;
+      case 'End': msg = ASjump(a, true); break;
+      case 'Enter': case ' ': msg = ASdescribeFull(a, false); break;
+      case 'w': case 'W': msg = ASwindowDesc(a); break;
+      case 'h': case 'H': case '?': msg = AShelptext; break;
+      case 'Escape':
+        ASstop(a);
+        msg = 'Stopped exploring graph.';
+        break;
+      default: return;
+    }
+  }
+  e.preventDefault();
+  e.stopPropagation();
+  ASsay(svg, msg);
+}
+
+function ASblur(e) {
+  var a = e.currentTarget._as;
+  if (a && a.on) { ASstop(a); }
+}
+
+// Call after a graph is fully drawn. Makes it keyboard explorable if it has anything in it.
+function ASmakeAccessible() {
+  var svg = svgpicture;
+  if (!svg || !svg._as || svg.nodeName.toLowerCase() !== 'svg' || svg._as.els.length === 0) { return; }
+  var picid = svg.getAttribute('id');
+  var alt = svg.getAttribute('alt') || '';
+  var srdiv = document.getElementById(picid + '-srlabel');
+  if (srdiv) { srdiv.parentNode.removeChild(srdiv); }  // the label now lives on the svg
+  svg.removeAttribute('aria-hidden');
+  svg.setAttribute('role', 'application');
+  svg.setAttribute('tabindex', '0');
+  svg.setAttribute('aria-label', (alt === '' ? 'Graph.' : alt) + ' Interactive graph. Press Enter to explore with the keyboard.');
+  var live = document.getElementById(picid + '-live');
+  if (!live) {
+    live = document.createElement('div');
+    live.id = picid + '-live';
+    live.className = 'sr-only';
+    live.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;';
+    live.setAttribute('aria-live', 'assertive');
+    live.setAttribute('aria-atomic', 'true');
+    svg.after(live);
+  }
+  svg._asLive = live;
+  if (!svg._asBound) {
+    svg._asBound = true;
+    svg.addEventListener('keydown', ASkeydown);
+    svg.addEventListener('blur', ASblur);
+  }
+}
 
 
 $(function() {
