@@ -1076,6 +1076,7 @@ function addMagGlass() {
   node.style.cursor = "pointer";
   svgpicture.appendChild(node);
   node.setAttribute("tabindex", 0);
+  node.setAttribute("role", "button");
   node.setAttribute("aria-label", "Expand Graph");
   node.addEventListener("click", asciisvgexpand);
   node.addEventListener("keydown", function(e) {
@@ -1925,7 +1926,7 @@ function ASprep(el, a) {
     ex.lowMark = ex.sign > 0 ? el.startMark : el.endMark;
     ex.highMark = ex.sign > 0 ? el.endMark : el.startMark;
     ex.start = ex.lowT;
-    // If it looks like y is a function of x (x never reverses and it isn't mostly vertical),
+    // If it looks like y is a function of x (x never reverses and it isn't nearly vertical),
     // step through round x values based on the x window, like plot() does.
     var xmono = true, last = null, tolx = 0.01/v.xu;
     for (var j = 0; j <= 200 && xmono; j++) {
@@ -1933,7 +1934,7 @@ function ASprep(el, a) {
       if (last !== null && (xx - last)*ex.sign < -tolx) { xmono = false; }
       last = xx;
     }
-    if (xmono && Math.abs(ddx) >= 0.2*T) {
+    if (xmono && Math.abs(ddx) >= 0.1*T) {
       var Wx = v.xmax - v.xmin, nx = ASnice(Wx/20);
       ex.xsteps = {normal:nx, small:ASsmall(nx), large:ASnice(Wx/4)};
       ex.xlo = Math.min(p0[0], p1[0]);
@@ -2039,6 +2040,7 @@ function ASsummary(a) {
 
 var AShelptext = 'Arrow keys move along the current element. Hold shift for smaller steps. ' +
   'Page up and page down take larger steps. Home and end jump to the ends. ' +
+  'N and P jump to the next and previous point of interest: an intercept or a local maximum or minimum. ' +
   'Alt down and alt up move to the next and previous graph element. ' +
   'Enter describes the current element. W describes the graph window. Escape leaves the graph.';
 
@@ -2152,7 +2154,8 @@ function ASmove(a, dir, size) { // dir: +1 forward (right/up), -1 back
     nt = ((nt % ex.T) + ex.T) % ex.T;
     wrapped = (raw !== nt);
   } else if (nt < mn) { nt = mn; } else if (nt > mx) { nt = mx; }
-  if (!ex.snap && !wrapped && ex.verts.length) { // don't step over a corner
+  // don't step over a corner (but on a function-like path, sharp turns are mostly just sampling at a peak)
+  if (!ex.snap && !wrapped && ex.verts.length && (!ex.xsteps || el.vertMark)) {
     var best = null;
     ex.verts.forEach(function(vv) {
       if (ds > 0 && vv > t + 0.01 && vv < nt - 0.01 && (best === null || vv < best)) { best = vv; }
@@ -2186,8 +2189,132 @@ function ASjump(a, toEnd) {
   return (ex.closed ? '' : ASendText(ex, toEnd) + '. ') + ASposText(el, a, a.t);
 }
 
+// Find the x-intercepts, y-intercepts and local extrema of an element that are in the graph
+// window, by sampling and then refining. Sorted by position along the element and cached.
+function ASpoi(el, a) {
+  var ex = ASprep(el, a), v = a.view;
+  if (ex.poi) { return ex.poi; }
+  ex.poi = [];
+  if (ex.isStatic) { return ex.poi; }
+  var lo = ex.closed ? 0 : Math.min(ex.lowT, ex.highT);
+  var hi = ex.closed ? ex.T : Math.max(ex.lowT, ex.highT);
+  var L = hi - lo;
+  if (!(L > 0)) { return ex.poi; }
+  var N = ex.snap ? 2000 : 800, h = L/N, ext = ex.closed ? 1 : 0, list = [], i;
+  var wrap = function(t) { return ex.closed ? ((t - lo) % L + L) % L + lo : t; };
+  var P = function(t) { return ex.pos(wrap(t)); };
+  var ts = [], ps = [];
+  for (i = -ext; i <= N + ext; i++) { ts.push(lo + h*i); ps.push(P(lo + h*i)); }
+  var W = [v.xmax - v.xmin, v.ymax - v.ymin];
+  var add = function(t, labels) {
+    var p = P(t);
+    if (ASinWin(p, v)) { list.push({t:wrap(t), p:p, labels:labels}); }
+  };
+  // c is the coordinate to scan: 1 for y (x-intercepts, max/min of y), 0 for x
+  var scan = function(c, zeroLabel, maxLabel, minLabel) {
+    var tol = (ex.snap ? 1e-9 : 2e-6)*W[c], zt = 1e-4*W[c];
+    var prev = null, dir = 0, mvEnd = 0;
+    var fv = function(t, sg) { var pt = P(t); return (pt && pt[c] != null) ? sg*pt[c] : -Infinity; };
+    for (var j = 0; j < ts.length; j++) {
+      var q = ps[j];
+      if (!q || q[c] == null || !isFinite(q[c])) { prev = null; dir = 0; continue; }
+      var val = q[c];
+      if (prev === null) {
+        if (zeroLabel && Math.abs(val) <= tol) { add(ts[j], [zeroLabel]); }
+      } else {
+        if (zeroLabel && Math.abs(val) <= tol && Math.abs(prev) > tol) {
+          add(ts[j], [zeroLabel]);
+        } else if (zeroLabel && Math.abs(val) > tol && Math.abs(prev) > tol && (val > 0) !== (prev > 0)) {
+          var A = ts[j-1], B = ts[j];
+          for (var it = 0; it < 50; it++) {
+            var m = (A + B)/2, pm = P(m);
+            if (!pm || pm[c] == null) { break; }
+            if ((pm[c] > 0) === (prev > 0)) { A = m; } else { B = m; }
+          }
+          var tz = (A + B)/2, pz = P(tz);
+          if (pz && pz[c] != null && Math.abs(pz[c]) <= zt) { add(tz, [zeroLabel]); }  // else a jump, not a crossing
+        }
+        var d = val - prev, s = d > tol ? 1 : (d < -tol ? -1 : 0);
+        if (s !== 0) {
+          if (dir !== 0 && s !== dir && maxLabel) {  // the direction flipped, so there is an extremum nearby
+            var sg = dir > 0 ? 1 : -1, A2 = ts[Math.max(mvEnd - 1, 0)], B2 = ts[j];
+            for (var k = 0; k < 60; k++) {
+              var m1 = A2 + (B2 - A2)/3, m2 = B2 - (B2 - A2)/3;
+              if (fv(m1, sg) < fv(m2, sg)) { A2 = m1; } else { B2 = m2; }
+            }
+            var te = (A2 + B2)/2, pe = P(te), labs = [sg > 0 ? maxLabel : minLabel];
+            if (zeroLabel && pe && pe[c] != null && Math.abs(pe[c]) <= 1e-7*W[c]) { labs.unshift(zeroLabel); }
+            add(te, labs);
+          }
+          dir = s;
+          mvEnd = j;
+        }
+      }
+      prev = val;
+    }
+  };
+  scan(1, 'x-intercept', ex.closed ? 'highest point' : 'local maximum', ex.closed ? 'lowest point' : 'local minimum');
+  if (ex.xfunc) {
+    scan(0, 'y-intercept', null, null);
+  } else {
+    scan(0, 'y-intercept', ex.closed ? 'rightmost point' : 'local x maximum',
+      ex.closed ? 'leftmost point' : 'local x minimum');
+  }
+  // combine features that land on the same spot
+  list.sort(function(p, q) { return p.t - q.t; });
+  var out = [];
+  var near = function(p, q) { return Math.hypot((p.p[0]-q.p[0])*v.xu, (p.p[1]-q.p[1])*v.yu) < 1.5; };
+  var merge = function(into, e) {
+    e.labels.forEach(function(l) { if (into.labels.indexOf(l) < 0) { into.labels.push(l); } });
+  };
+  list.forEach(function(e) {
+    var last = out[out.length - 1];
+    if (last && near(last, e)) { merge(last, e); } else { out.push(e); }
+  });
+  if (ex.closed && out.length > 1 && near(out[0], out[out.length - 1])) { merge(out[0], out.pop()); }
+  out.forEach(function(e) {
+    e.labels.sort(function(p, q) { return (/intercept/.test(q) ? 1 : 0) - (/intercept/.test(p) ? 1 : 0); });
+  });
+  ex.poi = out;
+  return out;
+}
+
+function ASnextPoi(a, dir) { // dir: +1 toward the right/top end (like the right and up arrows), -1 back
+  var el = a.els[a.cur], ex = ASprep(el, a);
+  if (ex.isStatic) {
+    return 'This element has no points of interest. Use alt up or alt down to move to another element.';
+  }
+  var list = ASpoi(el, a);
+  if (!list.length) {
+    return 'No intercepts or local extrema on this element within the graph window.';
+  }
+  var fwd = dir*ex.sign > 0, eps = (ex.closed ? ex.T : Math.abs(ex.highT - ex.lowT))*1e-4, pick = null;
+  list.forEach(function(e) {
+    if (fwd && e.t > a.t + eps && (pick === null || e.t < pick.t)) { pick = e; }
+    if (!fwd && e.t < a.t - eps && (pick === null || e.t > pick.t)) { pick = e; }
+  });
+  if (pick === null && ex.closed) {
+    pick = fwd ? list[0] : list[list.length - 1];
+    if (Math.abs(pick.t - a.t) <= eps && list.length === 1) { return 'This is the only point of interest on this element.'; }
+  }
+  if (pick === null) {
+    return 'No more points of interest toward the ' + (dir > 0 ? ex.highName : ex.lowName).toLowerCase() + '.';
+  }
+  a.t = pick.t;
+  a.sx = ex.xsteps ? {el:el, t:pick.t, x:pick.p[0]} : null;
+  ASplace(a);
+  return pick.labels.join(' and ') + '. ' + ASposText(el, a, a.t);
+}
+
+// While exploring, take the expand button out of the tab order so Tab leaves the graph.
+function ASexpandTab(a, tabindex) {
+  var btn = a.svg.querySelector('[role="button"]');
+  if (btn) { btn.setAttribute('tabindex', tabindex); }
+}
+
 function ASstop(a) {
   a.on = false;
+  ASexpandTab(a, 0);
   if (a.mk && a.mk.parentNode) { a.mk.parentNode.removeChild(a.mk); }
   a.mk = null;
 }
@@ -2201,6 +2328,7 @@ function ASkeydown(e) {
     if (k === 'Enter' || k === ' ') {
       e.preventDefault();
       a.on = true;
+      ASexpandTab(a, -1);
       ASsay(svg, 'Exploring graph. ' + ASwindowDesc(a) + ' ' + ASsummary(a) + ' ' + ASselect(a, 0) +
         ' Press H for keyboard help.');
     }
@@ -2219,6 +2347,8 @@ function ASkeydown(e) {
       case 'PageDown': msg = ASmove(a, -1, 'large'); break;
       case 'Home': msg = ASjump(a, false); break;
       case 'End': msg = ASjump(a, true); break;
+      case 'n': case 'N': msg = ASnextPoi(a, 1); break;
+      case 'p': case 'P': msg = ASnextPoi(a, -1); break;
       case 'Enter': case ' ': msg = ASdescribeFull(a, false); break;
       case 'w': case 'W': msg = ASwindowDesc(a); break;
       case 'h': case 'H': case '?': msg = AShelptext; break;
