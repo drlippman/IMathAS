@@ -41,7 +41,14 @@ function drawrect($w,$h) {
 	}
 	//$dw = 200;
 	//$dh = 200;
-	return showasciisvg($com,$dw,$dh);
+	$alt = _('A rectangle.');
+	$sidenames = array(_('top'), _('right'), _('bottom'), _('left'));
+	foreach ($sidenames as $i=>$sn) {
+		if ($len[$i]>0) {
+			$alt .= ' ' . sprintf(_('The %s side is labeled %s.'), $sn, $labels[$i]);
+		}
+	}
+	return showasciisvg($com,$dw,$dh,$alt,false);
 }
 
 //draws a triangle given 3 sides.
@@ -73,6 +80,13 @@ function drawtriSSS($a,$b,$c) {
 		
 	$dw = 200;
 	$dh = 200;
-	return showasciisvg($com,$dw,$dh);
+	$alt = _('A triangle with a horizontal base.');
+	$sidenames = array(_('The left side'), _('The base'), _('The right side'));
+	foreach ($sidenames as $i=>$sn) {
+		if ($len[$i]>0) {
+			$alt .= ' ' . sprintf(_('%s is labeled %s.'), $sn, $labels[$i]);
+		}
+	}
+	return showasciisvg($com,$dw,$dh,$alt,false);
 }
 ?>

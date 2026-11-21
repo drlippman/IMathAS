@@ -22,32 +22,32 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
    if ($a>=$b) { echo 'xmin should be smaller than xmax'; return; }
    if ($y!==null && $dirx==$diry) { echo 'directions should not be equal'; return;}
 
-   if ($_SESSION['graphdisp'] == 0) {
-      $alt = sprintf(_('A bell-shaped curve. '), $mu);
-      if ($axislabel != '') {
-         $alt .= sprintf(_('The horizontal axis is labeled %s. '), $axislabel);
-      }
-      $bn = ceil(($a - $mu)/$sigma - 1e-8);
-      $tn = floor(($b - $mu)/$sigma + 1e-8);
-      $alt .= _('The horizontal axis has tick marks at ');
-      $tm = [];
-      for ($i=$bn;$i<=$tn;$i++) {
-         $tm[] = $mu + $i*$sigma;
-      }
-      $tm[count($tm)-1] = _('and').' '.$tm[count($tm)-1];
-      $alt .= implode(', ', $tm) . '. ';
+   $alt = sprintf(_('A bell-shaped curve. '), $mu);
+   if ($axislabel != '') {
+      $alt .= sprintf(_('The horizontal axis is labeled %s. '), $axislabel);
+   }
+   $bn = ceil(($a - $mu)/$sigma - 1e-8);
+   $tn = floor(($b - $mu)/$sigma + 1e-8);
+   $alt .= _('The horizontal axis has tick marks at ');
+   $tm = [];
+   for ($i=$bn;$i<=$tn;$i++) {
+      $tm[] = $mu + $i*$sigma;
+   }
+   $tm[count($tm)-1] = _('and').' '.$tm[count($tm)-1];
+   $alt .= implode(', ', $tm) . '. ';
 
-      $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
-      
-      if ($dirx == 'right' && $diry == 'left' && $x !== null && $y !== null) {
-         $alt .= sprintf(_('The area from %d to %d is shaded.'), $x, $y);
-      } else if ($dirx == 'left' && $diry == 'right' && $x !== null && $y !== null) {
-         $alt .= sprintf(_('The area left of %d and right of %d is shaded.'), $x, $y);
-      } else if ($dirx == 'left' && $x !== null) {
-         $alt .= sprintf(_('The area left of %d is shaded.'), $x);
-      } else if ($dirx == 'right' && $x !== null) {
-         $alt .= sprintf(_('The area right of %d is shaded.'), $x);
-      }
+   $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
+   
+   if ($dirx == 'right' && $diry == 'left' && $x !== null && $y !== null) {
+      $alt .= sprintf(_('The area from %d to %d is shaded.'), $x, $y);
+   } else if ($dirx == 'left' && $diry == 'right' && $x !== null && $y !== null) {
+      $alt .= sprintf(_('The area left of %d and right of %d is shaded.'), $x, $y);
+   } else if ($dirx == 'left' && $x !== null) {
+      $alt .= sprintf(_('The area left of %d is shaded.'), $x);
+   } else if ($dirx == 'right' && $x !== null) {
+      $alt .= sprintf(_('The area right of %d is shaded.'), $x);
+   }
+   if ($_SESSION['graphdisp'] == 0) {
       return $alt;
    }
 
@@ -126,7 +126,7 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
        $plot .= 'fill="'.$color.'";path([' . implode(',',$ypts) . ']);';
    }
 
-   return showasciisvg($plot,$w,$h);
+   return showasciisvg($plot,$w,$h,$alt,false);
 }
 
 
@@ -165,23 +165,23 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
      $zy = ($y-$mu)/$sigma;
    }
 
-   if ($_SESSION['graphdisp'] == 0) {
-      $alt = sprintf(_('A bell-shaped curve. '), $mu);
-      if ($axislabel != '') {
-         $alt .= sprintf(_('The horizontal axis is labeled %s. '), $axislabel);
-      }
+   $alt = sprintf(_('A bell-shaped curve. '), $mu);
+   if ($axislabel != '') {
+      $alt .= sprintf(_('The horizontal axis is labeled %s. '), $axislabel);
+   }
 
-      $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
-      
-      if ($dirx == 'right' && $diry == 'left') {
-         $alt .= sprintf(_('The area from %d to %d is shaded.'), $x, $y);
-      } else if ($dirx == 'left' && $diry == 'right') {
-         $alt .= sprintf(_('The area left of %d and right of %d is shaded.'), $x, $y);
-      } else if ($dirx == 'left') {
-         $alt .= sprintf(_('The area left of %d is shaded.'), $x);
-      } else if ($dirx == 'right') {
-         $alt .= sprintf(_('The area right of %d is shaded.'), $x);
-      }
+   $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
+   
+   if ($dirx == 'right' && $diry == 'left') {
+      $alt .= sprintf(_('The area from %d to %d is shaded.'), $x, $y);
+   } else if ($dirx == 'left' && $diry == 'right') {
+      $alt .= sprintf(_('The area left of %d and right of %d is shaded.'), $x, $y);
+   } else if ($dirx == 'left') {
+      $alt .= sprintf(_('The area left of %d is shaded.'), $x);
+   } else if ($dirx == 'right') {
+      $alt .= sprintf(_('The area right of %d is shaded.'), $x);
+   }
+   if ($_SESSION['graphdisp'] == 0) {
       return $alt;
    }
    $dx = ($b-$a)/80;
@@ -260,7 +260,7 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
        $plot .= 'fill="'.$color.'";path([' . implode(',',$ypts) . ']);';
    }
 
-   return showasciisvg($plot,$w,$h);
+   return showasciisvg($plot,$w,$h,$alt,false);
 }
 
 
@@ -300,45 +300,45 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
      $zr = ($r-$mu)/$sigma;
    }
 
-   if ($_SESSION['graphdisp'] == 0) {
-      $alt = sprintf(_('A bell-shaped curve. '), $mu);
-      if ($axislabel != '') {
-         $alt .= sprintf(_('The horizontal axis is labeled %s. '), $axislabel);
-      }
-      $bn = ceil(($a - $mu)/$sigma - 1e-8);
-      $tn = floor(($b - $mu)/$sigma + 1e-8);
-      $alt .= _('The horizontal axis has tick marks at ');
-      $tm = [];
-      for ($i=$bn;$i<=$tn;$i++) {
-         $tm[] = $mu + $i*$sigma;
-      }
-      $tm[count($tm)-1] = _('and').' '.$tm[count($tm)-1];
-      $alt .= implode(', ', $tm) . '. ';
+   $alt = sprintf(_('A bell-shaped curve. '), $mu);
+   if ($axislabel != '') {
+      $alt .= sprintf(_('The horizontal axis is labeled %s. '), $axislabel);
+   }
+   $bn = ceil(($a - $mu)/$sigma - 1e-8);
+   $tn = floor(($b - $mu)/$sigma + 1e-8);
+   $alt .= _('The horizontal axis has tick marks at ');
+   $tm = [];
+   for ($i=$bn;$i<=$tn;$i++) {
+      $tm[] = $mu + $i*$sigma;
+   }
+   $tm[count($tm)-1] = _('and').' '.$tm[count($tm)-1];
+   $alt .= implode(', ', $tm) . '. ';
 
-      $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
-      
-      if ($x !== null) {
-         if ($dirx == 'right' && $diry == 'left') {
-            $alt .= sprintf(_('The area from %d to %d is shaded in %s.'), $x, $y, $color);
-         } else if ($dirx == 'left' && $diry == 'right') {
-            $alt .= sprintf(_('The area left of %d and right of %d is shaded in %s.'), $x, $y, $color);
-         } else if ($dirx == 'left') {
-            $alt .= sprintf(_('The area left of %d is shaded in %s.'), $x, $color);
-         } else if ($dirx == 'right') {
-            $alt .= sprintf(_('The area right of %d is shaded in %s.'), $x, $color);
-         }
+   $alt .= sprintf(_('The peak of the curve is centered at %d. '), $mu);
+   
+   if ($x !== null) {
+      if ($dirx == 'right' && $diry == 'left') {
+         $alt .= sprintf(_('The area from %d to %d is shaded in %s.'), $x, $y, $color);
+      } else if ($dirx == 'left' && $diry == 'right') {
+         $alt .= sprintf(_('The area left of %d and right of %d is shaded in %s.'), $x, $y, $color);
+      } else if ($dirx == 'left') {
+         $alt .= sprintf(_('The area left of %d is shaded in %s.'), $x, $color);
+      } else if ($dirx == 'right') {
+         $alt .= sprintf(_('The area right of %d is shaded in %s.'), $x, $color);
       }
-      if ($q !== null) {
-         if ($dirq == 'right' && $dirr == 'left') {
-            $alt .= sprintf(_('The area from %d to %d is shaded in %s.'), $q, $r, $color2);
-         } else if ($dirq == 'left' && $dirr == 'right') {
-            $alt .= sprintf(_('The area left of %d and right of %d is shaded in %s.'), $q, $r, $color2);
-         } else if ($dirq == 'left') {
-            $alt .= sprintf(_('The area left of %d is shaded in %s.'), $q, $color2);
-         } else if ($dirq == 'right') {
-            $alt .= sprintf(_('The area right of %d is shaded in %s.'), $q, $color2);
-         }
+   }
+   if ($q !== null) {
+      if ($dirq == 'right' && $dirr == 'left') {
+         $alt .= sprintf(_('The area from %d to %d is shaded in %s.'), $q, $r, $color2);
+      } else if ($dirq == 'left' && $dirr == 'right') {
+         $alt .= sprintf(_('The area left of %d and right of %d is shaded in %s.'), $q, $r, $color2);
+      } else if ($dirq == 'left') {
+         $alt .= sprintf(_('The area left of %d is shaded in %s.'), $q, $color2);
+      } else if ($dirq == 'right') {
+         $alt .= sprintf(_('The area right of %d is shaded in %s.'), $q, $color2);
       }
+   }
+   if ($_SESSION['graphdisp'] == 0) {
       return $alt;
    }
 
@@ -449,7 +449,7 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
    if ($r !== null && $dirr=='right') {
        $plot .= 'fill="'.$color2.'";path([' . implode(',',$rpts) . ']);';
    }
-   return showasciisvg($plot,$w,$h);
+   return showasciisvg($plot,$w,$h,$alt,false);
 }
 
 ?>

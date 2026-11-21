@@ -1174,7 +1174,7 @@ function connectthedots($xarray, $yarray, $color = 'black', $thick = 1, $startdo
     return $outarr;
 }
 
-function showasciisvg($script, $width = 200, $height = 200, $alt = null) {
+function showasciisvg($script, $width = 200, $height = 200, $alt = null, $explorable = true) {
     if (is_array($width)) {
         echo "second argument to showasciisvg should be an integer, not an array";
         $width = 200;
@@ -1219,7 +1219,10 @@ function showasciisvg($script, $width = 200, $height = 200, $alt = null) {
     if ($_SESSION['graphdisp'] == 0) {
         return $alt;
     }
-    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />";
+    // $explorable = false: graph is hidden from assistive tech and not keyboard-explorable;
+    // the text alternative in $alt is used instead.
+    $noexp = (!$explorable && empty($GLOBALS['hide-sronly'])) ? " data-noexplore='1'" : '';
+    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script'$noexp />";
     if (empty($GLOBALS['hide-sronly'])) {
         $out .= '<span class="sr-only">' . $alt . '</span>';
     }

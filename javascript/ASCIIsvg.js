@@ -371,6 +371,11 @@ function initPicture(x_min,x_max,y_min,y_max) {
       if (picture.hasAttribute("data-nomag")) {
         qnode.setAttribute("data-nomag",1);
       }
+      if (picture.hasAttribute("data-noexplore")) {
+        // text alternative is provided separately; hide graph from AT and don't make explorable
+        qnode.setAttribute("data-noexplore", 1);
+        qnode.setAttribute("aria-hidden", true);
+      }
       if (picture.getAttribute('align') === 'middle') {
         qnode.style.verticalAlign = 'middle';
       }
@@ -2390,6 +2395,7 @@ function ASblur(e) {
 function ASmakeAccessible() {
   var svg = svgpicture;
   if (!svg || !svg._as || svg.nodeName.toLowerCase() !== 'svg' || svg._as.els.length === 0) { return; }
+  if (svg.hasAttribute('data-noexplore')) { return; }  // text alternative provided instead
   var picid = svg.getAttribute('id');
   var alt = svg.getAttribute('alt') || '';
   var srdiv = document.getElementById(picid + '-srlabel');

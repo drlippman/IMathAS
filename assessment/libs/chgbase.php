@@ -107,7 +107,7 @@ function draw_mayan_number($n, $width = 50, $mode = 'standard') {
 		}
 		$ybase++;
 	}
-	$g = showasciisvg($cmd, $width, $width*$multi, $alt);
+	$g = showasciisvg($cmd, $width, $width*$multi, $alt, false);
 	$g = str_replace('<embed','<embed data-nomag=1', $g);
 	return $g;
 }
@@ -218,7 +218,7 @@ function draw_babylonian_number($n, $height=40, $zeroinmiddle=0) {
 		$xmax += $groupwidth;
 	}
 	$cmd = "setBorder(2,0,2,0);initPicture(0,$xmax,-.5,4.5);fill='none';" . $cmd;
-	$g = showasciisvg($cmd, $height*$xmax/5+4, $height, $alt);
+	$g = showasciisvg($cmd, $height*$xmax/5+4, $height, $alt, false);
 	$g = str_replace('<embed','<embed data-nomag=1', $g);
 	return $g;
 }

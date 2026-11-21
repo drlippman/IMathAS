@@ -245,7 +245,7 @@ function draw_angle() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(5);initPicture(-1.1,1.1,-1.1,1.1);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.1,1.1,-1.1,1.1);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -696,7 +696,7 @@ function draw_circle() {
     $alt = $userAltText;
   }
   
-  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -1020,7 +1020,7 @@ function draw_circlesector() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(5);initPicture($minxyDisp,1.35,$minxyDisp,1.35);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(5);initPicture($minxyDisp,1.35,$minxyDisp,1.35);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -1148,7 +1148,7 @@ function draw_square() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -1343,7 +1343,7 @@ function draw_rectangle() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(5);initPicture(-1.7,1.7,-1.7,1.7);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(5);initPicture(-1.7,1.7,-1.7,1.7);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -2345,7 +2345,7 @@ function draw_triangle() {
     $yminDisp = $yMidDisp - $halfYRange;
     $ymaxDisp = $yMidDisp + $halfYRange;
   }
-  $gr = showasciisvg("setBorder(10);initPicture($xminDisp,$xmaxDisp,$yminDisp,$ymaxDisp);$args;",$width,$height,$alt);
+  $gr = showasciisvg("setBorder(10);initPicture($xminDisp,$xmaxDisp,$yminDisp,$ymaxDisp);$args;",$width,$height,$alt,false);
   return $gr;
 }
 
@@ -2543,7 +2543,7 @@ function draw_polygon() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(10);initPicture(-1.5,1.5,-1.5,1.5);$args;",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(10);initPicture(-1.5,1.5,-1.5,1.5);$args;",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -2693,7 +2693,7 @@ function draw_prismcubes() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(10);initPicture(-$xyMin,1.1*$xyMax,-$xyMin,1.1*$xyMax);$args;",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(10);initPicture(-$xyMin,1.1*$xyMax,-$xyMin,1.1*$xyMax);$args;",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -2868,7 +2868,7 @@ function draw_cylinder() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(20);initPicture(-0.75*$dim,1.25*$dim,-$dim,$dim);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(20);initPicture(-0.75*$dim,1.25*$dim,-$dim,$dim);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -3120,7 +3120,7 @@ function draw_cone() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(20);initPicture(-$dim,$dim,(-1-1/4*$inv)*$dim,(1-1/4*$inv)*$dim);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(20);initPicture(-$dim,$dim,(-1-1/4*$inv)*$dim,(1-1/4*$inv)*$dim);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -3268,7 +3268,7 @@ function draw_sphere() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(20);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(20);initPicture(-1.5,1.5,-1.5,1.5);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -3595,7 +3595,7 @@ function draw_pyramid() {
   } else {
     $alt = $userAltText;
   }
-  $gr = showasciisvg("setBorder(20);initPicture(-$dim,$dim,-$dim,$dim);$args",$size,$size,$alt);
+  $gr = showasciisvg("setBorder(20);initPicture(-$dim,$dim,-$dim,$dim);$args",$size,$size,$alt,false);
   return $gr;
 }
 
@@ -3743,7 +3743,7 @@ function draw_rectprism() {
     $alt = $userAltText;
   }
 
-  $gr = showasciisvg("setBorder(10,10,40,10);initPicture(-0.2*$xMax,1.2*$xMax,-0.2*$yMax,1.2*$yMax);$args;",$sizew,$sizeh,$alt);
+  $gr = showasciisvg("setBorder(10,10,40,10);initPicture(-0.2*$xMax,1.2*$xMax,-0.2*$yMax,1.2*$yMax);$args;",$sizew,$sizeh,$alt,false);
   return $gr;
 }
 
@@ -3933,7 +3933,7 @@ function draw_polyomino() {
       $alttext .= ifthen($i==0,"($thisx,$thisy)",", ($thisx,$thisy)");
     }
   }
-  $gr = showasciisvg("setBorder(40,40*$yl/$xl,40,40*$yl/$xl); initPicture($xmin-1,$xmax+2,$ymin-1,$ymax+2); $axes; strokewidth=1.5; fill='$fillcolor'; $ptcode;",$size,$yl/$xl*$size,$alttext);
+  $gr = showasciisvg("setBorder(40,40*$yl/$xl,40,40*$yl/$xl); initPicture($xmin-1,$xmax+2,$ymin-1,$ymax+2); $axes; strokewidth=1.5; fill='$fillcolor'; $ptcode;",$size,$yl/$xl*$size,$alttext,false);
   if ($getdata === true) {
     return [$gr,count($used),$perimeter];
   } else {

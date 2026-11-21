@@ -392,7 +392,7 @@ function vmdrawinchruler($max=4,$val=0,$width=500,$height=80) {
 		$whole = floor($valx/16);
 		$alt .= " Arrow is pointing $offset divisions past $whole";
 	}
-	return showasciisvg($svg,$width,$height,$alt);
+	return showasciisvg($svg,$width,$height,$alt,false);
 }
 function vmdrawcmruler($max=4,$val=0,$width=500,$height=80) {
 	$maxx = ceil(10*$max+2);
@@ -413,7 +413,7 @@ function vmdrawcmruler($max=4,$val=0,$width=500,$height=80) {
 		$whole = floor($valx/10);
 		$alt .= " Arrow is pointing $offset divisions past $whole";
 	}
-	return showasciisvg($svg,$width,$height,$alt);
+	return showasciisvg($svg,$width,$height,$alt,false);
 }
 function vmdrawclock($hr,$min,$size=200) {
 	$fontsize = floor($size/12);
@@ -457,7 +457,7 @@ function vmdrawclock($hr,$min,$size=200) {
 			$alt .= $rem . ' marks past '.floor($min/5);
 		}
 	}
-	return showasciisvg($svg,$size,$size,$alt);
+	return showasciisvg($svg,$size,$size,$alt,false);
 }
 
 ?>
