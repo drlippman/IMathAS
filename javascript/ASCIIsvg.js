@@ -1156,6 +1156,12 @@ function noaxes() {
 }
 
 
+function axislabels(xname, yname) { // names used for the axes in the keyboard-explore descriptions
+  if (svgpicture && svgpicture._as) {
+    if (xname) { svgpicture._as.view.xname = String(xname); }
+    if (yname) { svgpicture._as.view.yname = String(yname); }
+  }
+}
 function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   ASnoreg++;  // axes, ticks and tick labels aren't explorable graph elements
   try {
@@ -1856,7 +1862,7 @@ function ASfirstVisible(ex, v) {
 }
 
 function ASpt(q, ex) {
-  return 'x ' + ASfmt(q[0], ex.dx) + ', y ' + ASfmt(q[1], ex.dy);
+  return ex.xn + ' ' + ASfmt(q[0], ex.dx) + ', ' + ex.yn + ' ' + ASfmt(q[1], ex.dy);
 }
 
 function ASplain(st) {
@@ -1868,7 +1874,8 @@ function ASprep(el, a) {
   if (el.ex) { return el.ex; }
   var v = a.view, kind = el.kind;
   var ex = {isStatic:false, snap:false, closed:false, verts:[], sign:1, at:null,
-    dx:ASdecFor(v.xmax - v.xmin), dy:ASdecFor(v.ymax - v.ymin)};
+    dx:ASdecFor(v.xmax - v.xmin), dy:ASdecFor(v.ymax - v.ymin),
+    xn:v.xname || 'x', yn:v.yname || 'y'};
   el.ex = ex;
   if (kind === 'dot' || kind === 'text' || kind === 'slopefield') {
     ex.isStatic = true;
@@ -2013,13 +2020,13 @@ function ASdescribe(el, a) { // what the element is, without a position
   switch (el.kind) {
     case 'plot':
       var s = st + ' curve';
-      if (el.src != null) { s += ', y equals ' + ASspeak(el.src); }
+      if (el.src != null) { s += ', ' + ex.yn + ' equals ' + ASspeak(el.src); }
       if (el.min !== v.xmin || el.max !== v.xmax) {
-        s += ', for x from ' + r(el.min) + ' to ' + r(el.max);
+        s += ', for ' + ex.xn + ' from ' + r(el.min) + ' to ' + r(el.max);
       }
       return s;
     case 'param':
-      return st + ' parametric curve, x equals ' + ASspeak(el.src[0]) + ', y equals ' + ASspeak(el.src[1]) +
+      return st + ' parametric curve, ' + ex.xn + ' equals ' + ASspeak(el.src[0]) + ', ' + ex.yn + ' equals ' + ASspeak(el.src[1]) +
         ', for t from ' + r(el.min) + ' to ' + r(el.max);
     case 'line':
       return st + ' line segment from ' + P(el.pts[0]) + ' to ' + P(el.pts[1]);
@@ -2058,7 +2065,7 @@ function ASposText(el, a, t) { // where we are on the element
   }
   var p = ex.pos(t);
   if (!p) {
-    return el.kind === 'plot' ? 'x ' + ASfmt(t, ex.dx) + ', undefined' : 'undefined';
+    return el.kind === 'plot' ? ex.xn + ' ' + ASfmt(t, ex.dx) + ', undefined' : 'undefined';
   }
   var s = ASpt(p, ex);
   var ex_ = (v.xmax - v.xmin)*1e-6, ey_ = (v.ymax - v.ymin)*1e-6;
@@ -2070,8 +2077,8 @@ function ASposText(el, a, t) { // where we are on the element
 
 function ASwindowDesc(a) {
   var v = a.view, dx = ASdecFor(v.xmax - v.xmin), dy = ASdecFor(v.ymax - v.ymin);
-  return 'Graph window: x from ' + ASfmt(v.xmin, dx) + ' to ' + ASfmt(v.xmax, dx) +
-    ', y from ' + ASfmt(v.ymin, dy) + ' to ' + ASfmt(v.ymax, dy) + '.';
+  return 'Graph window: ' + (v.xname || 'x') + ' from ' + ASfmt(v.xmin, dx) + ' to ' + ASfmt(v.xmax, dx) +
+    ', ' + (v.yname || 'y') + ' from ' + ASfmt(v.ymin, dy) + ' to ' + ASfmt(v.ymax, dy) + '.';
 }
 
 function ASsummary(a) {
@@ -2481,8 +2488,8 @@ function ASmakeAccessible() {
   if (!live) {
     live = document.createElement('div');
     live.id = picid + '-live';
-    live.className = 'sr-only';
-    live.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;';
+    //live.className = 'sr-only';
+    //live.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;';
     live.setAttribute('aria-live', 'assertive');
     live.setAttribute('aria-atomic', 'true');
     svg.after(live);
