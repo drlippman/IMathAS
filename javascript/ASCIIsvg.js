@@ -1097,10 +1097,36 @@ function addMagGlass() {
   node.setAttribute("fill-opacity", 0.01);
   node.style.cursor = "pointer";
   svgpicture.appendChild(node);
+  node.addEventListener("click", asciisvgexpand);
+  if (svgpicture.hasAttribute("data-noexplore")) {
+    // The svg is aria-hidden, so a focusable control inside it is not exposed to assistive tech.
+    // Use a real button after the svg instead, and show focus on the magnifier.
+    var btnid = svgpicture.getAttribute("id") + "-expandbtn";
+    var btn = document.getElementById(btnid);
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = btnid;
+      btn.className = "sr-only";
+      btn.textContent = "Expand Graph";
+      svgpicture.after(btn);
+    }
+    var glassnode = node;
+    btn.onclick = function() { asciisvgexpand({currentTarget: glassnode}); };
+    btn.onfocus = function() {
+      glassnode.setAttribute("stroke", "black");
+      glassnode.setAttribute("stroke-width", 2);
+      glassnode.setAttribute("fill-opacity", 0.3);
+    };
+    btn.onblur = function() {
+      glassnode.setAttribute("stroke", "none");
+      glassnode.setAttribute("fill-opacity", 0.01);
+    };
+    return;
+  }
   node.setAttribute("tabindex", 0);
   node.setAttribute("role", "button");
   node.setAttribute("aria-label", "Expand Graph");
-  node.addEventListener("click", asciisvgexpand);
   node.addEventListener("keydown", function(e) {
   	if (e.keyCode === 13) {asciisvgexpand(e);}
   });
@@ -2089,6 +2115,13 @@ function ASplace(a) { // put the visible marker at the current position
     c = myCreateElementSVG('circle');
     c.setAttribute('r', 2); c.setAttribute('fill', '#c00');
     g.appendChild(c);
+    c = myCreateElementSVG('text');  // visible coordinates, drawn with a white halo so it stays readable
+    c.setAttribute('font-size', 13); c.setAttribute('font-family', 'sans-serif');
+    c.setAttribute('fill', '#c00'); c.setAttribute('stroke', 'white');
+    c.setAttribute('stroke-width', 3); c.setAttribute('stroke-linejoin', 'round');
+    c.setAttribute('paint-order', 'stroke'); c.setAttribute('aria-hidden', 'true');
+    g.appendChild(c);
+    g._label = c;
     svg.appendChild(g);
     a.mk = g;
   }
@@ -2099,7 +2132,19 @@ function ASplace(a) { // put the visible marker at the current position
     a.mk.style.display = 'none';
   } else {
     a.mk.style.display = '';
-    a.mk.setAttribute('transform', 'translate(' + (p[0]*v.xu + v.ox) + ',' + (v.h - p[1]*v.yu - v.oy) + ')');
+    var px = p[0]*v.xu + v.ox, py = v.h - p[1]*v.yu - v.oy;
+    a.mk.setAttribute('transform', 'translate(' + px + ',' + py + ')');
+    var lbl = a.mk._label;
+    lbl.textContent = '(' + ASfmt(p[0], ex.dx) + ', ' + ASfmt(p[1], ex.dy) + ')';
+    var tw = 0;
+    try { tw = lbl.getComputedTextLength(); } catch (e) {}
+    if (!(tw > 0)) { tw = lbl.textContent.length*7.5; }
+    // put the label up and to the right of the point, flipping to stay inside the graph
+    var left = (px + 10 + tw > v.w) && (px - 10 - tw >= 0);
+    var below = (py - 12 < 12);
+    lbl.setAttribute('text-anchor', left ? 'end' : 'start');
+    lbl.setAttribute('x', left ? -10 : 10);
+    lbl.setAttribute('y', below ? 20 : -10);
   }
 }
 
@@ -2275,8 +2320,36 @@ function ASpoi(el, a) {
       prev = val;
     }
   };
-  scan(1, 'x-intercept', ex.closed ? 'highest point' : 'local maximum', ex.closed ? 'lowest point' : 'local minimum');
-  if (ex.xfunc) {
+  if ((el.kind === 'circle' || el.kind === 'ellipse') && el.c) {
+    // Fixed stops at the top, bottom, left and right of the shape, plus any axis intercepts.
+    var rx = (el.kind === 'circle') ? el.r : el.rx, ry = (el.kind === 'circle') ? el.r : el.ry;
+    scan(1, 'x-intercept', null, null);
+    scan(0, 'y-intercept', null, null);
+    [[el.c[0] + rx, el.c[1], 'rightmost point'], [el.c[0], el.c[1] - ry, 'lowest point'],
+     [el.c[0] - rx, el.c[1], 'leftmost point'], [el.c[0], el.c[1] + ry, 'highest point']
+    ].forEach(function(tg) {
+      var dist = function(t) {
+        var q = P(t);
+        return (q && q[1] != null) ? Math.hypot((q[0] - tg[0])*v.xu, (q[1] - tg[1])*v.yu) : Infinity;
+      };
+      var bj = 0, bd = Infinity;
+      for (var j = 0; j < ts.length; j++) {
+        var dd = dist(ts[j]);
+        if (dd < bd) { bd = dd; bj = j; }
+      }
+      var A = ts[bj] - h, B = ts[bj] + h;  // refine around the closest sample
+      for (var it = 0; it < 60; it++) {
+        var m1 = A + (B - A)/3, m2 = B - (B - A)/3;
+        if (dist(m1) < dist(m2)) { B = m2; } else { A = m1; }
+      }
+      add((A + B)/2, [tg[2]]);
+    });
+  } else {
+    scan(1, 'x-intercept', ex.closed ? 'highest point' : 'local maximum', ex.closed ? 'lowest point' : 'local minimum');
+  }
+  if (el.kind === 'circle' || el.kind === 'ellipse') {
+    // x extremes already handled above
+  } else if (ex.xfunc) {
     scan(0, 'y-intercept', null, null);
   } else {
     scan(0, 'y-intercept', ex.closed ? 'rightmost point' : 'local x maximum',
