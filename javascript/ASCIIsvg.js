@@ -1170,14 +1170,150 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     ASnoreg--;
   }
 }
+function ASgcd(a, b) { return b === 0 ? a : ASgcd(b, a % b); }
+
+// Parse an axis step given as a string: "0.5", "1/4", "pi/2", "3pi/4", "2*pi".
+// Returns null if invalid, else {val:number, frac:null or {num,den,ispi,val}}.
+function ASparseStep(s) {
+  var m = String(s).match(/^\s*([+-]?\d+(?:\.\d+)?)?\s*\*?\s*(pi|π)?\s*(?:\/\s*(\d+))?\s*$/i);
+  if (!m || (m[1] === undefined && !m[2])) { return null; }
+  var ispi = !!m[2];
+  var num = (m[1] === undefined) ? 1 : parseFloat(m[1]);
+  var den = (m[3] === undefined) ? 1 : parseInt(m[3], 10);
+  if (!(den > 0) || !(num > 0)) { return null; }
+  var val = num*(ispi ? Math.PI : 1)/den;
+  if (Math.floor(num) !== num || (!ispi && den === 1)) { return {val:val, frac:null}; }
+  var g = ASgcd(num, den);
+  return {val:val, frac:{num:num/g, den:den/g, ispi:ispi, val:val}};
+}
+
+// Text for k times the fraction step f, as [numerator string, denominator]
+function ASfracParts(k, f) {
+  var n = k*f.num, g = ASgcd(Math.abs(n), f.den);
+  n = n/g;
+  var d = f.den/g, a = Math.abs(n);
+  var ns = f.ispi ? (a === 1 ? 'π' : a + 'π') : String(a);
+  return [(n < 0 ? '-' : '') + ns, d];
+}
+
+function ASaxlab(k, f, pt, pos) { // draw a fraction-style axis label
+  if (k === 0) { text(pt, '0', pos); return; }
+  var pr = ASfracParts(k, f);
+  if (pr[1] === 1) { text(pt, pr[0], pos); } else { textfrac(pt, pr[0], pr[1], pos); }
+}
+
+function ASfracFmt(v, f) { // v as a fraction/multiple of pi consistent with f, or null if it isn't one
+  if (Math.abs(v) < 1e-12) { return '0'; }
+  var r = v/(f.ispi ? Math.PI : 1);
+  for (var d = 1; d <= 64; d++) {
+    var m = r*d;
+    if (Math.abs(m - Math.round(m)) < 1e-5*Math.max(1, Math.abs(m))) {  // loose enough for points found numerically
+      var n = Math.round(m);
+      if (n === 0) { return '0'; }
+      var g = ASgcd(Math.abs(n), d), a = Math.abs(n)/g, dd = d/g;
+      var s = f.ispi ? (a === 1 ? 'π' : a + 'π') : String(a);
+      return (n < 0 ? '−' : '') + s + (dd === 1 ? '' : '/' + dd);
+    }
+  }
+  return null;
+}
+
+// Smooth stand-in for a path that is the graph of a function: the path only has samples, and the
+// straight chords between them cut under peaks. A cubic spline through the samples (C2, so accurate
+// even when the samples are sparse), broken into separate pieces at sharp corners. Returns
+// {f:function(x), hs} or null if x isn't strictly increasing along the points.
+function ASsmoothFn(pts0, v) {
+  if (!pts0 || pts0.length < 3) { return null; }
+  var pts = pts0.slice(), n = pts.length, xs = [], ys = [], mL = [], mR = [], i, j;
+  if (pts[0][0] > pts[n-1][0]) { pts.reverse(); }
+  for (i = 0; i < n; i++) {
+    if (i > 0 && !(pts[i][0] > pts[i-1][0])) { return null; }
+    xs.push(pts[i][0]); ys.push(pts[i][1]);
+  }
+  var seg = function(k) { return (ys[k+1] - ys[k])/(xs[k+1] - xs[k]); };
+  var hh = function(k) { return xs[k+1] - xs[k]; };
+  // pieces run between corners
+  var starts = [0];
+  for (i = 1; i < n - 1; i++) {
+    if (Math.abs(Math.atan(seg(i)*v.yu/v.xu) - Math.atan(seg(i-1)*v.yu/v.xu)) > Math.PI/6) { starts.push(i); }
+  }
+  starts.push(n - 1);
+  for (var s = 0; s < starts.length - 1; s++) {
+    var a = starts[s], b = starts[s+1], m = b - a + 1, sl = [], sub = [], rhs = [], dg = [], up = [];
+    if (m === 2) {
+      mR[a] = mL[b] = seg(a);
+      continue;
+    }
+    // end slopes from a parabola through the first (last) three points of the piece
+    sl[0] = seg(a) + (seg(a) - seg(a+1))*hh(a)/(hh(a) + hh(a+1));
+    sl[m-1] = seg(b-1) + (seg(b-1) - seg(b-2))*hh(b-1)/(hh(b-1) + hh(b-2));
+    // interior slopes: h[i] m[i-1] + 2(h[i-1]+h[i]) m[i] + h[i-1] m[i+1] = 3(h[i] d[i-1] + h[i-1] d[i])
+    for (j = 1; j < m - 1; j++) {
+      var k = a + j, hp = hh(k-1), hn = hh(k);
+      sub[j] = hn; dg[j] = 2*(hp + hn); up[j] = hp;
+      rhs[j] = 3*(hn*seg(k-1) + hp*seg(k));
+    }
+    rhs[1] -= sub[1]*sl[0];
+    rhs[m-2] -= up[m-2]*sl[m-1];
+    for (j = 2; j < m - 1; j++) {  // Thomas algorithm
+      var w = sub[j]/dg[j-1];
+      dg[j] -= w*up[j-1];
+      rhs[j] -= w*rhs[j-1];
+    }
+    for (j = m - 2; j >= 1; j--) {
+      sl[j] = (rhs[j] - (j < m - 2 ? up[j]*sl[j+1] : 0))/dg[j];
+    }
+    mR[a] = sl[0]; mL[b] = sl[m-1];
+    for (j = 1; j < m - 1; j++) { mL[a+j] = mR[a+j] = sl[j]; }
+  }
+  return {
+    hs: (xs[n-1] - xs[0])/(n-1),
+    f: function(x) {
+      if (!(x >= xs[0] && x <= xs[n-1])) { return null; }
+      var lo = 0, hi = n - 2;
+      while (lo < hi) {
+        var mid = (lo + hi + 1) >> 1;
+        if (xs[mid] <= x) { lo = mid; } else { hi = mid - 1; }
+      }
+      var h = xs[lo+1] - xs[lo], t = (x - xs[lo])/h, t2 = t*t, t3 = t2*t;
+      return (2*t3 - 3*t2 + 1)*ys[lo] + (t3 - 2*t2 + t)*h*mR[lo] +
+        (-2*t3 + 3*t2)*ys[lo+1] + (t3 - t2)*h*mL[lo+1];
+    }
+  };
+}
+
+function ASfmtAx(v, dec, f) { // number to text for an axis, as a fraction if the axis uses fraction labels
+  if (f) {
+    var s = ASfracFmt(v, f);
+    if (s !== null) { return s; }
+  }
+  return ASfmt(v, dec);
+}
+
+function ASfracSteps(f, W) { // keyboard steps when an axis is labeled in fractions
+  return {normal:f.val/2, small:f.val/8, large:f.val*Math.max(1, Math.round(W/(4*f.val)))};
+}
+
 function axes_(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 //xscl=x is equivalent to xtick=x; xgrid=x; labels=true;
-  var x, y, ldx, ldy, lx, ly, lxp, lyp, pnode, st;
+// dx and dy may be strings giving fractions or multiples of pi, like "1/4" or "pi/2";
+// the axis is then labeled with fractions
+  var x, y, ldx, ldy, lx, ly, lxp, lyp, pnode, st, xf = null, yf = null, k, pd;
   if (!initialized) initPicture();
-  if (typeof dx=="string") { labels = dx; dx = null; }
-  if (typeof dy=="string") { gdx = dy; dy = null; }
-  if (xscl!=null) {dx = xscl; gdx = xscl; labels = dx}
-  if (yscl!=null) {dy = yscl; gdy = yscl}
+  if (typeof dx=="string") {
+    pd = ASparseStep(dx);
+    if (pd) { dx = pd.val; xf = pd.frac; if (labels==null) { labels = 1; } } else { dx = null; }
+  }
+  if (typeof dy=="string") {
+    pd = ASparseStep(dy);
+    if (pd) { dy = pd.val; yf = pd.frac; if (labels==null) { labels = 1; } } else { dy = null; }
+  }
+  if (xscl!=null) {dx = xscl; gdx = xscl; labels = dx; xf = null;}
+  if (yscl!=null) {dy = yscl; gdy = yscl; yf = null;}
+  if (svgpicture && svgpicture._as) {
+    svgpicture._as.view.xfrac = xf;
+    svgpicture._as.view.yfrac = yf;
+  }
   if (xtick!=null) {dx = xtick}
   if (ytick!=null) {dy = ytick}
   if (dox==null) {dox = true;}
@@ -1299,20 +1435,38 @@ function axes_(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     if (ddy<0) { ddy = 0;}
     if (ddx<0) { ddx = 0;}
     if (dox && dx>0) {
+      if (xf) {
+        for (k = (doy?1:0); k*ldx<=xmax+1e-9; k++)
+          if (k*ldx>=xmin-1e-9) ASaxlab(k, xf, [k*ldx,ly], lxp);
+        if (!fqonlyx) {
+          for (k = -1; k*ldx>=xmin-1e-9; k--)
+            if (k*ldx<=xmax+1e-9) ASaxlab(k, xf, [k*ldx,ly], lxp);
+        }
+      } else {
 	    for (x = (doy?ldx:0); x<=xmax; x = x+ldx)
 	      if (x>=xmin) text([x,ly], rounddec(x, ddx),lxp);
 	    if (!fqonlyx) {
 	      for (x = -ldx; xmin<=x; x = x-ldx)
 	        if (x<=xmax) text([x,ly], rounddec(x, ddx),lxp);
 	    }
+      }
     }
     if (doy && dy>0) {
+      if (yf) {
+        for (k = (dox?1:0); k*ldy<=ymax+1e-9; k++)
+          if (k*ldy>=ymin-1e-9) ASaxlab(k, yf, [lx,k*ldy], lyp);
+        if (!fqonlyy) {
+          for (k = -1; k*ldy>=ymin-1e-9; k--)
+            if (k*ldy<=ymax+1e-9) ASaxlab(k, yf, [lx,k*ldy], lyp);
+        }
+      } else {
 	    for (y = (dox?ldy:0); y<=ymax; y = y+ldy)
 	      if (y>=ymin) text([lx,y], rounddec(y, ddy), lyp);
       	    if (!fqonlyy) {
 	      for (y = -ldy; ymin<=y; y = y-ldy)
 	        if (y<=ymax) text([lx,y], rounddec(y, ddy), lyp);
 	    }
+      }
     }
   }
   if (st !== '') {
@@ -1862,7 +2016,7 @@ function ASfirstVisible(ex, v) {
 }
 
 function ASpt(q, ex) {
-  return ex.xn + ' ' + ASfmt(q[0], ex.dx) + ', ' + ex.yn + ' ' + ASfmt(q[1], ex.dy);
+  return ex.xn + ' ' + ex.fx(q[0]) + ', ' + ex.yn + ' ' + ex.fy(q[1]);
 }
 
 function ASplain(st) {
@@ -1876,6 +2030,8 @@ function ASprep(el, a) {
   var ex = {isStatic:false, snap:false, closed:false, verts:[], sign:1, at:null,
     dx:ASdecFor(v.xmax - v.xmin), dy:ASdecFor(v.ymax - v.ymin),
     xn:v.xname || 'x', yn:v.yname || 'y'};
+  ex.fx = function(n) { return ASfmtAx(n, ex.dx, v.xfrac); };
+  ex.fy = function(n) { return ASfmtAx(n, ex.dy, v.yfrac); };
   el.ex = ex;
   if (kind === 'dot' || kind === 'text' || kind === 'slopefield') {
     ex.isStatic = true;
@@ -1910,6 +2066,10 @@ function ASprep(el, a) {
     if (!(W > 0)) { W = 1; }
     var n = ASnice(W/20);
     ex.steps = {normal:n, small:ASsmall(n), large:ASnice(W/4)};
+    if (kind === 'plot' && v.xfrac) {
+      ex.steps = ASfracSteps(v.xfrac, W);
+      ex.xsteps = ex.steps;  // land on exact multiples of the step, not offsets from the window edge
+    }
     ex.dx = Math.max(ex.dx, ASdecOf(ex.steps.small));
     ex.lowMark = (ex.lowT === el.t0) ? el.startMark : null;
     ex.highMark = (ex.highT === el.t1) ? el.endMark : null;
@@ -1991,12 +2151,24 @@ function ASprep(el, a) {
     }
     if (xmono && Math.abs(ddx) >= 0.1*T) {
       var Wx = v.xmax - v.xmin, nx = ASnice(Wx/20);
-      ex.xsteps = {normal:nx, small:ASsmall(nx), large:ASnice(Wx/4)};
+      ex.xsteps = v.xfrac ? ASfracSteps(v.xfrac, Wx) : {normal:nx, small:ASsmall(nx), large:ASnice(Wx/4)};
       ex.xlo = Math.min(p0[0], p1[0]);
       ex.xhi = Math.max(p0[0], p1[0]);
       ex.dx = Math.max(ex.dx, ASdecOf(ex.xsteps.small));
       ex.lowName = "Left end"; ex.highName = "Right end";
       ex.xfunc = true;
+      if (el.polyline && el.pts && !el.vertMark) {  // report y from a smooth curve through the samples, not the chords
+        var smo = ASsmoothFn(el.pts, v);
+        if (smo) {
+          var rawpos = ex.pos;
+          ex.pos = function(s) {
+            var p = rawpos(s), y = p ? smo.f(p[0]) : null;
+            return y === null ? p : [p[0], y];
+          };
+          ex.smooth = true;
+          ex.hs = smo.hs;
+        }
+      }
       ex.sAtX = function(nx) { // x is monotone along the path, so bisect for the position
         if (nx <= ex.xlo || nx >= ex.xhi) { return ((nx <= ex.xlo) === (ex.sign > 0)) ? 0 : ex.T; }
         var sa = 0, sb = ex.T;
@@ -2065,7 +2237,7 @@ function ASposText(el, a, t) { // where we are on the element
   }
   var p = ex.pos(t);
   if (!p) {
-    return el.kind === 'plot' ? ex.xn + ' ' + ASfmt(t, ex.dx) + ', undefined' : 'undefined';
+    return el.kind === 'plot' ? ex.xn + ' ' + ex.fx(t) + ', undefined' : 'undefined';
   }
   var s = ASpt(p, ex);
   var ex_ = (v.xmax - v.xmin)*1e-6, ey_ = (v.ymax - v.ymin)*1e-6;
@@ -2077,8 +2249,8 @@ function ASposText(el, a, t) { // where we are on the element
 
 function ASwindowDesc(a) {
   var v = a.view, dx = ASdecFor(v.xmax - v.xmin), dy = ASdecFor(v.ymax - v.ymin);
-  return 'Graph window: ' + (v.xname || 'x') + ' from ' + ASfmt(v.xmin, dx) + ' to ' + ASfmt(v.xmax, dx) +
-    ', ' + (v.yname || 'y') + ' from ' + ASfmt(v.ymin, dy) + ' to ' + ASfmt(v.ymax, dy) + '.';
+  return 'Graph window: ' + (v.xname || 'x') + ' from ' + ASfmtAx(v.xmin, dx, v.xfrac) + ' to ' + ASfmtAx(v.xmax, dx, v.xfrac) +
+    ', ' + (v.yname || 'y') + ' from ' + ASfmtAx(v.ymin, dy, v.yfrac) + ' to ' + ASfmtAx(v.ymax, dy, v.yfrac) + '.';
 }
 
 function ASsummary(a) {
@@ -2142,7 +2314,7 @@ function ASplace(a) { // put the visible marker at the current position
     var px = p[0]*v.xu + v.ox, py = v.h - p[1]*v.yu - v.oy;
     a.mk.setAttribute('transform', 'translate(' + px + ',' + py + ')');
     var lbl = a.mk._label;
-    lbl.textContent = '(' + ASfmt(p[0], ex.dx) + ', ' + ASfmt(p[1], ex.dy) + ')';
+    lbl.textContent = '(' + ex.fx(p[0]) + ', ' + ex.fy(p[1]) + ')';
     var tw = 0;
     try { tw = lbl.getComputedTextLength(); } catch (e) {}
     if (!(tw > 0)) { tw = lbl.textContent.length*7.5; }
@@ -2282,6 +2454,10 @@ function ASpoi(el, a) {
   var W = [v.xmax - v.xmin, v.ymax - v.ymin];
   var add = function(t, labels) {
     var p = P(t);
+    if (ex.smooth && v.xfrac && p) {  // found from samples; if it is within a fraction of a sample of a label value, it is that value
+      var xl = Math.round(p[0]/v.xfrac.val)*v.xfrac.val;
+      if (Math.abs(p[0] - xl) < 0.2*ex.hs) { t = ex.sAtX(xl); p = P(t); }
+    }
     if (ASinWin(p, v)) { list.push({t:wrap(t), p:p, labels:labels}); }
   };
   // c is the coordinate to scan: 1 for y (x-intercepts, max/min of y), 0 for x

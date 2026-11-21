@@ -1090,6 +1090,16 @@ function addfractionaxislabels($plot, $step, $axis = "x") {
         echo "error: bad step size on pilabels";
         return;
     }
+    if (($_SESSION['graphdisp'] ?? 0) == 1) {
+        // SVG: asciisvg's axes() accepts a fraction string for the step, and draws the
+        // ticks and fraction labels itself (not explorable, and used for keyboard steps)
+        $jsstep = (($ispi && $num == 1) ? '' : $num) . ($ispi ? 'pi' : '') . ($den == 1 ? '' : '/' . $den);
+        if ($axis === 'x') {
+            return preg_replace('/axes\([^,]*,/', 'axes("' . $jsstep . '",', $plot, 1);
+        } else {
+            return preg_replace('/axes\(([^,]*),[^,]*,/', 'axes($1,"' . $jsstep . '",', $plot, 1);
+        }
+    }
     $tm = -.02 * $crossrange;
     $tx = .02 * $crossrange;
     $step = ceil($min / $stepn);
@@ -1117,21 +1127,14 @@ function addfractionaxislabels($plot, $step, $axis = "x") {
             $ld = $n;
         }
         
-        if (($_SESSION['graphdisp']??0)==1) {
-            if ($axis === 'x') {
-                $outst .= "line([$av,$tm],[$av,$tx]); textfrac([$av,$tm],\"$ld\",$d,\"below\");";
-            } else if ($axis === 'y') {
-                $outst .= "line([$tm,$av],[$tx,$av]); textfrac([$tm,$av],\"$ld\",$d,\"left\");";
-            }
-        } else {
-            if ($d != 1) {
-                $ld .= "/$d";
-            }
-            if ($axis === 'x') {
-                $outst .= "line([$av,$tm],[$av,$tx]); text([$av,$tm],\"$ld\",\"below\");";
-            } else if ($axis === 'y') {
-                $outst .= "line([$tm,$av],[$tx,$av]); text([$tm,$av],\"$ld\",\"left\");";
-            }
+        // image output
+        if ($d != 1) {
+            $ld .= "/$d";
+        }
+        if ($axis === 'x') {
+            $outst .= "line([$av,$tm],[$av,$tx]); text([$av,$tm],\"$ld\",\"below\");";
+        } else if ($axis === 'y') {
+            $outst .= "line([$tm,$av],[$tx,$av]); text([$tm,$av],\"$ld\",\"left\");";
         }
         $step++;
     }
