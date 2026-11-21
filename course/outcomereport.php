@@ -98,7 +98,7 @@ $typesel .= "<option value=0 ".($hidelocked==0?'selected':'').">". _('Show Locke
 $typesel .= "<option value=2 ".($hidelocked==2?'selected':'').">". _('Hide Locked'). "</option>";
 $typesel .= "</select></label>";
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
 
 if ($report == 'overview') {
 	$placeinhead .= '<script>

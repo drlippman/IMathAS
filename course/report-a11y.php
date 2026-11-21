@@ -262,7 +262,7 @@ $curBreadcrumb = $breadcrumbbase;
 $curBreadcrumb .= "<a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 $curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">" . _('Course Reports') . "</a> ";
 $placeinhead = '<style>tbody tr:hover, tbody tr:hover > * {background-color:#c1f5ff !important;} h2 {font-size:105%;}</style>';
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/tablesorter.js?v=112026"></script>';
 
 require_once "../header.php";
 echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; '.$pagetitle.'</div>';

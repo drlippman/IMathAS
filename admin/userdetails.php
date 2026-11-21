@@ -147,7 +147,7 @@ if ($myrights < 75) {
 }
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
 $placeinhead .= '<style type="text/css">
 li.unhide {
   display: none;

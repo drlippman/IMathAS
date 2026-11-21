@@ -334,8 +334,12 @@ th[aria-sort="ascending"]::after {
 th[aria-sort="descending"]::after {
 	content: "\2193";
 }
-th[tabindex] {
+th.tsortable {
 	cursor:pointer;
+}
+th.tsortable:focus-within {
+	outline: 2px solid #005fcc;
+	outline-offset: -2px;
 }
 td.c, th.c, input.c {
 	text-align: center;

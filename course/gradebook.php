@@ -356,7 +356,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 		$includeduedate = true;
 	}
 	$pagetitle = _('Gradebook');
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=051820\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
 	$placeinhead .= '<script type="text/javascript">
 		function showfb(id,type,uid,link) {
 			if (type=="all") {
@@ -453,7 +453,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	require_once "../footer.php";
 
 } else { //show instructor view
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=012811\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
 	
 	$showwidthtoggle = (strpos($coursetheme, '_fw')!==false);
 
@@ -1736,7 +1736,7 @@ function gbinstrdisp() {
 		array_splice($gbt,1,0,array($avgrow));
 	}
 	//print_r($gbt);
-	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n"; in placeinhead
+	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=112026\"></script>\n"; in placeinhead
 	echo "<div id=\"tbl-container\">";
 	echo '<div id="bigcontmyTable">';
 	if ($headerslocked) {

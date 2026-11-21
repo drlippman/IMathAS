@@ -932,7 +932,7 @@ if (isset($searchtype)) {
 		require_once('../includes/questionsearch.php');
 		outputSearchUI($searchtype, $searchterms, $search_results);
 
-		echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=082913\"></script>\n";
+		echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
 		echo "<form id=\"selq\" method=post action=\"manageqset.php?cid=$cid\">\n";
 		//echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
 		echo '<div class="stickyonscroll">Check: <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selq\',\'nchecked[]\',false)">None</a> ';

@@ -59,7 +59,7 @@ $placeinhead = '
    }
    #homefullwidth { clear: both;}
   </style>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
 if ($showpostsgadget) {
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/forumthreadcache.js?v=090226\"></script>\n";
 }

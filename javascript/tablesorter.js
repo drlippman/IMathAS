@@ -17,6 +17,7 @@ Alf Magne Kalleland
 (function() {
 	var tableWidget_okToSort = true;
 	var tableWidget_arraySort = [];
+	var tableWidget_status = [];
 	var tableWidget_tableCounter = 1;
 	var activeColumn = [];
 	var evenodd = [];
@@ -135,9 +136,18 @@ Alf Magne Kalleland
 		}
 	}
 
+	function getHeaderText(th) {
+		var clone = th.cloneNode(true);
+		var rm = clone.querySelectorAll('select,a,button,input,.sr-only');
+		for (var i=0; i<rm.length; i++) { rm[i].remove(); }
+		return clone.textContent.replace(/\s+/g,' ').trim();
+	}
+
 	function sortTable(e)
 	{
 		var el = e.currentTarget;
+		// don't sort when interacting with controls inside the header
+		if (e.target.closest && e.target.closest('a,select,input,option,label')) return;
 		if(!tableWidget_okToSort)return;
 		tableWidget_okToSort = false;
 		/* Getting index of current column */
@@ -258,7 +268,11 @@ Alf Magne Kalleland
 
 		tableWidget_okToSort = true;
 
-
+		if (tableWidget_status[widgetIndex]) {
+			var hdrtext = getHeaderText(el);
+			tableWidget_status[widgetIndex].textContent = (hdrtext ? _('Sorted by') + ' ' + hdrtext + ', ' : '') +
+				(direction=='descending' ? _('descending') : _('ascending'));
+		}
 	}
 	//sortlast:  true to sort last, false to not sort last, -n to not
 	//sort last n rows.  undef sorts all
@@ -273,27 +287,26 @@ Alf Magne Kalleland
 		var cells = tHead.getElementsByTagName('TH');
 		for(var no=0;no<cells.length;no++){
 			if(sortArray[no]){
+				cells[no].classList.add('tsortable');
+				// mouse users click the header; keyboard/screen reader users
+				// use a real (visually hidden) button, whose click bubbles up.
+				// We append it rather than wrapping content, since headers may
+				// contain links/selects and other scripts expect the first child.
 				cells[no].addEventListener("click", sortTable);
-				cells[no].setAttribute('tabindex', 0);
-				cells[no].addEventListener("keydown", function(e) {
-					if (e.key == 'Enter') {
-						sortTable(e);
-						e.preventDefault();
-						return false;
-					}
-				});
+				var hdrtext = getHeaderText(cells[no]);
+				var btn = document.createElement("button");
+				btn.type = "button";
+				btn.className = "sr-only tsortbtn";
+				btn.textContent = hdrtext ? (_('Sort by') + ' ' + hdrtext) : _('Sort');
+				cells[no].appendChild(btn);
 			}
 		}
-		let caption = obj.querySelector("caption");
-		if (!caption) {
-			caption = document.createElement("caption");
-			caption.className = "sr-only";
-			obj.insertBefore(caption, obj.firstChild);
-		}
-		let infspan = document.createElement("span");
-		infspan.className = "sr-only";
-		infspan.textContent = _('Any focusable table header can be clicked to sort');
-		caption.append(infspan);
+		var status = document.createElement("div");
+		status.className = "sr-only";
+		status.setAttribute("role", "status");
+		status.setAttribute("aria-live", "polite");
+		obj.parentNode.insertBefore(status, obj.nextSibling);
+		tableWidget_status[widgetIndex] = status;
 
 		//for(var no2=0;no2<sortArray.length;no2++){	/* Right align numeric cells */
 		//	if(sortArray[no2] && sortArray[no2]=='N')obj.rows[0].cells[no2].style.textAlign='right';

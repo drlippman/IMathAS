@@ -173,7 +173,7 @@
 		echo '<div id="gradeboxes">';
 		echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
 		if ($hassection) {
-			echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js\"></script>\n";
+			echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
 		}
 		if ($_GET['uid']=='all') {
 			echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>";
