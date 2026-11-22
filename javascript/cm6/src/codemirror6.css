@@ -56,7 +56,8 @@ div.cm-editor .cm-scroller { align-items: stretch !important; }
 .cm-matchingtag { background: rgba(255, 150, 0, .3); }
 
 /* selected text: white on blue */
-.cm-selected-text { color: #fff !important; background-color: #3366AA; }
+.cm-editor .cm-content ::selection,
+.cm-editor .cm-content::selection { color: #fff; background-color: #3366AA; }
 
 .cm-editor .cm-gutters { background-color: #f7f7f7; border-right: 1px solid #ddd; }
 .cm-editor .cm-lineNumbers .cm-gutterElement { color: #999; }

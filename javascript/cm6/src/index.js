@@ -11,7 +11,7 @@ import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { imathas } from "./imathas-mode.js";
 import { qtext } from "./qtext.js";
 import { highlighting } from "./tags.js";
-import { matchTags, scriptBracketMatching, closeBracketsOnlyInScript, preserveInPre, selectedText, clickToFocus, answerLines, setAnswerHighlight } from "./extras.js";
+import { matchTags, scriptBracketMatching, closeBracketsOnlyInScript, preserveInPre, clickToFocus, answerLines, setAnswerHighlight } from "./extras.js";
 
 // Tab inserts a tab (or indents a selection), Shift-Tab dedents
 const tabKeys = [{
@@ -44,7 +44,6 @@ function fromTextArea(ta, opts) {
     indentUnit.of("  "),
     EditorState.readOnly.of(!!opts.readOnly),
     EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
-    selectedText,
     clickToFocus,
     keymap.of([...tabKeys, ...defaultKeymap, ...historyKeymap])
   ];
