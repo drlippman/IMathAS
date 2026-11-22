@@ -262,6 +262,7 @@ class QuestionHtmlGenerator
         // Eval the question writer's question code.
         // In older questions, code is broken up into three parts.
         // In "modern" questions, the last two parts are empty.
+        $GLOBALS['mqfillinparts'] = []; // set by setupmathquillfillin
         try {
           $db_qsetid = $this->questionParams->getDbQuestionSetId();
           $controlinterpcode = interpret('control', $quesData['qtype'], $quesData['control'], 1, [$db_qsetid]);

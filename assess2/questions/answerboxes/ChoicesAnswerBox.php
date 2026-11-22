@@ -42,11 +42,15 @@ class ChoicesAnswerBox implements AnswerBox
         $style = '';
         $params = [];
 
-        $optionkeys = ['displayformat', 'answer', 'noshuffle', 'readerlabel', 'ansprompt'];
+        $optionkeys = ['displayformat', 'answer', 'noshuffle', 'readerlabel', 'ansprompt', 'answerboxsize'];
         foreach ($optionkeys as $optionkey) {
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
         $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
+        if ($multi && !empty($GLOBALS['mqfillinparts'][$partnum])) {
+            // part is used in a setupmathquillfillin; must be a select
+            $displayformat = 'select';
+        }
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');
@@ -133,6 +137,9 @@ class ChoicesAnswerBox implements AnswerBox
             }
             if ($colorbox != '') {$style .= ' class="' . $colorbox . '" ';} else { $style = '';}
             $out = "<select name=\"qn$qn\" id=\"qn$qn\" $style ";
+            if (!empty($answerboxsize)) { // used when the select is inside a setupmathquillfillin
+                $out .= 'data-boxsize="' . Sanitize::encodeStringForDisplay(sizeToCSS($answerboxsize)) . '" ';
+            }
             $out .= 'aria-label="' . $arialabel . '">';
             $out .= "<option value=\"NA\">$msg</option>\n";
         } else if ($displayformat == "horiz") {
