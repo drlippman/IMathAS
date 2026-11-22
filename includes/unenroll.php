@@ -80,9 +80,13 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 	// validate tounenroll
 	if (!empty($tounenroll) && count($tounenroll)>0) {
         $stulist = implode(',', array_map('intval', $tounenroll));
-		$stm = $DBH->prepare("SELECT userid FROM imas_students WHERE userid IN ($stulist) AND courseid=?");
+		$stm = $DBH->prepare("SELECT s.userid,u.LastName,u.FirstName FROM imas_students AS s JOIN imas_users AS u ON u.id=s.userid WHERE s.userid IN ($stulist) AND s.courseid=?");
 		$stm->execute([$cid]);
-		$tounenroll = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
+		$unenrolledNames = [];
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$unenrolledNames[$row[0]] = $row[1] . ', ' . $row[2];
+		}
+		$tounenroll = array_keys($unenrolledNames);
 	}
 	if (!empty($tounenroll) && count($tounenroll)>0) {
         $stulist = implode(',', array_map('intval', $tounenroll));
@@ -287,7 +291,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			"Unenroll",
 			null,
 			array(
-				"unenrolled"=>$stulist,
+				"unenrolled"=>$unenrolledNames,
 				"grades"=>$grades
 			)
 		);

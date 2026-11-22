@@ -68,7 +68,9 @@ function getAllNames($allactions) {
             }
         } else if ($action['action'] == 'Unenroll') {
             $data = json_decode($action['metadata'], true);
-            if (!empty($data['unenrolled'])) { // may be missing if metadata was truncated
+            // may be missing if metadata was truncated. Newer entries store an
+            // array of uid=>name; older ones a comma-separated string of uids
+            if (!empty($data['unenrolled']) && is_string($data['unenrolled'])) {
                 $uids = array_merge($uids, explode(',', $data['unenrolled']));
             }
         }
@@ -114,9 +116,16 @@ function mapMetadata($action) {
             // bad or truncated metadata; leave as raw text
             return $action;
         }
-        $data['unenrolled'] = explode(',',$data['unenrolled']);
-        foreach ($data['unenrolled'] as $k=>$v) {
-            $data['unenrolled'][$k] = $stunames[$v] ?? $v;
+        if (is_string($data['unenrolled'])) { // old format: comma-separated uids
+            $data['unenrolled'] = explode(',',$data['unenrolled']);
+            foreach ($data['unenrolled'] as $k=>$v) {
+                $data['unenrolled'][$k] = $stunames[$v] ?? $v;
+            }
+        } else { // new format: uid=>name. Use stored names for the grades mapping too
+            foreach ($data['unenrolled'] as $uid=>$name) {
+                $stunames[$uid] = $name;
+            }
+            $data['unenrolled'] = array_values($data['unenrolled']);
         }
         $newgrades = [];
         foreach ($data['grades'] as $uid=>$grades) {
