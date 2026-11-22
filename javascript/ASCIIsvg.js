@@ -2241,6 +2241,17 @@ function ASprepareElement(el, a) {
     var p0 = ex.pos(0), p1 = ex.pos(T);
     var ddx = (p1[0]-p0[0])*v.xu, ddy = (p1[1]-p0[1])*v.yu;
     var horiz = Math.abs(ddx) >= Math.abs(ddy);
+    if (!horiz && ddx !== 0 && Math.abs(ddx) >= 0.1*T) {
+      // A path whose x never reverses is a function-like graph even if it is steep
+      // (e.g. one branch of 1/((x-2)(x-3))); keep Left/Right matching x.
+      var sgx = ddx > 0 ? 1 : -1, lastx = null, mono = true, tx = 0.01/v.xu;
+      for (var k = 0; k <= 200 && mono; k++) {
+        var xk = ex.pos(T*k/200)[0];
+        if (lastx !== null && (xk - lastx)*sgx < -tx) { mono = false; }
+        lastx = xk;
+      }
+      if (mono) { horiz = true; }
+    }
     ex.sign = (horiz ? ddx : ddy) >= 0 ? 1 : -1;  // so that Right/Up goes toward the right/top end
     ex.lowT = ex.sign > 0 ? 0 : T;
     ex.highT = ex.sign > 0 ? T : 0;
@@ -2782,7 +2793,7 @@ function ASmakeAccessible() {
   if (!live) {
     live = document.createElement('div');
     live.id = picid + '-live';
-    //live.className = 'sr-only';
+    live.className = 'small'; // 'sr-only';
     //live.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;';
     live.setAttribute('aria-live', 'assertive');
     live.setAttribute('aria-atomic', 'true');
