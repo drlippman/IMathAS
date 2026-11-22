@@ -894,7 +894,7 @@
 
 	$useeditor = "noinit";
 	$editorquestionids = "qtext,solution"; //question editors: uploads stored publicly
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=112226"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=112226b"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=112226">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
@@ -921,9 +921,8 @@
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.cm-editor {font-size: medium;border: 1px solid #ccc;}
-		#ccbox .cm-editor, #qtbox .cm-editor {height: auto; clip-path: inset(0px);}
-		#ccbox .cm-scroller {min-height:220px; max-height:600px;}
-		#qtbox .cm-scroller {min-height:150px; max-height:600px;}
+		#ccbox .cm-editor, #qtbox .cm-editor {min-height:220px; max-height:600px;}
+		.cm-editor { -webkit-text-size-adjust: 100%; }
         .dd-active {background-color: #eef;}
 		</style>';
 	$placeinhead .= "<link href=\"$staticroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";

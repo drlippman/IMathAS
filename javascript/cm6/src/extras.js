@@ -132,7 +132,7 @@ export const selectedText = ViewPlugin.fromClass(class {
 }, { decorations: v => v.decorations });
 
 /* ---- clicking blank space inside the editor box focuses the editor ---- */
-
+/*
 export const clickToFocus = ViewPlugin.define(view => {
   const scroller = view.scrollDOM;
   const onDown = e => {
@@ -153,7 +153,7 @@ export const clickToFocus = ViewPlugin.define(view => {
   scroller.addEventListener("mousedown", onDown);
   return { destroy() { scroller.removeEventListener("mousedown", onDown); } };
 });
-
+*/
 /* ---- highlight lines that set $answer (used by the solver while dragging) ---- */
 
 export const setAnswerHighlight = StateEffect.define();
