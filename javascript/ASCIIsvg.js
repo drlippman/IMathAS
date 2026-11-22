@@ -1481,13 +1481,30 @@ function axes_(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 
 
 function slopefield(fun,dx,dy) {
-  ASregisterElement({kind:'slopefield', src:(typeof fun=="string"?fun:null)});
+  var g = fun;
+  if (typeof fun=="string") {
+    g = makeMathFunction(fun.replace(/Math\./g,''), 'x|y');
+  }
+  if (dx==null) dx=1;
+  if (dy==null) dy=1;
+  ASregisterElement({kind:'slopefield', src:(typeof fun=="string"?fun:null), g:g, gdx:dx, gdy:dy});
   ASnoreg++;
   try {
-    slopefield_(fun,dx,dy);
+    slopefield_(g,dx,dy);
   } finally {
     ASnoreg--;
   }
+}
+// Explorable field from precomputed values, so the equation need not be revealed.
+// xs, ys: grid coordinates (ascending); vals[j][i]: [vx,vy] at (xs[i],ys[j]), or null if undefined.
+// vector: describe as vectors rather than slopes. Call fieldend() after drawing the marks,
+// so the marks aren't registered as separate line elements.
+function fielddata(xs, ys, vals, vector) {
+  ASregisterElement({kind:'slopefield', src:null, xs:xs, ys:ys, vals:vals, vector:!!vector});
+  ASnoreg++;
+}
+function fieldend() {
+  if (ASnoreg > 0) { ASnoreg--; }
 }
 function slopefield_(fun,dx,dy) {
   var g = fun;
@@ -1903,6 +1920,19 @@ function ASregisterElement(el, force) {
   els.push(el);
 }
 
+// Inequality shading is drawn as a separate filled shape that isn't explorable.
+// ASmarkShadeStart is called before the boundary is drawn, and ASshaded afterward
+// notes the shading direction on the boundary's element(s) so it gets described.
+var ASshadeStart = 0;
+function ASmarkShadeStart() {
+  ASshadeStart = (svgpicture && svgpicture._as) ? svgpicture._as.els.length : 0;
+}
+function ASshaded(direction) {
+  if (!svgpicture || !svgpicture._as) { return; }
+  var els = svgpicture._as.els;
+  for (var i = ASshadeStart; i < els.length; i++) { els[i].shaded = direction; }
+}
+
 function ASendMarkers() { // markers currently set for line/arc ends
   if (marker=="dot") { return {s:"dot", e:"dot"}; }
   if (marker=="arrowdot") { return {s:"dot", e:"dot and arrow"}; }
@@ -2023,6 +2053,83 @@ function ASplainText(st) {
   return String(st).replace(/<[^>]*>/g, '').replace(/`/g, '');
 }
 
+// Slope fields are traced on the grid of slope marks: rows of fixed y, left to right.
+function ASprepareSlopeGrid(el, ex, v) {
+  var gx = el.gdx, gy = el.gdy, xs = [], ys = [], i, r = function(n) { return parseFloat(n.toPrecision(12)); };
+  if (el.vals) {  // precomputed grid
+    xs = el.xs; ys = el.ys;
+    gx = xs.length > 1 ? xs[1] - xs[0] : v.xmax - v.xmin;
+    gy = ys.length > 1 ? ys[1] - ys[0] : v.ymax - v.ymin;
+  } else {
+    if (!(gx > 0) || !(gy > 0)) { return; }
+    var x0 = Math.ceil(v.xmin/gx - 1e-9), y0 = Math.ceil(v.ymin/gy - 1e-9);
+    for (i = x0; i*gx <= v.xmax + 1e-9*gx; i++) { xs.push(r(i*gx)); }
+    for (i = y0; i*gy <= v.ymax + 1e-9*gy; i++) { ys.push(r(i*gy)); }
+  }
+  if (!xs.length || !ys.length) { return; }
+  ex.grid = {xs:xs, ys:ys, ix:0, iy:0};
+  ex.dx = Math.max(ex.dx, ASdecimalsForStep(gx));
+  ex.dy = Math.max(ex.dy, ASdecimalsForStep(gy));
+  ASsetSlopePoint(el, ex, 0, 0);
+}
+
+function ASsetSlopePoint(el, ex, ix, iy) {
+  var G = ex.grid;
+  G.ix = ix; G.iy = iy;
+  ex.at = [G.xs[ix], G.ys[iy]];
+}
+
+function ASslopeText(el, ex) {
+  var G = ex.grid, s, t, d = Math.max(2, Math.min(6, ex.dx));
+  if (el.vals) {
+    var w = el.vals[G.iy] && el.vals[G.iy][G.ix];
+    if (!w) { return el.vector ? 'vector undefined' : 'slope undefined'; }
+    if (el.vector) { return 'vector ' + ASformatNumber(w[0], d) + ', ' + ASformatNumber(w[1], d); }
+    if (w[0] === 0) { return 'slope ' + (w[1] === 0 ? 'undefined' : 'vertical'); }
+    s = w[1]/w[0];
+  } else {
+    s = el.g({x:G.xs[G.ix], y:G.ys[G.iy]});
+  }
+  if (isNaN(s)) { t = 'undefined'; }
+  else if (Math.abs(s) === Infinity) { t = 'vertical'; }
+  else { t = ASformatNumber(s, d); }
+  return 'slope ' + t;
+}
+
+// Right/Up and Left/Down step through the points of a row (continuing on to the next row);
+// Shift+arrow and PageUp/PageDown move to the next/previous row; Home/End go to the ends of the row.
+function ASslopeKey(a, k, shift) {
+  var el = a.els[a.cur], ex = ASprepareElement(el, a), G = ex.grid;
+  var nx = G.xs.length, ny = G.ys.length, ix = G.ix, iy = G.iy, note = '', dir = 0, rowMove = false;
+  switch (k) {
+    case 'ArrowRight': case 'ArrowUp': dir = 1; rowMove = shift; break;
+    case 'ArrowLeft': case 'ArrowDown': dir = -1; rowMove = shift; break;
+    case 'PageUp': dir = 1; rowMove = true; break;
+    case 'PageDown': dir = -1; rowMove = true; break;
+    case 'Home': ix = 0; note = 'Start of row. '; break;
+    case 'End': ix = nx - 1; note = 'End of row. '; break;
+    default: return null;
+  }
+  if (dir) {
+    if (rowMove) {
+      if (iy + dir < 0 || iy + dir >= ny) { return (dir > 0 ? 'Top' : 'Bottom') + ' row of the slope field.'; }
+      iy += dir;
+      note = 'Row at ' + ex.yn + ' ' + ex.fy(G.ys[iy]) + '. ';
+    } else if (ix + dir >= 0 && ix + dir < nx) {
+      ix += dir;
+    } else if (iy + dir >= 0 && iy + dir < ny) {
+      iy += dir;
+      ix = dir > 0 ? 0 : nx - 1;
+      note = 'New row. ';
+    } else {
+      return dir > 0 ? 'Last slope mark in the field.' : 'First slope mark in the field.';
+    }
+  }
+  ASsetSlopePoint(el, ex, ix, iy);
+  ASplaceMarker(a);
+  return note + ASpositionText(el, a, 0);
+}
+
 // Work out how to move along an element. Cached on the element.
 function ASprepareElement(el, a) {
   if (el.ex) { return el.ex; }
@@ -2036,6 +2143,7 @@ function ASprepareElement(el, a) {
   if (kind === 'dot' || kind === 'text' || kind === 'slopefield') {
     ex.isStatic = true;
     ex.at = el.at || null;
+    if (kind === 'slopefield' && (el.g || el.vals)) { ASprepareSlopeGrid(el, ex, v); }
     return ex;
   }
   if (kind === 'plot' || kind === 'param') {
@@ -2185,6 +2293,10 @@ function ASprepareElement(el, a) {
 }
 
 function ASdescribe(el, a) { // what the element is, without a position
+  return ASdescribeBase(el, a) + (el.shaded ? ', shaded ' + el.shaded : '');
+}
+
+function ASdescribeBase(el, a) {
   var ex = ASprepareElement(el, a), v = a.view;
   var st = ASstyle(el), filled = (el.fill && el.fill !== 'none');
   var P = function(q) { return ASpointText(q, ex); };
@@ -2225,7 +2337,7 @@ function ASdescribe(el, a) { // what the element is, without a position
     case 'text':
       return ASmapColorName(el.stroke) + ' text label "' + ASplainText(el.str) + '"';
     case 'slopefield':
-      return 'slope field' + (el.src != null ? ', slope equals ' + ASspeakableEquation(el.src) : '');
+      return (el.vector ? 'vector field' : 'slope field') + (el.src != null ? ', slope equals ' + ASspeakableEquation(el.src) : '');
   }
   return el.kind;
 }
@@ -2233,7 +2345,8 @@ function ASdescribe(el, a) { // what the element is, without a position
 function ASpositionText(el, a, t) { // where we are on the element
   var ex = ASprepareElement(el, a), v = a.view;
   if (ex.isStatic) {
-    return (el.kind === 'slopefield' || !ex.at) ? '' : ASpointText(ex.at, ex);
+    if (!ex.at) { return ''; }
+    return ASpointText(ex.at, ex) + (ex.grid ? ', ' + ASslopeText(el, ex) : '');
   }
   var p = ex.pos(t);
   if (!p) {
@@ -2268,6 +2381,8 @@ function ASsummary(a) {
 var AShelptext = 'Arrow keys move along the current element. Hold shift for smaller steps. ' +
   'Page up and page down take larger steps. Home and end jump to the ends. ' +
   'N and P jump to the next and previous point of interest: an intercept or a local maximum or minimum. ' +
+  'On a slope field, arrow keys step through the slope marks, announcing x, y and slope; ' +
+  'shift arrow or page up and page down move to the next or previous row. ' +
   'Alt down and alt up move to the next and previous graph element. ' +
   'Enter describes the current element. W describes the graph window. Escape leaves the graph.';
 
@@ -2375,7 +2490,7 @@ function ASmoveAlong(a, dir, size) { // dir: +1 forward (right/up), -1 back
   if (ex.isStatic) {
     return el.kind === 'dot' || el.kind === 'text' ?
       'This is a single ' + ASkindLabels[el.kind] + '. Use alt up or alt down to move to another element.' :
-      'The slope field cannot be traced. Use alt up or alt down to move to another element.';
+      'This element cannot be traced. Use alt up or alt down to move to another element.';
   }
   var t = a.t, st = ex.steps[size], nt, ds = 0, eps = ex.steps.small*1e-6;
   var mn = Math.min(ex.lowT, ex.highT), mx = Math.max(ex.lowT, ex.highT);
@@ -2617,6 +2732,9 @@ function ASkeyDown(e) {
     if (k === 'ArrowDown') { msg = ASselectElement(a, a.cur + 1, AScurrentX(a)); }
     else if (k === 'ArrowUp') { msg = ASselectElement(a, a.cur - 1, AScurrentX(a)); }
     else { return; }
+  } else if (a.els[a.cur].kind === 'slopefield' && ASprepareElement(a.els[a.cur], a).grid &&
+      (msg = ASslopeKey(a, k, e.shiftKey)) !== null) {
+    // handled as slope field movement
   } else {
     switch (k) {
       case 'ArrowRight': case 'ArrowUp': msg = ASmoveAlong(a, 1, size); break;

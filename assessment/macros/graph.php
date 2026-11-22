@@ -381,6 +381,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         }
         $path .= "fill=\"none\";";
 
+        // Optional 9th field: above/below/left/right. Doesn't draw any shading (the caller does),
+        // but notes the shading direction on this function for the keyboard explorer.
+        $shadenote = '';
+        if (!$isineq && isset($function[8]) && in_array($function[8], ['above', 'below', 'left', 'right'])) {
+            $shadenote = $function[8];
+        }
+
         if ($isxequals) { //handle x-equals case separately
             if (isset($function[2]) && $function[2] != '') {
                 $thisymin = $function[2];
@@ -396,6 +403,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             $alt .= "<tr><td>$val</td><td>$thisymin</td></tr>";
             $alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
             $alt .= '</tbody></table>';
+            if ($isineq || $shadenote !== '') {
+                $path .= "ASmarkShadeStart();";
+            }
             $path .= "line([$val,$thisymin],[$val,$thisymax]);";
             if (isset($function[5]) && $function[5] == 'open') {
                 $path .= "dot([$val,$thisymax],\"open\");";
@@ -417,6 +427,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 $path .= "arrowhead([$val,$thisymax],[$val,$thisymin]);";
                 $alt .= "Arrow at ($val,$thisymin). ";
             }
+            if ($shadenote !== '') {
+                $path .= "ASshaded(\"$shadenote\");";
+            }
             if ($isineq) {
                 $path .= "stroke=\"none\";strokedasharray=\"none\";";
                 if (isset($function[1]) && ($function[1] == 'red' || $function[1] == 'green')) {
@@ -424,11 +437,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 } else {
                     $path .= "fill=\"transblue\";";
                 }
+                // ASnoreg: the shading isn't explorable; it's described as part of the line
                 if ($ineqtype[0] == '<') {
-                    $path .= "rect([$xxmin,$thisymin],[$val,$thisymax]);";
+                    $path .= "ASnoreg++;rect([$xxmin,$thisymin],[$val,$thisymax]);ASnoreg--;ASshaded(\"left\");";
                     $alt .= "Shaded left";
                 } else {
-                    $path .= "rect([$val,$thisymin],[$xxmax,$thisymax]);";
+                    $path .= "ASnoreg++;rect([$val,$thisymin],[$xxmax,$thisymax]);ASnoreg--;ASshaded(\"right\");";
                     $alt .= "Shaded right";
                 }
             }
@@ -780,7 +794,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             }
             $pathout = implode('', $pieces);
         }
+        if ($isineq || $shadenote !== '') {
+            $path .= "ASmarkShadeStart();";
+        }
         $path .= $pathout;
+        if ($shadenote !== '') {
+            $path .= "ASshaded(\"$shadenote\");";
+        }
         if ($xmax != $xmin) {
             $alt .= "</tbody></table>\n";
         }
@@ -824,7 +844,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 } else {
                     $path .= "fill=\"transblue\";";
                 }
-                $path .= "stroke=\"none\";strokedasharray=\"none\";$pathstr";
+                $path .= "stroke=\"none\";strokedasharray=\"none\";ASnoreg++;$pathstr" .
+                    "ASnoreg--;ASshaded(\"" . ($ineqtype[0] == '<' ? 'below' : 'above') . "\");";
             } else {
                 if (($ineqtype[0] == '<' && $y>$ymax) || 
                     ($ineqtype[0] == '>' && $y<$ymin)
@@ -835,7 +856,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     } else {
                         $path .= "fill=\"transblue\";";
                     }
-                    $path .= "rect([$thisxxmin,$yymin],[$thisxxmax,$yymax]);";
+                    $path .= "ASnoreg++;rect([$thisxxmin,$yymin],[$thisxxmax,$yymax]);ASnoreg--;" .
+                        "ASshaded(\"" . ($ineqtype[0] == '<' ? 'below' : 'above') . "\");";
                 }
             }
         }
