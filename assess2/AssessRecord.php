@@ -3952,6 +3952,19 @@ class AssessRecord
         $out['feedback'] = $this->prepFeedbackOut($qdata['feedback'] ?? '');
       }
       $out['other_tries'] = $this->getPreviousTries($qdata['tries'], $dispqn !== null ? $dispqn : $qn, $out);
+      // formatted date/time that each try was submitted
+      $out['other_tries_time'] = array();
+      $recStart = intval($this->assessRecord['starttime']);
+      if (is_array($qdata['tries'])) {
+        foreach ($qdata['tries'] as $pn=>$parttrydata) {
+          $out['other_tries_time'][$pn] = array();
+          foreach ($parttrydata as $tn=>$parttry) {
+            $subsecs = isset($parttry['sub']) ? ($this->data['submissions'][$parttry['sub']] ?? null) : null;
+            $out['other_tries_time'][$pn][$tn] = ($subsecs === null) ? null :
+              tzdate("n/j/y, g:i a", $recStart + $subsecs);
+          }
+        }
+      }
       // include autosaves if teacher and last asssess & question version
       if ($this->teacherInGb &&
         $aver == count($this->data['assess_versions'])-1 &&
@@ -3965,6 +3978,9 @@ class AssessRecord
             $autosavereformatted[$pn] = array(array('stuans'=>$val));
           }
           $out['autosaves'] = $this->getPreviousTries($autosavereformatted, $dispqn !== null ? $dispqn : $qn, $out);
+          // formatted date/time of last autosave
+          $out['autosave_time'] = isset($autosaves['time']) ?
+            tzdate("n/j/y, g:i a", intval($this->assessRecord['starttime']) + $autosaves['time']) : null;
         }
       }
     }

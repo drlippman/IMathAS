@@ -16,6 +16,9 @@
       <span v-else>
       </span>
     </p>
+    <p v-if="type === 'autosave' && autosavetime" class="subdued small">
+      {{ autosavetime }}
+    </p>
     <div
       v-for="(part,index) in processedTries"
       :key = "index"
@@ -29,6 +32,9 @@
           {{ $t('gradebook-try_n', {n: tryn+1}) }}:
         </span>
         <span v-html="trystr"></span>
+        <span v-if="timeFor(index, tryn) !== ''" class="subdued small">
+          ({{ timeFor(index, tryn) }})
+        </span>
       </div>
     </div>
   </div>
@@ -37,7 +43,7 @@
 <script>
 export default {
   name: 'GbAllTries',
-  props: ['tries', 'qn', 'type', 'submitby', 'partcnt'],
+  props: ['tries', 'qn', 'type', 'submitby', 'partcnt', 'times', 'autosavetime'],
   data: function () {
     return {
       rendered: false,
@@ -72,6 +78,14 @@ export default {
     }
   },
   methods: {
+    timeFor (pn, tn) {
+      // preformatted date/time string from server
+      let str = null;
+      if (this.type === 'tries') {
+        str = this.times?.[pn]?.[tn];
+      }
+      return str || '';
+    },
     renderInit () {
       if (this.rendered) {
         return;

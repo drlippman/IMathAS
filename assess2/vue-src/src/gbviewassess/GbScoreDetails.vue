@@ -129,6 +129,7 @@
     <gb-all-tries
       v-if="showAllTries"
       :tries="qdata.other_tries"
+      :times="qdata.other_tries_time"
       type="tries"
       :qn="qn"
       :partcnt="qdata.answeights.length"
@@ -141,6 +142,7 @@
     <gb-all-tries
       v-if="showAutosaves"
       :tries="qdata.autosaves"
+      :autosavetime="qdata.autosave_time"
       type="autosave"
       :submitby="submitby"
       :qn="qn"
