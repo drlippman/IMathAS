@@ -13,6 +13,8 @@ import { qtext } from "./qtext.js";
 import { highlighting } from "./tags.js";
 import { matchTags, scriptBracketMatching, closeBracketsOnlyInScript, preserveInPre, clickToFocus, answerLines, setAnswerHighlight } from "./extras.js";
 
+EditorView.EDIT_CONTEXT = false;
+
 // Tab inserts a tab (or indents a selection), Shift-Tab dedents
 const tabKeys = [{
   key: "Tab",
