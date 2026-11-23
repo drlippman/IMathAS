@@ -7,6 +7,12 @@
 require_once "./init.php";
 $now = time();
 
+if (isset($_GET['unsetbackupdb']) && $myrights == 100) {
+	unset($_SESSION['usebackupserver']);
+	header('Location: ' . $imasroot . '/index.php');
+	exit;
+}
+
 //0: classes you're teaching
 //1: classes you're tutoring
 //2: classes you're taking
@@ -427,6 +433,11 @@ if ($myrights==100 || ($myspecialrights&64)!=0) {
 		}
 		echo '. <a href="admin/approvepending2.php?from=home">'._('Approve Pending Instructor Accounts').'</a>';
 	}
+}
+if ($myrights == 100 && !empty($_SESSION['usebackupserver'])) {
+	echo '<div class="sysnotice"><b>Using backup database:</b> ';
+	echo Sanitize::encodeStringForDisplay($_SESSION['usebackupserver']) . '. ';
+	echo '<a href="index.php?unsetbackupdb=1">Switch back to the normal database</a></div>';
 }
 if (isset($tzname) && isset($_SESSION['logintzname']) && $tzname!=$_SESSION['logintzname']) {
 	echo '<div class="sysnotice">'.sprintf(_('Notice: You have requested that times be displayed based on the <b>%s</b> time zone, and your computer is reporting you are currently in a different time zone. Be aware that times will display based on the %s timezone as requested, not your local time'),$tzname,$tzname).'</div>';
