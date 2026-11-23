@@ -2511,11 +2511,12 @@ function ASmoveAlong(a, dir, size) { // dir: +1 forward (right/up), -1 back
       'This is a single ' + ASkindLabels[el.kind] + '. Use alt up or alt down to move to another element.' :
       'This element cannot be traced. Use alt up or alt down to move to another element.';
   }
-  var t = a.t, st = ex.steps[size], nt, ds = 0, eps = ex.steps.small*1e-6;
+  var t = a.t, st = ex.steps[size], nt, nx, ds = 0, eps = ex.steps.small*1e-6;
   var mn = Math.min(ex.lowT, ex.highT), mx = Math.max(ex.lowT, ex.highT);
   if (ex.snap) {  // land on multiples of the step size
     nt = dir > 0 ? (Math.floor(t/st + 1e-9) + 1)*st : (Math.ceil(t/st - 1e-9) - 1)*st;
     nt = parseFloat(nt.toPrecision(12));
+    nx = nt;  // for a plot() t is x
   } else if (ex.xsteps) {  // y is a function of x: land on round x values
     var xst = ex.xsteps[size];
     // use the x we snapped to last time if we are still there; reading it back from the svg is slightly inexact
