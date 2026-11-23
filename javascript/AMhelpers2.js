@@ -388,6 +388,10 @@ function clearScoreMarkers(e) {
   }
 }
 
+// a select moved into a fill-in gap leaves a marker span behind; put score icons after that
+function selAfterEl(sel) {
+  return document.getElementById('mqselmark-' + sel.id) || sel;
+}
 function setScoreMarkers(base) {
   var svgchk = '<svg class="scoremarker" viewBox="0 0 24 24" width="16" height="16" stroke="green" stroke-width="3" fill="none" role="img" aria-hidden=true>';
   svgchk += '<polyline points="20 6 9 17 4 12"></polyline></svg>';
@@ -406,10 +410,10 @@ function setScoreMarkers(base) {
   $(base).find('div.ansyel,table.ansyel').append(svgychk);
   $(base).find('div.ansred,table.ansred').append(svgx);
   $(base).find('div.ansorg,table.ansorg').append(svgox);
-  $(base).find('select.ansgrn').after(svgchk);
-  $(base).find('select.ansyel').after(svgychk);
-  $(base).find('select.ansred').after(svgx);
-  $(base).find('select.ansorg').after(svgox);
+  $(base).find('select.ansgrn').each(function() { $(selAfterEl(this)).after(svgchk); });
+  $(base).find('select.ansyel').each(function() { $(selAfterEl(this)).after(svgychk); });
+  $(base).find('select.ansred').each(function() { $(selAfterEl(this)).after(svgx); });
+  $(base).find('select.ansorg').each(function() { $(selAfterEl(this)).after(svgox); });
   $(base).find('span[id^=mqinput-].ansgrn,input[type=text].ansgrn').after('<span class="scoremarker sr-only">' + _('Correct') + '</span>');
   $(base).find('span[id^=mqinput-].ansyel,input[type=text].ansyel').after('<span class="scoremarker sr-only">' + _('Partially correct') + '</span>');
   $(base).find('span[id^=mqinput-].ansred,input[type=text].ansred').after('<span class="scoremarker sr-only">' + _('Incorrect') + '</span>');
@@ -572,12 +576,33 @@ function initShowAnswer() {
 	});
 }
 
+// Select dropdowns (choices parts with displayformat "select") can be used in
+// a fill-in. In equation-editor mode the select is moved inside a gap in the
+// rendered expression; this puts selects back.
+function mqfillinRestoreSelects(root) {
+  $(root).find('.mqinnerselect select').each(function(i, sel) {
+    var marker = document.getElementById('mqselmark-' + sel.id);
+    if (marker) {
+      marker.parentNode.insertBefore(sel, marker);
+      marker.parentNode.removeChild(marker);
+    }
+    sel.style.fontSize = '';
+    sel.style.fieldSizing = '';
+    var na = sel.querySelector('option[value="NA"]');
+    if (na && na.hasAttribute('data-origtext')) {
+      na.textContent = na.getAttribute('data-origtext');
+      na.removeAttribute('data-origtext');
+    }
+  });
+}
+
 function toggleMQfillins(enableMQ, baseel) {
   baseel = baseel || "body"
   if (enableMQ) {
     $(baseel).find(".mqinnerfillin > .mqfillin-alt").hide();
-    $(baseel).find(".mqinnerfillin > .mqfillin-mq").show();
+    $(baseel).find(".mqinnerfillin > .mqfillin-mq, .mqfillin-warn").show();
     $(baseel).find(".mqinnerfillin").each(function(i,el) {
+      mqfillinRestoreSelects(el);
       var inp = el.getElementsByClassName('mqfillin-mq')[0];
       var holder = el.getElementsByClassName('mqfillin-alt')[0];
       var map = [];
@@ -589,10 +614,20 @@ function toggleMQfillins(enableMQ, baseel) {
         innerfieldCnt++;
         return 'innerfield('+(innerfieldCnt-1)+')'; // placeholder; replace below
       })
+    
       inp.innerText = AMtoMQ(initinput);
       var newmap = [];
+      var selects = [];
       for (var i=0;i<map.length;i++) {
         var srcref = document.getElementById('qn'+map[i]);
+        if (srcref.tagName === 'SELECT') {
+          selects.push(srcref);
+          // boxed gap shows the score color; the score marker stays in the hidden alt
+          var m = srcref.className.match(/(ansgrn|ansred|ansyel|ansorg)/);
+          inp.innerText = inp.innerText.replace('\\MathQuillMathField{{{'+i+'}}}',
+            '\\class{mqinnerselect'+(m ? ' mqinnerboxed '+m[0] : '')+' mqinnerref'+map[i]+'}{\\text{ }}');
+          continue;
+        }
         if (!srcref.hasAttribute('data-mq')) {
           srcref.setAttribute('data-mq','');
         }
@@ -640,10 +675,49 @@ function toggleMQfillins(enableMQ, baseel) {
           $(mqinp.innerFields[i].__controller.container).addClass(m[0]);
         }
         mqinp.innerFields[i].__controller.container.setAttribute('id', 'mqinner-qn'+qnref);
-        var w = parseInt(el.style.width ?? 0);
+        // unset or default size (20 -> 25ch) gets the standard 6ch; an explicit size is honored
+        var w = parseFloat(el.style.width) || 0;
         mqinp.innerFields[i].__controller.container.style.minWidth = ((w > 6 || w == 0)?6:w)+'ch';
         MQeditor.attachEditor(mqinp.innerFields[i].__controller.container);
       }
+      selects.forEach(function(sel) {
+        var gap = inp.querySelector('.mqinnerref' + sel.id.substring(2));
+        if (!gap) { return; }
+        var marker = document.createElement('span');
+        marker.id = 'mqselmark-' + sel.id;
+        marker.style.display = 'none';
+        sel.parentNode.insertBefore(marker, sel);
+        $(gap).css('text-align', 'left').children().hide(); // placeholder text
+        sel.style.fontSize = 'revert' // getComputedStyle(marker).fontSize; // page size, not math size
+        sel.style.fieldSizing = 'content'; // width follows the selected option (where supported)
+        var na = sel.querySelector('option[value="NA"]');
+        if (na && !na.hasAttribute('data-origtext')) {
+          na.setAttribute('data-origtext', na.textContent);
+          na.textContent = '?';
+        }
+        gap.appendChild(sel);
+        // MathQuill marks .mq-root-block aria-hidden; unhide the path down to
+        // the select (as MathQuill does for inner fields), hiding other siblings
+        var node = sel;
+        while (node.parentNode && !node.classList.contains('mq-root-block')) {
+          node = node.parentNode;
+        }
+        // node is now the root block (or top of tree); walk back down
+        var path = [];
+        for (var n = sel; n && n !== node.parentNode; n = n.parentNode) { path.push(n); }
+        path.reverse().forEach(function (anc) {
+          if (anc.nodeType === 1 && anc.getAttribute('aria-hidden') === 'true') {
+            anc.removeAttribute('aria-hidden');
+            Array.prototype.forEach.call(anc.children, function (ch) {
+              if (path.indexOf(ch) === -1) { ch.setAttribute('aria-hidden', 'true'); }
+            });
+          }
+        });
+        // keep MathQuill from cancelling the mouse/touch events the select needs to open
+        ['mousedown', 'touchstart', 'click', 'dblclick'].forEach(function (evt) {
+          gap.addEventListener(evt, function (e) { e.stopPropagation(); });
+        });
+      });
       for (var i=0;i<origmap.length;i++) {
         var qnref = origmap[i];
         // move keys
@@ -658,8 +732,9 @@ function toggleMQfillins(enableMQ, baseel) {
       }
     });
   } else {
+    mqfillinRestoreSelects($(baseel).find(".mqinnerfillin"));
     $(baseel).find(".mqinnerfillin > .mqfillin-alt").show();
-    $(baseel).find(".mqinnerfillin > .mqfillin-mq").hide();
+    $(baseel).find(".mqinnerfillin > .mqfillin-mq, .mqfillin-warn").hide();
     $(baseel).find(".mq-editable-field[id^=mqinner-qn],.mqfillin-mq .mqinnerboxed").each(function(i,el) {
       var qnref;
       if ($(el).hasClass("mqinnerboxed")) {

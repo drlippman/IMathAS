@@ -47,6 +47,10 @@ class ChoicesAnswerBox implements AnswerBox
             ${$optionkey} = getOptionVal($options, $optionkey, $multi, $partnum);
         }
         $questions = getOptionVal($options, 'questions', $multi, $partnum, 2);
+        if ($multi && !empty($GLOBALS['mqfillinparts'][$partnum])) {
+            // part is used in a setupmathquillfillin; must be a select
+            $displayformat = 'select';
+        }
 
         if (!is_array($questions)) {
             echo _('Eeek!  $questions is not defined or needs to be an array');

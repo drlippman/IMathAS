@@ -1289,8 +1289,14 @@ function setupmathquillfillin($mqformat, $altformat) {
         echo 'setupmathquillfillin: both inputs must include matching [AB#] elements';
         return '';
     }
+    // record which parts are in a fillin, so choices can be forced to select
+    foreach ($m1[1] as $abn) {
+        $GLOBALS['mqfillinparts'][intval($abn)] = true;
+    }
     $mqformat = preg_replace('/\[AB(\d+)\]/', 'innertmpfield($1)', $mqformat);
-    $out = '<span class="mqinnerfillin"><span class="mqfillin-mq"></span>&nbsp;<span class="mqfillin-err"></span>';
+    $out = '<span class="mqinnerfillin">';
+    $out .= '<span class="sr-only mqfillin-warn">'._('The following fill-in equation may be hard to use with a screenreader. It is recommended you toggle off the equation editor.').'</span>';
+    $out .= '<span class="mqfillin-mq"></span>&nbsp;<span class="mqfillin-err"></span>';
     $out .= '<span class="mqfillin-alt" data-form="'. Sanitize::encodeStringForDisplay($mqformat).'" style="display:none;">';
     $out .= $altformat . '</span></span>';
     return $out;
