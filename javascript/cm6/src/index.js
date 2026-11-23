@@ -39,7 +39,7 @@ function fromTextArea(ta, opts) {
   const extensions = [
     history(),
     highlighting,
-    //EditorView.lineWrapping,
+    EditorView.lineWrapping,
     EditorState.tabSize.of(2),
     indentUnit.of("  "),
     EditorState.readOnly.of(!!opts.readOnly),
