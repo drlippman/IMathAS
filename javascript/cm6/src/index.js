@@ -1,7 +1,7 @@
 // Entry point: defines window.IMathASCM, a thin helper around CodeMirror 6 for the IMathAS
 // question editors.  fromTextArea() returns a plain CM6 EditorView (plus .save() and
 // .toTextArea()), so everything else can use the CM6 API directly (view.state, view.dispatch).
-import { EditorState, StateEffect, Prec } from "@codemirror/state";
+import { EditorState, StateEffect, StateField, Prec } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import {
   defaultKeymap, history, historyKeymap, indentMore, indentLess, insertTab, indentSelection
@@ -22,6 +22,40 @@ const tabKeys = [{
   shift: indentLess
 }];
 
+// Insert key toggles overwrite mode (as in CM5). While on, typing a character replaces the
+// character after the cursor, and the cursor is drawn as a block.
+const setOverwrite = StateEffect.define();
+const overwriteField = StateField.define({
+  create: () => false,
+  update(val, tr) {
+    for (const e of tr.effects) if (e.is(setOverwrite)) val = e.value;
+    return val;
+  },
+  provide: f => EditorView.editorAttributes.from(f, on => (on ? { class: "cm-overwrite" } : {}))
+});
+const overwriteExt = [
+  overwriteField,
+  // Native caret (no drawSelection, which is problematic on mobile); block shape where supported
+  EditorView.baseTheme({ "&.cm-overwrite .cm-content": { caretShape: "block", "caret-shape": "block" } }),
+  Prec.high(keymap.of([{
+    key: "Insert",
+    run: v => { v.dispatch({ effects: setOverwrite.of(!v.state.field(overwriteField)) }); return true; }
+  }])),
+  EditorView.inputHandler.of((view, from, to, text) => {
+    if (!view.state.field(overwriteField) || from !== to || !text || text.includes("\n")) return false;
+    const line = view.state.doc.lineAt(to);
+    if (to >= line.to) return false; // at end of line: just insert
+    const end = Math.min(line.to, to + text.length);
+    view.dispatch({
+      changes: { from, to: end, insert: text },
+      selection: { anchor: from + text.length },
+      userEvent: "input.type",
+      scrollIntoView: true
+    });
+    return true;
+  })
+];
+
 /**
  * Replace a textarea with an editor.
  * @param {HTMLTextAreaElement} ta
@@ -40,6 +74,7 @@ function fromTextArea(ta, opts) {
 
   const extensions = [
     history(),
+    overwriteExt,
     highlighting,
     EditorView.lineWrapping,
     EditorState.tabSize.of(2),
