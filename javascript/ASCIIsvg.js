@@ -1495,6 +1495,7 @@ function slopefield(fun,dx,dy) {
   }
   if (dx==null) dx=1;
   if (dy==null) dy=1;
+  if (typeof fun == "string") { ASprefetchSpeech(fun); }
   ASregisterElement({kind:'slopefield', src:(typeof fun=="string"?fun:null), g:g, gdx:dx, gdy:dy});
   ASnoreg++;
   try {
@@ -1883,6 +1884,7 @@ function plot_(fun,x_min,x_max,points,id,min_type,max_type) {
   }
 
   if (vt0 !== null) {
+    if (typeof fun != "function") { ASprefetchSpeech(fun); }
     var markName = function(mt) {
       return mt == 1 ? "arrow, graph continues" : (mt == 2 ? "open dot" : (mt == 3 ? "closed dot" : null));
     };
@@ -2001,7 +2003,54 @@ function ASmapColorName(c) {
   return best;
 }
 
+var ASmjSpeechCache = {}; // equation source -> MathJax speech string, or '' while pending/unavailable
+var ASmjReady = false;    // true once MathJax startup has completed
+var ASmjHookSet = false;
+
+function ASinitSpeechHook() { // wait for MathJax to finish starting, then process queued equations
+  if (ASmjReady || window.mathRenderer !== 'MathJax') { return; }
+  if (window.MathJax && MathJax.startup && MathJax.startup.promise) {
+    if (ASmjHookSet) { return; }
+    ASmjHookSet = true;
+    MathJax.startup.promise.then(function() {
+      ASmjReady = true;
+      for (var s in ASmjSpeechCache) {
+        if (ASmjSpeechCache[s] === null) { ASmjSpeechCache[s] = ''; ASgenerateSpeech(s); }
+      }
+    }).catch(function() {});
+  }
+}
+
+function ASprefetchSpeech(s) { // queue an equation (or array of them) for MathJax speech; fallback text is used until ready
+  if (Array.isArray(s)) { s.forEach(ASprefetchSpeech); return; }
+  if (s == null) { return; }
+  s = String(s);
+  if (ASmjSpeechCache.hasOwnProperty(s)) { return; }
+  if (window.mathRenderer !== 'MathJax') { return; }
+  if (ASmjReady) {
+    ASmjSpeechCache[s] = '';
+    ASgenerateSpeech(s);
+  } else {
+    ASmjSpeechCache[s] = null; // queued
+    ASinitSpeechHook();
+  }
+}
+
+function ASgenerateSpeech(s) {
+  try {
+    MathJax.asciimath2svgPromise(s, {display: false}).then(function(node) {
+      var sp = node.querySelector('mjx-speech');
+      var label = sp ? sp.getAttribute('aria-label') : null;
+      if (label) {
+        ASmjSpeechCache[s] = label.replace(/,\s*math\s*$/i, '').trim();
+      }
+    }).catch(function() {});
+  } catch (e) {}
+}
+
 function ASspeakableEquation(s) { // make an equation a bit friendlier to hear
+  ASprefetchSpeech(s);
+  if (ASmjSpeechCache[String(s)]) { return ASmjSpeechCache[String(s)]; }
   return String(s)
     .replace(/\^2(?![\d.])/g, ' squared')
     .replace(/\^3(?![\d.])/g, ' cubed')
