@@ -615,7 +615,7 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 	//}
 	$outst .= "textabs([0,". ($height/2+15)  ."],\"Frequency\",\"right\",90);";
 	$outst .= $st;
-	return showasciisvg($outst,$width,$height);
+	return showasciisvg($outst,$width,$height,$alt,false);
 }
 
 //fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
@@ -711,7 +711,7 @@ function fdhistogram($freq,$label,$start,$cw,$labelstart=false,$upper=false,$wid
 
 	$outst .= "textabs([". ($width/2+15)  .",0],\"$label\",\"above\");textabs([0,". ($height/2+15)  ."],\"$vertlabel\",\"right\",90);";
 	$outst .= $st;
-	return showasciisvg($outst,$width,$height);
+	return showasciisvg($outst,$width,$height,$alt,false);
 }
 
 //fdbargraph(barlabels,freqarray,label,[width,height,options])
@@ -821,7 +821,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
-	return showasciisvg($outst,$width,$height);
+	return showasciisvg($outst,$width,$height,$alt,false);
 }
 
 //piechart(percents, labels, {width, height, data label})
@@ -1108,7 +1108,7 @@ function boxplot($arr,$label="",$options = array()) {
 	}
 	$outst .= $st;
 	$width = isset($options['width'])?$options['width']:400;
-	return showasciisvg($outst,$width*1,50+12*$ycnt);
+	return showasciisvg($outst,$width*1,50+12*$ycnt,$alt,false);
 }
 
 //normalcdf(z,[dec])
@@ -2706,7 +2706,7 @@ function dotplot($a,$label,$dotspace=1,$labelspace=null,$width=300,$height=150) 
 	$x2 = $endlabel + .2*$labelspace;
 	$initst .="line([$x1,0],[$x2,0]);";
 	$outst = $initst.$outst.$st;
-	return showasciisvg($outst,$width,$height);
+	return showasciisvg($outst,$width,$height,$alt,false);
   }
 
 //---------------------------------------------ANOVA-Oneway F ratio-----------------------------------------
@@ -3450,7 +3450,7 @@ function cluster_bargraph($var1,$var2,$freq,$label,$width=450,$height=300,$optio
 	$outst .= $st.$legendstr;
 
 	
-	return showasciisvg($outst,$width,$height);
+	return showasciisvg($outst,$width,$height,$alt,false);
 	
 }
 

@@ -49,7 +49,7 @@ launch-view_as_stu = Acting as student: {$name}
 launch-scorelist = Score List
 launch-itemanalysis = Item Analysis
 launch-gblinks = Gradebook Links
-launch-a11ywarn = If you are using a screenreader, you should turn on the graph and drawing accessibility options.
+launch-a11ywarn = If you are using a screenreader, you should turn on the drawing accessibility option, and set math entry to calculator-style.
 
 # Closed section
 closed-hidden = This assessment is not currently available.

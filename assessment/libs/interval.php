@@ -48,7 +48,6 @@ function linegraph($intvs) {
 	}
 	$commands .= ',0,1,0,1); stroke="blue"; strokewidth=2;';
 	foreach ($intvs as $intv) {
-		$commands .= 'line([';
 		$intv = str_replace(' ','',$intv);
 		$parts = explode(',',$intv);
         if (count($parts) != 2) { continue; } // invalid
@@ -56,51 +55,31 @@ function linegraph($intvs) {
 		$min = substr($parts[0],1);
 		$esym = substr($parts[1],-1);
 		$max = substr($parts[1],0,strlen($parts[1])-1);
-		if ($min=='-oo' || $min<$settings[0]) {
-			$commands .= $settings[0];
-		} else {
-			$commands .= $min;
-		}
-		$commands .= ',0],[';
-		if ($max=='oo' || $max=='+oo' || $max>$settings[1]) {
-			$commands .= $settings[1];
-		} else {
-			$commands .= $max;
-		}
-		$commands .= ',0]);';
+		$minoff = ($min=='-oo' || $min<$settings[0]);
+		$maxoff = ($max=='oo' || $max=='+oo' || $max>$settings[1]);
 		$alt .= "Line from $min to $max";
-		if ($min=='-oo' || $min<$settings[0]) {
-			$offlitt = $settings[0] + .1;
-			$commands .= 'marker="arrow";';
-			$commands .= "line([$offlitt,0],[{$settings[0]},0]);";
-			$commands .= 'marker="none";';
+		// the end markers are passed to path() so they are part of the line, not separate dots
+		if ($minoff) {
+			$startmk = '"arrow"';
+		} else if ($ssym=='[') {
+			$startmk = '"closed"';
+			$alt .= ", closed dot at $min";
 		} else {
-			$commands .= 'dot(['.$min.',0],';
-			if ($ssym=='[') {
-				$commands .= '"closed"';
-				$alt .= ", closed dot at $min";
-			} else {
-				$commands .= '"open"';
-				$alt .= ", open dot at $min";
-			}
-			$commands .= ');';
+			$startmk = '"open"';
+			$alt .= ", open dot at $min";
 		}
-		if ($max=='oo' || $max=='+oo' || $max>$settings[1]) {
-			$offlitt = $settings[1] - .1;
-			$commands .= 'marker="arrow";';
-			$commands .= "line([$offlitt,0],[{$settings[1]},0]);";
-			$commands .= 'marker="none";';
+		if ($maxoff) {
+			$endmk = '"arrow"';
+		} else if ($esym==']') {
+			$endmk = '"closed"';
+			$alt .= ", closed dot at $max";
 		} else {
-			$commands .= 'dot(['.$max.',0],';
-			if ($esym==']') {
-				$commands .= '"closed"';
-				$alt .= ", closed dot at $max";
-			} else {
-				$commands .= '"open"';
-				$alt .= ", open dot at $max";
-			}
-			$commands .= ');';
+			$endmk = '"open"';
+			$alt .= ", open dot at $max";
 		}
+		$linemin = $minoff ? $settings[0] : $min;
+		$linemax = $maxoff ? $settings[1] : $max;
+		$commands .= "path([[$linemin,0],[$linemax,0]],null,\"\",$startmk,$endmk);";
 		$alt .= '. ';
 	}
 	if ($_SESSION['graphdisp']==0) {

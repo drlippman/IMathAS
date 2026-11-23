@@ -17,7 +17,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	global $imasroot, $staticroot;
 	if ($GLOBALS['inquestiondisplay'] == false) {return '';}
 
-	$alt = '3D Plot';
+	$alt = '';
 	if (func_num_args()>14) {
 		$bounds = array_slice(func_get_args(),9,6);
 		if (func_num_args()>15) {
@@ -87,7 +87,12 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 	}
 	$GLOBALS['3dplotcnt'] = $r;
 	$html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
-	$html .= 'role="img" tabindex="0" aria-hidden="true" ';
+	$html .= 'role="application" tabindex="0"';
+	if ($alt == '') {
+		$html .= ' aria-label="'._('3 D Plot').'"';
+	} else {
+		$html .= ' aria-label="'._('3 D Plot, described below').'"';
+	}
 	$html .= ">";
 	if (isset($bounds)) {
 		$bndtxt = 'bounds:"' . implode(',',$bounds) . '",';
@@ -95,7 +100,7 @@ function plot3d($func,$umin=-2,$umax=2,$vmin=-2,$vmax=2,$disc=20,$width=300,$hei
 		$bndtxt='';
 	}
 	$html .= "</canvas>";
-	$html .= '<span class="sr-only">' . Sanitize::encodeStringForDisplay($alt) . '<wbr/></span>';
+	$html .= '<div class="sr-only">' . $alt . '<wbr/></div>';
 	$init = "var plot3d$r = new Viewer3D({verts: '$verts', faces: '$faces', $bndtxt width: '$width', height:'$height', showaxes:$axes}, 'plot3d$r');";
 	if (isset($GLOBALS['assessUIver']) && $GLOBALS['assessUIver'] > 1) {
 		$html .= "<script type=\"text/javascript\"> $init </script>";
@@ -141,7 +146,7 @@ function spacecurve($func,$tmin,$tmax) {
 	if (func_num_args()>13) {
 		$alt = func_get_arg(13);
 	} else {
-		$alt = '3D Spacecurve';
+		$alt = '';
 	}
 	//new approach
 	$func = str_replace('[','',$func);
@@ -173,10 +178,15 @@ function spacecurve($func,$tmin,$tmax) {
 	}
 	$GLOBALS['3dplotcnt'] = $r;
 	$html .= "<canvas id=\"plot3d$r\" width=\"$width\" height=\"$height\" ";
-	$html .= 'role="img" tabindex="0" aria-hidden="true" ';
+	$html .= 'role="application" tabindex="0"';
+	if ($alt == '') {
+		$html .= ' aria-label="'._('3 D spacecurve').'"';
+	} else {
+		$html .= ' aria-label="'._('3 D spacecurve, described below').'"';
+	}
 	$html .= ">";
 	$html .= "</canvas>";
-	$html .= '<span class="sr-only">' . Sanitize::encodeStringForDisplay($alt) . '<wbr/></span>';
+	$html .= '<div class="sr-only">' . $alt . '<wbr/></div>';
 
 	if (isset($bounds)) {
 		$bndtxt = 'bounds:"' . implode(',',$bounds) . '",';
@@ -194,8 +204,7 @@ function spacecurve($func,$tmin,$tmax) {
 }
 
 function replace3dalttext($plot, $alttext) {
-	//return preg_replace('/aria-label="[^"]*"/', 'aria-label="'.Sanitize::encodeStringForDisplay($alttext).'"', $plot);
-	return preg_replace('/sr-only">.*?<wbr\/><\//', 'sr-only">'.Sanitize::encodeStringForDisplay($alttext).'<wbr/></', $plot);
+	return preg_replace('/sr-only">.*?<wbr\/><\//', 'sr-only">'.$alttext.'<wbr/></', $plot);
 }
 
 //CalcPlot3Dembed(functions, [width, height, xmin, xmax, ymin, ymax, zmin, zmax, xscale, yscale, zscale, zclipmin, zclipmax])

@@ -360,7 +360,7 @@ $placeinhead .= '<script>
  	}
   });
   </script>';
-if (($a11ymode&1)==1) {
+if (($a11ymode&1)==1 || ($a11ymode&4)==4) {
 	$placeinhead .= '<script>
 	$(function() {
 		$(".questionpane > .question > .question img").each(function() {
@@ -377,21 +377,29 @@ if (($a11ymode&1)==1) {
 				$(this).after($span);
 			}
 		});
-		$(".questionpane > .question > .question .sr-only").each(function() {
-			$(this).removeClass("sr-only").addClass("sr-only-highlight");
-		});
 	});
 	</script>
-	<style>
-	.sr-only-highlight {
+	';
+}
+if (($a11ymode&1)==1 || ($a11ymode&4)==4) {
+	$placeinhead .= '<style>
+	.questionpane > .question > .question .sr-only,
+	.questionpane > .question > .question .screenreader {
+		position: static;
+		width: auto;
+		height: auto;
+		overflow: visible;
 		border: 1px solid #ccc;
 		padding: 5px;
 		color: #666;
+		display:inline-block;
 	}
-	.sr-only-highlight::before {
+	.questionpane > .question > .question .sr-only::before,
+	.questionpane > .question > .question .screenreader::before {
 		display: block;
 		color: #f33;
 		content: "Accessibility preview note: This text is only visible to screenreaders";
+		font-size: 70%;
 	}
 	</style>
 	';
@@ -722,6 +730,7 @@ if ($overwriteBody==1) {
   echo '<p>'._('Test with accessibility settings').': ';
   echo '<select onchange="changea11ymode(this)">';
   echo '<option value=0'.($a11ymode==0?' selected':'').'>'._('Default').'</option>';
+  echo '<option value=4'.($a11ymode==4?' selected':'').'>'._('Default, but show screenreader-only text').'</option>';
   echo '<option value=2'.($a11ymode==2?' selected':'').'>'._('Mouse alt').'</option>';
   echo '<option value=3'.($a11ymode==3?' selected':'').'>'._('Visual and mouse alt').'</option>';
   echo '</select>';

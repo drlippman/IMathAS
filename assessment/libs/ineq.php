@@ -88,7 +88,7 @@ function ineqbetweenplot($funcs) {
 		if (!isset($function[4])) {$function[4] = 1;}
 		if (!isset($function[3])) {$function[3] = '';}
 		if (isset($function[5])) {$fillcolor=$function[5];}
-		$newfuncstr[] = $function[0].','.$function[2].',,,,,'.$function[4].','.$function[3];
+		$newfuncstr[] = $function[0].','.$function[2].',,,,,'.$function[4].','.$function[3].','.$filltype;
 		for ($i = 0; $i<$stopat;$i++) {
 			$mins[$i][$k]=$settings[2] - 5*($settings[3]-$settings[2])/$settings[7];
 			$maxs[$i][$k]=$settings[3] + 5*($settings[3]-$settings[2])/$settings[7];
@@ -220,7 +220,7 @@ function ineqbetweenplot($funcs) {
 		}
 		$p = implode('<table', $parts);
 	} else {
-		$p = str_replace("' />","fill=\"trans$fillcolor\";strokewidth=0;$path;' />",$p);
+		$p = str_replace("' />","fill=\"trans$fillcolor\";strokewidth=0;ASnoreg++;$path;ASnoreg--;' />",$p);
 	}
 	return $p;
 }

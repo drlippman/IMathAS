@@ -803,7 +803,7 @@ function venn2diagram($vars,$shade="",$labels="",$size=200){
     // If nothing to shade, done
     if($shade == ""){
         $script = $HEADER.$LABELS;
-        return showasciisvg($script,$size,$size,$alt);
+        return showasciisvg($script,$size,$size,$alt,false);
     }
     // Else let A = {1,2}, B = {2,3} and U={0,1,2,3} and compute the members of $shade, the members correspond to the regions of VENN2_SETEXP constant to shade
     $shade = setexpToPostfix($shade);
@@ -816,7 +816,7 @@ function venn2diagram($vars,$shade="",$labels="",$size=200){
         $alt .= ' ' . $alts[$region] . '.';
     }
     $script = $HEADER.$DRAW.$LABELS;
-    return showasciisvg($script,$size,$size,$alt);
+    return showasciisvg($script,$size,$size,$alt,false);
 }
 
 // VENN3_SETEXPDIAGRAM
@@ -864,7 +864,7 @@ function venn3diagram($vars,$shade="",$labels="",$size=250){
     // If nothing to shade, done
     if($shade == ""){
         $script = $HEADER.$LABELS;
-        return showasciisvg($script,$size,$size, $alt);
+        return showasciisvg($script,$size,$size,$alt,false);
     }
     $shade = setexpToPostfix($shade);
     $vars = array($A => array(1,2,4,5), $B=>array(2,3,5,6), $C=>array(4,5,6,7));
@@ -877,7 +877,7 @@ function venn3diagram($vars,$shade="",$labels="",$size=250){
         $alt .= ' ' . $alts[$region] . '.';
     }
     $script = $HEADER.$DRAW.$LABELS;
-    return showasciisvg($script,$size,$size, $alt);
+    return showasciisvg($script,$size,$size,$alt,false);
     
 }
 ?>

@@ -796,6 +796,7 @@ function setupDraw(qn) {
         }
       }
     });
+    $("#qnwrap"+qn+" .drawcanvas").before($('<span>', {class: 'sr-only', text: _('If you are using a screenreader, you should enable the keyboard drawing entry alternative in user preferences')}));
   }
   $("#qn"+qn).parent().find(".a11ydrawadd:not(.inited)").off("click.adda11ydraw").on("click.adda11ydraw", function(event) {
     var qn = event.target.getAttribute('data-qn');

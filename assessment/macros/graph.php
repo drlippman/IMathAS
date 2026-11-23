@@ -95,11 +95,32 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
     //$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.";
     $commands = '';
     $alt = '';
+    // labels may give a fraction or pi-multiple step, like "pi/2" or "1/4"; those are
+    // drawn using addfractionaxislabels after the rest of the plot is built
+    $fracx = null;
+    $fracy = null;
+    $isfracstep = function ($s) {
+        $s = trim($s);
+        return ((strpos($s, '/') !== false || strpos($s, 'pi') !== false) &&
+            preg_match('/^\d*\.?\d*\*?(pi)?(\/\d+)?$/', $s));
+    };
     if (strpos($settings[4], ':')) {
         $lbl = explode(':', $settings[4]);
+        if ($isfracstep($lbl[0])) {
+            $fracx = trim($lbl[0]);
+            $lbl[0] = 1;
+        }
+        if (isset($lbl[1]) && $isfracstep($lbl[1])) {
+            $fracy = trim($lbl[1]);
+            $lbl[1] = 1;
+        }
         $lbl[0] = evalbasic($lbl[0], true, true);
         $lbl[1] = evalbasic($lbl[1], true, true);
     } else {
+        if ($isfracstep($settings[4])) {
+            $fracx = $fracy = trim($settings[4]);
+            $settings[4] = 1;
+        }
         $settings[4] = evalbasic($settings[4], true, true);
         $lbl = [];
     }
@@ -155,12 +176,19 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         $xvar = $lbl[2];
         $yvar = $lbl[3];
         if ($xvar != '' && $xvar != 'off') {
-            $commands .= "text([{$winxmax},0],\"{$xvar}\",\"aboveleft\");";
+            // ASnoreg: keep axis labels out of the explorable elements; the window description covers them
+            $commands .= "ASnoreg++;text([{$winxmax},0],\"{$xvar}\",\"aboveleft\");ASnoreg--;";
         }
         if ($yvar != '') {
-            $commands .= "text([0,{$ymax}],\"{$yvar}\",\"belowright\");";
+            $commands .= "ASnoreg++;text([0,{$ymax}],\"{$yvar}\",\"belowright\");ASnoreg--;";
         }
         $hasaxislabels = true;
+        // pass axis names to asciisvg for the keyboard-explore descriptions
+        $plainx = ($xvar != '' && $xvar != 'off') ? str_replace(['"', '\\', '`'], '', $xvar) : '';
+        $plainy = str_replace(['"', '\\', '`'], '', $yvar);
+        if ($plainx != '' || $plainy != '') {
+            $commands .= "axislabels(\"{$plainx}\",\"{$plainy}\");";
+        }
     }
     $absymin = 1E10;
     $absymax = -1E10;
@@ -374,6 +402,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         }
         $path .= "fill=\"none\";";
 
+        // Optional 9th field: above/below/left/right. Doesn't draw any shading (the caller does),
+        // but notes the shading direction on this function for the keyboard explorer.
+        $shadenote = '';
+        if (!$isineq && isset($function[8]) && in_array($function[8], ['above', 'below', 'left', 'right'])) {
+            $shadenote = $function[8];
+        }
+
         if ($isxequals) { //handle x-equals case separately
             if (isset($function[2]) && $function[2] != '') {
                 $thisymin = $function[2];
@@ -389,6 +424,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
             $alt .= "<tr><td>$val</td><td>$thisymin</td></tr>";
             $alt .= "<tr><td>$val</td><td>$thisymax</td></tr>";
             $alt .= '</tbody></table>';
+            if ($isineq || $shadenote !== '') {
+                $path .= "ASmarkShadeStart();";
+            }
             $path .= "line([$val,$thisymin],[$val,$thisymax]);";
             if (isset($function[5]) && $function[5] == 'open') {
                 $path .= "dot([$val,$thisymax],\"open\");";
@@ -410,6 +448,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 $path .= "arrowhead([$val,$thisymax],[$val,$thisymin]);";
                 $alt .= "Arrow at ($val,$thisymin). ";
             }
+            if ($shadenote !== '') {
+                $path .= "ASshaded(\"$shadenote\");";
+            }
             if ($isineq) {
                 $path .= "stroke=\"none\";strokedasharray=\"none\";";
                 if (isset($function[1]) && ($function[1] == 'red' || $function[1] == 'green')) {
@@ -417,11 +458,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 } else {
                     $path .= "fill=\"transblue\";";
                 }
+                // ASnoreg: the shading isn't explorable; it's described as part of the line
                 if ($ineqtype[0] == '<') {
-                    $path .= "rect([$xxmin,$thisymin],[$val,$thisymax]);";
+                    $path .= "ASnoreg++;rect([$xxmin,$thisymin],[$val,$thisymax]);ASnoreg--;ASshaded(\"left\");";
                     $alt .= "Shaded left";
                 } else {
-                    $path .= "rect([$val,$thisymin],[$xxmax,$thisymax]);";
+                    $path .= "ASnoreg++;rect([$val,$thisymin],[$xxmax,$thisymax]);ASnoreg--;ASshaded(\"right\");";
                     $alt .= "Shaded right";
                 }
             }
@@ -739,7 +781,47 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         if ($lastl > 0) {
             $pathstr .= "]);";
         }
-        $path .= $pathstr;
+        // Pass the start/end markers into the first/last path() call, so that the graph's
+        // keyboard navigation treats them as ends of the path rather than separate dots.
+        // Only done when the path really starts/ends at the marker location. If the curve is
+        // clipped there (leaves the graph window), the marker would be off-screen, so it is skipped.
+        $startattached = false;
+        $endattached = false;
+        $pathout = $pathstr;
+        $mkjs = ['open' => '"open"', 'closed' => '"closed"', 'arrow' => '"arrow"'];
+        $pieces = preg_split('/(?<=\]\);)/', $pathstr, -1, PREG_SPLIT_NO_EMPTY);
+        $npieces = count($pieces);
+        if ($npieces > 0) {
+            if (
+                isset($function[4]) && isset($mkjs[$function[4]]) && isset($fx[0]) &&
+                strpos($pieces[0], "path([[{$fx[0]},{$fy[0]}],") === 0
+            ) {
+                $startattached = true;
+            }
+            if (
+                isset($function[5]) && isset($mkjs[$function[5]]) &&
+                substr($pieces[$npieces - 1], -strlen(",[$x,$y]]);")) === ",[$x,$y]]);"
+            ) {
+                $endattached = true;
+            }
+        }
+        if ($startattached || $endattached) {
+            foreach ($pieces as $pi => $piece) {
+                $smk = ($pi == 0 && $startattached) ? $mkjs[$function[4]] : 'null';
+                $emk = ($pi == $npieces - 1 && $endattached) ? $mkjs[$function[5]] : 'null';
+                if ($smk != 'null' || $emk != 'null') {
+                    $pieces[$pi] = substr($piece, 0, -2) . ",null,\"\",$smk,$emk);";
+                }
+            }
+            $pathout = implode('', $pieces);
+        }
+        if ($isineq || $shadenote !== '') {
+            $path .= "ASmarkShadeStart();";
+        }
+        $path .= $pathout;
+        if ($shadenote !== '') {
+            $path .= "ASshaded(\"$shadenote\");";
+        }
         if ($xmax != $xmin) {
             $alt .= "</tbody></table>\n";
         }
@@ -783,7 +865,8 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                 } else {
                     $path .= "fill=\"transblue\";";
                 }
-                $path .= "stroke=\"none\";strokedasharray=\"none\";$pathstr";
+                $path .= "stroke=\"none\";strokedasharray=\"none\";ASnoreg++;$pathstr" .
+                    "ASnoreg--;ASshaded(\"" . ($ineqtype[0] == '<' ? 'below' : 'above') . "\");";
             } else {
                 if (($ineqtype[0] == '<' && $y>$ymax) || 
                     ($ineqtype[0] == '>' && $y<$ymin)
@@ -794,28 +877,24 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
                     } else {
                         $path .= "fill=\"transblue\";";
                     }
-                    $path .= "rect([$thisxxmin,$yymin],[$thisxxmax,$yymax]);";
+                    $path .= "ASnoreg++;rect([$thisxxmin,$yymin],[$thisxxmax,$yymax]);ASnoreg--;" .
+                        "ASshaded(\"" . ($ineqtype[0] == '<' ? 'below' : 'above') . "\");";
                 }
             }
         }
+        // the dots/arrows themselves were drawn by path() above, if the path reaches that point
         if (isset($function[5]) && $function[5] == 'open') {
-            $path .= "dot([$x,$y],\"open\");";
             $alt .= "Open dot at ($x,$y). ";
         } else if (isset($function[5]) && $function[5] == 'closed') {
-            $path .= "dot([$x,$y],\"closed\");";
             $alt .= "Closed dot at ($x,$y). ";
         } else if (isset($function[5]) && $function[5] == 'arrow' && isset($fx[$stopat - 2])) {
-            $path .= "arrowhead([{$fx[$stopat - 2]},{$fy[$stopat - 2]}],[$x,$y]);";
             $alt .= "Arrow at ($x,$y). ";
         }
         if (isset($function[4]) && $function[4] == 'open' && isset($fx[0])) {
-            $path .= "dot([{$fx[0]},{$fy[0]}],\"open\");";
             $alt .= "Open dot at ({$fx[0]},{$fy[0]}). ";
         } else if (isset($function[4]) && $function[4] == 'closed' && isset($fx[0])) {
-            $path .= "dot([{$fx[0]},{$fy[0]}],\"closed\");";
             $alt .= "Closed dot at ({$fx[0]},{$fy[0]}). ";
         } else if (isset($function[4]) && $function[4] == 'arrow' && isset($fx[1])) {
-            $path .= "arrowhead([{$fx[1]},{$fy[1]}],[{$fx[0]},{$fy[0]}]);";
             $alt .= "Arrow at ({$fx[0]},{$fy[0]}). ";
         }
 
@@ -842,9 +921,20 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         if (count(array_unique($allcolors)) == 1) {
             $alt = str_replace(', color ' . $allcolors[0], '', $alt);
         }
-        return ($globalalt == '') ? $alt : $globalalt;
+        $out = ($globalalt == '') ? $alt : $globalalt;
+        if ($fracx !== null) {
+            $out = addfractionaxislabels($out, $fracx);
+        }
+        return $out;
     } else {
-        return "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
+        $out = "<embed type='image/svg+xml' align='middle' width='$plotwidth' height='$plotheight' script='$commands' />\n";
+        if ($fracx !== null) {
+            $out = addfractionaxislabels($out, $fracx);
+        }
+        if ($fracy !== null) {
+            $out = addfractionaxislabels($out, $fracy, 'y');
+        }
+        return $out;
     }
 }
 
@@ -924,10 +1014,19 @@ function replacealttext($plot, $alttext) {
     if ($_SESSION['graphdisp'] == 0) {
         return $alttext;
     } else {
-        if (strpos($plot, 'alt="') !== false) { //replace
-            $plot = preg_replace('/alt="[^"]*"/', 'alt="' . Sanitize::encodeStringForDisplay($alttext) . '"', $plot);
-        } else { //add
-            $plot = preg_replace('/(\/?>)/', ' alt="' . Sanitize::encodeStringForDisplay($alttext) . '" $1', $plot);
+        if (strpos($plot, 'alt="') !== false) { // remove alt attribute because svg will be aria-hidden
+            $plot = preg_replace('/alt="[^"]*"/', 'alt=""', $plot);
+        }
+        if (strpos($plot, 'data-noexplore') === false && empty($GLOBALS['hide-sronly'])) {
+            $plot = str_replace('<embed ', '<embed data-noexplore="1" ', $plot);
+        }
+        // put alt in sr-only
+        if (empty($GLOBALS['hide-sronly'])) {
+            if (strpos($plot,'class="sr-only"') !== false) { // replace
+                $plot = preg_replace('/class="sr-only">.*?<wbr\/><\//', 'class="sr-only">'.$alttext.'<wbr/></', $plot);
+            } else {
+                $plot .= '<div class="sr-only">' . $alttext . '<wbr/></div>';
+            }
         }
         return $plot;
     }
@@ -1054,6 +1153,16 @@ function addfractionaxislabels($plot, $step, $axis = "x") {
         echo "error: bad step size on pilabels";
         return;
     }
+    if (($_SESSION['graphdisp'] ?? 0) == 1) {
+        // SVG: asciisvg's axes() accepts a fraction string for the step, and draws the
+        // ticks and fraction labels itself (not explorable, and used for keyboard steps)
+        $jsstep = (($ispi && $num == 1) ? '' : $num) . ($ispi ? 'pi' : '') . ($den == 1 ? '' : '/' . $den);
+        if ($axis === 'x') {
+            return preg_replace('/axes\([^,]*,/', 'axes("' . $jsstep . '",', $plot, 1);
+        } else {
+            return preg_replace('/axes\(([^,]*),[^,]*,/', 'axes($1,"' . $jsstep . '",', $plot, 1);
+        }
+    }
     $tm = -.02 * $crossrange;
     $tx = .02 * $crossrange;
     $step = ceil($min / $stepn);
@@ -1081,21 +1190,14 @@ function addfractionaxislabels($plot, $step, $axis = "x") {
             $ld = $n;
         }
         
-        if (($_SESSION['graphdisp']??0)==1) {
-            if ($axis === 'x') {
-                $outst .= "line([$av,$tm],[$av,$tx]); textfrac([$av,$tm],\"$ld\",$d,\"below\");";
-            } else if ($axis === 'y') {
-                $outst .= "line([$tm,$av],[$tx,$av]); textfrac([$tm,$av],\"$ld\",$d,\"left\");";
-            }
-        } else {
-            if ($d != 1) {
-                $ld .= "/$d";
-            }
-            if ($axis === 'x') {
-                $outst .= "line([$av,$tm],[$av,$tx]); text([$av,$tm],\"$ld\",\"below\");";
-            } else if ($axis === 'y') {
-                $outst .= "line([$tm,$av],[$tx,$av]); text([$tm,$av],\"$ld\",\"left\");";
-            }
+        // image output
+        if ($d != 1) {
+            $ld .= "/$d";
+        }
+        if ($axis === 'x') {
+            $outst .= "line([$av,$tm],[$av,$tx]); text([$av,$tm],\"$ld\",\"below\");";
+        } else if ($axis === 'y') {
+            $outst .= "line([$tm,$av],[$tx,$av]); text([$tm,$av],\"$ld\",\"left\");";
         }
         $step++;
     }
@@ -1145,7 +1247,7 @@ function connectthedots($xarray, $yarray, $color = 'black', $thick = 1, $startdo
     return $outarr;
 }
 
-function showasciisvg($script, $width = 200, $height = 200, $alt = null) {
+function showasciisvg($script, $width = 200, $height = 200, $alt = null, $explorable = true) {
     if (is_array($width)) {
         echo "second argument to showasciisvg should be an integer, not an array";
         $width = 200;
@@ -1184,15 +1286,18 @@ function showasciisvg($script, $width = 200, $height = 200, $alt = null) {
     }
     $script = str_replace("'", '"', $script);
     $script = Sanitize::encodeStringForDisplay($script);
-    if ($alt === null) {
+    if ($alt === null && (!$explorable || $_SESSION['graphdisp'] == 0)) {
         $alt = "[Graphs generated by this script: $script]";
     }
     if ($_SESSION['graphdisp'] == 0) {
         return $alt;
     }
-    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script' />";
-    if (empty($GLOBALS['hide-sronly'])) {
-        $out .= '<span class="sr-only">' . $alt . '</span>';
+    // $explorable = false: graph is hidden from assistive tech and not keyboard-explorable;
+    // the text alternative in $alt is used instead.
+    $noexp = (!$explorable && empty($GLOBALS['hide-sronly'])) ? " data-noexplore='1'" : '';
+    $out = "<embed type='image/svg+xml' align='middle' width='$width' height='$height' script='$script'$noexp />";
+    if (empty($GLOBALS['hide-sronly']) && !empty($alt)) {
+        $out .= '<div class="sr-only">' . $alt . '<wbr/></div>';
     }
     return $out;
 }

@@ -47,7 +47,6 @@ function diffeq_slopefield($func,$options=[]) {
     }
     $xrnd = max(0,intval(floor(-log10(abs($xmax-$xmin))-1e-12))+5);
 	$yrnd = max(0,intval(floor(-log10(abs($ymax-$ymin))-1e-12))+5);
-    $doalt = ($_SESSION['graphdisp']==0);
 
     $funcparts = explode(',', $func);
     $issystem = (count($funcparts)==2);
@@ -59,7 +58,17 @@ function diffeq_slopefield($func,$options=[]) {
         $vx = 1;
     }
 
-    if ($doalt) {
+    
+    $xs = [];
+    $ys = [];
+    for ($i = 0; $xmin + $i*$dx < $xmax + $dx/2; $i++) { $xs[] = $xmin + $i*$dx; }
+    for ($i = 0; $ymin + $i*$dy < $ymax + $dy/2; $i++) { $ys[] = $ymin + $i*$dy; }
+
+    // The table is only needed when graphs aren't displayed; otherwise the graph is explorable.
+    $explorable = true;
+    $showtable = ($_SESSION['graphdisp']==0);
+    $alt = '';
+    if ($showtable) {
         $alt = '<table class=gridded><caption>';
         if (!empty($caption)) {
             $alt .= $caption;
@@ -69,11 +78,14 @@ function diffeq_slopefield($func,$options=[]) {
             $alt .= _('Slope field. Each cell lists the slope at that point.');
         }
         $alt .= '</caption><thead><tr><th></th>';
-        for ($x = $xmin; $x < $xmax + $dx/2; $x += $dx) {
+        foreach ($xs as $x) {
             $alt .= '<th>'.$vs[0].'='.round($x,$xrnd).'</th>';
         }
         $alt .= '</tr></thead><tbody>';
+    } else {
+        $alt = !empty($caption) ? $caption : ($format == 'vectorfield' ? _('Vector field.') : _('Slope field.'));
     }
+
 
     $out = "setBorder(10);initPicture($xmin,$xmax,$ymin,$ymax);axes($xlbl,$ylbl,$labels,$xgrid,$ygrid);stroke=\"$color\";fill=\"$color\";";
     if ($showarrows) {
@@ -89,65 +101,83 @@ function diffeq_slopefield($func,$options=[]) {
 
     $data = [];
     $maxmag = 0;
-    for ($x = $xmin; $x < $xmax + $dx/2; $x += $dx) {
-        $data[$x] = [];
-        for ($y = $ymin; $y < $ymax + $dy/2; $y += $dy) {
+    foreach ($xs as $xi=>$x) {
+        $data[$xi] = [];
+        foreach ($ys as $yi=>$y) {
             $vy = $yfunc([$vs[0]=>$x, $vs[1]=>$y]);
             if ($issystem) {
                 $vx = $xfunc([$vs[0]=>$x, $vs[1]=>$y]);
             }
             if (!is_finite($vy) || !is_finite($vx)) {
-                $data[$x][$y] = [];
+                $data[$xi][$yi] = [];
             } else {
                 $mag = sqrt($vx*$vx+$vy/$ystretch*$vy/$ystretch);
                 if ($mag > $maxmag) {
                     $maxmag = $mag;
                 }
-                $data[$x][$y] = [$vx,$vy,$mag];
+                $data[$xi][$yi] = [$vx,$vy,$mag];
             }
         }
     }
-    for ($y = $ymin; $y < $ymax + $dy/2; $y += $dy) {
-        if ($doalt) {
+
+    // Pass the grid values (not the equation) so the graph can be explored by keyboard.
+    $jsvals = [];
+    foreach ($ys as $yi=>$y) {
+        $row = [];
+        foreach ($xs as $xi=>$x) {
+            $row[] = empty($data[$xi][$yi]) ? 'null' : '['.round($data[$xi][$yi][0],6).','.round($data[$xi][$yi][1],6).']';
+        }
+        $jsvals[] = '['.implode(',',$row).']';
+    }
+    if ($explorable) {
+        $out .= 'fielddata(['.implode(',',array_map(function($v) use ($xrnd) { return round($v,$xrnd); }, $xs)).'],['.
+            implode(',',array_map(function($v) use ($yrnd) { return round($v,$yrnd); }, $ys)).'],['.
+            implode(',',$jsvals).'],'.($format == 'vectorfield' ? 'true' : 'false').');';
+    }
+
+    foreach ($ys as $yi=>$y) {
+        if ($showtable) {
             $alt .= '<tr><th scope=row>'.$vs[1].'='.round($y,$yrnd).'</th>';
         }
-        for ($x = $xmin; $x < $xmax + $dx/2; $x += $dx) {
-            if (empty($data[$x][$y])) {
-                if ($doalt) {
-                    $alt .= '<td>-</td>';
-                }
+        foreach ($xs as $xi=>$x) {
+            if (empty($data[$xi][$yi])) {
+                if ($showtable) { $alt .= '<td>-</td>'; }
                 continue;
             }
-            list($vx,$vy,$thismag) = $data[$x][$y];
-            if ($doalt) {
+            list($vx,$vy,$thismag) = $data[$xi][$yi];
+            if ($showtable) {
                 if ($format == "vectorfield") {
                     $alt .= '<td>&lang;' . round($vx, 2) .','. round($vy, 2). '&rang;</td>';
                 } else {
                     $alt .= '<td>' . ($vx==0 ? _('undefined') : round($vy/$vx, 2)) . '</td>';
                 }
-            } else {
-                $mag = $norm ? $thismag : $maxmag;
-                if ($mag == 0) { continue; }
-                if ($format == "vectorfield") {
-                    $x0 = round($x, $xrnd);
-                    $x1 = round($x + $vx*$len/$mag, $xrnd);
-                    $y0 = round($y, $yrnd);
-                    $y1 = round($y + $vy*$len/$mag, $yrnd);
-                } else {
-                    $x0 = round($x - 0.5*$vx*$len/$mag, $xrnd);
-                    $x1 = round($x + 0.5*$vx*$len/$mag, $xrnd);
-                    $y0 = round($y - 0.5*$vy*$len/$mag, $yrnd);
-                    $y1 = round($y + 0.5*$vy*$len/$mag, $yrnd);
-                }
-                $out .= "line([$x0,$y0],[$x1,$y1]);";
             }
+            $mag = $norm ? $thismag : $maxmag;
+            if ($mag == 0) { continue; }
+            if ($format == "vectorfield") {
+                $x0 = round($x, $xrnd);
+                $x1 = round($x + $vx*$len/$mag, $xrnd);
+                $y0 = round($y, $yrnd);
+                $y1 = round($y + $vy*$len/$mag, $yrnd);
+            } else {
+                $x0 = round($x - 0.5*$vx*$len/$mag, $xrnd);
+                $x1 = round($x + 0.5*$vx*$len/$mag, $xrnd);
+                $y0 = round($y - 0.5*$vy*$len/$mag, $yrnd);
+                $y1 = round($y + 0.5*$vy*$len/$mag, $yrnd);
+            }
+            $out .= "line([$x0,$y0],[$x1,$y1]);";
         }
     }
-    if ($doalt) {
+    if ($explorable) {
+        $out .= 'fieldend();';
+    }
+    if ($showtable) {
         $alt .= '</tbody></table>';
+    }
+    if ($_SESSION['graphdisp']==0) {
 		return $alt;
 	} else {
-		return "<embed type='image/svg+xml' align='middle' width='$width' height='$height' alt='Graph of slopefield; enable text alternatives in user preferences for more' script='$out' />\n";
+        return showasciisvg($out,$width*1,$height*1,$alt,$explorable);
 	}
 
 }

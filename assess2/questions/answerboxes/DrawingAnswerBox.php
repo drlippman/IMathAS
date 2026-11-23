@@ -259,14 +259,14 @@ class DrawingAnswerBox implements AnswerBox
         if (isset($GLOBALS['hidedrawcontrols'])) {
             $out .= $plot;
         } else {
+            $out .= '<p class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() .
+                (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '') . '</p>';
             if ($_SESSION['userprefs']['drawentry'] == 0) { //accessible entry
                 $def = 0;
                 $a11yinfo = implode(',', $answerformat);
                 if ($_SESSION['graphdisp'] == 0) {
                     $a11yinfo .= ',noprev';
                 }
-                $out .= '<p class="sr-only">' . $this->answerBoxParams->getQuestionIdentifierString() .
-                    (!empty($readerlabel) ? ' ' . Sanitize::encodeStringForDisplay($readerlabel) : '') . '</p>';
                 $out .= '<p>' . _('Graphing window to add drawings to:') . '</p>';
                 if ($_SESSION['graphdisp'] > 0) {
                     $plot = str_replace('<embed', '<embed data-nomag=1', $plot); //hide mag
@@ -636,9 +636,45 @@ class DrawingAnswerBox implements AnswerBox
             $recttext = array();
             $ineqcolors = array("blue", "red", "green");
             $k = 0;
-            foreach ($answers as $ans) {
+            $nlmarkers = [];
+            $nlskip = [];
+            if ($answerformat[0] == 'numberline') {
+                // associate dots/opendots with line segment endpoints, so they display as
+                // segment end markers rather than separate points
+                $nldots = [];
+                $nllines = [];
+                foreach ($answers as $ai => $ans) {
+                    if (is_array($ans) || $ans === '' || substr($ans, 0, 4) == 'alt:') { continue; }
+                    $parts = array_map('trim', explode(',', $ans));
+                    if (count($parts) == 2 || (count($parts) == 3 && ($parts[2] == 'open' || $parts[2] == 'closed'))) {
+                        if (is_numeric($parts[0]) || is_nicenumber($parts[0])) {
+                            $nldots[$ai] = [evalbasic($parts[0], true), (count($parts) == 3 && $parts[2] == 'open') ? 'open' : 'closed'];
+                        }
+                    } else if (count($parts) == 3 && $parts[1] !== '' && $parts[2] !== '') {
+                        $nllines[$ai] = [
+                            ($parts[1] === '-oo') ? null : evalbasic($parts[1], true),
+                            ($parts[2] === 'oo') ? null : evalbasic($parts[2], true)
+                        ];
+                    }
+                }
+                $nltol = ($settings[1] - $settings[0]) / 1000;
+                foreach ($nllines as $li => $ends) {
+                    foreach ([0, 1] as $e) {
+                        if ($ends[$e] === null) { continue; }
+                        foreach ($nldots as $di => $dot) {
+                            if (abs($dot[0] - $ends[$e]) < $nltol) {
+                                $nlmarkers[$li][$e] = $dot[1];
+                                $nlskip[$di] = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach ($answers as $ansidx => $ans) {
                 if (is_array($ans)) {continue;} //shouldn't happen, unless user forgot to set question to multipart
                 if ($ans == '') {continue;}
+                if (isset($nlskip[$ansidx])) {continue;}
                 if (substr($ans,0,4)=='alt:') {
                     $saarr[] = $ans;
                     continue;
@@ -784,6 +820,17 @@ class DrawingAnswerBox implements AnswerBox
                                 }
                             } else {
                                 $saarr[$k] .= ',,';
+                            }
+                            if (!empty($nlmarkers[$ansidx])) {
+                                $mkparts = explode(',', $saarr[$k]);
+                                // indices: 0 expr, 1 color, 2 min, 3 max, 4 start marker, 5 end marker
+                                if (isset($nlmarkers[$ansidx][0]) && empty($mkparts[4])) {
+                                    $mkparts[4] = $nlmarkers[$ansidx][0];
+                                }
+                                if (isset($nlmarkers[$ansidx][1]) && empty($mkparts[5])) {
+                                    $mkparts[5] = $nlmarkers[$ansidx][1];
+                                }
+                                $saarr[$k] = implode(',', $mkparts);
                             }
                             if ($locky == 1) {
                                 $saarr[$k] .= ',3';

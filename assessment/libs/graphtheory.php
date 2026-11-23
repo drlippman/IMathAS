@@ -923,12 +923,12 @@ function graphmaketable($g,$op=array()) {
 		if (!empty($op['colors'][$i])) {
 			$op['labels'][$i] .= ' ('._('color').' '.$op['colors'][$i].')';
 		}
-		$table .= '<th>'.$op['labels'][$i].'</th>';
+		$table .= '<th scope="col">'.$op['labels'][$i].'</th>';
 	}
 	$table .= '</tr></thead><tbody>';
 	for ($i=0; $i<$n; $i++) {
 		$table .= '<tr>';
-		$table .= '<th>'.$op['labels'][$i].'</th>';
+		$table .= '<th scope="row">'.$op['labels'][$i].'</th>';
 		for ($j=0; $j<$n; $j++) {
 			if ($g[$i][$j]==0 && $g[$j][$i]==0) {
 				$table .= '<td>--</td>';
@@ -1202,8 +1202,9 @@ function graphprocessoptions($g,$op) {
 //can get called with graph matrix g, g[i][j] if vertex i has edge to j
 //pos is array where pos[i] = array(x,y) positions for vertices
 function graphdrawit($pos,$g,$op) {
+	$alt = _('Graph with this adjacency table:') . graphmaketable($g, $op);
 	if ($_SESSION['graphdisp'] == 0) {
-		return _('Graph with this adjacency table:') . graphmaketable($g, $op);
+		return $alt;
 	}
 	if (!isset($op['width'])) {$op['width'] = 360;}
 	if (!isset($op['height'])) {$op['height'] = 300;}
@@ -1282,7 +1283,7 @@ function graphdrawit($pos,$g,$op) {
 			}
 		}
 	}
-	return showasciisvg($com,$op['width'],$op['height']);
+	return showasciisvg($com,$op['width'],$op['height'],$alt,false);
 }
 
 //graphcomparecircuits(A,B)
@@ -1714,7 +1715,12 @@ function graphdrawschedule($sc,$w=600,$h=-1,$names=array()) {
 	}
 	$com .= "fontbackground='white';";
 	$cnt = 0;
+	$alt = sprintf(_('Schedule for %d processors, completing at time %s.'), $p, $ct);
+	$alt .= '<table class="stats"><thead><tr><th scope="col">' . _('Processor') . '</th><th scope="col">' . _('Task') . '</th><th scope="col">' . _('Start time') . '</th><th scope="col">' . _('End time') . '</th></tr></thead><tbody>';
 	foreach ($sc as $n=>$tl) {
+		if (count($tl)==0) {
+			$alt .= '<tr><th scope="row">' . ($n+1) . '</th><td colspan="3">' . _('No tasks') . '</td></tr>';
+		}
 		foreach ($tl as $ti) {
 			$col = $colors[$cnt%7]; $cnt++;
 			if (count($names)==0) {
@@ -1722,12 +1728,14 @@ function graphdrawschedule($sc,$w=600,$h=-1,$names=array()) {
 			} else {
 				$tn = $names[$ti[0]];
 			}
+			$alt .= '<tr><th scope="row">' . ($n+1) . '</th><td>' . $tn . '</td><td>' . $ti[1] . '</td><td>' . ($ti[1]+$ti[2]) . '</td></tr>';
 			$com .= "fill='$col';rect([".$ti[1].",".($p-$n-1)."],[".($ti[1]+$ti[2]).",".($p-$n)."]);";
 			$com .= "text([".($ti[1]+.5*$ti[2]).",".($p-$n-.5)."],'$tn');";
 		}
 	}
 
-	return showasciisvg($com,$w,$h);
+	$alt .= '</tbody></table>';
+	return showasciisvg($com,$w,$h,$alt,false);
 }
 
 //graphschedulelayout(g,w,pos,[op])
