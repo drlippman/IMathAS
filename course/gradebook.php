@@ -31,21 +31,12 @@ if ($isteacher || $istutor) {
 	$canviewall = false;
 }
 
+require_once "../includes/gbmode.php";
 if ($canviewall) {
-	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-		$gbmode = $_GET['gbmode'];
-		$_SESSION[$cid.'gbmode'] = $gbmode;
-		if (isset($_GET['setgbmodeonly'])) {
-			echo "DONE";
-			exit;
-		}
-	} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
-	} else {
-		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$gbmode = $stm->fetchColumn(0);
-		$_SESSION[$cid.'gbmode'] = $gbmode;
+	$gbmode = loadGbMode($cid, true, true);
+	if (isset($_GET['gbmode']) && $_GET['gbmode']!='' && isset($_GET['setgbmodeonly'])) {
+		echo "DONE";
+		exit;
 	}
 	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
@@ -88,39 +79,22 @@ if ($canviewall) {
 		$_SESSION[$cid.'catcollapse'] = $overridecollapse;
 	}
 
-	//Gbmode : Links NC Dates
-	/*gbmode is GFEDCBA where
-		G & 1 is  Try to shorten header names
-		F & 1 is  Show Section Column	
-		F & 2 is  Show Code Column
-		F & 4 is  Show Points (0), Percents (4)
-		E & 3 is  Show pics: none (0), small(1), big (2)
-		E & 4 is  Lock headers: 0 locked, 1 unlocked
-		D & 1 is  Total on right (0), left (1)
-		D & 2 is  Average on bottom (0), top (2)
-		D & 4 is  Last login column: hide (0), show (4)
-		C & 1 is  Links show: full (0), summary (1)
-		C & 2 is  Locked: show (0), hide (2)
-		*C & 4 is  Due date column: hide (0), show (4)  * changed to default
-		B % 3 is  NC assignments: show (0), student visible (cntingb not 0) (1), hide all (2)
-		*B & 4 is  Last change column: hide (0), show (4) * changed to default
-		A     is  Show by availability: Past due (0), Past & Available (1), All (2), Past & Attempted (3), Available only (4)
-	*/
-	$shortenheaders = (((floor($gbmode/1000000)%10)&1)==1);
-	$hidesection = (((floor($gbmode/100000)%10)&1)==1);
-	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
-	$showpercents = (((floor($gbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
-	$showpics = ((floor($gbmode/10000)%10)&3) ; //0 none, 1 small, 2 big
-	$headerlockdef = (((floor($gbmode/10000)%10)&4)==0)?0:1 ; //0 locked, 1 unlocked (inverted from $headerslocked)
-	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
-	$avgontop = ((floor($gbmode/1000)%10)&2) ; //0 bottom, 2 top
-	$lastlogin = (((floor($gbmode/1000)%10)&4)==4) ; //0 hide, 2 show last login column
-	$links = ((floor($gbmode/100)%10)&1); //0: view/edit, 1 q breakdown
-	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
-	$includeduedate = true; // (((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
-	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
-	$includelastchange = true; //(((floor($gbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
-	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
+	//Gbmode is a bitfield; see includes/gbmode.php for the layout
+	$shortenheaders = (gbmodeGet($gbmode, 'shortenheaders')==1);
+	$hidesection = (gbmodeGet($gbmode, 'hidesection')==1);
+	$hidecode = (gbmodeGet($gbmode, 'hidecode')==1);
+	$showpercents = gbmodeGet($gbmode, 'showpercents'); //show percents instead of points
+	$showpics = gbmodeGet($gbmode, 'showpics'); //0 none, 1 small, 2 big
+	$headerlockdef = gbmodeGet($gbmode, 'headerunlocked'); //0 locked, 1 unlocked (inverted from $headerslocked)
+	$totonleft = gbmodeGet($gbmode, 'totonleft'); //0 right, 1 left
+	$avgontop = gbmodeGet($gbmode, 'avgontop'); //0 bottom, 1 top
+	$lastlogin = (gbmodeGet($gbmode, 'lastlogin')==1); //show last login column
+	$links = gbmodeGet($gbmode, 'links'); //0: view/edit, 1 q breakdown
+	$hidelocked = gbmodeGet($gbmode, 'hidelocked'); //0: show locked, 1: hide locked
+	$includeduedate = true;
+	$hidenc = gbmodeGet($gbmode, 'hidenc'); //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$includelastchange = true;
+	$availshow = gbmodeGet($gbmode, 'availshow'); //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
 
 	$usefullwidth = false;
 	$headerslocked = false;
@@ -318,6 +292,7 @@ var cid = '.Sanitize::onlyInt($cid).';
 var stu = '.Sanitize::onlyInt($stu).';
 var basesite = "'.$GLOBALS['basesiteurl'] . '/course/gradebook.php";
 var gbmodebase = '.Sanitize::onlyInt($gbmode).';
+var gbfields = '.json_encode(gbmodeJsFields()).';
 var gbmod = {
 	"hidenc": '.Sanitize::onlyInt($hidenc).',
 	"availshow": '.Sanitize::onlyInt($availshow).',
@@ -346,7 +321,7 @@ $placeinhead .= '<style>
  button.prevnext { margin: 0; padding: 2px 6px;}
  </style>';	
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=110126"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/gradebook.js?v=111426"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -1778,7 +1753,7 @@ function gbinstrdisp() {
 			echo '<br/><span class="small">N='.(count($gbt)-2).'</span><br/>';
 			echo "<select id=\"lockedtoggle\" onchange=\"chglockedtoggle()\" aria-label=\""._('Display locked students') ."\">";
 			echo "<option value=0 "; writeHtmlSelected($hidelocked,0); echo ">", _('Show Locked'), "</option>";
-			echo "<option value=2 "; writeHtmlSelected($hidelocked,2); echo ">", _('Hide Locked'), "</option>";
+			echo "<option value=1 "; writeHtmlSelected($hidelocked,1); echo ">", _('Hide Locked'), "</option>";
 			echo "</select>";
 		}
 		echo '</div></th>';

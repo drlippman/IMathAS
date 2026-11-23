@@ -355,9 +355,19 @@ private function importGBsetup() {
 	$db_fields['gbscheme'] = explode(',', $db_fields['gbscheme']);
 	$sets = array();
 	$exarr = array();
+	require_once __DIR__ . '/../includes/gbmode.php';
 	foreach ($db_fields['gbscheme'] as $field) {
 		if (isset($this->data['gbscheme'][$field])) {
 			$sets[] = $field.'=?';
+			if ($field == 'defgbmode') {
+				if (empty($this->data['gbscheme']['gbmodev'])) {
+					//older export file, legacy decimal format
+					$exarr[] = gbmodeFromLegacy($this->data['gbscheme'][$field]);
+				} else {
+					$exarr[] = ((int) $this->data['gbscheme'][$field]) & GBMODE_MASK;
+				}
+				continue;
+			}
 			$exarr[] = $this->data['gbscheme'][$field];
 		}
 	}

@@ -169,7 +169,8 @@
 	 $CFG['AMS']['guesslib'] = true;  //guess library based on where most questions are from
 
 	 //and most of the gradebook settings
-	 $CFG['GBS']['defgbmode'] = 1011;    //default gradebook mode
+	 $CFG['GBS']['gbmode'] = 137;        //default gradebook mode; a bitfield, see includes/gbmode.php
+	                                     //(the old decimal-format $CFG['GBS']['defgbmode'] is still read, and converted)
 	 $CFG['GBS']['orderby'] = 1;         //default gradebook ordering
 	 $CFG['GBS']['lockheader'] = true;   //lock headers?
 

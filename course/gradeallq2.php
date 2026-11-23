@@ -23,16 +23,9 @@
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$stu = $_GET['stu'];
-	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-	$gbmode = $_GET['gbmode'];
-	} else if (isset($_SESSION[$cid.'gbmode'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
-	} else {
-		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$gbmode = $stm->fetchColumn(0);
-	}
-	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	require_once "../includes/gbmode.php";
+	$gbmode = loadGbMode($cid, true, false);
+	$hidelocked = gbmodeGet($gbmode, 'hidelocked'); //0: show locked, 1: hide locked
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	$qid = Sanitize::onlyInt($_GET['qid']);
 	if (isset($_GET['ver'])) {

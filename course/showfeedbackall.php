@@ -17,14 +17,8 @@ if ($isteacher || $istutor) {
 }
 
 if ($canviewall) {
-	if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
-	} else {
-		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$gbmode = $stm->fetchColumn(0);
-		$_SESSION[$cid.'gbmode'] = $gbmode;
-	}
+	require_once "../includes/gbmode.php";
+	$gbmode = loadGbMode($cid, false, true);
 	if (isset($_SESSION[$cid.'catfilter'])) {
 		$catfilter = $_SESSION[$cid.'catfilter'];
 	} else {
@@ -40,8 +34,8 @@ if ($canviewall) {
 		}
 	}
 
-	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
-	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
+	$hidenc = gbmodeGet($gbmode, 'hidenc'); //0: show all, 1 stu visible (cntingb not 0), 2 hide all
+	$availshow = gbmodeGet($gbmode, 'availshow'); //0: past, 1 past&cur, 2 all, 3 past&attempted, 4 current only
 } else {
 	$secfilter = -1;
 	$catfilter = -1;

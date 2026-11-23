@@ -15,15 +15,8 @@
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
 
-	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-		$gbmode = $_GET['gbmode'];
-	} else if (isset($_SESSION[$cid.'gbmode'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
-	} else {
-		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$gbmode = $stm->fetchColumn(0);
-	}
+	require_once "../includes/gbmode.php";
+	$gbmode = loadGbMode($cid, true, false);
 
 	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder,groupsetid,ver,deffeedbacktext,scoresingb FROM imas_assessments WHERE id=:id AND courseid=:cid");
 	$stm->execute(array(':id'=>$aid, ':cid'=>$cid));

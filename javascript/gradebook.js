@@ -24,19 +24,22 @@ function stepstu(dir) {
 	sel.selectedIndex = newidx;
 	chgstu(sel);
 }
+// gbmode is a bitfield; gbfields (defined by the page) maps field name to [shift, mask]
+function gbSetField(gbmode, field, val) {
+	var f = gbfields[field];
+	return (gbmode & ~(f[1] << f[0])) | ((val & f[1]) << f[0]);
+}
 function chggbfilters() {
-	var gbmode = gbmodebase - 10*gbmod.hidenc - 1*gbmod.availshow;
-	gbmode += 10*$("#hidenc").val() + 1*$("#availshow").val();
+	var gbmode = gbSetField(gbmodebase, "hidenc", $("#hidenc").val());
+	gbmode = gbSetField(gbmode, "availshow", $("#availshow").val());
 	window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
 }
 function chglockedtoggle() {
-	var gbmode = gbmodebase - 100*gbmod.hidelocked;
-	gbmode += 100*$("#lockedtoggle").val();
+	var gbmode = gbSetField(gbmodebase, "hidelocked", $("#lockedtoggle").val());
 	window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
 }
 function chglinktoggle() {
-	var gbmode = gbmodebase - 100*gbmod.links;
-	gbmode += 100*$("#linktoggle").val();
+	var gbmode = gbSetField(gbmodebase, "links", $("#linktoggle").val());
 	window.location = basesite+"?cid="+cid+"&stu="+stu+"&gbmode="+gbmode;
 }
 function setupGBpercents() {
@@ -82,9 +85,8 @@ function setupGBpercents() {
 };
 $(function() {
 	$("input[name=links]").on("change",function(e) {
-		var gbmode = gbmodebase - 100*gbmod.links;
 		let val = $(this).val();
-		gbmode += 100*val;
+		var gbmode = gbSetField(gbmodebase, "links", val);
 		$.ajax({
 			url: basesite+"?cid="+cid+"&setgbmodeonly=true&gbmode="+gbmode,
 			type: "GET"
@@ -96,8 +98,7 @@ $(function() {
 	$("input[name=pts]").on("change",function(e) {
 		var val = 1*$(this).val();
 		if (val != gbmod.pts) {
-			var gbmode = gbmodebase - 400000*gbmod.pts;
-			gbmode += 400000*val;
+			var gbmode = gbSetField(gbmodebase, "showpercents", val);
 			if (val == 0) { //show points
 				$("*[data-ptv]").each(function() {
 					$(this).text($(this).attr("data-ptv"))
@@ -119,9 +120,8 @@ $(function() {
 		}
 	});
 	$("input[name=pics]").on("change",function(e) {
-		var gbmode = gbmodebase - 10000*gbmod.showpics;
 		let val = $(this).val();
-		gbmode += 10000*val;
+		var gbmode = gbSetField(gbmodebase, "showpics", val);
 		
 		if (val == 0) {
 			$(".pii-image").hide();
@@ -150,9 +150,8 @@ $(function() {
 		chgnewflag();
 	});
 	$("input[name=hdrs]").on("change",function(e) {
-		var gbmode = gbmodebase - 40000*gbmod.headerlockdef;
 		let val = $(this).val();
-		gbmode += 40000*(1-val); // gbmod is inverted
+		var gbmode = gbSetField(gbmodebase, "headerunlocked", 1-val); // inverted
 		if (val==0) {
 			if ($("body").attr("class").match(/fw\d+/)) {
 				$("body").attr("data-fw", $("body").attr("class").replace(/.*(fw\d+).*/,'$1'));

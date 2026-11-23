@@ -84,18 +84,11 @@
         }
 	}
 
-	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-		$gbmode = $_GET['gbmode'];
-	} else if (isset($_SESSION[$cid.'gbmode'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
-	} else {
-		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$gbmode = $stm->fetchColumn(0);
-	}
-	$hidesection = (((floor($gbmode/100000)%10)&1)==1);
-	$hidecode = (((floor($gbmode/100000)%10)&2)==2);
-	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	require_once "../includes/gbmode.php";
+	$gbmode = loadGbMode($cid, true, false);
+	$hidesection = (gbmodeGet($gbmode, 'hidesection')==1);
+	$hidecode = (gbmodeGet($gbmode, 'hidecode')==1);
+	$hidelocked = gbmodeGet($gbmode, 'hidelocked'); //0: show locked, 1: hide locked
 	$includeduedate = true; //(((floor($gbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
 
 	if (isset($tutorsection) && $tutorsection!='') {

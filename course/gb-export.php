@@ -10,13 +10,8 @@
 		exit;
 	}
 	$canviewall = true;
-	if (isset($_SESSION[$cid.'gbmode'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
-	} else {
-		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$gbmode = $stm->fetchColumn(0);
-	}
+	require_once "../includes/gbmode.php";
+	$gbmode = loadGbMode($cid, false, false);
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];
 	} else {
@@ -128,10 +123,10 @@
 	$secfilter = -1;
 
 	//Gbmode : Links NC Dates
-	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
-	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
-	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
-	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
+	$totonleft = gbmodeGet($gbmode, 'totonleft'); //0 right, 1 left
+	$links = gbmodeGet($gbmode, 'links'); //0: view/edit, 1 q breakdown
+	$hidenc = gbmodeGet($gbmode, 'hidenc'); //0: show all, 1 stu visible (cntingb not 0), 2 hide all
+	$availshow = gbmodeGet($gbmode, 'availshow'); //0: past, 1 past&cur, 2 all, 3 past&attempted, 4 current only
 
 	require_once "gbtable2.php";
 	$includecomments = true;

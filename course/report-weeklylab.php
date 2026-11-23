@@ -49,16 +49,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	$body = _("You need to log in as a teacher to access this page\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
-	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-		$gbmode = $_GET['gbmode'];
-	} else if (isset($_SESSION[$cid.'gbmode'])) {
-		$gbmode =  $_SESSION[$cid.'gbmode'];
-	} else {
-		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$cid));
-		$gbmode = $stm->fetchColumn(0);
-	}
-	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	require_once "../includes/gbmode.php";
+	$gbmode = loadGbMode($cid, true, false);
+	$hidelocked = gbmodeGet($gbmode, 'hidelocked'); //0: show locked, 1: hide locked
 
 	if (isset($_POST['interval'])) {
 		//settings update postback

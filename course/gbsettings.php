@@ -142,13 +142,21 @@
 				}
 			}
 		}
-		$defgbmode = $_POST['gbmode1'] + 10*$_POST['gbmode10'] + 100*($_POST['gbmode100']+$_POST['gbmode200']) + 1000*$_POST['gbmode1000'] + 1000*$_POST['gbmode1002'] + 40000*$_POST['gbmode40000'] + 400000*$_POST['gbmode400000'];
-		if (isset($_POST['gbmode4000'])) {$defgbmode += 4000;}
-		if (isset($_POST['gbmode400'])) {$defgbmode += 400;}
-		if (isset($_POST['gbmode40'])) {$defgbmode += 40;}
-		if (!isset($_POST['gbmode100000'])) {$defgbmode += 100000;}
-		if (!isset($_POST['gbmode200000'])) {$defgbmode += 200000;}
-		if (isset($_POST['gbmode1000000'])) {$defgbmode += 1000000;}
+		require_once "../includes/gbmode.php";
+		$defgbmode = gbmodeEncode([
+			'availshow' => intval($_POST['gbm_availshow'] ?? 1),
+			'hidenc' => intval($_POST['gbm_hidenc'] ?? 2),
+			'links' => intval($_POST['gbm_links'] ?? 0),
+			'hidelocked' => intval($_POST['gbm_hidelocked'] ?? 0),
+			'totonleft' => intval($_POST['gbm_totonleft'] ?? 0),
+			'avgontop' => intval($_POST['gbm_avgontop'] ?? 0),
+			'lastlogin' => isset($_POST['gbm_lastlogin']) ? 1 : 0,
+			'showpercents' => intval($_POST['gbm_showpercents'] ?? 0),
+			'headerunlocked' => intval($_POST['gbm_headerunlocked'] ?? 0),
+			'hidesection' => isset($_POST['gbm_showsection']) ? 0 : 1, //checkboxes are "show"
+			'hidecode' => isset($_POST['gbm_showcode']) ? 0 : 1,
+			'shortenheaders' => isset($_POST['gbm_shortenheaders']) ? 1 : 0,
+		]);
 		$stugbmode = ($_POST['stugbmode1'] ?? 0) + ($_POST['stugbmode2'] ?? 0) + ($_POST['stugbmode4'] ?? 0) + ($_POST['stugbmode8'] ?? 0);
 		$stm = $DBH->prepare("UPDATE imas_gbscheme SET useweights=:useweights,orderby=:orderby,usersort=:usersort,defaultcat=:defaultcat,defgbmode=:defgbmode,stugbmode=:stugbmode,colorize=:colorize WHERE courseid=:courseid");
 		$stm->execute(array(':useweights'=>$useweights, ':orderby'=>$orderby, ':usersort'=>$usersort, ':defaultcat'=>$defaultcat, ':defgbmode'=>$defgbmode, ':stugbmode'=>$stugbmode, ':colorize'=>$_POST['colorize'], ':courseid'=>$cid));
@@ -312,38 +320,20 @@
 	$stm->execute(array(':courseid'=>$cid));
 	list($useweights,$orderby,$defaultcat,$defgbmode,$usersort,$stugbmode,$colorize) = $stm->fetch(PDO::FETCH_NUM);
 
-	/*
-		defgbmode is GFEDCBA where
-		G & 1 is  Try to shorten header names
-		F & 1 is  Show Section Column	
-		F & 2 is  Show Code Column
-		F & 4 is  Show Points (0), Percents (4)
-		E & 3 is  Show pics: none (0), small(1), big (2)
-		E & 4 is  Lock headers: 0 locked, 1 unlocked
-		D & 1 is  Total on right (0), left (1)
-		D & 2 is  Average on bottom (0), top (2)
-		D & 4 is  Last login column: hide (0), show (4)
-		C & 1 is  Links show: full (0), summary (1)
-		C & 2 is  Locked: show (0), hide (2)
-		C & 4 is  Due date column: hide (0), show (4)
-		B % 3 is  NC assignments: show (0), student visible (cntingb not 0) (1), hide all (2)
-		B & 4 is  Last change column: hide (0), show (4)
-		A     is  Show by availability: Past due (0), Past & Available (1), All (2), Past & Attempted (3), Available only (4)
-	*/
-	$shortenheaders = (((floor($defgbmode/1000000)%10)&1)==1);
-	$hidesection = (((floor($defgbmode/100000)%10)&1)==1);
-	$hidecode = (((floor($defgbmode/100000)%10)&2)==2);
-	$showpercents = (((floor($defgbmode/100000)%10)&4)==4)?1:0; //show percents instead of points
-	$headerlockeddef = (((floor($defgbmode/10000)%10)&4)==4)?1:0 ; //0 locked, 1 unlocked
-	$totonleft = ((floor($defgbmode/1000)%10)&1) ; //0 right, 1 left
-	$avgontop = ((floor($defgbmode/1000)%10)&2) ; //0 bottom, 2 top
-	$lastlogin = (((floor($defgbmode/1000)%10)&4)==4) ; //0 hide, 4 show last login column
-	$links = ((floor($defgbmode/100)%10)&1); //0: view/edit, 1 q breakdown
-	$hidelocked = ((floor($defgbmode/100)%10)&2); //0: show 2: hide locked
-	$includeduedate = (((floor($defgbmode/100)%10)&4)==4); //0: hide due date, 4: show due date
-	$hidenc = (floor($defgbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
-	$includelastchange = (((floor($defgbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
-	$availshow = $defgbmode%10; //0: past, 1 past&cur, 2 all, 3 past&attempted, 4 avail only
+	require_once "../includes/gbmode.php";
+	$defgbmode = ((int) $defgbmode) & GBMODE_MASK;
+	$shortenheaders = (gbmodeGet($defgbmode, 'shortenheaders')==1);
+	$hidesection = (gbmodeGet($defgbmode, 'hidesection')==1);
+	$hidecode = (gbmodeGet($defgbmode, 'hidecode')==1);
+	$showpercents = gbmodeGet($defgbmode, 'showpercents'); //show percents instead of points
+	$headerlockeddef = gbmodeGet($defgbmode, 'headerunlocked'); //0 locked, 1 unlocked
+	$totonleft = gbmodeGet($defgbmode, 'totonleft'); //0 right, 1 left
+	$avgontop = gbmodeGet($defgbmode, 'avgontop'); //0 bottom, 1 top
+	$lastlogin = (gbmodeGet($defgbmode, 'lastlogin')==1);
+	$links = gbmodeGet($defgbmode, 'links'); //0: view/edit, 1 q breakdown
+	$hidelocked = gbmodeGet($defgbmode, 'hidelocked'); //0: show, 1: hide locked
+	$hidenc = gbmodeGet($defgbmode, 'hidenc'); //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+	$availshow = gbmodeGet($defgbmode, 'availshow'); //0: past, 1 past&cur, 2 all, 3 past&attempted, 4 avail only
 
 	$colorval = array(0);
 	$colorlabel = array(_("No Color"));
@@ -392,21 +382,21 @@
 		?>
 	</span><br class=form />
 
-	<label for="gbmode40000" class=form><?php echo _('Gradebook headers:'); ?></label>
+	<label for="gbm_headerunlocked" class=form><?php echo _('Gradebook headers:'); ?></label>
 	<span class=formright>
 		<?php
-		writeHtmlSelect("gbmode40000", array(0,1), array(_('Lock Headers'), _('Unlock Headers')), $headerlockeddef);
+		writeHtmlSelect("gbm_headerunlocked", array(0,1), array(_('Lock Headers'), _('Unlock Headers')), $headerlockeddef);
 		?>
 	</span><br class=form />
 
-	<label for="gbmode400000" class=form><?php echo _('Show scores as:'); ?> </label>
+	<label for="gbm_showpercents" class=form><?php echo _('Show scores as:'); ?> </label>
 	<span class=formright>
 		<?php
-		writeHtmlSelect("gbmode400000", array(0,1), array(_('Points'), _('Percents')), $showpercents);
+		writeHtmlSelect("gbm_showpercents", array(0,1), array(_('Points'), _('Percents')), $showpercents);
 		?>
 	</span><br class=form />
 	
-	<label for="gbmode100" class=form><?php echo _('Links show:'); ?></label>
+	<label for="gbm_links" class=form><?php echo _('Links show:'); ?></label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1);
@@ -415,32 +405,32 @@
         } else {
             $orderlabel = array(_('Full View/Edit'),_('Question Breakdown'));
         }
-		writeHtmlSelect("gbmode100", $orderval, $orderlabel, $links);
+		writeHtmlSelect("gbm_links", $orderval, $orderlabel, $links);
 		?>
 	</span><br class=form />
 
-	<label for="gbmode1" class=form><?php echo _('Default show by availability:'); ?> </label>
+	<label for="gbm_availshow" class=form><?php echo _('Default show by availability:'); ?> </label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,3,4,1,2);
 		$orderlabel = array(_('Past Due Items'),_('Past & Attempted Items'),_('Available Items Only'),_('Past & Available Items'),_('All Items'));
-		writeHtmlSelect("gbmode1", $orderval, $orderlabel, $availshow);
+		writeHtmlSelect("gbm_availshow", $orderval, $orderlabel, $availshow);
 		?>
 	</span><br class=form>
 
-	<label for="gbmode10" class=form><?php echo _('Not Counted (NC) items:'); ?> </label>
+	<label for="gbm_hidenc" class=form><?php echo _('Not Counted (NC) items:'); ?> </label>
 	<span class=formright>
 		<?php
 		$orderval = array(0,1,2);
 		$orderlabel = array(_('Show NC items'),_('Show NC items not hidden from students'),_('Hide NC items'));
-		writeHtmlSelect("gbmode10", $orderval, $orderlabel, $hidenc);
+		writeHtmlSelect("gbm_hidenc", $orderval, $orderlabel, $hidenc);
 		?>
 	</span><br class=form>
 
-	<label for="gbmode200" class=form><?php echo _('Locked Students:'); ?></label>
+	<label for="gbm_hidelocked" class=form><?php echo _('Locked Students:'); ?></label>
 	<span class=formright>
 		<?php
-		writeHtmlSelect("gbmode200", array(0,2), array(_('Show'), _('Hide')), $hidelocked);
+		writeHtmlSelect("gbm_hidelocked", array(0,1), array(_('Show'), _('Hide')), $hidelocked);
 		?>
 	</span><br class=form />
 
@@ -449,34 +439,32 @@
 	<?php writeHtmlSelect("colorize",$colorval,$colorlabel,$colorize); ?>
 	</span><br class=form />
 
-	<label for="gbmode1000" class=form><?php echo _('Totals columns show on:'); ?></label>
+	<label for="gbm_totonleft" class=form><?php echo _('Totals columns show on:'); ?></label>
 	<span class=formright>
 		<?php
-		writeHtmlSelect("gbmode1000", array(0,1), array(_('Right'), _('Left')), $totonleft);
+		writeHtmlSelect("gbm_totonleft", array(0,1), array(_('Right'), _('Left')), $totonleft);
 		?>
 	</span><br class=form />
 
-	<label for="gbmode1002" class=form><?php echo _('Average row shows on:'); ?></label>
+	<label for="gbm_avgontop" class=form><?php echo _('Average row shows on:'); ?></label>
 	<span class=formright>
 		<?php
-		writeHtmlSelect("gbmode1002", array(0,2), array(_('Bottom'), _('Top')), $avgontop);
+		writeHtmlSelect("gbm_avgontop", array(0,1), array(_('Bottom'), _('Top')), $avgontop);
 		?>
 	</span><br class=form />
 
 	<span class=form id="detlbl"><?php echo _('Include details:'); ?></span>
 	<span class=formright role=group aria-labelledby=detlbl>
-		<input type="checkbox" name="gbmode100000" value="1" id="secshow" <?php writeHtmlChecked($hidesection,false);?>/><label for="secshow"><?php echo _('Section column (if used)'); ?></label><br/>
-		<input type="checkbox" name="gbmode200000" value="2" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow"><?php echo _('Code column (if used)'); ?></label><br/>
-		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol"><?php echo _('Last Login column'); ?></label><br/>
-			<span style="display:none;"><input type="checkbox" name="gbmode400" value="4" id="duedate" <?php writeHtmlChecked($includeduedate,true);?>/><label for="duedate"><?php echo _('Due Date in column headers, and column in single-student view'); ?></label><br/>
-			<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php writeHtmlChecked($includelastchange,true);?>/><label for="lastchg"><?php echo _('Last Change column in single-student view'); ?></label><br/></span>
-		<input type="checkbox" name="gbmode1000000" value="1" id="shortenhdr" <?php writeHtmlChecked($shortenheaders,true);?>/><label for="shortenhdr"><?php echo _('Try to shorten header names'); ?></label>
+		<input type="checkbox" name="gbm_showsection" value="1" id="secshow" <?php writeHtmlChecked($hidesection,false);?>/><label for="secshow"><?php echo _('Section column (if used)'); ?></label><br/>
+		<input type="checkbox" name="gbm_showcode" value="1" id="codeshow" <?php writeHtmlChecked($hidecode,false);?>/><label for="codeshow"><?php echo _('Code column (if used)'); ?></label><br/>
+		<input type="checkbox" name="gbm_lastlogin" value="1" id="llcol" <?php writeHtmlChecked($lastlogin,true);?>/><label for="llcol"><?php echo _('Last Login column'); ?></label><br/>
+		<input type="checkbox" name="gbm_shortenheaders" value="1" id="shortenhdr" <?php writeHtmlChecked($shortenheaders,true);?>/><label for="shortenhdr"><?php echo _('Try to shorten header names'); ?></label>
 	
 	</span><br class=form />
 
 	<span class="form" id="totlbl"><?php echo _('Totals to show students:'); ?></span>
 	<span class=formright role=group aria-labelledby=totlbl>
-		<input type="checkbox" name="stugbmode1" value="1" id="totshow1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/><label for="totshow1"><?php echo _('Past Due'); ?></label><br/>
+		<input type="checkbox" name="stugbm_availshow" value="1" id="totshow1" <?php writeHtmlChecked(($stugbmode)&1,1);?>/><label for="totshow1"><?php echo _('Past Due'); ?></label><br/>
 		<input type="checkbox" name="stugbmode2" value="2" id="totshow2" <?php writeHtmlChecked(($stugbmode)&2,2);?>/><label for="totshow2"><?php echo _('Past Due and Attempted'); ?></label><br/>
 		<input type="checkbox" name="stugbmode4" value="4" id="totshow4" <?php writeHtmlChecked(($stugbmode)&4,4);?>/><label for="totshow4"><?php echo _('Past Due and Available'); ?></label><br/>
 		<input type="checkbox" name="stugbmode8" value="8" id="totshow8" <?php writeHtmlChecked(($stugbmode)&8,8);?>/><label for="totshow8"><?php echo _('All (including future)'); ?></label><br/>

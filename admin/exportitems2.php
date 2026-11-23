@@ -110,6 +110,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$stm = $DBH->prepare("SELECT ".$db_fields['gbscheme']." FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$row = $stm->fetch(PDO::FETCH_ASSOC);
+		$row['gbmodev'] = 2; //defgbmode is in bitfield format (absent in older exports: legacy decimal format)
 		$output['gbscheme'] = $row;
 	}
 

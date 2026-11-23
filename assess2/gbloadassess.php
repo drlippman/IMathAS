@@ -35,11 +35,10 @@ $viewfull = true;
 if ($isteacher || $istutor) {
   $stm = $DBH->prepare("SELECT defgbmode,usersort FROM imas_gbscheme WHERE courseid=:courseid");
   $stm->execute(array(':courseid'=>$cid));
-  list($gbmode,$usersort) = $stm->fetch(PDO::FETCH_NUM);
-  if (isset($_SESSION[$cid.'gbmode'])) {
-    $gbmode =  $_SESSION[$cid.'gbmode'];
-  } 
-  if (((floor($gbmode/100)%10)&1) == 1) {
+  list($defgbmode,$usersort) = $stm->fetch(PDO::FETCH_NUM);
+  require_once __DIR__ . '/../includes/gbmode.php';
+  $gbmode = loadGbMode($cid, false, false, $defgbmode);
+  if (gbmodeGet($gbmode, 'links') == 1) {
     $viewfull = false;
   }
 }
@@ -330,7 +329,7 @@ if ($isActualTeacher || $istutor) {
 		$query .= " AND istu.section=? ";
         $qarr[] = $secfilter;
 	}
-    $hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+    $hidelocked = gbmodeGet($gbmode, 'hidelocked'); //0: show locked, 1: hide locked
 	if ($hidelocked) {
 		$query .= ' AND istu.locked=0 ';
 	}

@@ -14,18 +14,9 @@ if (isset($_GET['secfilter'])) {
 } else {
 	$secfilter = -1;
 }
-if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-    $gbmode = Sanitize::onlyInt($_GET['gbmode']);
-    $_SESSION[$cid.'gbmode'] = $gbmode;
-} else if (isset($_SESSION[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
-    $gbmode = Sanitize::onlyInt($_SESSION[$cid.'gbmode']);
-} else {
-    $stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-    $stm->execute(array(':courseid'=>$cid));
-    $gbmode = $stm->fetchColumn(0);
-    $_SESSION[$cid.'gbmode'] = $gbmode;
-}
-$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+require_once "../includes/gbmode.php";
+$gbmode = loadGbMode($cid, true, true);
+$hidelocked = gbmodeGet($gbmode, 'hidelocked'); //0: show locked, 1: hide locked
 
 $curBreadcrumb = $breadcrumbbase;
 if (empty($_COOKIE['fromltimenu'])) {
@@ -156,10 +147,10 @@ if ($overwriteBody==1) {
 if ($haslocked) {
     echo '<p>';
     if ($hidelocked) {
-        $newgbmode = $gbmode - 100;
+        $newgbmode = gbmodeSet($gbmode, 'hidelocked', 0);
         echo '<a href="logingrid.php?cid='.$cid.'&gbmode='.$newgbmode.'">'._('Show locked students').'</a>';
     } else {
-        $newgbmode = $gbmode + 100;
+        $newgbmode = gbmodeSet($gbmode, 'hidelocked', 1);
         echo '<a href="logingrid.php?cid='.$cid.'&gbmode='.$newgbmode.'">'._('Hide locked students').'</a>';
     }
     echo '</p>';

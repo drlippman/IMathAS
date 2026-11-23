@@ -146,7 +146,8 @@ if (!empty($createcourse)) {
 		//}
 		$useweights = intval(isset($CFG['GBS']['useweights'])?$CFG['GBS']['useweights']:0);
 		$orderby = intval(isset($CFG['GBS']['orderby'])?$CFG['GBS']['orderby']:0);
-		$defgbmode = intval(isset($CFG['GBS']['defgbmode'])?$CFG['GBS']['defgbmode']:21);
+		require_once __DIR__ . '/includes/gbmode.php';
+		$defgbmode = gbmodeDefault();
 		$usersort = intval(isset($CFG['GBS']['usersort'])?$CFG['GBS']['usersort']:0);
 		$stm = $DBH->prepare("INSERT INTO imas_gbscheme (courseid,useweights,orderby,defgbmode,usersort) VALUES (:courseid, :useweights, :orderby, :defgbmode, :usersort)");
 		$stm->execute(array(':courseid'=>$cid, ':useweights'=>$useweights, ':orderby'=>$orderby, ':defgbmode'=>$defgbmode, ':usersort'=>$usersort));

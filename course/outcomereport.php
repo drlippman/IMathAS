@@ -38,17 +38,9 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$outcomeinfo[$row[0]] = $row[1];
 }
 
-if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-	$gbmode = $_GET['gbmode'];
-	$_SESSION[$cid.'gbmode'] = $gbmode;
-} else if (isset($_SESSION[$cid.'gbmode'])) {
-	$gbmode =  $_SESSION[$cid.'gbmode'];
-} else {
-	$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
-	$stm->execute(array(':courseid'=>$cid));
-	$gbmode = $stm->fetchColumn(0);
-}
-$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+require_once "../includes/gbmode.php";
+$gbmode = loadGbMode($cid, true, true);
+$hidelocked = gbmodeGet($gbmode, 'hidelocked'); //0: show locked, 1: hide locked
 
 
 $outc = array();
@@ -95,7 +87,7 @@ $typesel .= '<option value="1" '.($type==1?'selected="selected"':'').'>'._('Past
 $typesel .= '</select></label> ';
 $typesel .= '<label>'._('Locked students:').' <select id="lockedtoggle" onchange="chglockedtoggle()">';
 $typesel .= "<option value=0 ".($hidelocked==0?'selected':'').">". _('Show Locked'). "</option>";
-$typesel .= "<option value=2 ".($hidelocked==2?'selected':'').">". _('Hide Locked'). "</option>";
+$typesel .= "<option value=1 ".($hidelocked==1?'selected':'').">". _('Hide Locked'). "</option>";
 $typesel .= "</select></label>";
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
@@ -126,7 +118,7 @@ $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 	function chglockedtoggle() {
 		var newval = document.getElementById("lockedtoggle").value;
 		if (newval != '.$hidelocked.') {
-			var newgbmode = '.Sanitize::onlyInt($gbmode).' - 100*'.$hidelocked.' + 100*newval;
+			var newgbmode = (('.Sanitize::onlyInt($gbmode).' & ~64) | (64*newval));
 			window.location = selfaddr+"&gbmode="+newgbmode;
 		}
 	}
