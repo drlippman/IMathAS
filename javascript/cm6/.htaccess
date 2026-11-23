@@ -1,0 +1,6 @@
+# Only the built bundle is public; source, node_modules, package files, README, etc. are not.
+Options -Indexes
+
+RewriteEngine On
+RewriteRule ^dist/codemirror6\.min\.(js|css)$ - [L]
+RewriteRule ^ - [R=404,L]

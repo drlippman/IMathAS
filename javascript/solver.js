@@ -1,6 +1,6 @@
 	   $(function() {
-        controlEditor.setOption("extraKeys", {
-         "Ctrl-M": function(cm) {
+        IMathASCM.addKeys(controlEditor, {
+         "Ctrl-m": function(view) {
           handleSageEvent();
          }
 	    });
@@ -35,7 +35,7 @@
 			handleDragStart(event);
 		});
 		$("#sagetocontrol").on("dragend", function(event) {
-			controlEditor.removeOverlay("answer");
+			IMathASCM.highlightAnswerLines(controlEditor, false);
 		});
 		$("#solverappend").on("click",handleSolverAppend);
 		$("#solverappendalone").on("click",handleSolverAppendAlone);
@@ -102,21 +102,7 @@
 			});
 		});
 
-		//CodeMirror mode to highlight $answer lines during drag
-		CodeMirror.defineMode("answer", function() {
-			return {
-				token: function(stream) {
-					//look for a line containing $answer[...]
-					var tw_pos = stream.string.search(/\$answers?[\[\]0-9\s]*=/i);
-					stream.skipToEnd();
-					if (tw_pos === -1) {
-						stream.skipToEnd();
-						return null;
-					}
-					return "searching";
-			}
-		  };
-		});
+		//$answer lines are highlighted during drag by IMathASCM.highlightAnswerLines
 	});
 	   
 
@@ -140,14 +126,14 @@
 			}*/
 			var sagecommand = '';
 			$("#solverpopup").show()
-				if (controlEditor.somethingSelected()) {
-					var selection=controlEditor.getSelection();
+				var selection = IMathASCM.getSelection(controlEditor);
+				if (selection !== "") {
 					$("#imathastosage").val(selection);
 					var formula_variables = convertMomSageVariables(selection,true);
 					sagecommand=guessSageCommand(formula_variables);
 					//sendSageCommand(sagecommand);
 				}
-			if (controlEditor.getValue().search(/\$answer[\[\]\s0-9]*=/i) > 0) {
+			if (IMathASCM.getValue(controlEditor).search(/\$answer[\[\]\s0-9]*=/i) > 0) {
 				//disable Append button
 				$("#solverappend").prop("disabled", true);
 				$("#solverappend").css("color", "#808080");
@@ -195,13 +181,13 @@
 		//Append output as $answer to Common Control
 		function handleSolverAppend() {
 			handleSolverCopy();
-			controlEditor.setValue(controlEditor.getValue()+"\n$answer = \""+$("#sagetocontrol").val()+"\"");
+			IMathASCM.setValue(controlEditor, IMathASCM.getValue(controlEditor)+"\n$answer = \""+$("#sagetocontrol").val()+"\"");
 		}
 
 		//Append output to Common Control
 		function handleSolverAppendAlone() {
 			handleSolverCopy();
-			controlEditor.setValue(controlEditor.getValue()+"\n"+$("#sagetocontrol").val());
+			IMathASCM.setValue(controlEditor, IMathASCM.getValue(controlEditor)+"\n"+$("#sagetocontrol").val());
 		}
 
 		//Show Solver Input help
@@ -294,6 +280,18 @@
 			}
 		}
 
+		//Build the sage command for a formula, variable list, and operation
+		function buildSageCommand(formula, variables, operation) {
+			var variable_list=variables.join(",");
+			var variablestr=variable_list+"=var(\""+variable_list+"\")";
+			if (operation=="plot") {
+				return variablestr+"\nplot("+formula+", ("+variables[0]+",-10,10))";
+			} else if (operation=="simplify") {
+				return "def fullsimp(expr):return expr.simplify_full().simplify_trig()\n"+variablestr+"\nfullsimp("+formula+")";
+			}
+			return variablestr+"\n"+operation+"( "+formula+" , "+variables[0]+")";
+		}
+
 		//Guess the sage command based on the formula if selected
 		function guessSageCommand(formula_variables) {
 			var formula=formula_variables.formula;
@@ -302,24 +300,20 @@
 				return formula;
 			}
 
-			var variable_list=variables.join(",");
-			sagecommand=variable_list+"=var(\""+variable_list+"\")";
 			var operation=$("#solveroperation").val();
-			if (operation!==undefined && operation != "") {
-				sagecommand=sagecommand+"\n"+operation+"( "+formula+" , "+variables[0]+")";
-			} else if ( formula.indexOf("=")>=0 ) {
-				//if no operation selected and contains =
-				//assume solving for the first symbolic variable
-				sagecommand=sagecommand+"\nsolve( "+formula+" , "+variables[0]+")";
-				$("#solveroperation").val("solve")
-										.trigger("chosen:updated");
-			} else {
-				//start with example of differentiating wrt the first symbolic variable
-				sagecommand=sagecommand+"\ndiff( "+formula+" , "+variables[0]+")";
-				$("#solveroperation").val("diff")
+			if (operation===undefined || operation == "") {
+				if ( formula.indexOf("=")>=0 ) {
+					//if no operation selected and contains =
+					//assume solving for the first symbolic variable
+					operation = "solve";
+				} else {
+					//start with example of differentiating wrt the first symbolic variable
+					operation = "diff";
+				}
+				$("#solveroperation").val(operation)
 										.trigger("chosen:updated");
 			}
-			return sagecommand;
+			return buildSageCommand(formula, variables, operation);
 		}
 
 		//Send command to Sage cell
@@ -353,15 +347,7 @@
 				if (variables===undefined||variables===null||operation===undefined || operation == "") {
 					sagecommand = formula;
 				} else {
-					var variable_list=variables.join(",");
-					var variablestr=variable_list+"=var(\""+variable_list+"\")";
-					if (operation=="plot") {
-						sagecommand=variablestr+"\nplot("+formula+", ("+variables[0]+",-10,10))";
-					} else if (operation=="simplify") {
-						sagecommand="def fullsimp(expr):return expr.simplify_full().simplify_trig()\n"+variablestr+"\nfullsimp("+formula+")";
-					} else {
-						sagecommand=variablestr+"\n"+operation+"( "+formula+" , "+variables[0]+")";
-					}
+					sagecommand=buildSageCommand(formula, variables, operation);
 				}
 				
 				//$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);;
@@ -437,7 +423,7 @@
 
 		function handleDrop(event) {
 			//clear the CodeMirror selection
-			controlEditor.setCursor(controlEditor.getCursor());
+			IMathASCM.collapseSelection(controlEditor);
 			var imathas_dropped = event.originalEvent.dataTransfer.getData("Text");
 			var formula_variables = convertMomSageVariables(imathas_dropped , true);
 			sagecommand=guessSageCommand(formula_variables);
@@ -449,7 +435,7 @@
 
 		function handleDragStart(event) {
 			event.originalEvent.dataTransfer.setData("text", $("#"+event.target.id).text());
-			controlEditor.addOverlay("answer");
+			IMathASCM.highlightAnswerLines(controlEditor, true);
 		}
 
 		var lastsolverpos, solvermousebase;

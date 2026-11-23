@@ -1,0 +1,25 @@
+{
+  "name": "imathas-codemirror6",
+  "version": "0.2.0",
+  "private": true,
+  "description": "CodeMirror 6 build for the IMathAS question editor",
+  "scripts": {
+    "build:js": "esbuild src/index.js --bundle --minify --format=iife --target=es2019 --legal-comments=none --outfile=dist/codemirror6.min.js",
+    "build:css": "esbuild src/codemirror6.css --minify --outfile=dist/codemirror6.min.css",
+    "build": "npm run build:js && npm run build:css",
+    "analyze": "esbuild src/index.js --bundle --minify --format=iife --target=es2019 --analyze --outfile=dist/analyze.tmp.js",
+    "build:dev": "esbuild src/index.js --bundle --sourcemap --format=iife --target=es2019 --outfile=dist/codemirror6.js"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.18.0",
+    "@codemirror/commands": "^6.8.0",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/view": "^6.36.0",
+    "@lezer/highlight": "^1.2.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
