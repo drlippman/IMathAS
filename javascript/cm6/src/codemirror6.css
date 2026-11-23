@@ -25,6 +25,10 @@
 /* CM6's default wrapping (white-space: break-spaces; overflow-wrap: anywhere) makes Chrome on
    Android long-press-select the wrong text.  Use the more conventional wrapping instead. */
 .cm-editor .cm-content.cm-lineWrapping {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.cm-editor .cm-content.cm-lineWrapping .cm-line {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
