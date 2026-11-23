@@ -170,6 +170,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$uid = $line['userid'];
 		if (!isset($st[$uid])) { continue; } //not a student we're reporting on
 		$aid = $line['assessmentid'];
+		if (!isset($assessmentInfo[$aid])) { continue; }
 		$totalAttemptCount++;
     $assessmentInfo[$aid]['attempts']++;
 
@@ -181,7 +182,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$st[$uid]['totalPointsOnAttempted'] += $pts;
 		$st[$uid]['totalPointsPossibleOnAttempted'] += $assessmentInfo[$aid]['possible'];
 		$assessmentInfo[$aid]['totalPointsEarned'] += $pts;
-
+		if ($assessmentInfo[$aid]['possible'] == 0) { continue;}
+		
 		if ($assessmentInfo[$aid]['minscore']!=0 && $useminscore) { //use minscore
 			$minscore = $assessmentInfo[$aid]['minscore'];
 			if (($minscore<10000 && $pts<$minscore) || ($minscore>10000 && $pts<($minscore-10000)/100*$assessmentInfo[$aid]['possible'])) {
@@ -216,6 +218,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		if (!isset($st[$uid])) { continue; } //not a student we're reporting on
 		$aid = $line['assessmentid'];
 		$totalAttemptCount++;
+		if (!isset($assessmentInfo[$aid])) { continue; }
     $assessmentInfo[$aid]['attempts']++;
 
 		//get student scores
@@ -225,6 +228,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$st[$uid]['totalPointsOnAttempted'] += $pts;
 		$st[$uid]['totalPointsPossibleOnAttempted'] += $assessmentInfo[$aid]['possible'];
 		$assessmentInfo[$aid]['totalPointsEarned'] += $pts;
+		if ($assessmentInfo[$aid]['possible'] == 0) { continue;}
 
 		if ($assessmentInfo[$aid]['minscore']!=0 && $useminscore) { //use minscore
 			$minscore = $assessmentInfo[$aid]['minscore'];
