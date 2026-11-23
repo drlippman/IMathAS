@@ -919,7 +919,7 @@
 	$placeinhead .= '</script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=112226"></script>';
 
-	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
+	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=112226\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.cm-editor {font-size: medium;border: 1px solid #ccc;}
 		#ccbox .cm-editor, #qtbox .cm-editor {max-height:600px;}
 		#ccbox .cm-content, #ccbox .cm-gutter, #qtbox .cm-content, #qtbox .cm-gutter {min-height:220px;}
