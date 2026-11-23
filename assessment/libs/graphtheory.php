@@ -21,7 +21,7 @@
 //    position of vertex labels.
 
 global $allowedmacros;
-array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphcircuittostringans","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable","graphgetcriticalpath","graphgetvalence");
+array_push($allowedmacros,"graphspringlayout","graphcirclelayout","graphgridlayout","graphpathlayout","graphcircleladder","graphcircle","graphbipartite","graphgrid","graphrandom","graphrandomgridschedule","graphemptygraph","graphfillmatrix","graphdijkstra","graphbackflow","graphkruskal","graphadjacencytoincidence","graphincidencetoadjacency","graphdrawit","graphdecreasingtimelist","graphcriticaltimelist","graphcircledstar","graphcircledstarlayout","graphmaketable","graphsortededges","graphcircuittoarray","graphcircuittostringans","graphnearestneighbor","graphrepeatednearestneighbor","graphgetedges","graphgettotalcost","graphnestedpolygons","graphmakesymmetric","graphisconnected","graphgetedgesarray","graphsequenceeuleredgedups","graphsequenceishamiltonian","graphshortestpath","graphgetpathlength","graphcomparecircuits","graphlistprocessing","graphscheduletaskinfo","graphschedulecompletion","graphscheduleidle","graphdrawschedule","graphschedulelayout","graphscheduleproctasks","graphschedulemultchoice","graphprereqtable","graphgetcriticalpath","graphgetvalence");
 
 ///graphcircleladder(n,m,[options])
 //draws a circular ladder graph
@@ -226,6 +226,31 @@ function graphemptygraph($n) {
 	return $g;
 }
 
+//graphfillmatrix(g)
+//converts a sparse adjacency matrix (missing rows/entries) into a full
+//n x n matrix, with missing entries set to 0. n is determined by the largest
+//row or column index used.
+function graphfillmatrix($g) {
+	$n = 0;
+	foreach ($g as $i=>$row) {
+		$n = max($n, $i+1);
+		if (is_array($row)) {
+			foreach ($row as $j=>$v) {
+				$n = max($n, $j+1);
+			}
+		}
+	}
+	$out = graphemptygraph($n);
+	foreach ($g as $i=>$row) {
+		if (is_array($row)) {
+			foreach ($row as $j=>$v) {
+				$out[$i][$j] = $v;
+			}
+		}
+	}
+	return $out;
+}
+
 //graphdijkstra(g,[dest])
 //computes dijkstras algorithm on the graph g
 //g is a 2-dimensional matrix
@@ -236,7 +261,8 @@ function graphemptygraph($n) {
 //dist[i] is the shortest dist to end, and
 //next[i] is the vertex next closest to the end
 function graphdijkstra($g,$dest=-1,$op=[]) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$dist = array();
 	$next = array();
 	$eaten = array();
@@ -286,7 +312,8 @@ function graphdijkstra($g,$dest=-1,$op=[]) {
 //graphkruskal(g)
 //return a minimum cost spanning tree graph from graph g
 function graphkruskal($g) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$edgelist = array();
 	$addededges = array();
 	$clusters = array();
@@ -334,7 +361,8 @@ function graphkruskal($g) {
 //returns a hamiltonian circuit graph using repeated nearest neighbor
 //set multi to true to return an array of graphs if found
 function graphrepeatednearestneighbor($g, $multi=false) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$minval = 1e16;
 	for ($i=0; $i<$n; $i++) {
 		list($ng,$v) = graphnearestneighbor($g,$i,true);
@@ -359,7 +387,8 @@ function graphrepeatednearestneighbor($g, $multi=false) {
 //returns a hamiltonian circuit graph using nearest neighbor
 //starting at vertex start
 function graphnearestneighbor($g,$start,$returnweight=false) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$visited = array();
 	$cur = $start;
 	$ng = graphemptygraph($n);
@@ -396,7 +425,8 @@ function graphnearestneighbor($g,$start,$returnweight=false) {
 //graphsortededges(g)
 //returns a hamiltonian circuit graph using sorted edges
 function graphsortededges($g) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$edgelist = array();
 	$addededges = array();
 	$clusters = array();
@@ -451,7 +481,8 @@ function graphsortededges($g) {
 //returns 0 if all edges covered with no dup
 //returns # of dups if covers all edges with duplications
 function graphsequenceeuleredgedups($g,$op,$seq) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
     $seq = trim($seq);
 	if (isset($op['labels']) && $op['labels'] != 'letters') {
 		$lbl = $op['labels'];
@@ -506,7 +537,8 @@ function graphsequenceeuleredgedups($g,$op,$seq) {
 //a hamiltonian circuit on graph g.  options op is needed
 //for labels
 function graphsequenceishamiltonian($g,$op,$seq) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	if ($op['labels'] != 'letters') {
 		$lbl = $op['labels'];
 	} else {
@@ -555,7 +587,8 @@ function graphsequenceishamiltonian($g,$op,$seq) {
 //options needed for vertex labels
 function graphgetpathlength($g,$op,$seq) {
 	$seq = explode(' or ', $seq)[0];
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	if ($op['labels'] != 'letters') {
 		$lbl = $op['labels'];
 	} else {
@@ -628,7 +661,8 @@ function graphcircuittostringans($gs, $lbl='', $start=0) {
 	}
 	$out = array();
 	foreach ($gs as $g) {
-		$n = count($g[0]);
+		$g = graphfillmatrix($g);
+		$n = count($g);
         if (!isset($lbl[$start])) {
             echo "insufficient labels for all vertices";
             continue;
@@ -667,7 +701,8 @@ function graphcircuittostringans($gs, $lbl='', $start=0) {
 //converts graph containing a circuit to an array
 //of vertices in circuit order
 function graphcircuittoarray($g,$start=0) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$order = array($start);
 	$cur = $start;
 	$last = -1;
@@ -697,7 +732,8 @@ function graphgetedges($g,$op) {
 	} else {
 		$lbl = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 	}
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$good = array();
 	$bad = array();
 	for ($i=0; $i<$n; $i++) {
@@ -729,7 +765,8 @@ function graphgetedges($g,$op) {
 //gets array of edges in a graph
 //returns array of edges; each edge is array(startvert,endvert)
 function graphgetedgesarray($g,$op=[]) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$good = array();
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
@@ -753,7 +790,8 @@ function graphgetedgesarray($g,$op=[]) {
 //graphgettotalcost(g)
 //gets total cost of all edges in a graph
 function graphgettotalcost($g) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$totalcost = 0;
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1;$j<$n;$j++) {
@@ -769,7 +807,8 @@ function graphgettotalcost($g) {
 //outputs list where list[i] is array of vertices
 //  that lead to i.  Only intended for digraphs.
 function graphadjacencytoprereqs($g,$op) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$list = array();
 	for ($i=0; $i<$n; $i++) {
 		$list[$i] = array();
@@ -818,7 +857,8 @@ function graphprereqtable($g,$w,$op=array()) {
 //outputs list where list[i] is array of vertices
 //  that i leads to
 function graphadjacencytoincidence($g,$op) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$list = array();
 	for ($i=0; $i<$n; $i++) {
 		$list[$i] = array();
@@ -864,7 +904,8 @@ function graphincidencetoadjacency($list,$op=array()) {
 //if digraph, can use dir:
 //   0: indegree, 1: outdegree, 2: both (default)
 function graphgetvalence($g,$vert,$dir=2) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$cnt = 0;
 	for ($i=0; $i<$n; $i++) {
 		if ($dir==2 && ((isset($g[$i][$vert]) && $g[$i][$vert]>0) || (isset($g[$vert][$i]) && $g[$vert][$i]>0))) {
@@ -881,7 +922,8 @@ function graphgetvalence($g,$vert,$dir=2) {
 //graphmakesymmetric(g)
 //ensures that all edges are bidirectional.
 function graphmakesymmetric($g) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	for ($i=0; $i<$n; $i++) {
 		for ($j=$i+1; $j<$n; $j++) {
 			$m = max($g[$i][$j] ?? 0,$g[$j][$i] ?? 0);
@@ -897,7 +939,8 @@ function graphmakesymmetric($g) {
 //graphisconnected
 //checks if graph is connected
 function graphisconnected($g) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$ng = graphmakesymmetric($g);
 	$inf = 1e16;
 	list($dist,$next) = graphdijkstra($ng);
@@ -912,7 +955,8 @@ function graphisconnected($g) {
 //graphmaketable(g,[op])
 //makes a weights table based on a given graph
 function graphmaketable($g,$op=array()) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$lettersarray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 	if (!isset($op['labels']) || !is_array($op['labels'])) {
 		$op['labels'] = array_slice($lettersarray,0,$n);
@@ -954,7 +998,8 @@ function graphspringlayout($g,$op=array()) {
 	$iterations = 40;
 	$t = 2;
 	$dim = 2;
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$k = sqrt(1/$n);
 	$dt = $t/$iterations;
 	$pos = array();
@@ -1018,7 +1063,8 @@ function graphspringlayout($g,$op=array()) {
 //g is a 2-dimensional upper triangular matrix
 //g[i][j] &gt; 0 if vertexes i and j are connected
 function graphcirclelayout($g,$op=array()) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$dtheta = 2*M_PI/$n;
 	for ($i = 0; $i<$n; $i++) {
 		$pos[$i][0] = 10*cos($dtheta*$i);
@@ -1037,7 +1083,8 @@ function graphcirclelayout($g,$op=array()) {
 //g is a 2-dimensional upper triangular matrix
 //g[i][j] &gt; 0 if vertexes i and j are connected
 function graphcircledstarlayout($g,$op=array()) {
-	$n = count($g[0])-1;
+	$g = graphfillmatrix($g);
+	$n = count($g)-1;
 	$dtheta = 2*M_PI/$n;
 	$pos[0][0] = 0;
 	$pos[0][1] = 0;
@@ -1060,7 +1107,8 @@ function graphcircledstarlayout($g,$op=array()) {
 //g is a 2-dimensional matrix
 //g[i][j] &gt; 0 if vertexes i and j are connected
 function graphgridlayout($g,$op=array()) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	if (isset($op['gridv'])) {
 		$sn = $op['gridv'];
 	} else {
@@ -1083,7 +1131,8 @@ function graphgridlayout($g,$op=array()) {
 //g is a 2-dimensional matrix
 //g[i][j] &gt; 0 if vertexes i and j are connected
 function graphpathlayout($g,$op=array()) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	list($dist,$next) = graphbackflow($g);
 	$maxh = max($dist);
 	$maxv = ceil($n/$maxh);
@@ -1107,7 +1156,8 @@ function graphpathlayout($g,$op=array()) {
 //internal function, not to be used directly
 function graphprocessoptions($g,$op) {
 	global $RND;
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 
 	if (!isset($op['connected'])) {
 		if (!empty($op['tree'])) {
@@ -1501,7 +1551,8 @@ function graphgetkeysweights($w) {
 //dist[i] is the longest dist to end, and
 //next[i] is the vertex next closest to the end
 function graphbackflow($g,$w=array()) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$dist = array();
 	$next = array();
 	$eaten = array();
@@ -1568,7 +1619,8 @@ function graphlistprocessing($g,$t,$L,$p,$op=array()) {
 	for ($i=0;$i<$p;$i++) {
 		$out[$i] = array();
 	}
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$done = array();
 	$started = array();
 	$curtime = 0;
@@ -1744,7 +1796,8 @@ function graphdrawschedule($sc,$w=600,$h=-1,$names=array()) {
 //pos is array where L[task number] = array(column,row (counting up from bottom))
 //use $options['labels'] to specify labels, or T1 - TN will be used
 function graphschedulelayout($g,$w,$pos,$op=array()) {
-	$n = count($g[0]);
+	$g = graphfillmatrix($g);
+	$n = count($g);
 	$op['digraph'] = true;
 	if (!isset($op['width'])) {
 		$op['width'] = 600;
