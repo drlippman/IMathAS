@@ -11,7 +11,7 @@ import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { imathas } from "./imathas-mode.js";
 import { qtext } from "./qtext.js";
 import { highlighting } from "./tags.js";
-import { matchTags, scriptBracketMatching, closeBracketsOnlyInScript, preserveInPre, clickToFocus, answerLines, setAnswerHighlight } from "./extras.js";
+import { matchTags, scriptBracketMatching, closeBracketsOnlyInScript, preserveInPre, answerLines, setAnswerHighlight } from "./extras.js";
 
 EditorView.EDIT_CONTEXT = false;
 
@@ -46,7 +46,6 @@ function fromTextArea(ta, opts) {
     indentUnit.of("  "),
     EditorState.readOnly.of(!!opts.readOnly),
     EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
-    clickToFocus,
     keymap.of([...tabKeys, ...defaultKeymap, ...historyKeymap])
   ];
   if (showNumbers) extensions.push(lineNumbers());

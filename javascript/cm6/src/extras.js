@@ -131,28 +131,6 @@ export const selectedText = ViewPlugin.fromClass(class {
   }
 }, { decorations: v => v.decorations });
 
-/* ---- clicking blank space inside the editor box focuses the editor ---- */
-export const clickToFocus = ViewPlugin.define(view => {
-  const scroller = view.scrollDOM;
-  const onDown = e => {
-    if (e.button !== 0) return;
-    if (e.target !== scroller && e.target !== view.contentDOM) return; // only blank areas
-    if (e.target === scroller) {
-      // ignore clicks on the scrollbars
-      const r = scroller.getBoundingClientRect();
-      if (e.clientX - r.left >= scroller.clientWidth || e.clientY - r.top >= scroller.clientHeight) return;
-      e.preventDefault(); // keep the browser from moving focus elsewhere
-      const pos = view.posAtCoords({ x: e.clientX, y: e.clientY }, false);
-      view.focus();
-      if (pos != null) view.dispatch({ selection: { anchor: pos } });
-    } else if (!view.hasFocus) {
-      view.focus();
-    }
-  };
-  scroller.addEventListener("mousedown", onDown);
-  return { destroy() { scroller.removeEventListener("mousedown", onDown); } };
-});
-
 /* ---- highlight lines that set $answer (used by the solver while dragging) ---- */
 
 export const setAnswerHighlight = StateEffect.define();

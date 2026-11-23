@@ -921,7 +921,9 @@
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=110621\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.cm-editor {font-size: medium;border: 1px solid #ccc;}
-		#ccbox .cm-editor, #qtbox .cm-editor {min-height:220px; max-height:600px;}
+		#ccbox .cm-editor, #qtbox .cm-editor {max-height:600px;}
+		#ccbox .cm-content, #ccbox .cm-gutter, #qtbox .cm-content, #qtbox .cm-gutter {min-height:220px;}
+		
 		.cm-editor { -webkit-text-size-adjust: 100%; }
         .dd-active {background-color: #eef;}
 		#description { width: 98% }
