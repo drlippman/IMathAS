@@ -26,7 +26,7 @@
    Android long-press-select the wrong text.  Use the more conventional wrapping instead. */
 .cm-editor .cm-content.cm-lineWrapping {
   white-space: pre-wrap;
-  word-break: normal;
+  word-break: break-word;
   overflow-wrap: break-word;
 }
 
