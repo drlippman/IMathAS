@@ -46,6 +46,7 @@ function fromTextArea(ta, opts) {
     indentUnit.of("  "),
     EditorState.readOnly.of(!!opts.readOnly),
     EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
+    clickToFocus,
     keymap.of([...tabKeys, ...defaultKeymap, ...historyKeymap])
   ];
   if (showNumbers) extensions.push(lineNumbers());

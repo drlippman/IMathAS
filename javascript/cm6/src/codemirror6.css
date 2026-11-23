@@ -24,7 +24,7 @@
 
 /* CM6's default wrapping (white-space: break-spaces; overflow-wrap: anywhere) makes Chrome on
    Android long-press-select the wrong text.  Use the more conventional wrapping instead. */
-.cm-editor .cm-content.cm-lineWrapping {
+/*.cm-editor .cm-content.cm-lineWrapping {
   word-break: normal;
   overflow-wrap: normal;
 }
@@ -32,7 +32,7 @@
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
-}
+}*/
 
 /* CM6 top-aligns the content inside the scroller, so when page CSS gives .cm-scroller a
    min-height, the empty area below the text isn't part of the editable element and clicking
