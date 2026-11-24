@@ -96,7 +96,7 @@
       paletteWin = editor.windowManager.openUrl({
         title: 'Equation Editor',
         url: fullUrl,
-        width: 660,
+        width: 550,
         height: 500,
         buttons: [
           {
@@ -123,6 +123,16 @@
           paletteWin = null;
         }
       });
+
+      const dlg = document.querySelector('.tox-dialog:last-of-type'); // or the topmost .tox-dialog
+      if (dlg) {
+        dlg.style.resize = 'both';
+        dlg.style.overflow = 'auto';   // resize needs overflow other than visible
+        dlg.style.minWidth = '405px';
+        dlg.style.maxWidth = '900px';
+        dlg.style.minHeight = '415px';
+        dlg.style.maxHeight = '600px';
+      }
     }
 
     // ── handle messages from the palette page ─────────────────────────────
