@@ -8,7 +8,7 @@ if (isset($CFG['hooks']['admin/forms'])) {
 	require_once $CFG['hooks']['admin/forms'];
 }
 
-$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/DatePicker.js\"></script>";
 
 //call hook, if defined

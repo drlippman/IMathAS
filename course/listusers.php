@@ -153,7 +153,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['newstu']) && $CFG['GEN']['allowinstraddstus']) {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Enroll Students')."\n";
 		$pagetitle = _('Enroll a New Student');
-		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 
 		if (isset($_POST['SID'])) {
 			require_once "../includes/newusercommon.php";
@@ -214,7 +214,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	} elseif (isset($_GET['chgstuinfo'])) {
 		$curBreadcrumb .= " <a href=\"listusers.php?cid=$cid\">"._('Roster')."</a> &gt; "._('Change User Info')."\n";
 		$pagetitle = _('Change Student Info');
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 		require_once "../includes/newusercommon.php";
 
 		$uidToUpdate = Sanitize::onlyInt($_GET['uid']);

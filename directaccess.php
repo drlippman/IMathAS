@@ -198,7 +198,7 @@
 		$challenge = bin2hex(random_bytes(16));
 		$_SESSION['challenge'] = $challenge;
         $_SESSION['newuserstart'] = time();
-		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 		if (isset($CFG['locale'])) {
 			$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jqvalidatei18n/messages_'.substr($CFG['locale'],0,2).'.min.js"></script>';
 		}

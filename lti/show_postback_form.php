@@ -76,7 +76,7 @@ function show_postback_form($launch, $db, $err='') {
   $flexwidth = true;
 	$nologo = true;
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js?v=102226\" ></script>";
-  $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+  $placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 
 	require_once "../header.php";
 	echo '<h1>'.sprintf(_('Connecting to %s'),$installname).'</h1>';

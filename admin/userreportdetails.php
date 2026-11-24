@@ -235,7 +235,7 @@ if ($myrights < 100 && (($myspecialrights&32)!=32)) {
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
-$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 $placeinhead .= '<style type="text/css">
 li.unhide {
   display: none;

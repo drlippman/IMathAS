@@ -440,7 +440,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$flexwidth = true;
 		$nologo = true;
-		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 		require_once "header.php";
 		echo '<h1>'.sprintf(_('Connecting to %s'), Sanitize::encodeStringForDisplay($installname)).'</h1>';
 		if (isset($infoerr)) {
@@ -2180,7 +2180,7 @@ if (isset($_GET['launch'])) {
 		//ask for student info
 		$nologo = true;
 		$flexwidth = true;
-		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+		$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.min.js?v=122917"></script><script type="text/javascript" src="'.$staticroot.'/javascript/jquery.validate.a11y.js?v=1"></script>';
 		require_once "header.php";
 		echo '<h1>'.sprintf(_('Connecting to %s'), Sanitize::encodeStringForDisplay($installname)).'</h1>';
 		if (isset($infoerr)) {
