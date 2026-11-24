@@ -53,7 +53,7 @@ function showUserPrefsForm($limited = false) {
 		'useeqed'=>1,
 		'tztype'=>0,
 		'usertheme'=>0,
-		'livepreview'=>1);
+		'livepreview'=>0);
 	if (!$limited) {
 		$prefdescript = array(
 			'mathdisp'=>_('Math Display'),
@@ -136,7 +136,7 @@ function storeUserPrefs() {
 		'useed'=>1,
 		'useeqed'=>1,
 		'usertheme'=>0,
-		'livepreview'=>1);
+		'livepreview'=>0);
 	foreach($prefdefaults as $k=>$v) {
 		$_SESSION['userprefs'][$k] = $_POST[$k];
 		if (isset($CFG['UP'][$k])) {
@@ -290,7 +290,7 @@ function generateuserprefs($uid) {
 		'drawentry'=>1,
 		'useed'=>1,
 		'useeqed'=>1,
-		'livepreview'=>1);
+		'livepreview'=>0);
 
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$stm = $DBH->prepare("SELECT item,value FROM imas_user_prefs WHERE userid=:id");
