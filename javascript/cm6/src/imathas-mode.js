@@ -211,6 +211,8 @@ export const imathasStreamParser = {
   languageData: {
     commentTokens: { line: "//", block: { open: "/*", close: "*/" } },
     indentOnInput: /^\s*[\}\]\)]$/,
+    // treat $ as part of a word so double-click selects the whole $variable
+    wordChars: "$",
     closeBrackets: { brackets: ["(", "[", "{", "'", '"'] }
   }
 };
