@@ -1197,7 +1197,7 @@ if ($overwriteBody==1) {
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs ?? ''); ?>';
 	</script>
-	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js?v=112026"></script>
+	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js?v=112426"></script>
 
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 

@@ -330,12 +330,29 @@ th[aria-sort]::after {
 }
 th[aria-sort="ascending"]::after {
 	content: "\2191";
+	content: "\2191" / "";  /* empty alt text: not read by screen readers */
 }
 th[aria-sort="descending"]::after {
 	content: "\2193";
+	content: "\2193" / "";
 }
 th.tsortable {
 	cursor:pointer;
+}
+th.tsortable button.tsortbtn:not(.sr-only) {
+	background: none;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	font: inherit;
+	color: inherit;
+	text-align: inherit;
+	cursor: pointer;
+}
+/* the th shows the focus ring (via :focus-within), so skip it on the button */
+th.tsortable button.tsortbtn:focus,
+th.tsortable button.tsortbtn:focus-visible {
+	outline: none;
 }
 th.tsortable:focus-within {
 	outline: 2px solid #005fcc;

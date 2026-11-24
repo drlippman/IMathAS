@@ -831,7 +831,7 @@ if ($overwriteBody==1) {
 		window.location = "listusers.php?cid="+cid+"&rmode="+rmode;
 	}
 	</script>
-	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js?v=112026"></script>
+	<script type="text/javascript" src="<?php echo $staticroot ?>/javascript/tablesorter.js?v=112426"></script>
 	<div class="cpmid">
 	<?php
 	echo '<span class="column" style="width:auto;">';

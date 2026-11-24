@@ -165,7 +165,7 @@ if ($isadmin) {
 $curBreadcrumb .= _('LTI Connections');
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
 $placeinhead .= '<script type="text/javascript">
 function removeuserlti(el,id) {
   return removelti(el,"user",id);

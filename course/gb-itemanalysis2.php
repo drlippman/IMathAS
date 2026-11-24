@@ -286,7 +286,7 @@
 	}
 	echo '</p>';
 	//echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
-	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
 	echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
 	echo "<tr><th scope=\"col\"># <span class=\"sr-only\">Question Number</span></th><th scope=\"col\">Question</th><th scope=\"col\">Grade</th>";
 	//echo "<th scope=\"col\">Average Score<br/>All</th>";

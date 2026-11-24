@@ -1670,7 +1670,11 @@ jQuery(document).ready(function($) {
 		var $ancestor = $el.parent();
 		while (parentBg === 'rgba(0, 0, 0, 0)' || parentBg === 'transparent') {
 			$ancestor = $ancestor.parent();
-			if (!$ancestor.length) break;
+			// stop at the document node (parent of <html>), which has no styles
+			if (!$ancestor.length || $ancestor[0].nodeType !== 1) {
+				parentBg = 'Canvas'; // everything was transparent; use page background
+				break;
+			}
 			parentBg = $ancestor.css('background-color');
 		}
 		$el.css('background-color', parentBg);

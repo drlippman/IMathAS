@@ -107,7 +107,7 @@ if (count($reqdates)==0) {
 function htmlHeader() {
 	extract($GLOBALS, EXTR_SKIP | EXTR_REFS);
 
-	$placeinhead = '<script type="text/javascript" src="'.$GLOBALS['staticroot'].'/javascript/tablesorter.js?v=112026"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$GLOBALS['staticroot'].'/javascript/tablesorter.js?v=112426"></script>';
 	$pagetitle = _('New Instructor Accounts');
 	require_once "../header.php";
 	echo '<div class=breadcrumb>';

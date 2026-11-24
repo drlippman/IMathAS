@@ -331,7 +331,7 @@
 		echo '</span></p>';
 	}
 
-    echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
+    echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
     
     
     if ($isteacher || ($istutor && ($tutoredit&1) == 1)) {

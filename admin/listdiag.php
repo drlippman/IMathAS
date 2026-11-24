@@ -87,7 +87,7 @@ if ($myrights<75) {
 $curBreadcrumb .= _('Diagnostics');
 
 /******* begin html output ********/
-$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
+$placeinhead = "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
 $placeinhead .= '<script type="text/javascript">
 $(function() {
   var html = \'<span class="dropdown"><a role="button" tabindex=0 class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$staticroot.'/img/gears.svg" alt="Options"/></a>\';

@@ -86,7 +86,7 @@ switch($_GET['action']) {
 		if ($googlePending) {
 			echo '<p>'._('You signed in with Google. Finish creating your account below - your name and email have been filled in for you.')."</p>\n";
 		}
-		echo "<form id=\"newuserform\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
+		echo "<form id=\"newuserform\" aria-labelledby=\"headerforms\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
         echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form pii-username\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw1\">",_('Choose a password:'),"</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">",_('Confirm password:'),"</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";

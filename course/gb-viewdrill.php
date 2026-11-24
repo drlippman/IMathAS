@@ -98,7 +98,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 }
 $placeinhead = '<script type="text/javascript">function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 $placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}</script>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
 
 $pagetitle = _('Drill Assessment Results');
 require_once "../header.php";

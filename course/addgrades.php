@@ -726,7 +726,7 @@
 			echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
 		}
 		if ($hassection) {
-			echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
+			echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
 		}
 		if ($_GET['grades']=='all') {
 			echo '<button type="button" id="useqa" onclick="togglequickadd(this)">'._("Use Quicksearch Entry").'</button>';

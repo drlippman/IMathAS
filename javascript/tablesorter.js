@@ -136,18 +136,87 @@ Alf Magne Kalleland
 		}
 	}
 
+	// Returns the first line of the header's text (lines are separated by <br>).
 	function getHeaderText(th) {
 		var clone = th.cloneNode(true);
-		var rm = clone.querySelectorAll('select,a,button,input,.sr-only');
+		var rm = clone.querySelectorAll('select,a,button:not(.tsortbtn),input,.sr-only');
 		for (var i=0; i<rm.length; i++) { rm[i].remove(); }
-		return clone.textContent.replace(/\s+/g,' ').trim();
+		var brs = clone.querySelectorAll('br');
+		for (var j=0; j<brs.length; j++) { brs[j].replaceWith('\u0001'); }
+		var lines = clone.textContent.split('\u0001');
+		var out = [];
+		for (var k=0; k<lines.length; k++) {
+			var line = lines[k].replace(/\s+/g,' ').trim();
+			if (line) { out.push(line); }
+		}
+		return out[0] || '';
+	}
+
+	// One shared, hidden description element that all sort buttons point to.
+	// (aria-describedby still uses the text of a hidden element.)
+	function getSortDescId() {
+		var id = 'tsortdesc';
+		if (!document.getElementById(id)) {
+			var d = document.createElement("span");
+			d.id = id;
+			d.hidden = true;
+			d.textContent = _('click to sort');
+			document.body.appendChild(d);
+		}
+		return id;
+	}
+
+	// Puts the first line of the header (leading nodes up to the first <br> or
+	// interactive element) inside a button. If there is no such text, appends
+	// a visually hidden "Sort" button instead.
+	function wrapHeaderText(th) {
+		var interactive = 'a,select,input,button,textarea,label';
+		// Headers may wrap their content, e.g. <th><div><span>Text<br>..
+		// Descend through leading div/span wrappers to where the text is.
+		var c = th;
+		for (;;) {
+			var first = c.firstChild;
+			while (first && first.nodeType === 3 && first.textContent.trim() === '') {
+				first = first.nextSibling;
+			}
+			if (first && first.nodeType === 1 && /^(DIV|SPAN)$/.test(first.tagName) &&
+				!first.classList.contains('sr-only')) {
+				c = first;
+			} else { break; }
+		}
+		var nodes = [];
+		var hasText = false;
+		for (var n = c.firstChild; n; n = n.nextSibling) {
+			if (n.nodeType === 1) {
+				if (n.tagName === 'BR' || n.matches(interactive) ||
+					n.querySelector(interactive + ',br')) { break; }
+				if (n.classList.contains('sr-only')) { continue; }
+			} else if (n.nodeType !== 3) { break; }
+			if (n.textContent.trim() !== '') { hasText = true; }
+			nodes.push(n);
+		}
+		var btn = document.createElement("button");
+		btn.type = "button";
+		btn.className = "tsortbtn";
+		btn.setAttribute("aria-describedby", getSortDescId());
+		if (hasText) {
+			c.insertBefore(btn, nodes[0]);
+			for (var i = 0; i < nodes.length; i++) { btn.appendChild(nodes[i]); }
+		} else {
+			btn.classList.add("sr-only");
+			btn.textContent = _('Sort');
+			th.appendChild(btn);
+		}
 	}
 
 	function sortTable(e)
 	{
-		var el = e.currentTarget;
+		// Delegated from document, so the th itself has no click handler
+		// (screen readers announce elements with handlers as "clickable").
+		var el = e.target.closest ? e.target.closest('th.tsortable') : null;
+		if (!el) return;
 		// don't sort when interacting with controls inside the header
-		if (e.target.closest && e.target.closest('a,select,input,option,label')) return;
+		if (e.target.closest('a,select,input,option,label')) return;
 		if(!tableWidget_okToSort)return;
 		tableWidget_okToSort = false;
 		/* Getting index of current column */
@@ -288,17 +357,11 @@ Alf Magne Kalleland
 		for(var no=0;no<cells.length;no++){
 			if(sortArray[no]){
 				cells[no].classList.add('tsortable');
-				// mouse users click the header; keyboard/screen reader users
-				// use a real (visually hidden) button, whose click bubbles up.
-				// We append it rather than wrapping content, since headers may
-				// contain links/selects and other scripts expect the first child.
-				cells[no].addEventListener("click", sortTable);
-				var hdrtext = getHeaderText(cells[no]);
-				var btn = document.createElement("button");
-				btn.type = "button";
-				btn.className = "sr-only tsortbtn";
-				btn.textContent = hdrtext ? (_('Sort by') + ' ' + hdrtext) : _('Sort');
-				cells[no].appendChild(btn);
+				// mouse users click anywhere in the header (delegated click
+				// handler); keyboard/screen reader users use a real button
+				// holding the first line of the header text, whose click
+				// bubbles up.
+				wrapHeaderText(cells[no]);
 			}
 		}
 		var status = document.createElement("div");
@@ -342,5 +405,6 @@ Alf Magne Kalleland
 
 		tableWidget_tableCounter++;
 	}
+	document.addEventListener("click", sortTable);
 	window.initSortTable = initSortTable;
 })();

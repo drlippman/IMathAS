@@ -172,7 +172,7 @@ function gbinstrdisp() {
 	$hasendmsg = false;
 	$gbt = gbtable();
 	//print_r($gbt);
-	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112026\"></script>\n";
+	echo "<script type=\"text/javascript\" src=\"$staticroot/javascript/tablesorter.js?v=112426\"></script>\n";
 	echo "<div id=\"tbl-container\">";
 	echo "<table class=gb id=myTable><thead><tr>";
 	$n=0;

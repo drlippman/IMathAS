@@ -102,7 +102,7 @@ $from = Sanitize::simpleString($_GET['from'] ?? '');
 // HTML display
 
 $pagetitle = _('Mass Change Prereqs');
-//$placeinhead = '<script type="text/javascript" src="'. $staticroot . '/javascript/tablesorter.js?v=112026"></script>';
+//$placeinhead = '<script type="text/javascript" src="'. $staticroot . '/javascript/tablesorter.js?v=112426"></script>';
 if (!empty($CFG['GEN']['uselocaljs'])) {
 	$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/vue3-4-31.min.js"></script>';
 } else {
