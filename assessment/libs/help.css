@@ -51,6 +51,7 @@ pre {
     border-radius: 8px;
     padding: 10px;
     margin: 0px 20px;
+    white-space: pre-wrap;
 }
 details.example {
     margin-top: 0.25em;
@@ -87,4 +88,7 @@ details.example pre {
 }
 #floating-top-btn:hover {
     text-decoration: underline;
+}
+body {
+    overflow-wrap: anywhere;
 }

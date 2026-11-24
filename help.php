@@ -7,7 +7,7 @@
 <html>
 <head>
 <title><?php echo $installname;?> Help</title>
-<link rel="stylesheet" href="<?php echo $staticroot;?>/assessment/libs/help.css?v=112325" type="text/css" />
+<link rel="stylesheet" href="<?php echo $staticroot;?>/assessment/libs/help.css?v=112426" type="text/css" />
 <link rel="stylesheet" href="<?php echo $staticroot;?>/iconfonts/style.css?v=081316" type="text/css" />
 <link rel="stylesheet" href="<?php echo $staticroot;?>/tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />
 <?php
