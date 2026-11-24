@@ -4,7 +4,7 @@
 	require_once "init_without_validate.php";
 	if (!isset($_GET['bare'])) {
 ?>
-<html>
+<html lang="en">
 <head>
 <title><?php echo $installname;?> Help</title>
 <link rel="stylesheet" href="<?php echo $staticroot;?>/assessment/libs/help.css?v=112426" type="text/css" />
