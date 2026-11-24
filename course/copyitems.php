@@ -497,7 +497,7 @@ if ($overwriteBody==1) {
 //DISPLAY BLOCK FOR selecting calendar items to copy
 ?>
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copycalitems">
-	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
+	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey'] ?? ''); ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
 	<h2>Select Calendar Items to Copy</h2>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
@@ -559,11 +559,11 @@ $excludeAssess = ($sourceUIver > $destUIver);
 	}
 ?>
 	<form id="qform" method=post action="copyitems.php?cid=<?php echo $cid ?>&action=copy" onsubmit="return copyitemsonsubmit();">
-	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey']); ?>">
+	<input type=hidden name=ekey id=ekey value="<?php echo Sanitize::encodeStringForDisplay($_POST['ekey'] ?? ''); ?>">
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($ctc); ?>">
 	<p>What to copy:
 	<?php
-		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.Sanitize::onlyInt($ctc).'">'._('Preview source course').'</a>';}
+		if (empty($_POST['ekey'])) { echo ' <a class="small" target="_blank" href="course.php?cid='.Sanitize::onlyInt($ctc).'">'._('Preview source course').'</a>';}
 	?>
 	<br/>
 	<?php
