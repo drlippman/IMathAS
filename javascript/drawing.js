@@ -380,7 +380,8 @@ function addA11yTarget(canvdata, thisdrawla, imgpath) {
 
 function adda11ydraw(tarnum,initmode,defval) {
 	var thistarg = targets[tarnum];
-	var mode = initmode || document.getElementById("a11ydrawnew"+tarnum).value;
+	var mode = (typeof initmode === 'undefined' || initmode === null || initmode === '')
+		? document.getElementById("a11ydrawnew"+tarnum).value : initmode;
 	var val = defval || "";
     var afgroup = thistarg.afgroup;
     var n = thistarg.el.getElementsByTagName("li").length+1;
@@ -390,7 +391,8 @@ function adda11ydraw(tarnum,initmode,defval) {
     html += thistarg.moderef[mode].descr + '.<br/>';
 	html += '<label><span class="a11ydrawinstr"></span><br/>';
     html += '<input type="text" value="'+val+'" data-n="'+thistarg.moderef[mode].inN+'" ' + disabled;
-    html += 'onblur="imathasDraw.updatea11ydraw(this)"/></label>';
+    html += 'onblur="imathasDraw.updatea11ydraw(this)" ';
+    html += 'onkeydown="if(event.key===\'Enter\'){event.preventDefault();imathasDraw.updatea11ydraw(this,true);}"/></label>';
 	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)"' + disabled + '>';
 	html += _("Remove")+' '+numname+'</button>';
 	var li = $("<li>", {class:"a11ydrawrow", "data-mode":mode}).html(html);
@@ -418,7 +420,7 @@ function changea11ydraw(tarel, tarnum) {
 	$(tarel).closest("li").find(".a11ydrawinstr").text(modedata.input);
 	encodea11ydraw();
 }
-function updatea11ydraw(el) {
+function updatea11ydraw(el, fromEnter) {
 	var qn = parseInt($(el).closest('.a11ydraw').attr("id").substring(8));
     var err = 0;
     var elval = el.value.trim();
@@ -466,13 +468,17 @@ function updatea11ydraw(el) {
     } else {
         el.removeAttribute('aria-invalid');
         el.removeAttribute('aria-describedby');
-        setariastatus("");
+        setariastatus(fromEnter ? _("Graph Updated") : "");
     }
-    
+
 	encodea11ydraw(qn);
 }
 function pixcoordstopointlist(vals,tarnum) {
 	var thistarg = targets[tarnum];
+	if (Array.isArray(vals[0])) {
+		// list of points
+		return vals.map(function(v) { return pixcoordstopointlist(v, tarnum); }).join(",");
+	}
 	var x,y;
 	x = (vals[0] - thistarg.imgborder)/thistarg.pixperx + thistarg.xmin;
 	y = (thistarg.imgheight - vals[1] - thistarg.imgborder)/thistarg.pixpery + thistarg.ymin;
