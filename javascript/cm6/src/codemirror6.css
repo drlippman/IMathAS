@@ -22,11 +22,6 @@
 }
 .cm-editor .cm-scroller { font-family: monospace; line-height: 1.3; }
 
-/* CM6 top-aligns the content inside the scroller, so when page CSS gives .cm-scroller a
-   min-height, the empty area below the text isn't part of the editable element and clicking
-   there doesn't focus the editor.  Stretch the content (and gutters) to fill the scroller. */
-div.cm-editor .cm-scroller { align-items: stretch !important; }
-
 .cm-keyword    { color: var(--cm-c-keyword); }
 .cm-atom       { color: var(--cm-c-atom); }
 .cm-number     { color: var(--cm-c-number); }

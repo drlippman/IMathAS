@@ -986,8 +986,8 @@ $ansfmtlbl = array("none","any fraction","reduced fraction","fraction or decimal
 $useeditor = "text,popuptxt";
 $editorquestionids = "text,popuptxt"; //question editors: uploads stored publicly
 
-$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=111526"></script>';
-$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=111526">';
+$placeinhead = '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=112426b"></script>';
+$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=112426b">';
 $placeinhead .= '<style type="text/css">
   .txted {
     padding-left: 1px;

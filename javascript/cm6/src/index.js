@@ -11,9 +11,27 @@ import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { imathas } from "./imathas-mode.js";
 import { qtext } from "./qtext.js";
 import { highlighting } from "./tags.js";
-import { matchTags, scriptBracketMatching, closeBracketsOnlyInScript, preserveInPre, answerLines, setAnswerHighlight } from "./extras.js";
+import { matchTags, scriptBracketMatching, closeBracketsOnlyInScript, preserveInPre, clickToFocus, answerLines, setAnswerHighlight } from "./extras.js";
 
 EditorView.EDIT_CONTEXT = false;
+
+// Browser extensions (e.g. text-snippet tools) may insert via execCommand("insertHTML") or
+// similar, which the browser parses as HTML; <style>/<script> content is then lost when CM reads
+// the DOM back.  Intercept HTML insertions and insert them as literal text instead: prefer
+// text/plain, falling back to the raw HTML string (the code editor wants source, not rendering).
+const literalHtmlInsert = EditorView.domEventHandlers({
+  beforeinput(e, view) {
+    if (e.inputType !== "insertHTML" || view.state.readOnly) return false;
+    const dt = e.dataTransfer;
+    const text = (dt && (dt.getData("text/plain") || dt.getData("text/html"))) || e.data;
+    if (!text) return false;
+    e.preventDefault();
+    view.dispatch(view.state.replaceSelection(text), {
+      userEvent: "input.paste", scrollIntoView: true
+    });
+    return true;
+  }
+});
 
 // Tab inserts a tab (or indents a selection), Shift-Tab dedents
 const tabKeys = [{
@@ -75,6 +93,8 @@ function fromTextArea(ta, opts) {
   const extensions = [
     history(),
     overwriteExt,
+    literalHtmlInsert,
+    clickToFocus,
     highlighting,
     EditorView.lineWrapping,
     EditorState.tabSize.of(2),

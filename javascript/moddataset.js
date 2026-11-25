@@ -103,25 +103,30 @@ function changea11ytype() {
 		$("#a11yaltwarn").hide();
 	}
 }
+// Resize a CM6 editor by delta px, starting from its current displayed height. The height must
+// be read before the max-height/min-height limits are lifted, or an editor capped by max-height
+// reports its full content height instead.
+function resizeCMEditor(view, delta) {
+	var h = $(view.dom).height();
+	$(view.dom).css("min-height", 0).css("max-height", "none");
+	$(view.dom).find(".cm-scroller").css("min-height", 0).css("max-height", "none");
+	IMathASCM.setSize(view, "100%", Math.max(60, h + delta));
+}
 function incctrlboxsize() {
-	$("#ccbox").find(".cm-editor").css("min-height", 0).css("max-height", "none");
-	IMathASCM.setSize(controlEditor, "100%", $(controlEditor.dom).height() + 28);
+	resizeCMEditor(controlEditor, 28);
 }
 function decctrlboxsize() {
-	$("#ccbox").find(".cm-editor").css("min-height", 0).css("max-height", "none");
-	IMathASCM.setSize(controlEditor, "100%", $(controlEditor.dom).height() - 28);
+	resizeCMEditor(controlEditor, -28);
 }
 function incqtboxsize(id) {
 	if (!editoron) {
-		$("#" + id).parent().find(".cm-scroller").css("min-height", 0).css("max-height", "none");
-		IMathASCM.setSize(qEditor[id], "100%", $(qEditor[id].dom).height() + 28);
+		resizeCMEditor(qEditor[id], 28);
 		document.getElementById(id).rows += 2;
 	}
 }
 function decqtboxsize(id) {
 	if (!editoron) {
-		$("#" + id).parent().find(".cm-scroller").css("min-height", 0).css("max-height", "none");
-		IMathASCM.setSize(qEditor[id], "100%", $(qEditor[id].dom).height() - 28);
+		resizeCMEditor(qEditor[id], -28);
 		document.getElementById(id).rows -= 2;
 	}
 }
@@ -391,4 +396,4 @@ if (FormData){ // Only allow quicksave if FormData object exists
 	$(function() {
 		$(".quickSaveButton, .quickSaveNotice").remove();
 	});
-}
+}

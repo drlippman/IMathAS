@@ -894,8 +894,8 @@
 
 	$useeditor = "noinit";
 	$editorquestionids = "qtext,solution"; //question editors: uploads stored publicly
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=112426"></script>';
-	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=112326">';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=112426b"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=112426b">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
@@ -917,12 +917,12 @@
 	$placeinhead .= 'var canedit = ' . ($canedit ? "true" : "false") . ';';
 
 	$placeinhead .= '</script>';
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=112226"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/moddataset.js?v=112426"></script>';
 
 	$placeinhead .= "<script src=\"$staticroot/javascript/solver.js?ver=112226\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.cm-editor {font-size: medium;border: 1px solid #ccc;}
 		#ccbox .cm-editor, #qtbox .cm-editor {max-height:600px;}
-		#ccbox .cm-content, #ccbox .cm-gutter, #qtbox .cm-content, #qtbox .cm-gutter {min-height:220px;}
+		#ccbox .cm-scroller, #qtbox .cm-scroller {min-height:220px;}
 		
 		.cm-editor { -webkit-text-size-adjust: 100%; }
         .dd-active {background-color: #eef;}
