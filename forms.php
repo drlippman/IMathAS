@@ -88,7 +88,7 @@ switch($_GET['action']) {
 		}
 		echo "<form id=\"newuserform\" aria-labelledby=\"headerforms\" class=limitaftervalidate method=post action=\"actions.php?action=newuser$gb\">\n";
         echo "<span class=form><label for=\"SID\">$longloginprompt:</label></span> <input class=\"form pii-username\" type=\"text\" size=12 id=SID name=SID><BR class=\"form\">\n";
-		echo "<span class=\"form\"><label for=\"pw1\">",_('Choose a password:'),"</label></span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
+		echo "<span class=\"form\"><label for=\"pw1\">",_('Choose a password:'),"</label>",getPasswordHintHtml(),"</span><input class=\"form\" type=\"password\" size=20 id=pw1 name=pw1><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"pw2\">",_('Confirm password:'),"</label></span> <input class=\"form\" type=\"password\" size=20 id=pw2 name=pw2><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"firstname\">",_('Enter First Name:'),"</label></span> <input class=\"form pii-first-name\" type=\"text\" size=20 id=firstname name=firstname autocomplete=\"given-name\" value=\"".($googlePending ? Sanitize::encodeStringForDisplay($googlePending['given_name']) : '')."\"><BR class=\"form\">\n";
 		echo "<span class=\"form\"><label for=\"lastname\">",_('Enter Last Name:'),"</label></span> <input class=\"form pii-last-name\" type=\"text\" size=20 id=lastname name=lastname autocomplete=\"family-name\" value=\"".($googlePending ? Sanitize::encodeStringForDisplay($googlePending['family_name']) : '')."\"><BR class=\"form\">\n";
@@ -260,7 +260,7 @@ switch($_GET['action']) {
         if ($mfa !== '') {
             echo "<span class=form><label for=\"mfa\">",_('Enter 2-factor Authentication code'),":</label></span> <input class=form type=text id=mfa name=mfa size=10 /> <BR class=form>\n";
         }
-		echo "<span class=form><label for=\"pw1\">",_('Enter new password'),":</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
+		echo "<span class=form><label for=\"pw1\">",_('Enter new password'),":</label>",getPasswordHintHtml(),"</span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">",_('Verify new password'),":</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
 
 		showNewUserValidation("pageform",array("oldpw"));
@@ -394,7 +394,7 @@ switch($_GET['action']) {
 		echo '<span class="form">',_('Password'),'</span> ';
         echo '<span class="formright"><label><input type="checkbox" name="dochgpw" id="dochgpw" onclick="togglechgpw(this)" aria-controls="pwinfo" aria-expanded="false"/> ',_('Change Password?'),'</span><br class="form" />';
 		echo '<div style="display:none" id="pwinfo" tabindex="-1">';
-		echo "<span class=form><label for=\"pw1\">",_('Enter new password:'),"</label></span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
+		echo "<span class=form><label for=\"pw1\">",_('Enter new password:'),"</label>",getPasswordHintHtml(),"</span>  <input class=form type=password id=pw1 name=pw1 size=40> <BR class=form>\n";
 		echo "<span class=form><label for=\"pw2\">",_('Verify new password:'),"</label></span>  <input class=form type=password id=pw2 name=pw2 size=40> <BR class=form>\n";
         echo '</div>';
         echo '<span class=form><label for="dochgmfa">'._('2-factor Authentication').'</label></span>';
@@ -853,7 +853,7 @@ switch($_GET['action']) {
 			if (!empty($linkdata['uid'])) {
 				echo '<input type="hidden" name="code" value="'.Sanitize::encodeStringForDisplay($_GET['code']).'"/>';
 				echo '<p>',_('Please select a new password'),':</p>';
-				echo '<p>',_('Enter new password'),':  <input type="password" size="25" id=pw1 name="pw1"/><br/>';
+				echo '<p>',_('Enter new password'),':',getPasswordHintHtml(),'<br/><input type="password" size="25" id=pw1 name="pw1"/><br/>';
 				echo '<p>',_('Verify new password'),':  <input type="password" size="25" id=pw2 name="pw2"/></p>';
 
 				if ($linkdata['recoverylink']) {

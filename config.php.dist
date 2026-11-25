@@ -38,6 +38,8 @@
 	  as requirements for the password
 	$CFG['acct']['passwordFormaterror'] = a custom error message to display if the
 		password does not match the requirement.
+	$CFG['acct']['passwordreqs'] = optional text displayed in small type below
+		new password entry fields (e.g. describing password requirements)
 	$CFG['acct']['emailFormat'] = a single regex string or array of regexs
 	  as requirements for the email
 	$CFG['acct']['emailFormaterror'] = a custom error message to display if the

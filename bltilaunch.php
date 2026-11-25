@@ -520,13 +520,13 @@ if (isset($_GET['launch'])) {
 			if ($allow_acctcreation) {
 				echo "<p>".sprintf(_("If you do not already have an account on %s, provide the information below to create an account and enable automated signon from %s"),$installname,Sanitize::encodeStringForDisplay($ltiorgname))."</p>";
                 echo "<span class=form><label for=\"SID\">".Sanitize::encodeStringForDisplay($longloginprompt).":</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
-				echo "<span class=form><label for=\"pw1\">"._("Choose a password:")."</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
+				require_once __DIR__.'/includes/newusercommon.php';
+				echo "<span class=form><label for=\"pw1\">"._("Choose a password:")."</label>".getPasswordHintHtml()."</span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 				echo "<span class=form><label for=\"pw2\">"._("Confirm password:")."</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
 				echo "<span class=form><label for=\"firstname\">"._("Enter First Name:")."</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deffirst)."\" size=20 id=firstname name=firstname autocomplete=\"given-name\"><BR class=form>\n";
 				echo "<span class=form><label for=\"lastname\">"._("Enter Last Name:")."</label></span> <input class=form type=text value=\"".Sanitize::encodeStringForDisplay($deflast)."\" size=20 id=lastname name=lastname autocomplete=\"family-name\"><BR class=form>\n";
 				echo "<span class=form><label for=\"email\">"._("Enter E-mail address:")."</label></span>  <input class=form type=email value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email autocomplete=\"email\"><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">"._("Notify me by email when I receive a new message:")."</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
-				require_once __DIR__.'/includes/newusercommon.php';
 				$needTOS = ($ltirole=='learner' && studentTOSRequired());
 				if ($needTOS) {
 					echo getStudentTOSAgreeRow();
@@ -2263,13 +2263,13 @@ if (isset($_GET['launch'])) {
 				echo "<p>If you do not already have an account on $installname, provide the information below to create an account ";
 				echo "and enable automated signon from ".Sanitize::encodeStringForDisplay($ltiorgname)."</p>";
 				echo "<span class=form><label for=\"SID\">".Sanitize::encodeStringForDisplay($longloginprompt).":</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>\n";
-				echo "<span class=form><label for=\"pw1\">Choose a password:</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
+				require_once __DIR__.'/includes/newusercommon.php';
+				echo "<span class=form><label for=\"pw1\">Choose a password:</label>".getPasswordHintHtml()."</span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>\n";
 				echo "<span class=form><label for=\"pw2\">Confirm password:</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>\n";
 				echo "<span class=form><label for=\"firstname\">Enter First Name:</label></span> <input class=form type=text autocomplete=\"given-name\" value=\"".Sanitize::encodeStringForDisplay($deffirst)."\" size=20 id=firstnam name=firstname><BR class=form>\n";
 				echo "<span class=form><label for=\"lastname\">Enter Last Name:</label></span> <input class=form type=text autocomplete=\"family-name\" value=\"".Sanitize::encodeStringForDisplay($deflast)."\" size=20 id=lastname name=lastname><BR class=form>\n";
 				echo "<span class=form><label for=\"email\">Enter E-mail address:</label></span>  <input class=form type=email autocomplete=\"email\" value=\"".Sanitize::encodeStringForDisplay($defemail)."\" size=60 id=email name=email><BR class=form>\n";
 				echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><input class=floatleft type=checkbox id=msgnot name=msgnot /><BR class=form>\n";
-				require_once __DIR__.'/includes/newusercommon.php';
 				$needTOS = ($ltirole=='learner' && studentTOSRequired());
 				if ($needTOS) {
 					echo getStudentTOSAgreeRow();

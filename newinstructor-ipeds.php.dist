@@ -382,7 +382,7 @@ $_SESSION['challenge'] = uniqid();
         <input id=SID name=SID value="<?php echo Sanitize::encodeStringForDisplay($SID);?>" size=40 />
     </span><br class=form>
 
-    <span class=form><label for=pw1>Password:</label></span>
+    <span class=form><label for=pw1>Password:</label><?php echo getPasswordHintHtml(); ?></span>
     <span class=formright><input type=password id=pw1 name=pw1 size=40 /></span><br class=form>
 
     <span class=form><label for=pw2>Reenter Password:</label></span>

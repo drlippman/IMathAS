@@ -97,7 +97,8 @@ function show_postback_form($launch, $db, $err='') {
     if ($promptForAcctCreation) {
       echo '<p>'.sprintf(_('If you do not already have an account on %s, provide the information below to create an account and enable automated signon'),$installname).'</p>';
       echo '<span class=form><label for="SID">'.Sanitize::encodeStringForDisplay($GLOBALS['longloginprompt']).':</label></span> <input class=form type=text size=12 id=SID name=SID><BR class=form>';
-      echo '<span class=form><label for="pw1">'._('Choose a password').':</label></span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>';
+      require_once __DIR__.'/../includes/newusercommon.php';
+      echo '<span class=form><label for="pw1">'._('Choose a password').':</label>'.getPasswordHintHtml().'</span><input class=form type=password size=20 id=pw1 name=pw1><BR class=form>';
       echo '<span class=form><label for="pw2">'._('Confirm password').':</label></span> <input class=form type=password size=20 id=pw2 name=pw2><BR class=form>';
       echo '<span class=form><label for="firstname">'._('Enter First Name').':</label></span> <input class=form type=text autocomplete="given-name" value="'.Sanitize::encodeStringForDisplay($deffirst).'" size=20 id=firstname name=firstname><BR class=form>';
       echo '<span class=form><label for="lastname">'._('Enter Last Name').':</label></span> <input class=form type=text autocomplete="family-name" value="'.Sanitize::encodeStringForDisplay($deflast).'" size=20 id=lastname name=lastname><BR class=form>';
@@ -116,7 +117,6 @@ function show_postback_form($launch, $db, $err='') {
         echo getStudentTOSAgreeRow();
       }
       echo '<div class=submit><button type=submit>'._('Create Account').'</button></div>';
-      require_once __DIR__.'/../includes/newusercommon.php';
       $requiredrules = array(
         'curSID'=>'{depends: function(element) {return $("#SID").val()==""}}',
         'curPW'=>'{depends: function(element) {return $("#SID").val()==""}}',

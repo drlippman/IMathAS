@@ -258,3 +258,16 @@ function checkNewUserValidation($required = array('SID','firstname','lastname','
     return '<p>'.implode('</p><p>', $errors).'</p>';
   }
 }
+
+/**
+ * Returns small-text HTML (with leading line break, for placing inside the
+ * label span) for the optional $CFG['acct']['passwordreqs'], or an empty
+ * string if not set. Display below new-password labels.
+ */
+function getPasswordHintHtml() {
+	global $CFG;
+	if (empty($CFG['acct']['passwordreqs'])) {
+		return '';
+	}
+	return '<br><span class="small grey">' . Sanitize::encodeStringForDisplay($CFG['acct']['passwordreqs']) . '</span>';
+}

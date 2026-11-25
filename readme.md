@@ -140,6 +140,7 @@ These provide additional validation options beyond `$loginformat`.
 - `$CFG['acct']['emailFormat']`:  A regular expression to check email addresses with
 - `$CFG['acct']['passwordMinlength']`:  Minimum password length.  Defaults to 6.
 - `$CFG['acct']['passwordFormat']`:  A regular expression or array of regexs to check the password against.  If an array is given, _all_ regexes must match against the password.
+- `$CFG['acct']['passwordreqs']`: A message to display on select password pages describing the password requirements.
 - `$CFG['acct']['importLoginformat']`:  If set, this regular expression replaces `$loginformat` when using the  "import students from file" option.
 - `$CFG['acct']['SIDformaterror']`: A message to display if the username/SID has invalid format.
 - `$CFG['acct']['passwordFormaterror']`: A message to display if the password has invalid format.
