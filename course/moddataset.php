@@ -894,7 +894,7 @@
 
 	$useeditor = "noinit";
 	$editorquestionids = "qtext,solution"; //question editors: uploads stored publicly
-	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=112426b"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.js?v=112526"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$staticroot.'/javascript/cm6/dist/codemirror6.min.css?v=112426b">';
 
 	//$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
@@ -1143,7 +1143,7 @@ if ($olnames !== '') {
 	echo ' | <a href="modtutorialq.php?'.Sanitize::encodeStringForDisplay($_SERVER['QUERY_STRING']).'">'._('Tutorial Style editor').'</a>';
 }?>
 </p>
-<div id=ccbox>
+<div id=ccbox class="skipmathrender">
 <label for=control><?php echo _('Common Control'); ?></label>: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
 <input type=button id="solveropenbutton" value="Solver">
 <button type="submit"><?php echo _("Save"); ?></button>
@@ -1155,7 +1155,7 @@ if ($olnames !== '') {
 </div>
 
 
-<div id=qtbox>
+<div id=qtbox class="skipmathrender">
 <label for=qtext><?php echo _('Question Text'); ?></label>: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
 <button type="button" onclick="toggleeditor('qtext')" ><?php echo _("Toggle Editor"); ?></button>
 <button type="submit"><?php echo _("Save"); ?></button>
@@ -1169,9 +1169,9 @@ if ($olnames !== '') {
 <?php
 if ($line['solution']=='') {
 	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();initsolneditor();return false;">'._('Add a detailed solution').'</a></p>';
-	echo '<div id="solutionwrapper" style="display:none;">';
+	echo '<div id="solutionwrapper" class="skipmathrender" style="display:none;">';
 } else {
-	echo '<div id="solutionwrapper">';
+	echo '<div id="solutionwrapper" class="skipmathrender">';
 }
 ?>
 <label for="solution"><?php echo _('Detailed Solution:'); ?></label>
